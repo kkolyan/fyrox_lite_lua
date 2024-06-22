@@ -1,0 +1,15 @@
+
+[package]
+name = "game_dylib"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+fyrox_no_lua = { path = "../game", default-features = false }
+
+[features]
+default = ["fyrox_no_lua/default"]
+dylib-engine = ["fyrox_no_lua/dylib-engine"]

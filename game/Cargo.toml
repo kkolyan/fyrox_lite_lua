@@ -1,0 +1,12 @@
+
+[package]
+name = "fyrox_no_lua"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fyrox = {workspace = true}
+
+[features]
+default = ["fyrox/default"]
+dylib-engine = ["fyrox/dylib"]

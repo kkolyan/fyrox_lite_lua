@@ -1,0 +1,12 @@
+[package]
+name = "executor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fyrox = { workspace = true }
+fyrox_no_lua = { path = "../game", optional = true }
+
+[features]
+default = ["fyrox_no_lua"]
+dylib = ["fyrox/dylib"]
