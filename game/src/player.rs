@@ -1,47 +1,27 @@
 //! Game project.
 use fyrox::asset::Resource;
-use fyrox::core::algebra::{Matrix3, Rotation3, Unit, UnitQuaternion, UnitVector3};
-use fyrox::core::futures::executor::block_on;
-use fyrox::core::log::Log;
+use fyrox::core::algebra::{Rotation3, UnitQuaternion};
 use fyrox::core::num_traits::Zero;
 use fyrox::core::ComponentProvider;
-use fyrox::event::{DeviceEvent, KeyEvent, MouseButton};
-use fyrox::graph::SceneGraph;
-use fyrox::resource::model::{Model, ModelResourceExtension};
-use fyrox::scene::collider::Collider;
-use fyrox::scene::rigidbody::RigidBody;
+use fyrox::event::{DeviceEvent, MouseButton};
+use fyrox::resource::model::Model;
 use fyrox::{
     core::{
-        algebra::{Vector2, Vector3},
-        pool::Handle,
-        reflect::prelude::*,
-        type_traits::prelude::*,
-        visitor::prelude::*,
-        TypeUuidProvider,
+        algebra::Vector3, pool::Handle, reflect::prelude::*, type_traits::prelude::*,
+        visitor::prelude::*, TypeUuidProvider,
     },
-    engine::GraphicsContext,
     event::{ElementState, Event, WindowEvent},
-    gui::{
-        button::ButtonMessage,
-        message::{MessageDirection, UiMessage},
-        text::TextMessage,
-        widget::WidgetMessage,
-        UiNode, UserInterface,
-    },
     keyboard::{KeyCode, PhysicalKey},
-    plugin::{Plugin, PluginContext, PluginRegistrationContext},
-    scene::{animation::spritesheet::SpriteSheetAnimation, node::Node, Scene},
+    scene::node::Node,
     script::{ScriptContext, ScriptTrait},
 };
 use std::f32::consts::PI;
 use std::ops::Mul;
-use std::path::Path;
 
-use crate::bullet::{Bullet, BulletHit, BulletParams, BulletSeed};
-use crate::fyrox_utils::{self, HandleNodeExt};
+use crate::bullet::{Bullet, BulletHit, BulletSeed};
+use crate::fyrox_utils::HandleNodeExt;
 use crate::game::Game;
 use crate::transient::Transient;
-use fyrox::graph::BaseSceneGraph;
 
 #[derive(Visit, Reflect, Debug, Clone, TypeUuidProvider, ComponentProvider, Default)]
 #[type_uuid(id = "c5671d19-9f1a-4286-8486-add4ebaadaec")]
@@ -103,19 +83,18 @@ impl Player {
         let rot = camera_global_transform.fixed_view::<3, 3>(0, 0);
         let bullet_orientation = UnitQuaternion::from_matrix(&rot.into());
 
-        let prefab = self
-            .bullet
-            .as_ref()
-            .unwrap()
-            .clone();
-        Bullet::spawn(ctx.scene, BulletSeed {
-            prefab,
-            origin: camera_pos,
-            direction: bullet_orientation.transform_vector(&Vector3::z_axis()),
-            initial_velocity: self.initial_bullet_velocity,
-            author_collider: self.collider,
-            range: self.shooting_range,
-        });
+        let prefab = self.bullet.as_ref().unwrap().clone();
+        Bullet::spawn(
+            ctx.scene,
+            BulletSeed {
+                prefab,
+                origin: camera_pos,
+                direction: bullet_orientation.transform_vector(&Vector3::z_axis()),
+                initial_velocity: self.initial_bullet_velocity,
+                author_collider: self.collider,
+                range: self.shooting_range,
+            },
+        );
         println!("bullet spawned");
     }
 }
@@ -128,7 +107,9 @@ impl ScriptTrait for Player {
             .window
             .set_cursor_grab(fyrox::window::CursorGrabMode::Confined);
 
-        self.collider = ctx.handle.try_get_collider(ctx.scene)
+        self.collider = ctx
+            .handle
+            .try_get_collider(ctx.scene)
             .expect("Collider not found under Player node");
     }
 
@@ -188,7 +169,9 @@ impl ScriptTrait for Player {
             .clone();
         let move_delta = self_rotation.transform_vector(&move_delta);
         let force = move_delta * self.power;
-        ctx.scene.graph[ctx.handle].as_rigid_body_mut().apply_force(force);
+        ctx.scene.graph[ctx.handle]
+            .as_rigid_body_mut()
+            .apply_force(force);
     }
 
     fn on_os_event(&mut self, event: &Event<()>, ctx: &mut ScriptContext) {

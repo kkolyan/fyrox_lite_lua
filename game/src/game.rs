@@ -1,46 +1,24 @@
 //! Game project.
 use fyrox::core::color::Color;
-use fyrox::graph::SceneGraph;
-use fyrox::gui::text::{Text, TextBuilder};
+use fyrox::gui::brush::Brush;
+use fyrox::gui::text::TextBuilder;
 use fyrox::gui::widget::WidgetBuilder;
 pub use fyrox::plugin::Plugin;
-use fyrox::{core::ComponentProvider, gui::brush::Brush};
 use fyrox::{
     core::{
-        algebra::{Vector2, Vector3},
-        pool::Handle,
-        reflect::prelude::*,
-        type_traits::prelude::*,
-        visitor::prelude::*,
-        TypeUuidProvider,
+        algebra::Vector3, pool::Handle, reflect::prelude::*, visitor::prelude::*, TypeUuidProvider,
     },
-    engine::GraphicsContext,
-    event::{ElementState, Event, WindowEvent},
-    gui::{
-        button::ButtonMessage,
-        message::{MessageDirection, UiMessage},
-        text::TextMessage,
-        widget::WidgetMessage,
-        UiNode, UserInterface,
-    },
-    keyboard::{KeyCode, PhysicalKey},
+    gui::{message::MessageDirection, text::TextMessage, UiNode},
     plugin::{PluginContext, PluginRegistrationContext},
-    scene::{
-        animation::spritesheet::SpriteSheetAnimation,
-        dim2::{rectangle::Rectangle, rigidbody::RigidBody},
-        node::Node,
-        Scene,
-    },
-    script::{ScriptContext, ScriptTrait},
+    scene::node::Node,
+    script::ScriptTrait,
 };
-use std::path::Path;
 
 use crate::beacon::Beacon;
 use crate::bullet::Bullet;
 use crate::guard::Guard;
 use crate::guard_chief::GuardChief;
 use crate::player::Player;
-use crate::transient::Transient;
 
 #[derive(Visit, Reflect, Debug, Default)]
 pub struct Game {

@@ -3,7 +3,7 @@ Rudimental Game made with Fyrox Engine.
 
 # How to run
 ```sh
-cargo run --package executor
+cargo run -p executor
 ```
 
 # How to play

@@ -1,48 +1,20 @@
 //! Game project.
 use fyrox::asset::Resource;
-use fyrox::core::algebra::{Point3, Rotation3, Unit, UnitQuaternion, UnitVector3};
-use fyrox::core::log::Log;
-use fyrox::core::math::Matrix4Ext;
-use fyrox::core::num_traits::Zero;
+use fyrox::core::algebra::{Point3, UnitQuaternion};
 use fyrox::core::ComponentProvider;
-use fyrox::event::{DeviceEvent, KeyEvent};
 use fyrox::graph::BaseSceneGraph;
-use fyrox::graph::SceneGraph;
 use fyrox::resource::model::{Model, ModelResourceExtension};
 use fyrox::scene::graph::physics::RayCastOptions;
-use fyrox::scene::rigidbody::RigidBody;
 use fyrox::script::RoutingStrategy;
 use fyrox::{
     core::{
-        algebra::{Vector2, Vector3},
-        pool::Handle,
-        reflect::prelude::*,
-        type_traits::prelude::*,
-        visitor::prelude::*,
-        TypeUuidProvider,
+        algebra::Vector3, pool::Handle, reflect::prelude::*, type_traits::prelude::*,
+        visitor::prelude::*, TypeUuidProvider,
     },
-    engine::GraphicsContext,
-    event::{ElementState, Event, WindowEvent},
-    gui::{
-        button::ButtonMessage,
-        message::{MessageDirection, UiMessage},
-        text::TextMessage,
-        widget::WidgetMessage,
-        UiNode, UserInterface,
-    },
-    keyboard::{KeyCode, PhysicalKey},
-    plugin::{Plugin, PluginContext, PluginRegistrationContext},
-    scene::{animation::spritesheet::SpriteSheetAnimation, node::Node, Scene},
+    scene::{node::Node, Scene},
     script::{ScriptContext, ScriptTrait},
 };
-use std::f32::consts::PI;
-use std::ops::{Add, Mul};
-use std::path::Path;
-use std::sync::atomic::{AtomicI64, Ordering};
-
-use crate::fyrox_utils::print_ancestors;
-use crate::guard::Guard;
-use crate::transient::Transient;
+use std::ops::Add;
 
 #[derive(Visit, Reflect, Debug, Clone, TypeUuidProvider, ComponentProvider, Default)]
 #[type_uuid(id = "12371d19-9f1a-4286-8486-add4ebaadaec")]
@@ -70,16 +42,11 @@ pub struct BulletSeed {
 impl Bullet {
     pub fn spawn(scene: &mut Scene, seed: BulletSeed) {
         let orientation = UnitQuaternion::face_towards(&seed.direction, &Vector3::y_axis());
-        let bullet = seed.prefab.instantiate_at(
-            scene,
-            seed.origin,
-            orientation,
-        );
+        let bullet = seed.prefab.instantiate_at(scene, seed.origin, orientation);
         let bullet = &mut scene.graph[bullet];
         let bullet_script = bullet.try_get_script_mut::<Bullet>().unwrap();
         bullet_script.params = BulletParams {
-            velocity: seed.direction.normalize()
-                * seed.initial_velocity,
+            velocity: seed.direction.normalize() * seed.initial_velocity,
             remaining_sec: seed.range / seed.initial_velocity,
             author_collider: seed.author_collider,
         };

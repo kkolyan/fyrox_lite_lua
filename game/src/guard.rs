@@ -1,50 +1,26 @@
 //! Game project.
 use fyrox::asset::Resource;
-use fyrox::core::algebra::{Point3, Rotation3, Unit, UnitQuaternion, UnitVector3};
-use fyrox::core::log::Log;
-use fyrox::core::math::Matrix4Ext;
-use fyrox::core::num_traits::Zero;
+use fyrox::core::algebra::Point3;
 use fyrox::core::ComponentProvider;
-use fyrox::event::{DeviceEvent, KeyEvent};
 use fyrox::graph::BaseSceneGraph;
-use fyrox::graph::SceneGraph;
 use fyrox::rand::random;
 use fyrox::resource::model::Model;
 use fyrox::scene::graph::physics::RayCastOptions;
 use fyrox::scene::rigidbody::RigidBody;
 use fyrox::{
     core::{
-        algebra::{Vector2, Vector3},
-        pool::Handle,
-        reflect::prelude::*,
-        type_traits::prelude::*,
-        visitor::prelude::*,
-        TypeUuidProvider,
+        algebra::Vector3, pool::Handle, reflect::prelude::*, type_traits::prelude::*,
+        visitor::prelude::*, TypeUuidProvider,
     },
-    engine::GraphicsContext,
-    event::{ElementState, Event, WindowEvent},
-    gui::{
-        button::ButtonMessage,
-        message::{MessageDirection, UiMessage},
-        text::TextMessage,
-        widget::WidgetMessage,
-        UiNode, UserInterface,
-    },
-    keyboard::{KeyCode, PhysicalKey},
-    plugin::{Plugin, PluginContext, PluginRegistrationContext},
-    scene::{animation::spritesheet::SpriteSheetAnimation, node::Node, Scene},
+    scene::node::Node,
     script::{ScriptContext, ScriptTrait},
 };
-use std::f32::consts::PI;
-use std::ops::{Add, Deref, Mul, Not, Sub};
-use std::path::Path;
-use std::sync::atomic::{AtomicI64, Ordering};
+use std::ops::Sub;
 
 use crate::bullet::{Bullet, BulletHit, BulletSeed};
 use crate::fyrox_utils::HandleNodeExt;
 use crate::game::Game;
 use crate::player::Player;
-use crate::transient::Transient;
 
 #[derive(Visit, Reflect, Debug, Clone, TypeUuidProvider, ComponentProvider, Default)]
 #[type_uuid(id = "9f8183d3-2a4a-4951-a6e6-5fbc9c479e2e")]
@@ -55,7 +31,7 @@ pub struct Guard {
 
     reload_delay_sec: f32,
 
-	gun_height: f32,
+    gun_height: f32,
 
     switch_waypoint_timeout_sec: f32,
 
@@ -68,9 +44,9 @@ pub struct Guard {
     #[reflect(hidden)]
     collider: Handle<Node>,
 
-	bullet_prefab: Option<Resource<Model>>,
-	initial_bullet_velocity: f32,
-	attack_range: f32,
+    bullet_prefab: Option<Resource<Model>>,
+    initial_bullet_velocity: f32,
+    attack_range: f32,
 
     beacon_reached_distance: f32,
     move_power: f32,
@@ -78,21 +54,27 @@ pub struct Guard {
 
 impl Guard {
     fn try_attack_player(&mut self, ctx: &mut ScriptContext) -> bool {
-		let player_pos = ctx.scene.graph[ctx.plugins.get::<Game>().player].global_position();
+        let player_pos = ctx.scene.graph[ctx.plugins.get::<Game>().player].global_position();
         let self_pos = ctx.scene.graph[ctx.handle].global_position();
         let sight_vector = player_pos.sub(self_pos);
-		println!("try attack player. player_pos: {:?}, self_pos: {:?}", player_pos, self_pos);
+        println!(
+            "try attack player. player_pos: {:?}, self_pos: {:?}",
+            player_pos, self_pos
+        );
 
         if self.can_see_player(ctx, player_pos, sight_vector) {
-			Bullet::spawn(ctx.scene, BulletSeed {
-				prefab: self.bullet_prefab.as_ref().unwrap().clone(),
-				origin: self_pos + Vector3::new(0.0, self.gun_height, 0.0),
-				direction: sight_vector,
-				initial_velocity: self.initial_bullet_velocity,
-				author_collider: self.collider,
-				range: self.attack_range,
-			});
-			self.reloading_sec = self.reload_delay_sec;
+            Bullet::spawn(
+                ctx.scene,
+                BulletSeed {
+                    prefab: self.bullet_prefab.as_ref().unwrap().clone(),
+                    origin: self_pos + Vector3::new(0.0, self.gun_height, 0.0),
+                    direction: sight_vector,
+                    initial_velocity: self.initial_bullet_velocity,
+                    author_collider: self.collider,
+                    range: self.attack_range,
+                },
+            );
+            self.reloading_sec = self.reload_delay_sec;
             return true;
         }
 
@@ -130,8 +112,6 @@ impl Guard {
         }
         false
     }
-
-    fn fire_at_player(&mut self, ctx: &mut ScriptContext) {}
 
     fn move_to_waypoint(&mut self, ctx: &mut ScriptContext) {
         self.waypoint_sec += ctx.dt;

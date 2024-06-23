@@ -7,7 +7,7 @@ use fyrox::{
 pub fn print_ancestors(ctx: &mut ScriptContext, mut handle: Handle<Node>) {
     println!("Node hierarchy:");
     loop {
-        let mut node = &mut ctx.scene.graph.try_get_mut(handle);
+        let node = &mut ctx.scene.graph.try_get_mut(handle);
         let Some(node) = node else {
             break;
         };
