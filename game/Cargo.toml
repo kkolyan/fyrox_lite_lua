@@ -6,7 +6,10 @@ edition = "2021"
 
 [dependencies]
 fyrox = {workspace = true}
+profiling = {version = "1.0.15", features = ["profile-with-puffin"]}
+extend = "1.2.0"
 
 [features]
 default = ["fyrox/default"]
 dylib-engine = ["fyrox/dylib"]
+profiling = ["profiling/profile-with-puffin"]

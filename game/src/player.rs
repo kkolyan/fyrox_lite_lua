@@ -1,6 +1,6 @@
 //! Game project.
 use fyrox::asset::Resource;
-use fyrox::core::algebra::{Rotation3, Unit, UnitQuaternion};
+use fyrox::core::algebra::{Matrix3, Rotation3, Unit, UnitQuaternion, UnitVector3};
 use fyrox::core::futures::executor::block_on;
 use fyrox::core::log::Log;
 use fyrox::core::num_traits::Zero;
@@ -8,6 +8,7 @@ use fyrox::core::ComponentProvider;
 use fyrox::event::{DeviceEvent, KeyEvent, MouseButton};
 use fyrox::graph::SceneGraph;
 use fyrox::resource::model::{Model, ModelResourceExtension};
+use fyrox::scene::collider::Collider;
 use fyrox::scene::rigidbody::RigidBody;
 use fyrox::{
     core::{
@@ -36,18 +37,34 @@ use std::f32::consts::PI;
 use std::ops::Mul;
 use std::path::Path;
 
+use crate::bullet::{Bullet, BulletHit, BulletParams, BulletSeed};
+use crate::fyrox_utils::{self, HandleNodeExt};
+use crate::game::Game;
+use crate::transient::Transient;
+use fyrox::graph::BaseSceneGraph;
+
 #[derive(Visit, Reflect, Debug, Clone, TypeUuidProvider, ComponentProvider, Default)]
 #[type_uuid(id = "c5671d19-9f1a-4286-8486-add4ebaadaec")]
 #[visit(optional)]
 pub struct Player {
-    pub sensitivity: f32,
-    pub camera: Handle<Node>,
-    pub power: f32,
-    pub bullet: Option<Resource<Model>>,
+    sensitivity: f32,
+    camera: Handle<Node>,
+    power: f32,
+    bullet: Option<Resource<Model>>,
+    initial_bullet_velocity: f32,
+    shooting_range: f32,
+    reload_delay_sec: f32,
 
     #[reflect(hidden)]
-    #[visit(skip)]
-    temp: TempState,
+    reload_sec: f32,
+
+    #[reflect(hidden)]
+    published: bool,
+
+    #[reflect(hidden)]
+    collider: Handle<Node>,
+
+    temp: Transient<TempState>,
 }
 
 #[derive(Debug, Default, Clone)]
@@ -57,6 +74,7 @@ pub struct TempState {
     pub back: bool,
     pub left: bool,
     pub right: bool,
+    pub fire: bool,
 }
 
 impl Player {
@@ -77,21 +95,75 @@ impl Player {
             self.temp.aim_y,
         ));
     }
+
+    fn fire(&mut self, ctx: &mut ScriptContext) {
+        let camera_global_transform = ctx.scene.graph[self.camera].global_transform();
+        let camera_pos = ctx.scene.graph[self.camera].global_position();
+
+        let rot = camera_global_transform.fixed_view::<3, 3>(0, 0);
+        let bullet_orientation = UnitQuaternion::from_matrix(&rot.into());
+
+        let prefab = self
+            .bullet
+            .as_ref()
+            .unwrap()
+            .clone();
+        Bullet::spawn(ctx.scene, BulletSeed {
+            prefab,
+            origin: camera_pos,
+            direction: bullet_orientation.transform_vector(&Vector3::z_axis()),
+            initial_velocity: self.initial_bullet_velocity,
+            author_collider: self.collider,
+            range: self.shooting_range,
+        });
+        println!("bullet spawned");
+    }
 }
 
 impl ScriptTrait for Player {
     fn on_init(&mut self, #[allow(unused_variables)] ctx: &mut ScriptContext) {
-        let _ = ctx.graphics_context.as_initialized_mut().window
+        let _ = ctx
+            .graphics_context
+            .as_initialized_mut()
+            .window
             .set_cursor_grab(fyrox::window::CursorGrabMode::Confined);
+
+        self.collider = ctx.handle.try_get_collider(ctx.scene)
+            .expect("Collider not found under Player node");
+    }
+
+    fn on_start(&mut self, #[allow(unused_variables)] ctx: &mut ScriptContext) {
+        ctx.message_dispatcher.subscribe_to::<BulletHit>(ctx.handle);
+    }
+
+    fn on_message(
+        &mut self,
+        message: &mut dyn fyrox::script::ScriptMessagePayload,
+        ctx: &mut fyrox::script::ScriptMessageContext,
+    ) {
+        if let Some(_bullet) = message.downcast_ref::<BulletHit>() {
+            ctx.plugins.get_mut::<Game>().wounds += 1;
+            println!("player wounded!");
+        }
     }
 
     fn on_update(&mut self, ctx: &mut ScriptContext) {
-        let self_rotation = ctx.scene.graph[ctx.handle]
-            .local_transform()
-            .rotation()
-            .clone();
+        profiling::scope!("Player::on_update");
+        if self.reload_sec > 0.0 {
+            self.reload_sec -= ctx.dt;
+        }
+        if !self.published {
+            self.published = true;
+            ctx.plugins.get_mut::<Game>().player = ctx.handle;
+        }
 
-        let rb = ctx.scene.graph[ctx.handle].cast_mut::<RigidBody>().unwrap();
+        if self.temp.fire {
+            if self.reload_sec <= 0.0 {
+                self.reload_sec = self.reload_delay_sec;
+                self.fire(ctx);
+            }
+        }
+
         let mut move_delta = Vector3::<f32>::zero();
         if self.temp.forward {
             move_delta.z += 1.0
@@ -110,10 +182,13 @@ impl ScriptTrait for Player {
             move_delta.normalize_mut();
         }
 
-
+        let self_rotation = ctx.scene.graph[ctx.handle]
+            .local_transform()
+            .rotation()
+            .clone();
         let move_delta = self_rotation.transform_vector(&move_delta);
-        let force = move_delta * self.power * ctx.dt;
-        rb.apply_force(force);
+        let force = move_delta * self.power;
+        ctx.scene.graph[ctx.handle].as_rigid_body_mut().apply_force(force);
     }
 
     fn on_os_event(&mut self, event: &Event<()>, ctx: &mut ScriptContext) {
@@ -142,15 +217,11 @@ impl ScriptTrait for Player {
                 button,
             } = event
             {
-                if *state == ElementState::Pressed && *button == MouseButton::Left {
-                    let camera_rot = ctx.scene.graph[self.camera].global_transform();
-                    let camera_pos = ctx.scene.graph[self.camera].global_position();
-
-                    let bullet = self.bullet.as_ref().unwrap().instantiate(ctx.scene);
-                    let bullet = &mut ctx.scene.graph[bullet];
-                    bullet.local_transform_mut().set_position(camera_pos);
-                    bullet.cast_mut::<RigidBody>().unwrap()
-                        .set_lin_vel(camera_rot.transform_vector(&Vector3::z_axis()));
+                if *button == MouseButton::Left {
+                    self.temp.fire = match state {
+                        ElementState::Pressed => true,
+                        ElementState::Released => false,
+                    };
                 }
             }
         }

@@ -4,8 +4,8 @@ members = [ "editor", "executor", "game", "game-dylib"]
 resolver = "2"
 
 [workspace.dependencies]
-fyrox = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "9e6673c"}
-fyroxed_base = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "9e6673c"}
+fyrox = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false}
+fyroxed_base = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false}
 
 # Separate build profiles for hot reloading. These profiles ensures that build artifacts for
 # hot reloading will be placed into their own folders and does not interfere with standard (static)

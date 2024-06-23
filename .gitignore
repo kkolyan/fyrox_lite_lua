@@ -1,0 +1,6 @@
+.idea
+/target
+*.log
+/settings.ron
+/bindgen/expand
+.vscode
