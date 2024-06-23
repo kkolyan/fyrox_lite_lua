@@ -7,4 +7,3 @@ pub mod game;
 pub mod guard;
 pub mod guard_chief;
 pub mod player;
-pub mod transient;

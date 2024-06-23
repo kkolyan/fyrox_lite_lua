@@ -21,7 +21,6 @@ use std::ops::Mul;
 use crate::bullet::{Bullet, BulletHit, BulletSeed};
 use crate::fyrox_utils::HandleNodeExt;
 use crate::game::Game;
-use crate::transient::Transient;
 
 #[derive(Visit, Reflect, Debug, Clone, TypeUuidProvider, ComponentProvider, Default)]
 #[type_uuid(id = "c5671d19-9f1a-4286-8486-add4ebaadaec")]
@@ -44,7 +43,9 @@ pub struct Player {
     #[reflect(hidden)]
     collider: Handle<Node>,
 
-    temp: Transient<TempState>,
+    #[visit(skip)]
+    #[reflect(hidden)]
+    temp: TempState,
 }
 
 #[derive(Debug, Default, Clone)]
