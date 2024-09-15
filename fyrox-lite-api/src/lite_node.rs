@@ -1,8 +1,5 @@
 use fyrox::{
-    core::{
-        algebra::{UnitQuaternion, Vector3},
-        pool::Handle,
-    },
+    core::{algebra::UnitQuaternion, pool::Handle},
     scene::node::Node,
     script::{RoutingStrategy, ScriptMessagePayload, ScriptTrait},
 };
@@ -73,11 +70,15 @@ impl LiteNode {
     }
 
     /// Sends a hierarchical script message with the given payload.
-    pub fn send_hierarchical<T>(&self, routing: RoutingStrategy, payload: T)
+    pub fn send_hierarchical<T>(&self, routing: LiteRoutingStrategy, payload: T)
     where
         T: ScriptMessagePayload,
     {
         with_script_context(|ctx| {
+            let routing = match routing {
+                LiteRoutingStrategy::Up => RoutingStrategy::Up,
+                LiteRoutingStrategy::Down => RoutingStrategy::Down,
+            };
             ctx.message_sender
                 .send_hierarchical(self.handle, routing, payload);
         });
@@ -122,10 +123,6 @@ impl LiteNode {
         self.handle.is_some()
     }
 
-    pub fn has_script<T: ScriptTrait>(&self) -> bool {
-        with_script_context(|ctx| ctx.scene.graph[self.handle].has_script::<T>())
-    }
-
     pub fn parent(&self) -> LiteNode {
         with_script_context(|ctx| ctx.scene.graph[self.handle].parent().into())
     }
@@ -134,6 +131,17 @@ impl LiteNode {
         with_script_context(|ctx| {
             let node = &mut ctx.scene.graph[self.handle];
             f(node.try_get_script_mut::<T>().unwrap());
+        })
+    }
+    pub fn find_script<T: ScriptTrait, R>(&self, f: impl Fn(&mut T) -> Option<R>) -> Option<R> {
+        with_script_context(|ctx| {
+            let node = &mut ctx.scene.graph[self.handle];
+            for script in node.try_get_scripts_mut::<T>() {
+                if let Some(r) = f(script) {
+                    return Some(r);
+                }
+            }
+            None
         })
     }
 
@@ -145,4 +153,22 @@ impl LiteNode {
             UnitQuaternion::from_matrix(&rot.into()).into()
         })
     }
+
+    pub fn tag_is(&self, tag: &str) -> bool {
+        with_script_context(|ctx| ctx.scene.graph[self.handle].tag() == tag)
+    }
+
+    pub fn set_tag(&self, tag: &str) {
+        with_script_context(|ctx| {
+            ctx.scene.graph[self.handle].set_tag(tag.to_string());
+        });
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum LiteRoutingStrategy {
+    /// An message will be passed to the specified root node and then to every node up in the hierarchy.
+    Up,
+    /// An message will be passed to every node down the tree in the hierarchy.
+    Down,
 }

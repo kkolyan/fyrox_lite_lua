@@ -1,7 +1,7 @@
 use std::fmt::{Debug, Display};
 
 use fyrox::core::{
-    algebra::{Rotation3, Unit, UnitQuaternion, Vector3},
+    algebra::{Unit, UnitQuaternion, Vector3},
     num_traits::Zero,
 };
 
@@ -30,17 +30,17 @@ impl LiteVector3 {
     #[rustfmt::skip]    pub fn set_y(&mut self, value: f32) { self.0.y = value; }
     #[rustfmt::skip]    pub fn set_z(&mut self, value: f32) { self.0.z = value; }
 
-    #[rustfmt::skip]     pub fn x_axis() -> Self { Vector3::x_axis().into_inner().into() }
-    #[rustfmt::skip]     pub fn y_axis() -> Self { Vector3::y_axis().into_inner().into() }
-    #[rustfmt::skip]     pub fn z_axis() -> Self { Vector3::z_axis().into_inner().into() }
-	
+    #[rustfmt::skip]    pub fn x_axis() -> Self { Vector3::x_axis().into_inner().into() }
+    #[rustfmt::skip]    pub fn y_axis() -> Self { Vector3::y_axis().into_inner().into() }
+    #[rustfmt::skip]    pub fn z_axis() -> Self { Vector3::z_axis().into_inner().into() }
+
     pub fn zero() -> Self {
         Vector3::zero().into()
     }
     pub fn new(x: f32, y: f32, z: f32) -> LiteVector3 {
         LiteVector3(Vector3::new(x, y, z))
     }
-    pub fn mul__f32(&self, o: f32) -> LiteVector3 {
+    pub fn mul(&self, o: f32) -> LiteVector3 {
         LiteVector3(self.0 * o)
     }
 
@@ -91,13 +91,15 @@ impl LiteQuaternion {
         ))
     }
 
+    #[allow(non_snake_case)]
     pub fn mul__LiteVector(&self, o: LiteVector3) -> LiteVector3 {
         LiteVector3(self.0.mul(&o.0))
     }
-	
-	pub fn mul__LiteQuaternion(&self, rot_delta: LiteQuaternion) -> LiteQuaternion {
-		LiteQuaternion(self.0.mul(&rot_delta.0))
-	}
+
+    #[allow(non_snake_case)]
+    pub fn mul__LiteQuaternion(&self, rot_delta: LiteQuaternion) -> LiteQuaternion {
+        LiteQuaternion(self.0.mul(&rot_delta.0))
+    }
 }
 
 impl From<LiteQuaternion> for UnitQuaternion<f32> {

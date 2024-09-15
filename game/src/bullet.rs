@@ -1,10 +1,7 @@
 //! Game project.
 use fyrox::asset::Resource;
-use fyrox::core::algebra::{Point3, UnitQuaternion};
 use fyrox::core::ComponentProvider;
 use fyrox::resource::model::Model;
-use fyrox::scene::graph::physics::RayCastOptions;
-use fyrox::script::RoutingStrategy;
 use fyrox::{
     core::{
         algebra::Vector3, pool::Handle, reflect::prelude::*, type_traits::prelude::*,
@@ -15,9 +12,9 @@ use fyrox::{
 };
 use fyrox_lite_api::lite_ctx::{LiteContext, LiteScript};
 use fyrox_lite_api::lite_math::{LiteQuaternion, LiteVector3};
+use fyrox_lite_api::lite_node::LiteRoutingStrategy;
 use fyrox_lite_api::lite_physics::{LitePhysics, LiteRayCastOptions};
 use fyrox_lite_api::lite_prefab::LitePrefab;
-use std::ops::Add;
 
 #[derive(Visit, Reflect, Debug, Clone, TypeUuidProvider, ComponentProvider, Default)]
 #[type_uuid(id = "12371d19-9f1a-4286-8486-add4ebaadaec")]
@@ -48,7 +45,7 @@ impl Bullet {
         let bullet = LitePrefab::from(seed.prefab).instantiate_at(seed.origin, orientation);
         bullet.with_script::<Bullet>(|it| {
             it.params = BulletParams {
-                velocity: seed.direction.normalize().mul__f32(seed.initial_velocity).into(),
+                velocity: seed.direction.normalize().mul(seed.initial_velocity).into(),
                 remaining_sec: seed.range / seed.initial_velocity,
                 author_collider: seed.author_collider,
             };
@@ -67,7 +64,7 @@ impl LiteScript for Bullet {
             ctx.node.destroy();
             return;
         }
-        let new_pos = ctx.node.local_position().add(LiteVector3::from(self.params.velocity).mul__f32(ctx.dt));
+        let new_pos = ctx.node.local_position().add(LiteVector3::from(self.params.velocity).mul(ctx.dt));
 
         let opts = LiteRayCastOptions {
             ray_origin: ctx.node.local_position(),
@@ -87,7 +84,7 @@ impl LiteScript for Bullet {
                 continue;
             }
             hit.collider
-                .send_hierarchical(RoutingStrategy::Up, BulletHit {});
+                .send_hierarchical(LiteRoutingStrategy::Up, BulletHit {});
             ctx.node.destroy();
             return;
         }

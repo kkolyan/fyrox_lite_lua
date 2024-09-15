@@ -1,10 +1,8 @@
 //! Game project.
 use fyrox::asset::Resource;
-use fyrox::core::algebra::Point3;
 use fyrox::core::ComponentProvider;
 use fyrox::rand::random;
 use fyrox::resource::model::Model;
-use fyrox::scene::graph::physics::RayCastOptions;
 use fyrox::script::ScriptMessagePayload;
 use fyrox::{
     core::{
@@ -18,11 +16,9 @@ use fyrox_lite_api::lite_ctx::{LiteContext, LiteScript};
 use fyrox_lite_api::lite_math::LiteVector3;
 use fyrox_lite_api::lite_node::LiteNode;
 use fyrox_lite_api::lite_physics::{LitePhysics, LiteRayCastOptions};
-use std::ops::Sub;
 
 use crate::bullet::{Bullet, BulletHit, BulletSeed};
 use crate::game::Game;
-use crate::player::Player;
 
 #[derive(Visit, Reflect, Debug, Clone, TypeUuidProvider, ComponentProvider, Default)]
 #[type_uuid(id = "9f8183d3-2a4a-4951-a6e6-5fbc9c479e2e")]
@@ -99,7 +95,7 @@ impl Guard {
             }
             while handle.is_valid() {
                 let node = &handle;
-                if node.has_script::<Player>() {
+                if node.tag_is("Player") {
                     return true;
                 }
                 handle = node.parent();
@@ -128,7 +124,7 @@ impl Guard {
         if vector_to_beacon.magnitude() < self.beacon_reached_distance {
             self.current_waypoint = None;
         } else {
-            let force = vector_to_beacon.normalize().mul__f32(self.move_power);
+            let force = vector_to_beacon.normalize().mul(self.move_power);
             ctx.node.as_rigid_body().unwrap().apply_force(force);
         }
     }

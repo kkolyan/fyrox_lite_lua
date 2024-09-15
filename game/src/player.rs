@@ -1,14 +1,12 @@
 //! Game project.
 use fyrox::asset::Resource;
-use fyrox::core::algebra::{Rotation3, UnitQuaternion};
-use fyrox::core::num_traits::Zero;
 use fyrox::core::ComponentProvider;
 use fyrox::event::{DeviceEvent, MouseButton};
 use fyrox::resource::model::Model;
 use fyrox::script::ScriptMessagePayload;
 use fyrox::{
     core::{
-        algebra::Vector3, pool::Handle, reflect::prelude::*, type_traits::prelude::*,
+         pool::Handle, reflect::prelude::*, type_traits::prelude::*,
         visitor::prelude::*, TypeUuidProvider,
     },
     event::{ElementState, Event, WindowEvent},
@@ -21,7 +19,6 @@ use fyrox_lite_api::lite_math::{LiteQuaternion, LiteVector3};
 use fyrox_lite_api::lite_node::LiteNode;
 use fyrox_lite_api::lite_window::LiteWindow;
 use std::f32::consts::PI;
-use std::ops::Mul;
 
 use crate::bullet::{Bullet, BulletHit, BulletSeed};
 use crate::game::Game;
@@ -100,6 +97,9 @@ impl Player {
 
 impl LiteScript for Player {
     fn on_init(&mut self, ctx: &mut LiteContext) {
+
+        ctx.node.set_tag("Player");
+
         let _ = LiteWindow::set_cursor_grab(fyrox::window::CursorGrabMode::Confined);
 
         self.collider = ctx
@@ -158,7 +158,7 @@ impl LiteScript for Player {
 
         let self_rotation = ctx.node.local_rotation();
         let move_delta = self_rotation.mul__LiteVector(move_delta);
-        let force = move_delta.mul__f32(self.power);
+        let force = move_delta.mul(self.power);
         ctx.node.as_rigid_body().unwrap().apply_force(force);
     }
 
