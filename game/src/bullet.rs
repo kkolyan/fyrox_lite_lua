@@ -14,6 +14,10 @@ use fyrox::{
     scene::{node::Node, Scene},
     script::{ScriptContext, ScriptTrait},
 };
+use fyrox_lite_api::lite_ctx::{LiteContext, LiteScript};
+use fyrox_lite_api::lite_node::LiteNode;
+use fyrox_lite_api::lite_physics::LitePhysics;
+use fyrox_lite_api::lite_prefab::LitePrefab;
 use std::ops::Add;
 
 #[derive(Visit, Reflect, Debug, Clone, TypeUuidProvider, ComponentProvider, Default)]
@@ -40,35 +44,34 @@ pub struct BulletSeed {
 }
 
 impl Bullet {
-    pub fn spawn(scene: &mut Scene, seed: BulletSeed) {
+    pub fn spawn(seed: BulletSeed) {
         let orientation = UnitQuaternion::face_towards(&seed.direction, &Vector3::y_axis());
-        let bullet = seed.prefab.instantiate_at(scene, seed.origin, orientation);
-        let bullet = &mut scene.graph[bullet];
-        let bullet_script = bullet.try_get_script_mut::<Bullet>().unwrap();
-        bullet_script.params = BulletParams {
-            velocity: seed.direction.normalize() * seed.initial_velocity,
-            remaining_sec: seed.range / seed.initial_velocity,
-            author_collider: seed.author_collider,
-        };
+        let bullet = LitePrefab::from(seed.prefab).instantiate_at( seed.origin, orientation);
+        bullet.with_script::<Bullet>(|it| {
+            it.params = BulletParams {
+                velocity: seed.direction.normalize() * seed.initial_velocity,
+                remaining_sec: seed.range / seed.initial_velocity,
+                author_collider: seed.author_collider,
+            };
+        });
     }
 }
 
 #[derive(Debug)]
 pub struct BulletHit {}
 
-impl ScriptTrait for Bullet {
-    fn on_update(&mut self, ctx: &mut ScriptContext) {
+impl LiteScript for Bullet {
+    fn on_update(&mut self, ctx: &mut LiteContext) {
         profiling::scope!("Bullet::on_update");
         self.params.remaining_sec -= ctx.dt;
         if self.params.remaining_sec <= 0.0 {
-            ctx.scene.graph.remove_node(ctx.handle);
+            ctx.node.destroy();
             return;
         }
-        let t = ctx.scene.graph[ctx.handle].local_transform_mut();
-        let new_pos = t.position().add(self.params.velocity * ctx.dt);
+        let new_pos = ctx.node.local_position().add(self.params.velocity * ctx.dt);
 
         let opts = RayCastOptions {
-            ray_origin: Point3::from(*t.position().get_value_ref()),
+            ray_origin: Point3::from(ctx.node.local_position()),
             ray_direction: self.params.velocity.normalize(),
             max_len: self.params.velocity.magnitude() * ctx.dt,
             groups: Default::default(),
@@ -77,21 +80,24 @@ impl ScriptTrait for Bullet {
         let mut results = vec![];
         {
             profiling::scope!("cast_ray");
-            ctx.scene.graph.physics.cast_ray(opts, &mut results);
+            LitePhysics::cast_ray(opts, &mut results);
         }
 
         for hit in results {
-            if hit.collider == self.params.author_collider {
+            if hit.collider == self.params.author_collider.into() {
                 continue;
             }
-            ctx.message_sender
-                .send_hierarchical(hit.collider, RoutingStrategy::Up, BulletHit {});
-            ctx.scene.graph.remove_node(ctx.handle);
+            hit.collider.send_hierarchical(RoutingStrategy::Up, BulletHit {});
+            ctx.node.destroy();
             return;
         }
 
-        ctx.scene.graph[ctx.handle]
-            .local_transform_mut()
-            .set_position(new_pos);
+        ctx.node.set_local_position(new_pos);
+    }
+}
+
+impl ScriptTrait for Bullet {
+    fn on_update(&mut self, ctx: &mut ScriptContext) {
+        self.redispatch_update(ctx);
     }
 }

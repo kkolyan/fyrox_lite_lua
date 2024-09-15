@@ -1236,6 +1236,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "fyrox-lite-api"
+version = "0.1.0"
+dependencies = [
+ "fyrox",
+]
+
+[[package]]
 name = "fyrox-math"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1316,6 +1323,7 @@ version = "0.1.0"
 dependencies = [
  "extend",
  "fyrox",
+ "fyrox-lite-api",
  "profiling",
 ]
 

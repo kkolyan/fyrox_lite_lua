@@ -5,6 +5,7 @@ use fyrox::{
     core::{reflect::prelude::*, type_traits::prelude::*, visitor::prelude::*, TypeUuidProvider},
     script::{ScriptContext, ScriptTrait},
 };
+use fyrox_lite_api::lite_ctx::{LiteContext, LiteScript};
 
 use crate::game::Game;
 
@@ -13,11 +14,17 @@ use crate::game::Game;
 #[visit(optional)]
 pub struct Beacon {}
 
+impl LiteScript for Beacon {
+    fn on_update(&mut self, ctx: &mut LiteContext) {
+        let pos = ctx.node.global_position();
+        ctx.with_plugin::<Game, _>(|it| it.beacons.push(pos));
+        ctx.node.destroy();
+        println!("beacon registered: {:?}", ctx.node);
+    }
+}
+
 impl ScriptTrait for Beacon {
     fn on_update(&mut self, ctx: &mut ScriptContext) {
-        let pos = ctx.scene.graph[ctx.handle].global_position();
-        ctx.plugins.get_mut::<Game>().beacons.push(pos);
-        ctx.scene.graph.remove_node(ctx.handle);
-        println!("beacon registered: {:?}", ctx.handle);
+        self.redispatch_update(ctx);
     }
 }

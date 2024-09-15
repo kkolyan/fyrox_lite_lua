@@ -15,6 +15,9 @@ use fyrox::{
     scene::node::Node,
     script::{ScriptContext, ScriptTrait},
 };
+use fyrox_lite_api::lite_ctx::{LiteContext, LiteScript};
+use fyrox_lite_api::lite_node::LiteNode;
+use fyrox_lite_api::lite_window::LiteWindow;
 use std::f32::consts::PI;
 use std::ops::Mul;
 
@@ -59,90 +62,81 @@ pub struct TempState {
 }
 
 impl Player {
-    fn turn(&self, x: f32, ctx: &mut ScriptContext) {
-        let self_transform = ctx.scene.graph[ctx.handle].local_transform_mut();
+    fn turn(&self, x: f32, ctx: &mut LiteContext) {
         let rot_delta = Rotation3::from_axis_angle(&Vector3::y_axis(), self.sensitivity * x);
-        self_transform.set_rotation(self_transform.rotation().mul(&rot_delta));
+        ctx.node
+            .set_local_rotation(ctx.node.local_rotation().mul(&rot_delta));
     }
 
-    fn aim(&mut self, y: f32, ctx: &mut ScriptContext) {
+    fn aim(&mut self, y: f32) {
         self.temp.aim_y += y * self.sensitivity;
 
         self.temp.aim_y = self.temp.aim_y.clamp(-PI / 2.0, PI / 2.0);
 
-        let camera_transform = ctx.scene.graph[self.camera].local_transform_mut();
-        camera_transform.set_rotation(UnitQuaternion::from_axis_angle(
+        LiteNode::from(self.camera).set_local_rotation(UnitQuaternion::from_axis_angle(
             &Vector3::x_axis(),
             self.temp.aim_y,
         ));
     }
 
-    fn fire(&mut self, ctx: &mut ScriptContext) {
-        let camera_global_transform = ctx.scene.graph[self.camera].global_transform();
-        let camera_pos = ctx.scene.graph[self.camera].global_position();
-
-        let rot = camera_global_transform.fixed_view::<3, 3>(0, 0);
-        let bullet_orientation = UnitQuaternion::from_matrix(&rot.into());
+    fn fire(&mut self) {
+        let camera_pos = LiteNode::from(self.camera).global_position();
+        let bullet_orientation = LiteNode::from(self.camera).global_rotation();
 
         let prefab = self.bullet.as_ref().unwrap().clone();
-        Bullet::spawn(
-            ctx.scene,
-            BulletSeed {
-                prefab,
-                origin: camera_pos,
-                direction: bullet_orientation.transform_vector(&Vector3::z_axis()),
-                initial_velocity: self.initial_bullet_velocity,
-                author_collider: self.collider,
-                range: self.shooting_range,
-            },
-        );
+        Bullet::spawn(BulletSeed {
+            prefab,
+            origin: camera_pos,
+            direction: bullet_orientation.transform_vector(&Vector3::z_axis()),
+            initial_velocity: self.initial_bullet_velocity,
+            author_collider: self.collider,
+            range: self.shooting_range,
+        });
         println!("bullet spawned");
     }
 }
 
-impl ScriptTrait for Player {
-    fn on_init(&mut self, #[allow(unused_variables)] ctx: &mut ScriptContext) {
-        let _ = ctx
-            .graphics_context
-            .as_initialized_mut()
-            .window
-            .set_cursor_grab(fyrox::window::CursorGrabMode::Confined);
+impl LiteScript for Player {
+    fn on_init(&mut self, ctx: &mut LiteContext) {
+        let _ = LiteWindow::set_cursor_grab(fyrox::window::CursorGrabMode::Confined);
 
         self.collider = ctx
-            .handle
-            .try_get_collider(ctx.scene)
-            .expect("Collider not found under Player node");
+            .node
+            .try_get_collider()
+            .expect("Collider not found under Player node")
+            .into();
     }
 
-    fn on_start(&mut self, #[allow(unused_variables)] ctx: &mut ScriptContext) {
-        ctx.message_dispatcher.subscribe_to::<BulletHit>(ctx.handle);
+    fn on_start(&mut self, ctx: &mut LiteContext) {
+        ctx.node.subscribe_to::<BulletHit>();
     }
 
     fn on_message(
         &mut self,
         message: &mut dyn fyrox::script::ScriptMessagePayload,
-        ctx: &mut fyrox::script::ScriptMessageContext,
+        ctx: &mut fyrox_lite_api::lite_node::LiteMessageContext,
     ) {
         if let Some(_bullet) = message.downcast_ref::<BulletHit>() {
-            ctx.plugins.get_mut::<Game>().wounds += 1;
+            ctx.with_plugin::<Game, _>(|it| it.wounds += 1);
             println!("player wounded!");
         }
     }
 
-    fn on_update(&mut self, ctx: &mut ScriptContext) {
+    fn on_update(&mut self, ctx: &mut LiteContext) {
         profiling::scope!("Player::on_update");
         if self.reload_sec > 0.0 {
             self.reload_sec -= ctx.dt;
         }
         if !self.published {
             self.published = true;
-            ctx.plugins.get_mut::<Game>().player = ctx.handle;
+            let player = ctx.node;
+            ctx.with_plugin::<Game, _>(|it| it.player = player.into());
         }
 
         if self.temp.fire {
             if self.reload_sec <= 0.0 {
                 self.reload_sec = self.reload_delay_sec;
-                self.fire(ctx);
+                self.fire();
             }
         }
 
@@ -164,18 +158,13 @@ impl ScriptTrait for Player {
             move_delta.normalize_mut();
         }
 
-        let self_rotation = ctx.scene.graph[ctx.handle]
-            .local_transform()
-            .rotation()
-            .clone();
+        let self_rotation = ctx.node.local_rotation().clone();
         let move_delta = self_rotation.transform_vector(&move_delta);
         let force = move_delta * self.power;
-        ctx.scene.graph[ctx.handle]
-            .as_rigid_body_mut()
-            .apply_force(force);
+        ctx.node.with_rigid_body(|it| it.apply_force(force));
     }
 
-    fn on_os_event(&mut self, event: &Event<()>, ctx: &mut ScriptContext) {
+    fn on_os_event(&mut self, event: &Event<()>, ctx: &mut LiteContext) {
         if let Event::WindowEvent { event, .. } = event {
             if let WindowEvent::KeyboardInput {
                 device_id: _,
@@ -216,8 +205,34 @@ impl ScriptTrait for Player {
         {
             if let DeviceEvent::MouseMotion { delta: (x, y) } = event {
                 self.turn(-*x as f32, ctx);
-                self.aim(*y as f32, ctx);
+                self.aim(*y as f32);
             }
         }
+    }
+}
+
+impl ScriptTrait for Player {
+    fn on_init(&mut self, #[allow(unused_variables)] ctx: &mut ScriptContext) {
+        self.redispatch_init(ctx);
+    }
+
+    fn on_start(&mut self, #[allow(unused_variables)] ctx: &mut ScriptContext) {
+        self.redispatch_start(ctx);
+    }
+
+    fn on_message(
+        &mut self,
+        message: &mut dyn fyrox::script::ScriptMessagePayload,
+        ctx: &mut fyrox::script::ScriptMessageContext,
+    ) {
+        self.redispatch_message(message, ctx);
+    }
+
+    fn on_update(&mut self, ctx: &mut ScriptContext) {
+        self.redispatch_update(ctx);
+    }
+
+    fn on_os_event(&mut self, event: &Event<()>, ctx: &mut ScriptContext) {
+        self.redispatch_os_event(event, ctx);
     }
 }

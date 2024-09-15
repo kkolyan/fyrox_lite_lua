@@ -12,6 +12,8 @@ use fyrox::{
     },
     script::{ScriptContext, ScriptTrait},
 };
+use fyrox_lite_api::lite_ctx::LiteScript;
+use fyrox_lite_api::lite_prefab::LitePrefab;
 
 use crate::game::Game;
 
@@ -31,8 +33,8 @@ pub struct GuardChief {
 
 impl GuardChief {}
 
-impl ScriptTrait for GuardChief {
-    fn on_update(&mut self, ctx: &mut ScriptContext) {
+impl LiteScript for GuardChief {
+    fn on_update(&mut self, ctx: &mut fyrox_lite_api::lite_ctx::LiteContext) {
         if !self.frame_skipped_for_beacons {
             self.frame_skipped_for_beacons = true;
             return;
@@ -40,14 +42,13 @@ impl ScriptTrait for GuardChief {
         if !self.initialized {
             self.initialized = true;
             for _ in 0..self.initial_count {
-                let beacons = &ctx.plugins.get::<Game>().beacons;
+                let beacons = ctx.with_plugin::<Game, _>(|it| it.beacons.clone());
                 if !beacons.is_empty() {
                     let position = beacons[random::<usize>() % beacons.len()];
 
                     let orientation = UnitQuaternion::from_axis_angle(&Vector3::y_axis(), random());
 
-                    self.gaurd_prefab.as_ref().unwrap().instantiate_at(
-                        ctx.scene,
+                    LitePrefab::from(self.gaurd_prefab.as_ref().unwrap().clone()).instantiate_at(
                         position,
                         orientation,
                     );
@@ -57,5 +58,11 @@ impl ScriptTrait for GuardChief {
                 }
             }
         }
+    }
+}
+
+impl ScriptTrait for GuardChief {
+    fn on_update(&mut self, ctx: &mut ScriptContext) {
+        self.redispatch_update(ctx);
     }
 }

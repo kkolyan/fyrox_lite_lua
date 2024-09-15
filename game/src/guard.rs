@@ -15,6 +15,9 @@ use fyrox::{
     scene::node::Node,
     script::{ScriptContext, ScriptTrait},
 };
+use fyrox_lite_api::lite_ctx::{LiteContext, LiteScript};
+use fyrox_lite_api::lite_node::LiteNode;
+use fyrox_lite_api::lite_physics::LitePhysics;
 use std::ops::Sub;
 
 use crate::bullet::{Bullet, BulletHit, BulletSeed};
@@ -53,9 +56,9 @@ pub struct Guard {
 }
 
 impl Guard {
-    fn try_attack_player(&mut self, ctx: &mut ScriptContext) -> bool {
-        let player_pos = ctx.scene.graph[ctx.plugins.get::<Game>().player].global_position();
-        let self_pos = ctx.scene.graph[ctx.handle].global_position();
+    fn try_attack_player(&mut self, ctx: &mut LiteContext) -> bool {
+        let player_pos = ctx.with_plugin::<Game, _>(|it| LiteNode::from(it.player)).global_position();
+        let self_pos = ctx.node.global_position();
         let sight_vector = player_pos.sub(self_pos);
         println!(
             "try attack player. player_pos: {:?}, self_pos: {:?}",
@@ -64,7 +67,6 @@ impl Guard {
 
         if self.can_see_player(ctx, player_pos, sight_vector) {
             Bullet::spawn(
-                ctx.scene,
                 BulletSeed {
                     prefab: self.bullet_prefab.as_ref().unwrap().clone(),
                     origin: self_pos + Vector3::new(0.0, self.gun_height, 0.0),
@@ -83,7 +85,7 @@ impl Guard {
 
     fn can_see_player(
         &self,
-        ctx: &ScriptContext,
+        ctx: &LiteContext,
         player_pos: Vector3<f32>,
         sight_vector: Vector3<f32>,
     ) -> bool {
@@ -95,14 +97,14 @@ impl Guard {
             sort_results: true,
         };
         let mut results = vec![];
-        ctx.scene.graph.physics.cast_ray(opts, &mut results);
+        LitePhysics::cast_ray(opts, &mut results);
         for hit in results {
             let mut handle = hit.collider;
-            if handle == self.collider {
+            if handle == self.collider.into() {
                 continue;
             }
-            while handle.is_some() {
-                let node = &ctx.scene.graph[handle];
+            while handle.is_valid() {
+                let node = &handle;
                 if node.has_script::<Player>() {
                     return true;
                 }
@@ -113,7 +115,7 @@ impl Guard {
         false
     }
 
-    fn move_to_waypoint(&mut self, ctx: &mut ScriptContext) {
+    fn move_to_waypoint(&mut self, ctx: &mut LiteContext) {
         self.waypoint_sec += ctx.dt;
         if self.waypoint_sec > self.switch_waypoint_timeout_sec {
             self.current_waypoint = None;
@@ -122,39 +124,38 @@ impl Guard {
             // println!("guard {:?} switched waypoint", ctx.handle);
         }
         if self.current_waypoint.is_none() {
-            let beacons = &ctx.plugins.get::<Game>().beacons;
-            self.current_waypoint = Some(beacons[random::<usize>() % beacons.len()]);
+            ctx.with_plugin::<Game, _>(|it| {
+                let beacons = &it.beacons;
+                self.current_waypoint = Some(beacons[random::<usize>() % beacons.len()]);
+            });
         }
-        let pos = ctx.scene.graph[ctx.handle]
-            .local_transform()
-            .position()
-            .get_value_ref();
+        let pos = ctx.node.local_position();
         let vector_to_beacon = self.current_waypoint.unwrap().sub(pos);
         if vector_to_beacon.magnitude() < self.beacon_reached_distance {
             self.current_waypoint = None;
         } else {
             let force = vector_to_beacon.normalize() * self.move_power;
-            ctx.scene.graph[ctx.handle]
-                .cast_mut::<RigidBody>()
-                .unwrap()
-                .apply_force(force);
+            ctx.node.with_rigid_body(|it| {
+                it.apply_force(force);
+            });
         }
     }
 }
 
-impl ScriptTrait for Guard {
-    fn on_init(&mut self, ctx: &mut ScriptContext) {
+impl LiteScript for Guard {
+    fn on_init(&mut self, ctx: &mut LiteContext) {
         self.collider = ctx
-            .handle
-            .try_get_collider(ctx.scene)
-            .expect("Collider not found under Guard node");
+            .node
+            .try_get_collider()
+            .expect("Collider not found under Guard node")
+            .into();
     }
 
-    fn on_start(&mut self, ctx: &mut ScriptContext) {
-        ctx.message_dispatcher.subscribe_to::<BulletHit>(ctx.handle);
+    fn on_start(&mut self, ctx: &mut LiteContext) {
+        ctx.node.subscribe_to::<BulletHit>();
     }
 
-    fn on_update(&mut self, ctx: &mut ScriptContext) {
+    fn on_update(&mut self, ctx: &mut LiteContext) {
         if self.reloading_sec > 0.0 {
             self.reloading_sec -= ctx.dt;
         }
@@ -167,12 +168,36 @@ impl ScriptTrait for Guard {
     fn on_message(
         &mut self,
         message: &mut dyn fyrox::script::ScriptMessagePayload,
-        ctx: &mut fyrox::script::ScriptMessageContext,
+        ctx: &mut fyrox_lite_api::lite_node::LiteMessageContext,
     ) {
         if let Some(_bullet) = message.downcast_ref::<BulletHit>() {
-            ctx.scene.graph.remove_node(ctx.handle);
-            ctx.plugins.get_mut::<Game>().frags += 1;
+            ctx.node.destroy();
+            ctx.with_plugin::<Game, _>(|it| {
+                it.frags += 1;
+            });
             println!("guard killed!");
         }
+    }
+}
+
+impl ScriptTrait for Guard {
+    fn on_init(&mut self, ctx: &mut ScriptContext) {
+        self.redispatch_init(ctx);
+    }
+
+    fn on_start(&mut self, ctx: &mut ScriptContext) {
+        self.redispatch_start(ctx);
+    }
+
+    fn on_update(&mut self, ctx: &mut ScriptContext) {
+        self.redispatch_update(ctx);
+    }
+
+    fn on_message(
+        &mut self,
+        message: &mut dyn fyrox::script::ScriptMessagePayload,
+        ctx: &mut fyrox::script::ScriptMessageContext,
+    ) {
+        self.redispatch_message(message, ctx);
     }
 }
