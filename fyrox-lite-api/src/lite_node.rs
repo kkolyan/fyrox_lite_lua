@@ -1,13 +1,11 @@
 use fyrox::{
     core::{
-        algebra::{Rotation3, UnitQuaternion, Vector3},
+        algebra::{UnitQuaternion, Vector3},
         pool::Handle,
     },
     scene::{node::Node, rigidbody::RigidBody},
     script::{RoutingStrategy, ScriptMessagePayload, ScriptTrait},
 };
-
-use std::ops::Mul;
 
 use crate::script_context::with_script_context;
 use fyrox::graph::BaseSceneGraph;
