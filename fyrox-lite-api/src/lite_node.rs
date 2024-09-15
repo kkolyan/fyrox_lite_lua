@@ -1,8 +1,13 @@
 use fyrox::{
-    core::{algebra::{UnitQuaternion, Vector3}, pool::Handle},
+    core::{
+        algebra::{Rotation3, UnitQuaternion, Vector3},
+        pool::Handle,
+    },
     scene::{node::Node, rigidbody::RigidBody},
     script::{RoutingStrategy, ScriptMessagePayload, ScriptTrait},
 };
+
+use std::ops::Mul;
 
 use crate::script_context::with_script_context;
 use fyrox::graph::BaseSceneGraph;
@@ -72,7 +77,7 @@ impl LiteNode {
 
     pub fn set_local_position(&self, new_pos: Vector3<f32>) {
         with_script_context(|ctx| {
-            ctx.scene.graph[ctx.handle]
+            ctx.scene.graph[self.handle]
                 .local_transform_mut()
                 .set_position(new_pos);
         });
@@ -80,7 +85,7 @@ impl LiteNode {
 
     pub fn set_local_rotation(&self, value: UnitQuaternion<f32>) {
         with_script_context(|ctx| {
-            ctx.scene.graph[ctx.handle]
+            ctx.scene.graph[self.handle]
                 .local_transform_mut()
                 .set_rotation(value);
         });
@@ -119,18 +124,25 @@ impl LiteNode {
 
     pub fn with_script<T: ScriptTrait>(&self, f: impl FnOnce(&mut T)) {
         with_script_context(|ctx| {
-			let node = &mut ctx.scene.graph[self.handle];
-			f(node.try_get_script_mut::<T>().unwrap());
+            let node = &mut ctx.scene.graph[self.handle];
+            f(node.try_get_script_mut::<T>().unwrap());
         })
     }
-	
-	pub fn global_rotation(&self) -> UnitQuaternion<f32> {
+
+    pub fn global_rotation(&self) -> UnitQuaternion<f32> {
         with_script_context(|ctx| {
-		
-			let camera_global_transform = ctx.scene.graph[self.handle].global_transform();
-	
-			let rot = camera_global_transform.fixed_view::<3, 3>(0, 0);
-			UnitQuaternion::from_matrix(&rot.into())
-		})
-	}
+            let camera_global_transform = ctx.scene.graph[self.handle].global_transform();
+
+            let rot = camera_global_transform.fixed_view::<3, 3>(0, 0);
+            UnitQuaternion::from_matrix(&rot.into())
+        })
+    }
+
+    pub fn turn(&self, x: f32) {
+        with_script_context(|ctx| {
+            let self_transform = ctx.scene.graph[ctx.handle].local_transform_mut();
+            let rot_delta = Rotation3::from_axis_angle(&Vector3::y_axis(), x);
+            self_transform.set_rotation(self_transform.rotation().mul(&rot_delta));
+        });
+    }
 }

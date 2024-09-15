@@ -60,10 +60,10 @@ impl Guard {
             .global_position();
         let self_pos = ctx.node.global_position();
         let sight_vector = player_pos.sub(self_pos);
-        println!(
-            "try attack player. player_pos: {:?}, self_pos: {:?}",
-            player_pos, self_pos
-        );
+        // println!(
+        //     "try attack player. player_pos: {:?}, self_pos: {:?}",
+        //     player_pos, self_pos
+        // );
 
         if self.can_see_player(player_pos, sight_vector) {
             Bullet::spawn(BulletSeed {
