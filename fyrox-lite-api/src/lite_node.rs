@@ -88,7 +88,9 @@ impl LiteNode {
 
     pub fn subscribe_to<T: 'static>(&self) {
         with_script_context(|ctx| {
-            ctx.message_dispatcher.subscribe_to::<T>(self.handle);
+            ctx.message_dispatcher.as_mut()
+            .expect("cannot subscribe from on_message callback. do it in on_init, on_start or on_update")
+            .subscribe_to::<T>(self.handle);
         });
     }
 
@@ -131,19 +133,4 @@ impl LiteNode {
 			UnitQuaternion::from_matrix(&rot.into())
 		})
 	}
-}
-
-pub struct LiteMessageContext {
-    /// Amount of time that passed from last call. It has valid values only when called from `on_update`.
-    pub dt: f32,
-
-    /// Handle of a node to which the script instance belongs to. To access the node itself use `scene` field:
-    ///
-    /// ```rust
-    /// # use fyrox_impl::script::ScriptContext;
-    /// # fn foo(context: ScriptContext) {
-    /// let node_mut = &mut context.scene.graph[context.handle];
-    /// # }
-    /// ```
-    pub node: LiteNode,
 }

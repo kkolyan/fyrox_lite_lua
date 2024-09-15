@@ -5,9 +5,8 @@ use fyrox::{
 };
 
 use crate::{
-    lite_node::{LiteMessageContext, LiteNode},
-    script_context::{with_script_context, without_script_context},
-    script_message_context::{with_script_message_context, without_script_message_context},
+    lite_node::{LiteNode},
+    script_context::{with_script_context, without_script_context, without_script_message_context},
 };
 
 pub trait LiteScript {
@@ -18,7 +17,7 @@ pub trait LiteScript {
     fn on_message(
         &mut self,
         message: &mut dyn fyrox::script::ScriptMessagePayload,
-        ctx: &mut LiteMessageContext,
+        ctx: &mut LiteContext,
     ) {
     }
 
@@ -62,7 +61,7 @@ pub trait LiteScript {
         #[allow(unused_variables)] message: &mut dyn ScriptMessagePayload,
         #[allow(unused_variables)] ctx: &mut ScriptMessageContext,
     ) {
-        let mut lite_ctx = LiteMessageContext {
+        let mut lite_ctx = LiteContext {
             node: ctx.handle.into(),
             dt: ctx.dt,
         };
@@ -94,12 +93,5 @@ impl LiteContext {
     // TODO contribute "take" method to "ctx.plugins"
     pub fn with_plugin<T: Plugin, R>(&mut self, f: impl FnOnce(&mut T) -> R) -> R {
         with_script_context(|ctx| f(ctx.plugins.get_mut::<T>()))
-    }
-}
-
-impl LiteMessageContext {
-    // TODO contribute "take" method to "ctx.plugins"
-    pub fn with_plugin<T: Plugin, R>(&mut self, f: impl FnOnce(&mut T) -> R) -> R {
-        with_script_message_context(|ctx| f(ctx.plugins.get_mut::<T>()))
     }
 }

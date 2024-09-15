@@ -5,6 +5,7 @@ use fyrox::core::num_traits::Zero;
 use fyrox::core::ComponentProvider;
 use fyrox::event::{DeviceEvent, MouseButton};
 use fyrox::resource::model::Model;
+use fyrox::script::ScriptMessagePayload;
 use fyrox::{
     core::{
         algebra::Vector3, pool::Handle, reflect::prelude::*, type_traits::prelude::*,
@@ -113,8 +114,8 @@ impl LiteScript for Player {
 
     fn on_message(
         &mut self,
-        message: &mut dyn fyrox::script::ScriptMessagePayload,
-        ctx: &mut fyrox_lite_api::lite_node::LiteMessageContext,
+        message: &mut dyn ScriptMessagePayload,
+        ctx: &mut LiteContext,
     ) {
         if let Some(_bullet) = message.downcast_ref::<BulletHit>() {
             ctx.with_plugin::<Game, _>(|it| it.wounds += 1);
@@ -222,7 +223,7 @@ impl ScriptTrait for Player {
 
     fn on_message(
         &mut self,
-        message: &mut dyn fyrox::script::ScriptMessagePayload,
+        message: &mut dyn ScriptMessagePayload,
         ctx: &mut fyrox::script::ScriptMessageContext,
     ) {
         self.redispatch_message(message, ctx);

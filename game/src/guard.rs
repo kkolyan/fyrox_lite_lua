@@ -7,6 +7,7 @@ use fyrox::rand::random;
 use fyrox::resource::model::Model;
 use fyrox::scene::graph::physics::RayCastOptions;
 use fyrox::scene::rigidbody::RigidBody;
+use fyrox::script::ScriptMessagePayload;
 use fyrox::{
     core::{
         algebra::Vector3, pool::Handle, reflect::prelude::*, type_traits::prelude::*,
@@ -167,8 +168,8 @@ impl LiteScript for Guard {
 
     fn on_message(
         &mut self,
-        message: &mut dyn fyrox::script::ScriptMessagePayload,
-        ctx: &mut fyrox_lite_api::lite_node::LiteMessageContext,
+        message: &mut dyn ScriptMessagePayload,
+        ctx: &mut LiteContext,
     ) {
         if let Some(_bullet) = message.downcast_ref::<BulletHit>() {
             ctx.node.destroy();
@@ -195,7 +196,7 @@ impl ScriptTrait for Guard {
 
     fn on_message(
         &mut self,
-        message: &mut dyn fyrox::script::ScriptMessagePayload,
+        message: &mut dyn ScriptMessagePayload,
         ctx: &mut fyrox::script::ScriptMessageContext,
     ) {
         self.redispatch_message(message, ctx);
