@@ -7,7 +7,11 @@ use fyrox::{
     script::{RoutingStrategy, ScriptMessagePayload, ScriptTrait},
 };
 
-use crate::{lite_physics::LiteRigidBody, script_context::with_script_context};
+use crate::{
+    lite_math::{LiteUnitQuaternion, LiteVector3},
+    lite_physics::LiteRigidBody,
+    script_context::with_script_context,
+};
 use fyrox::graph::BaseSceneGraph;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -44,25 +48,27 @@ impl LiteNode {
         with_script_context(|ctx| ctx.scene.graph.remove_node(self.handle));
     }
 
-    pub fn global_position(&self) -> Vector3<f32> {
-        with_script_context(|ctx| ctx.scene.graph[self.handle].global_position())
+    pub fn global_position(&self) -> LiteVector3 {
+        with_script_context(|ctx| ctx.scene.graph[self.handle].global_position().into())
     }
 
-    pub fn local_position(&self) -> Vector3<f32> {
+    pub fn local_position(&self) -> LiteVector3 {
         with_script_context(|ctx| {
-            *ctx.scene.graph[self.handle]
+            (*ctx.scene.graph[self.handle]
                 .local_transform()
                 .position()
-                .get_value_ref()
+                .get_value_ref())
+            .into()
         })
     }
 
-    pub fn local_rotation(&self) -> UnitQuaternion<f32> {
+    pub fn local_rotation(&self) -> LiteUnitQuaternion {
         with_script_context(|ctx| {
-            *ctx.scene.graph[self.handle]
+            (*ctx.scene.graph[self.handle]
                 .local_transform()
                 .rotation()
-                .get_value_ref()
+                .get_value_ref())
+            .into()
         })
     }
 
@@ -77,19 +83,19 @@ impl LiteNode {
         });
     }
 
-    pub fn set_local_position(&self, new_pos: Vector3<f32>) {
+    pub fn set_local_position(&self, new_pos: LiteVector3) {
         with_script_context(|ctx| {
             ctx.scene.graph[self.handle]
                 .local_transform_mut()
-                .set_position(new_pos);
+                .set_position(new_pos.into());
         });
     }
 
-    pub fn set_local_rotation(&self, value: UnitQuaternion<f32>) {
+    pub fn set_local_rotation(&self, value: LiteUnitQuaternion) {
         with_script_context(|ctx| {
             ctx.scene.graph[self.handle]
                 .local_transform_mut()
-                .set_rotation(value);
+                .set_rotation(value.into());
         });
     }
 
@@ -131,12 +137,12 @@ impl LiteNode {
         })
     }
 
-    pub fn global_rotation(&self) -> UnitQuaternion<f32> {
+    pub fn global_rotation(&self) -> LiteUnitQuaternion {
         with_script_context(|ctx| {
             let camera_global_transform = ctx.scene.graph[self.handle].global_transform();
 
             let rot = camera_global_transform.fixed_view::<3, 3>(0, 0);
-            UnitQuaternion::from_matrix(&rot.into())
+            UnitQuaternion::from_matrix(&rot.into()).into()
         })
     }
 }

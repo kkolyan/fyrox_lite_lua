@@ -17,6 +17,7 @@ use fyrox::{
     script::{ScriptContext, ScriptTrait},
 };
 use fyrox_lite_api::lite_ctx::{LiteContext, LiteScript};
+use fyrox_lite_api::lite_math::{LiteUnitQuaternion, LiteVector3};
 use fyrox_lite_api::lite_node::LiteNode;
 use fyrox_lite_api::lite_window::LiteWindow;
 use std::f32::consts::PI;
@@ -63,9 +64,10 @@ pub struct TempState {
 
 impl Player {
     fn turn(&self, x: f32, ctx: &mut LiteContext) {
+        // TODO use Quaternion instead
         let rot_delta = Rotation3::from_axis_angle(&Vector3::y_axis(), self.sensitivity * x);
         ctx.node
-            .set_local_rotation(ctx.node.local_rotation().mul(&rot_delta));
+            .set_local_rotation(ctx.node.local_rotation().mul(rot_delta));
     }
 
     fn aim(&mut self, y: f32) {
@@ -73,8 +75,8 @@ impl Player {
 
         self.temp.aim_y = self.temp.aim_y.clamp(-PI / 2.0, PI / 2.0);
 
-        LiteNode::from(self.camera).set_local_rotation(UnitQuaternion::from_axis_angle(
-            &Vector3::x_axis(),
+        LiteNode::from(self.camera).set_local_rotation(LiteUnitQuaternion::from_axis_angle(
+            LiteVector3::x_axis(),
             self.temp.aim_y,
         ));
     }
@@ -87,7 +89,7 @@ impl Player {
         Bullet::spawn(BulletSeed {
             prefab,
             origin: camera_pos,
-            direction: bullet_orientation.transform_vector(&Vector3::z_axis()),
+            direction: bullet_orientation.transform_vector(LiteVector3::z_axis()),
             initial_velocity: self.initial_bullet_velocity,
             author_collider: self.collider,
             range: self.shooting_range,
@@ -136,27 +138,27 @@ impl LiteScript for Player {
             }
         }
 
-        let mut move_delta = Vector3::<f32>::zero();
+        let mut move_delta = LiteVector3::zero();
         if self.temp.forward {
-            move_delta.z += 1.0
+            move_delta.set_z(move_delta.get_z() + 1.0)
         }
         if self.temp.back {
-            move_delta.z -= 1.0
+            move_delta.set_z(move_delta.get_z() - 1.0)
         }
         if self.temp.left {
-            move_delta.x += 1.0
+            move_delta.set_x(move_delta.get_x() + 1.0)
         }
         if self.temp.right {
-            move_delta.x -= 1.0
+            move_delta.set_x(move_delta.get_x() - 1.0)
         }
 
         if move_delta.magnitude() > 0.001 {
-            move_delta.normalize_mut();
+            move_delta.normalize_inplace();
         }
 
         let self_rotation = ctx.node.local_rotation();
-        let move_delta = self_rotation.transform_vector(&move_delta);
-        let force = move_delta * self.power;
+        let move_delta = self_rotation.transform_vector(move_delta);
+        let force = move_delta.mul__f32(self.power);
         ctx.node.as_rigid_body().unwrap().apply_force(force);
     }
 

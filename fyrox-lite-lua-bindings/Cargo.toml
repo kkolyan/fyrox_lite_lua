@@ -1,0 +1,8 @@
+[package]
+name = "fyrox-lite-lua-bindings"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fyrox-lite-api = {path = "../fyrox-lite-api"}
+mlua = { version = "0.9.1", features = ["luau"] }

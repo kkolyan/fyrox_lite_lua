@@ -14,7 +14,8 @@ use fyrox::{
     script::{ScriptContext, ScriptTrait},
 };
 use fyrox_lite_api::lite_ctx::{LiteContext, LiteScript};
-use fyrox_lite_api::lite_physics::LitePhysics;
+use fyrox_lite_api::lite_math::{LiteUnitQuaternion, LiteVector3};
+use fyrox_lite_api::lite_physics::{LitePhysics, LiteRayCastOptions};
 use fyrox_lite_api::lite_prefab::LitePrefab;
 use std::ops::Add;
 
@@ -34,8 +35,8 @@ pub struct BulletParams {
 
 pub struct BulletSeed {
     pub prefab: Resource<Model>,
-    pub origin: Vector3<f32>,
-    pub direction: Vector3<f32>,
+    pub origin: LiteVector3,
+    pub direction: LiteVector3,
     pub initial_velocity: f32,
     pub author_collider: Handle<Node>,
     pub range: f32,
@@ -43,11 +44,11 @@ pub struct BulletSeed {
 
 impl Bullet {
     pub fn spawn(seed: BulletSeed) {
-        let orientation = UnitQuaternion::face_towards(&seed.direction, &Vector3::y_axis());
+        let orientation = LiteUnitQuaternion::face_towards(seed.direction, LiteVector3::y_axis());
         let bullet = LitePrefab::from(seed.prefab).instantiate_at(seed.origin, orientation);
         bullet.with_script::<Bullet>(|it| {
             it.params = BulletParams {
-                velocity: seed.direction.normalize() * seed.initial_velocity,
+                velocity: seed.direction.normalize().mul__f32(seed.initial_velocity).into(),
                 remaining_sec: seed.range / seed.initial_velocity,
                 author_collider: seed.author_collider,
             };
@@ -66,11 +67,11 @@ impl LiteScript for Bullet {
             ctx.node.destroy();
             return;
         }
-        let new_pos = ctx.node.local_position().add(self.params.velocity * ctx.dt);
+        let new_pos = ctx.node.local_position().add(LiteVector3::from(self.params.velocity).mul__f32(ctx.dt));
 
-        let opts = RayCastOptions {
-            ray_origin: Point3::from(ctx.node.local_position()),
-            ray_direction: self.params.velocity.normalize(),
+        let opts = LiteRayCastOptions {
+            ray_origin: ctx.node.local_position(),
+            ray_direction: LiteVector3(self.params.velocity).normalize(),
             max_len: self.params.velocity.magnitude() * ctx.dt,
             groups: Default::default(),
             sort_results: true,

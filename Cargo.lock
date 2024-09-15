@@ -290,7 +290,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "regex",
- "rustc-hash",
+ "rustc-hash 1.1.0",
  "shlex",
  "syn 2.0.67",
 ]
@@ -351,6 +351,16 @@ checksum = "15b55663a85f33501257357e6421bb33e769d5c9ffb5ba0921c975a123e35e68"
 dependencies = [
  "block-sys",
  "objc2",
+]
+
+[[package]]
+name = "bstr"
+version = "1.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "40723b8fb387abc38f4f4a37c09073622e41dd12327033091ef8950659e6dc0c"
+dependencies = [
+ "memchr",
+ "serde",
 ]
 
 [[package]]
@@ -449,13 +459,13 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.99"
+version = "1.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96c51067fd44124faa7f870b4b1c969379ad32b2ba805aa959430ceaa384f695"
+checksum = "b62ac837cdb5cb22e10a256099b4fc502b1dfe560cb282963a974d7abd80e476"
 dependencies = [
  "jobserver",
  "libc",
- "once_cell",
+ "shlex",
 ]
 
 [[package]]
@@ -1243,6 +1253,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "fyrox-lite-lua-bindings"
+version = "0.1.0"
+dependencies = [
+ "fyrox-lite-api",
+ "mlua",
+]
+
+[[package]]
 name = "fyrox-math"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1915,6 +1933,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "luau0-src"
+version = "0.10.3+luau640"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f39d12b514a676c943990cfbe6200fedcb9c293c8c9219d29be512a6969be92"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "lz4_flex"
 version = "0.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1999,6 +2026,32 @@ dependencies = [
  "log",
  "wasi",
  "windows-sys 0.48.0",
+]
+
+[[package]]
+name = "mlua"
+version = "0.9.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d111deb18a9c9bd33e1541309f4742523bfab01d276bfa9a27519f6de9c11dc7"
+dependencies = [
+ "bstr",
+ "libloading",
+ "mlua-sys",
+ "num-traits",
+ "once_cell",
+ "rustc-hash 2.0.0",
+]
+
+[[package]]
+name = "mlua-sys"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ebe026d6bd1583a9cf9080e189030ddaea7e6f5f0deb366a8e26f8a26c4135b8"
+dependencies = [
+ "cc",
+ "cfg-if",
+ "luau0-src",
+ "pkg-config",
 ]
 
 [[package]]
@@ -2369,7 +2422,7 @@ dependencies = [
  "nalgebra",
  "num-derive",
  "num-traits",
- "rustc-hash",
+ "rustc-hash 1.1.0",
  "simba",
  "slab",
  "smallvec",
@@ -2391,7 +2444,7 @@ dependencies = [
  "nalgebra",
  "num-derive",
  "num-traits",
- "rustc-hash",
+ "rustc-hash 1.1.0",
  "simba",
  "slab",
  "smallvec",
@@ -2635,7 +2688,7 @@ dependencies = [
  "num-traits",
  "ordered-float",
  "parry2d",
- "rustc-hash",
+ "rustc-hash 1.1.0",
  "simba",
  "thiserror",
 ]
@@ -2658,7 +2711,7 @@ dependencies = [
  "num-traits",
  "ordered-float",
  "parry3d",
- "rustc-hash",
+ "rustc-hash 1.1.0",
  "simba",
  "thiserror",
 ]
@@ -2877,6 +2930,12 @@ name = "rustc-hash"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
+
+[[package]]
+name = "rustc-hash"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "583034fd73374156e66797ed8e5b0d5690409c9226b22d87cb7f19821c05d152"
 
 [[package]]
 name = "rustfft"

@@ -15,8 +15,9 @@ use fyrox::{
     script::{ScriptContext, ScriptTrait},
 };
 use fyrox_lite_api::lite_ctx::{LiteContext, LiteScript};
+use fyrox_lite_api::lite_math::LiteVector3;
 use fyrox_lite_api::lite_node::LiteNode;
-use fyrox_lite_api::lite_physics::LitePhysics;
+use fyrox_lite_api::lite_physics::{LitePhysics, LiteRayCastOptions};
 use std::ops::Sub;
 
 use crate::bullet::{Bullet, BulletHit, BulletSeed};
@@ -68,7 +69,7 @@ impl Guard {
         if self.can_see_player(player_pos, sight_vector) {
             Bullet::spawn(BulletSeed {
                 prefab: self.bullet_prefab.as_ref().unwrap().clone(),
-                origin: self_pos + Vector3::new(0.0, self.gun_height, 0.0),
+                origin: self_pos.add(LiteVector3::new(0.0, self.gun_height, 0.0)),
                 direction: sight_vector,
                 initial_velocity: self.initial_bullet_velocity,
                 author_collider: self.collider,
@@ -81,9 +82,9 @@ impl Guard {
         false
     }
 
-    fn can_see_player(&self, player_pos: Vector3<f32>, sight_vector: Vector3<f32>) -> bool {
-        let opts = RayCastOptions {
-            ray_origin: Point3::from(player_pos),
+    fn can_see_player(&self, player_pos: LiteVector3, sight_vector: LiteVector3) -> bool {
+        let opts = LiteRayCastOptions {
+            ray_origin: player_pos,
             ray_direction: sight_vector.normalize(),
             max_len: sight_vector.magnitude(),
             groups: Default::default(),
@@ -123,11 +124,11 @@ impl Guard {
             });
         }
         let pos = ctx.node.local_position();
-        let vector_to_beacon = self.current_waypoint.unwrap().sub(pos);
+        let vector_to_beacon = LiteVector3(self.current_waypoint.unwrap()).sub(pos);
         if vector_to_beacon.magnitude() < self.beacon_reached_distance {
             self.current_waypoint = None;
         } else {
-            let force = vector_to_beacon.normalize() * self.move_power;
+            let force = vector_to_beacon.normalize().mul__f32(self.move_power);
             ctx.node.as_rigid_body().unwrap().apply_force(force);
         }
     }

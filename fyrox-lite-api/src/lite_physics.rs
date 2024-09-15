@@ -6,23 +6,24 @@ use fyrox::{
         pool::Handle,
     },
     scene::{
+        collider,
         graph::physics::{FeatureId, Intersection, QueryResultsStorage, RayCastOptions},
         node::Node,
     },
 };
 
-use crate::{lite_node::LiteNode, script_context::with_script_context};
+use crate::{lite_math::LiteVector3, lite_node::LiteNode, script_context::with_script_context};
 
 #[derive(Debug)]
 pub struct LitePhysics;
 
 impl LitePhysics {
-    pub fn cast_ray(opts: RayCastOptions, results: &mut Vec<LiteIntersection>) {
+    pub fn cast_ray(opts: LiteRayCastOptions, results: &mut Vec<LiteIntersection>) {
         with_script_context(|ctx| {
             ctx.scene
                 .graph
                 .physics
-                .cast_ray(opts, &mut QueryResultsStorageWrapper(results));
+                .cast_ray(opts.into(), &mut QueryResultsStorageWrapper(results));
         });
     }
 }
@@ -115,17 +116,54 @@ pub struct LiteIntersection {
     /// Distance from the ray origin.
     pub toi: f32,
 }
+pub struct LiteRayCastOptions {
+    /// A ray origin.
+    pub ray_origin: LiteVector3,
 
+    /// A ray direction. Can be non-normalized.
+    pub ray_direction: LiteVector3,
+
+    /// Maximum distance of cast.
+    pub max_len: f32,
+
+    /// Groups to check.
+    pub groups: collider::InteractionGroups,
+
+    /// Whether to sort intersections from closest to farthest.
+    pub sort_results: bool,
+}
+
+impl From<LiteRayCastOptions> for RayCastOptions {
+    fn from(
+        LiteRayCastOptions {
+            ray_origin,
+            ray_direction,
+            max_len,
+            groups,
+            sort_results,
+        }: LiteRayCastOptions,
+    ) -> Self {
+        RayCastOptions {
+            ray_origin: Point3::from(Vector3::from(ray_origin)),
+            ray_direction: ray_direction.into(),
+            max_len,
+            groups,
+            sort_results,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
 pub struct LiteRigidBody {
     pub handle: Handle<Node>,
 }
 
 impl LiteRigidBody {
-    pub fn apply_force(&mut self, force: Vector3<f32>) {
+    pub fn apply_force(&mut self, force: LiteVector3) {
         with_script_context(|ctx| {
             ctx.scene.graph[self.handle]
                 .as_rigid_body_mut()
-                .apply_force(force)
+                .apply_force(force.into())
         })
     }
 }

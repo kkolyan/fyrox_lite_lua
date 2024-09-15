@@ -16,7 +16,7 @@ pub struct Beacon {}
 impl LiteScript for Beacon {
     fn on_update(&mut self, ctx: &mut LiteContext) {
         let pos = ctx.node.global_position();
-        ctx.with_plugin::<Game, _>(|it| it.beacons.push(pos));
+        ctx.with_plugin::<Game, _>(|it| it.beacons.push(pos.into()));
         ctx.node.destroy();
         println!("beacon registered: {:?}", ctx.node);
     }
