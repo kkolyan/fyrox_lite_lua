@@ -2,8 +2,7 @@
 use fyrox::asset::Resource;
 use fyrox::core::algebra::{Point3, UnitQuaternion};
 use fyrox::core::ComponentProvider;
-use fyrox::graph::BaseSceneGraph;
-use fyrox::resource::model::{Model, ModelResourceExtension};
+use fyrox::resource::model::Model;
 use fyrox::scene::graph::physics::RayCastOptions;
 use fyrox::script::RoutingStrategy;
 use fyrox::{
@@ -11,11 +10,10 @@ use fyrox::{
         algebra::Vector3, pool::Handle, reflect::prelude::*, type_traits::prelude::*,
         visitor::prelude::*, TypeUuidProvider,
     },
-    scene::{node::Node, Scene},
+    scene::node::Node,
     script::{ScriptContext, ScriptTrait},
 };
 use fyrox_lite_api::lite_ctx::{LiteContext, LiteScript};
-use fyrox_lite_api::lite_node::LiteNode;
 use fyrox_lite_api::lite_physics::LitePhysics;
 use fyrox_lite_api::lite_prefab::LitePrefab;
 use std::ops::Add;
@@ -46,7 +44,7 @@ pub struct BulletSeed {
 impl Bullet {
     pub fn spawn(seed: BulletSeed) {
         let orientation = UnitQuaternion::face_towards(&seed.direction, &Vector3::y_axis());
-        let bullet = LitePrefab::from(seed.prefab).instantiate_at( seed.origin, orientation);
+        let bullet = LitePrefab::from(seed.prefab).instantiate_at(seed.origin, orientation);
         bullet.with_script::<Bullet>(|it| {
             it.params = BulletParams {
                 velocity: seed.direction.normalize() * seed.initial_velocity,
@@ -87,7 +85,8 @@ impl LiteScript for Bullet {
             if hit.collider == self.params.author_collider.into() {
                 continue;
             }
-            hit.collider.send_hierarchical(RoutingStrategy::Up, BulletHit {});
+            hit.collider
+                .send_hierarchical(RoutingStrategy::Up, BulletHit {});
             ctx.node.destroy();
             return;
         }

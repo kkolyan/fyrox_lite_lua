@@ -5,23 +5,28 @@ use fyrox::{
 };
 
 use crate::{
-    lite_node::{LiteNode},
+    lite_node::LiteNode,
     script_context::{with_script_context, without_script_context, without_script_message_context},
 };
 
 pub trait LiteScript {
-    fn on_init(&mut self, ctx: &mut LiteContext) {}
-    fn on_start(&mut self, ctx: &mut LiteContext) {}
-    fn on_update(&mut self, ctx: &mut LiteContext) {}
+    fn on_init(&mut self, #[allow(unused_variables)] ctx: &mut LiteContext) {}
+    fn on_start(&mut self, #[allow(unused_variables)] ctx: &mut LiteContext) {}
+    fn on_update(&mut self, #[allow(unused_variables)] ctx: &mut LiteContext) {}
 
     fn on_message(
         &mut self,
-        message: &mut dyn fyrox::script::ScriptMessagePayload,
-        ctx: &mut LiteContext,
+        #[allow(unused_variables)] message: &mut dyn fyrox::script::ScriptMessagePayload,
+        #[allow(unused_variables)] ctx: &mut LiteContext,
     ) {
     }
 
-    fn on_os_event(&mut self, event: &Event<()>, ctx: &mut LiteContext) {}
+    fn on_os_event(
+        &mut self,
+        #[allow(unused_variables)] event: &Event<()>,
+        #[allow(unused_variables)] ctx: &mut LiteContext,
+    ) {
+    }
 
     fn redispatch_init(&mut self, ctx: &mut ScriptContext) {
         let mut lite_ctx = LiteContext {

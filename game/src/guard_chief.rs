@@ -4,7 +4,7 @@ use fyrox::core::algebra::UnitQuaternion;
 use fyrox::core::log::Log;
 use fyrox::core::ComponentProvider;
 use fyrox::rand::random;
-use fyrox::resource::model::{Model, ModelResourceExtension};
+use fyrox::resource::model::Model;
 use fyrox::{
     core::{
         algebra::Vector3, reflect::prelude::*, type_traits::prelude::*, visitor::prelude::*,
@@ -48,10 +48,8 @@ impl LiteScript for GuardChief {
 
                     let orientation = UnitQuaternion::from_axis_angle(&Vector3::y_axis(), random());
 
-                    LitePrefab::from(self.gaurd_prefab.as_ref().unwrap().clone()).instantiate_at(
-                        position,
-                        orientation,
-                    );
+                    LitePrefab::from(self.gaurd_prefab.as_ref().unwrap().clone())
+                        .instantiate_at(position, orientation);
                     Log::info(format!("guard spawned at {:?}", position));
                 } else {
                     Log::err("cannot spawn guards: no beacons found");

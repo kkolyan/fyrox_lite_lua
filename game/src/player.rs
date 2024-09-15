@@ -23,7 +23,6 @@ use std::f32::consts::PI;
 use std::ops::Mul;
 
 use crate::bullet::{Bullet, BulletHit, BulletSeed};
-use crate::fyrox_utils::HandleNodeExt;
 use crate::game::Game;
 
 #[derive(Visit, Reflect, Debug, Clone, TypeUuidProvider, ComponentProvider, Default)]
@@ -112,11 +111,7 @@ impl LiteScript for Player {
         ctx.node.subscribe_to::<BulletHit>();
     }
 
-    fn on_message(
-        &mut self,
-        message: &mut dyn ScriptMessagePayload,
-        ctx: &mut LiteContext,
-    ) {
+    fn on_message(&mut self, message: &mut dyn ScriptMessagePayload, ctx: &mut LiteContext) {
         if let Some(_bullet) = message.downcast_ref::<BulletHit>() {
             ctx.with_plugin::<Game, _>(|it| it.wounds += 1);
             println!("player wounded!");
@@ -159,7 +154,7 @@ impl LiteScript for Player {
             move_delta.normalize_mut();
         }
 
-        let self_rotation = ctx.node.local_rotation().clone();
+        let self_rotation = ctx.node.local_rotation();
         let move_delta = self_rotation.transform_vector(&move_delta);
         let force = move_delta * self.power;
         ctx.node.with_rigid_body(|it| it.apply_force(force));

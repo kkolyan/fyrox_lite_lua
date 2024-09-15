@@ -1,6 +1,5 @@
 //! Game project.
 use fyrox::core::ComponentProvider;
-use fyrox::graph::BaseSceneGraph;
 use fyrox::{
     core::{reflect::prelude::*, type_traits::prelude::*, visitor::prelude::*, TypeUuidProvider},
     script::{ScriptContext, ScriptTrait},

@@ -2,11 +2,9 @@
 use fyrox::asset::Resource;
 use fyrox::core::algebra::Point3;
 use fyrox::core::ComponentProvider;
-use fyrox::graph::BaseSceneGraph;
 use fyrox::rand::random;
 use fyrox::resource::model::Model;
 use fyrox::scene::graph::physics::RayCastOptions;
-use fyrox::scene::rigidbody::RigidBody;
 use fyrox::script::ScriptMessagePayload;
 use fyrox::{
     core::{
@@ -22,7 +20,6 @@ use fyrox_lite_api::lite_physics::LitePhysics;
 use std::ops::Sub;
 
 use crate::bullet::{Bullet, BulletHit, BulletSeed};
-use crate::fyrox_utils::HandleNodeExt;
 use crate::game::Game;
 use crate::player::Player;
 
@@ -58,7 +55,9 @@ pub struct Guard {
 
 impl Guard {
     fn try_attack_player(&mut self, ctx: &mut LiteContext) -> bool {
-        let player_pos = ctx.with_plugin::<Game, _>(|it| LiteNode::from(it.player)).global_position();
+        let player_pos = ctx
+            .with_plugin::<Game, _>(|it| LiteNode::from(it.player))
+            .global_position();
         let self_pos = ctx.node.global_position();
         let sight_vector = player_pos.sub(self_pos);
         println!(
@@ -66,17 +65,15 @@ impl Guard {
             player_pos, self_pos
         );
 
-        if self.can_see_player(ctx, player_pos, sight_vector) {
-            Bullet::spawn(
-                BulletSeed {
-                    prefab: self.bullet_prefab.as_ref().unwrap().clone(),
-                    origin: self_pos + Vector3::new(0.0, self.gun_height, 0.0),
-                    direction: sight_vector,
-                    initial_velocity: self.initial_bullet_velocity,
-                    author_collider: self.collider,
-                    range: self.attack_range,
-                },
-            );
+        if self.can_see_player(player_pos, sight_vector) {
+            Bullet::spawn(BulletSeed {
+                prefab: self.bullet_prefab.as_ref().unwrap().clone(),
+                origin: self_pos + Vector3::new(0.0, self.gun_height, 0.0),
+                direction: sight_vector,
+                initial_velocity: self.initial_bullet_velocity,
+                author_collider: self.collider,
+                range: self.attack_range,
+            });
             self.reloading_sec = self.reload_delay_sec;
             return true;
         }
@@ -84,12 +81,7 @@ impl Guard {
         false
     }
 
-    fn can_see_player(
-        &self,
-        ctx: &LiteContext,
-        player_pos: Vector3<f32>,
-        sight_vector: Vector3<f32>,
-    ) -> bool {
+    fn can_see_player(&self, player_pos: Vector3<f32>, sight_vector: Vector3<f32>) -> bool {
         let opts = RayCastOptions {
             ray_origin: Point3::from(player_pos),
             ray_direction: sight_vector.normalize(),
@@ -166,11 +158,7 @@ impl LiteScript for Guard {
         }
     }
 
-    fn on_message(
-        &mut self,
-        message: &mut dyn ScriptMessagePayload,
-        ctx: &mut LiteContext,
-    ) {
+    fn on_message(&mut self, message: &mut dyn ScriptMessagePayload, ctx: &mut LiteContext) {
         if let Some(_bullet) = message.downcast_ref::<BulletHit>() {
             ctx.node.destroy();
             ctx.with_plugin::<Game, _>(|it| {
