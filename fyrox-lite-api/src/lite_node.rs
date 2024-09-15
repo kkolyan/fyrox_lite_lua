@@ -27,23 +27,23 @@ impl From<LiteNode> for Handle<Node> {
 impl LiteNode {
     pub fn with_rigid_body(&mut self, f: impl FnOnce(&mut RigidBody)) {
         with_script_context(|ctx| {
-            f(ctx.scene.graph[self.handle]
+            f(ctx.scene().graph[self.handle]
                 .cast_mut::<RigidBody>()
                 .unwrap());
         });
     }
 
     pub fn destroy(&mut self) {
-        with_script_context(|ctx| ctx.scene.graph.remove_node(self.handle));
+        with_script_context(|ctx| ctx.scene().graph.remove_node(self.handle));
     }
 
     pub fn global_position(&self) -> Vector3<f32> {
-        with_script_context(|ctx| ctx.scene.graph[ctx.handle].global_position())
+        with_script_context(|ctx| ctx.scene().graph[ctx.handle()].global_position())
     }
 
     pub fn local_position(&self) -> Vector3<f32> {
         with_script_context(|ctx| {
-            *ctx.scene.graph[ctx.handle]
+            *ctx.scene().graph[ctx.handle()]
                 .local_transform()
                 .position()
                 .get_value_ref()
@@ -52,7 +52,7 @@ impl LiteNode {
 
     pub fn local_rotation(&self) -> UnitQuaternion<f32> {
         with_script_context(|ctx| {
-            *ctx.scene.graph[ctx.handle]
+            *ctx.scene().graph[ctx.handle()]
                 .local_transform()
                 .rotation()
                 .get_value_ref()
@@ -72,7 +72,7 @@ impl LiteNode {
 
     pub fn set_local_position(&self, new_pos: Vector3<f32>) {
         with_script_context(|ctx| {
-            ctx.scene.graph[ctx.handle]
+            ctx.scene().graph[ctx.handle()]
                 .local_transform_mut()
                 .set_position(new_pos);
         });
@@ -80,7 +80,7 @@ impl LiteNode {
 
     pub fn set_local_rotation(&self, value: UnitQuaternion<f32>) {
         with_script_context(|ctx| {
-            ctx.scene.graph[ctx.handle]
+            ctx.scene().graph[ctx.handle()]
                 .local_transform_mut()
                 .set_rotation(value);
         });
@@ -94,11 +94,11 @@ impl LiteNode {
 
     pub fn try_get_collider(&self) -> Option<LiteNode> {
         with_script_context(|ctx| {
-            ctx.scene.graph[self.handle]
+            ctx.scene().graph[self.handle]
                 .children()
                 .iter()
                 .copied()
-                .find(|it| ctx.scene.graph[*it].is_collider())
+                .find(|it| ctx.scene().graph[*it].is_collider())
                 .map(|it| it.into())
         })
     }
@@ -108,16 +108,16 @@ impl LiteNode {
     }
 
     pub fn has_script<T: ScriptTrait>(&self) -> bool {
-        with_script_context(|ctx| ctx.scene.graph[self.handle].has_script::<T>())
+        with_script_context(|ctx| ctx.scene().graph[self.handle].has_script::<T>())
     }
 
     pub fn parent(&self) -> LiteNode {
-        with_script_context(|ctx| ctx.scene.graph[self.handle].parent().into())
+        with_script_context(|ctx| ctx.scene().graph[self.handle].parent().into())
     }
 
     pub fn with_script<T: ScriptTrait>(&self, f: impl FnOnce(&mut T)) {
         with_script_context(|ctx| {
-			let node = &mut ctx.scene.graph[self.handle];
+			let node = &mut ctx.scene().graph[self.handle];
 			f(node.try_get_script_mut::<T>().unwrap());
         })
     }
@@ -125,7 +125,7 @@ impl LiteNode {
 	pub fn global_rotation(&self) -> UnitQuaternion<f32> {
         with_script_context(|ctx| {
 		
-			let camera_global_transform = ctx.scene.graph[self.handle].global_transform();
+			let camera_global_transform = ctx.scene().graph[self.handle].global_transform();
 	
 			let rot = camera_global_transform.fixed_view::<3, 3>(0, 0);
 			UnitQuaternion::from_matrix(&rot.into())

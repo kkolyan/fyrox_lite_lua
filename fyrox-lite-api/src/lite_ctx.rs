@@ -6,7 +6,7 @@ use fyrox::{
 
 use crate::{
     lite_node::{LiteMessageContext, LiteNode},
-    script_context::{with_script_context, without_script_context},
+    script_context::{with_script_context, without_script_context, UnifiedScriptContext},
     script_message_context::{with_script_message_context, without_script_message_context},
 };
 
@@ -26,8 +26,8 @@ pub trait LiteScript {
 
     fn redispatch_init(&mut self, ctx: &mut ScriptContext) {
         let mut lite_ctx = LiteContext {
-            node: ctx.handle.into(),
-            dt: ctx.dt,
+            node: ctx.handle().into(),
+            dt: ctx.dt(),
         };
 
         without_script_context(ctx, || {
@@ -37,8 +37,8 @@ pub trait LiteScript {
 
     fn redispatch_start(&mut self, ctx: &mut ScriptContext) {
         let mut lite_ctx = LiteContext {
-            node: ctx.handle.into(),
-            dt: ctx.dt,
+            node: ctx.handle().into(),
+            dt: ctx.dt(),
         };
 
         without_script_context(ctx, || {
@@ -48,8 +48,8 @@ pub trait LiteScript {
 
     fn redispatch_update(&mut self, ctx: &mut ScriptContext) {
         let mut lite_ctx = LiteContext {
-            node: ctx.handle.into(),
-            dt: ctx.dt,
+            node: ctx.handle().into(),
+            dt: ctx.dt(),
         };
 
         without_script_context(ctx, || {
@@ -63,8 +63,8 @@ pub trait LiteScript {
         #[allow(unused_variables)] ctx: &mut ScriptMessageContext,
     ) {
         let mut lite_ctx = LiteMessageContext {
-            node: ctx.handle.into(),
-            dt: ctx.dt,
+            node: ctx.handle().into(),
+            dt: ctx.dt(),
         };
 
         without_script_message_context(ctx, || {
@@ -74,8 +74,8 @@ pub trait LiteScript {
 
     fn redispatch_os_event(&mut self, event: &Event<()>, ctx: &mut ScriptContext) {
         let mut lite_ctx = LiteContext {
-            node: ctx.handle.into(),
-            dt: ctx.dt,
+            node: ctx.handle().into(),
+            dt: ctx.dt(),
         };
 
         without_script_context(ctx, || {
