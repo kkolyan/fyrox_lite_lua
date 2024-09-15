@@ -43,12 +43,12 @@ impl LiteNode {
     }
 
     pub fn global_position(&self) -> Vector3<f32> {
-        with_script_context(|ctx| ctx.scene.graph[ctx.handle].global_position())
+        with_script_context(|ctx| ctx.scene.graph[self.handle].global_position())
     }
 
     pub fn local_position(&self) -> Vector3<f32> {
         with_script_context(|ctx| {
-            *ctx.scene.graph[ctx.handle]
+            *ctx.scene.graph[self.handle]
                 .local_transform()
                 .position()
                 .get_value_ref()
@@ -57,7 +57,7 @@ impl LiteNode {
 
     pub fn local_rotation(&self) -> UnitQuaternion<f32> {
         with_script_context(|ctx| {
-            *ctx.scene.graph[ctx.handle]
+            *ctx.scene.graph[self.handle]
                 .local_transform()
                 .rotation()
                 .get_value_ref()
@@ -136,13 +136,5 @@ impl LiteNode {
             let rot = camera_global_transform.fixed_view::<3, 3>(0, 0);
             UnitQuaternion::from_matrix(&rot.into())
         })
-    }
-
-    pub fn turn(&self, x: f32) {
-        with_script_context(|ctx| {
-            let self_transform = ctx.scene.graph[ctx.handle].local_transform_mut();
-            let rot_delta = Rotation3::from_axis_angle(&Vector3::y_axis(), x);
-            self_transform.set_rotation(self_transform.rotation().mul(&rot_delta));
-        });
     }
 }
