@@ -3,7 +3,7 @@ use fyrox::{
         algebra::{UnitQuaternion, Vector3},
         pool::Handle,
     },
-    scene::{node::Node, rigidbody::RigidBody},
+    scene::node::Node,
     script::{RoutingStrategy, ScriptMessagePayload, ScriptTrait},
 };
 
@@ -28,11 +28,12 @@ impl From<LiteNode> for Handle<Node> {
 }
 
 impl LiteNode {
-
     pub fn as_rigid_body(&mut self) -> Option<LiteRigidBody> {
         with_script_context(|ctx| {
             if ctx.scene.graph[self.handle].is_rigid_body() {
-                Some(LiteRigidBody{ handle: self.handle })
+                Some(LiteRigidBody {
+                    handle: self.handle,
+                })
             } else {
                 None
             }
