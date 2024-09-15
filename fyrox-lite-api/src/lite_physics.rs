@@ -1,8 +1,14 @@
 use std::cmp::Ordering;
 
 use fyrox::{
-    core::algebra::{Point3, Vector3},
-    scene::graph::physics::{FeatureId, Intersection, QueryResultsStorage, RayCastOptions},
+    core::{
+        algebra::{Point3, Vector3},
+        pool::Handle,
+    },
+    scene::{
+        graph::physics::{FeatureId, Intersection, QueryResultsStorage, RayCastOptions},
+        node::Node,
+    },
 };
 
 use crate::{lite_node::LiteNode, script_context::with_script_context};
@@ -13,14 +19,17 @@ pub struct LitePhysics;
 impl LitePhysics {
     pub fn cast_ray(opts: RayCastOptions, results: &mut Vec<LiteIntersection>) {
         with_script_context(|ctx| {
-            ctx.scene.graph.physics.cast_ray(opts, &mut QueryResultsStorageWrapper(results));
+            ctx.scene
+                .graph
+                .physics
+                .cast_ray(opts, &mut QueryResultsStorageWrapper(results));
         });
     }
 }
 
 struct QueryResultsStorageWrapper<'a>(&'a mut Vec<LiteIntersection>);
 
-impl <'a> QueryResultsStorage for QueryResultsStorageWrapper<'a> {
+impl<'a> QueryResultsStorage for QueryResultsStorageWrapper<'a> {
     fn push(&mut self, intersection: Intersection) -> bool {
         self.0.push(LiteIntersection::from(&intersection));
         true
@@ -105,4 +114,18 @@ pub struct LiteIntersection {
 
     /// Distance from the ray origin.
     pub toi: f32,
+}
+
+pub struct LiteRigidBody {
+    pub handle: Handle<Node>,
+}
+
+impl LiteRigidBody {
+    pub fn apply_force(&mut self, force: Vector3<f32>) {
+        with_script_context(|ctx| {
+            ctx.scene.graph[self.handle]
+                .as_rigid_body_mut()
+                .apply_force(force)
+        })
+    }
 }

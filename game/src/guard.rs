@@ -128,9 +128,7 @@ impl Guard {
             self.current_waypoint = None;
         } else {
             let force = vector_to_beacon.normalize() * self.move_power;
-            ctx.node.with_rigid_body(|it| {
-                it.apply_force(force);
-            });
+            ctx.node.as_rigid_body().unwrap().apply_force(force);
         }
     }
 }

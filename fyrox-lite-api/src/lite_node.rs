@@ -7,7 +7,7 @@ use fyrox::{
     script::{RoutingStrategy, ScriptMessagePayload, ScriptTrait},
 };
 
-use crate::script_context::with_script_context;
+use crate::{lite_physics::LiteRigidBody, script_context::with_script_context};
 use fyrox::graph::BaseSceneGraph;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -28,12 +28,15 @@ impl From<LiteNode> for Handle<Node> {
 }
 
 impl LiteNode {
-    pub fn with_rigid_body(&mut self, f: impl FnOnce(&mut RigidBody)) {
+
+    pub fn as_rigid_body(&mut self) -> Option<LiteRigidBody> {
         with_script_context(|ctx| {
-            f(ctx.scene.graph[self.handle]
-                .cast_mut::<RigidBody>()
-                .unwrap());
-        });
+            if ctx.scene.graph[self.handle].is_rigid_body() {
+                Some(LiteRigidBody{ handle: self.handle })
+            } else {
+                None
+            }
+        })
     }
 
     pub fn destroy(&mut self) {

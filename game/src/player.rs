@@ -157,7 +157,7 @@ impl LiteScript for Player {
         let self_rotation = ctx.node.local_rotation();
         let move_delta = self_rotation.transform_vector(&move_delta);
         let force = move_delta * self.power;
-        ctx.node.with_rigid_body(|it| it.apply_force(force));
+        ctx.node.as_rigid_body().unwrap().apply_force(force);
     }
 
     fn on_os_event(&mut self, event: &Event<()>, ctx: &mut LiteContext) {
