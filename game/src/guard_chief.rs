@@ -1,19 +1,18 @@
 //! Game project.
 use fyrox::asset::Resource;
-use fyrox::core::algebra::UnitQuaternion;
 use fyrox::core::log::Log;
 use fyrox::core::ComponentProvider;
 use fyrox::rand::random;
 use fyrox::resource::model::Model;
 use fyrox::{
     core::{
-        algebra::Vector3, reflect::prelude::*, type_traits::prelude::*, visitor::prelude::*,
+        reflect::prelude::*, type_traits::prelude::*, visitor::prelude::*,
         TypeUuidProvider,
     },
     script::{ScriptContext, ScriptTrait},
 };
 use fyrox_lite_api::lite_ctx::LiteScript;
-use fyrox_lite_api::lite_math::{LiteUnitQuaternion, LiteVector3};
+use fyrox_lite_api::lite_math::{LiteQuaternion, LiteVector3};
 use fyrox_lite_api::lite_prefab::LitePrefab;
 
 use crate::game::Game;
@@ -47,7 +46,7 @@ impl LiteScript for GuardChief {
                 if !beacons.is_empty() {
                     let position = LiteVector3::from(beacons[random::<usize>() % beacons.len()]);
 
-                    let orientation = LiteUnitQuaternion::from_axis_angle(LiteVector3::y_axis(), random());
+                    let orientation = LiteQuaternion::from_axis_angle(LiteVector3::y_axis(), random());
 
                     LitePrefab::from(self.gaurd_prefab.as_ref().unwrap().clone())
                         .instantiate_at(position, orientation);

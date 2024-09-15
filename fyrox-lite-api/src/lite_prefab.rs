@@ -4,7 +4,7 @@ use fyrox::{
     resource::model::{Model, ModelResourceExtension},
 };
 
-use crate::{lite_math::{LiteUnitQuaternion, LiteVector3}, lite_node::LiteNode, script_context::with_script_context};
+use crate::{lite_math::{LiteQuaternion, LiteVector3}, lite_node::LiteNode, script_context::with_script_context};
 
 pub struct LitePrefab {
     resource: Resource<Model>,
@@ -20,7 +20,7 @@ impl LitePrefab {
     pub fn instantiate_at(
         &self,
         position: LiteVector3,
-        orientation: LiteUnitQuaternion,
+        orientation: LiteQuaternion,
     ) -> LiteNode {
         with_script_context(|ctx| {
             self.resource

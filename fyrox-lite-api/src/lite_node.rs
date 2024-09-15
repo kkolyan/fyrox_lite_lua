@@ -8,7 +8,7 @@ use fyrox::{
 };
 
 use crate::{
-    lite_math::{LiteUnitQuaternion, LiteVector3},
+    lite_math::{LiteQuaternion, LiteVector3},
     lite_physics::LiteRigidBody,
     script_context::with_script_context,
 };
@@ -62,7 +62,7 @@ impl LiteNode {
         })
     }
 
-    pub fn local_rotation(&self) -> LiteUnitQuaternion {
+    pub fn local_rotation(&self) -> LiteQuaternion {
         with_script_context(|ctx| {
             (*ctx.scene.graph[self.handle]
                 .local_transform()
@@ -91,7 +91,7 @@ impl LiteNode {
         });
     }
 
-    pub fn set_local_rotation(&self, value: LiteUnitQuaternion) {
+    pub fn set_local_rotation(&self, value: LiteQuaternion) {
         with_script_context(|ctx| {
             ctx.scene.graph[self.handle]
                 .local_transform_mut()
@@ -137,7 +137,7 @@ impl LiteNode {
         })
     }
 
-    pub fn global_rotation(&self) -> LiteUnitQuaternion {
+    pub fn global_rotation(&self) -> LiteQuaternion {
         with_script_context(|ctx| {
             let camera_global_transform = ctx.scene.graph[self.handle].global_transform();
 

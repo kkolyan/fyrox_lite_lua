@@ -17,7 +17,7 @@ use fyrox::{
     script::{ScriptContext, ScriptTrait},
 };
 use fyrox_lite_api::lite_ctx::{LiteContext, LiteScript};
-use fyrox_lite_api::lite_math::{LiteUnitQuaternion, LiteVector3};
+use fyrox_lite_api::lite_math::{LiteQuaternion, LiteVector3};
 use fyrox_lite_api::lite_node::LiteNode;
 use fyrox_lite_api::lite_window::LiteWindow;
 use std::f32::consts::PI;
@@ -65,9 +65,9 @@ pub struct TempState {
 impl Player {
     fn turn(&self, x: f32, ctx: &mut LiteContext) {
         // TODO use Quaternion instead
-        let rot_delta = Rotation3::from_axis_angle(&Vector3::y_axis(), self.sensitivity * x);
+        let rot_delta = LiteQuaternion::from_axis_angle(LiteVector3::y_axis(), self.sensitivity * x);
         ctx.node
-            .set_local_rotation(ctx.node.local_rotation().mul(rot_delta));
+            .set_local_rotation(ctx.node.local_rotation().mul__LiteQuaternion(rot_delta));
     }
 
     fn aim(&mut self, y: f32) {
@@ -75,7 +75,7 @@ impl Player {
 
         self.temp.aim_y = self.temp.aim_y.clamp(-PI / 2.0, PI / 2.0);
 
-        LiteNode::from(self.camera).set_local_rotation(LiteUnitQuaternion::from_axis_angle(
+        LiteNode::from(self.camera).set_local_rotation(LiteQuaternion::from_axis_angle(
             LiteVector3::x_axis(),
             self.temp.aim_y,
         ));
@@ -89,7 +89,7 @@ impl Player {
         Bullet::spawn(BulletSeed {
             prefab,
             origin: camera_pos,
-            direction: bullet_orientation.transform_vector(LiteVector3::z_axis()),
+            direction: bullet_orientation.mul__LiteVector(LiteVector3::z_axis()),
             initial_velocity: self.initial_bullet_velocity,
             author_collider: self.collider,
             range: self.shooting_range,
@@ -157,7 +157,7 @@ impl LiteScript for Player {
         }
 
         let self_rotation = ctx.node.local_rotation();
-        let move_delta = self_rotation.transform_vector(move_delta);
+        let move_delta = self_rotation.mul__LiteVector(move_delta);
         let force = move_delta.mul__f32(self.power);
         ctx.node.as_rigid_body().unwrap().apply_force(force);
     }

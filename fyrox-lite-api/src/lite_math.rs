@@ -78,36 +78,36 @@ impl From<LiteVector3> for Vector3<f32> {
 }
 
 #[derive(Clone, Copy)]
-pub struct LiteUnitQuaternion(UnitQuaternion<f32>);
+pub struct LiteQuaternion(UnitQuaternion<f32>);
 
-impl LiteUnitQuaternion {
-    pub fn face_towards(dir: LiteVector3, up: LiteVector3) -> LiteUnitQuaternion {
-        LiteUnitQuaternion(UnitQuaternion::face_towards(&dir.into(), &up.into()))
+impl LiteQuaternion {
+    pub fn face_towards(dir: LiteVector3, up: LiteVector3) -> LiteQuaternion {
+        LiteQuaternion(UnitQuaternion::face_towards(&dir.into(), &up.into()))
     }
-    pub fn from_axis_angle(axis: LiteVector3, angle: f32) -> LiteUnitQuaternion {
-        LiteUnitQuaternion(UnitQuaternion::from_axis_angle(
+    pub fn from_axis_angle(axis: LiteVector3, angle: f32) -> LiteQuaternion {
+        LiteQuaternion(UnitQuaternion::from_axis_angle(
             &Unit::new_normalize(Vector3::from(axis)),
             angle,
         ))
     }
 
-    pub fn transform_vector(&self, o: LiteVector3) -> LiteVector3 {
-        LiteVector3(self.0.transform_vector(&o.0))
+    pub fn mul__LiteVector(&self, o: LiteVector3) -> LiteVector3 {
+        LiteVector3(self.0.mul(&o.0))
     }
 	
-	pub fn mul(&self, rot_delta: Rotation3<f32>) -> LiteUnitQuaternion {
-		LiteUnitQuaternion(self.0.mul(&rot_delta))
+	pub fn mul__LiteQuaternion(&self, rot_delta: LiteQuaternion) -> LiteQuaternion {
+		LiteQuaternion(self.0.mul(&rot_delta.0))
 	}
 }
 
-impl From<LiteUnitQuaternion> for UnitQuaternion<f32> {
-    fn from(value: LiteUnitQuaternion) -> Self {
+impl From<LiteQuaternion> for UnitQuaternion<f32> {
+    fn from(value: LiteQuaternion) -> Self {
         value.0
     }
 }
 
-impl From<UnitQuaternion<f32>> for LiteUnitQuaternion {
+impl From<UnitQuaternion<f32>> for LiteQuaternion {
     fn from(value: UnitQuaternion<f32>) -> Self {
-        LiteUnitQuaternion(value)
+        LiteQuaternion(value)
     }
 }

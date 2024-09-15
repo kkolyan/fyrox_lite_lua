@@ -14,7 +14,7 @@ use fyrox::{
     script::{ScriptContext, ScriptTrait},
 };
 use fyrox_lite_api::lite_ctx::{LiteContext, LiteScript};
-use fyrox_lite_api::lite_math::{LiteUnitQuaternion, LiteVector3};
+use fyrox_lite_api::lite_math::{LiteQuaternion, LiteVector3};
 use fyrox_lite_api::lite_physics::{LitePhysics, LiteRayCastOptions};
 use fyrox_lite_api::lite_prefab::LitePrefab;
 use std::ops::Add;
@@ -44,7 +44,7 @@ pub struct BulletSeed {
 
 impl Bullet {
     pub fn spawn(seed: BulletSeed) {
-        let orientation = LiteUnitQuaternion::face_towards(seed.direction, LiteVector3::y_axis());
+        let orientation = LiteQuaternion::face_towards(seed.direction, LiteVector3::y_axis());
         let bullet = LitePrefab::from(seed.prefab).instantiate_at(seed.origin, orientation);
         bullet.with_script::<Bullet>(|it| {
             it.params = BulletParams {
