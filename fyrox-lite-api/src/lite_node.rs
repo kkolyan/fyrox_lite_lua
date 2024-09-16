@@ -1,5 +1,8 @@
+use crate::wrapper_reflect;
+use std::any::Any;
+
 use fyrox::{
-    core::{algebra::UnitQuaternion, pool::Handle},
+    core::{algebra::UnitQuaternion, pool::Handle, reflect::*, visitor::Visit},
     scene::node::Node,
     script::{RoutingStrategy, ScriptMessagePayload, ScriptTrait},
 };
@@ -11,7 +14,7 @@ use crate::{
 };
 use fyrox::graph::BaseSceneGraph;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct LiteNode {
     handle: Handle<Node>,
 }
@@ -171,4 +174,123 @@ pub enum LiteRoutingStrategy {
     Up,
     /// An message will be passed to every node down the tree in the hierarchy.
     Down,
+}
+
+impl Visit for LiteNode {
+    fn visit(
+        &mut self,
+        name: &str,
+        visitor: &mut fyrox::core::visitor::Visitor,
+    ) -> fyrox::core::visitor::VisitResult {
+        self.handle.visit(name, visitor)
+    }
+}
+
+impl Reflect for LiteNode {
+    wrapper_reflect!(handle);
+
+    fn source_path() -> &'static str
+    where
+        Self: Sized,
+    {
+        file!()
+    }
+
+    fn assembly_name(&self) -> &'static str {
+        env!("CARGO_PKG_NAME")
+    }
+
+    fn type_assembly_name() -> &'static str
+    where
+        Self: Sized,
+    {
+        env!("CARGO_PKG_NAME")
+    }
+}
+
+#[macro_export]
+macro_rules! wrapper_reflect {
+    ($ident:tt) => {
+        fn type_name(&self) -> &'static str {
+            self.$ident.type_name()
+        }
+
+        fn doc(&self) -> &'static str {
+            self.$ident.doc()
+        }
+
+        fn fields_info(&self, func: &mut dyn FnMut(&[FieldInfo])) {
+            self.$ident.fields_info(func)
+        }
+
+        fn into_any(self: Box<Self>) -> Box<dyn Any> {
+            self
+        }
+
+        fn as_any(&self, func: &mut dyn FnMut(&dyn Any)) {
+            fyrox::core::reflect::Reflect::as_any(&self.$ident, func)
+        }
+
+        fn as_any_mut(&mut self, func: &mut dyn FnMut(&mut dyn Any)) {
+            fyrox::core::reflect::Reflect::as_any_mut(&mut self.$ident, func)
+        }
+
+        fn as_reflect(&self, func: &mut dyn FnMut(&dyn Reflect)) {
+            self.$ident.as_reflect(func)
+        }
+
+        fn as_reflect_mut(&mut self, func: &mut dyn FnMut(&mut dyn Reflect)) {
+            self.$ident.as_reflect_mut(func)
+        }
+
+        fn set(&mut self, value: Box<dyn Reflect>) -> Result<Box<dyn Reflect>, Box<dyn Reflect>> {
+            self.$ident.set(value)
+        }
+
+        fn field(&self, name: &str, func: &mut dyn FnMut(Option<&dyn Reflect>)) {
+            self.$ident.field(name, func)
+        }
+
+        fn field_mut(&mut self, name: &str, func: &mut dyn FnMut(Option<&mut dyn Reflect>)) {
+            self.$ident.field_mut(name, func)
+        }
+
+        fn as_array(&self, func: &mut dyn FnMut(Option<&dyn ReflectArray>)) {
+            self.$ident.as_array(func)
+        }
+
+        fn as_array_mut(&mut self, func: &mut dyn FnMut(Option<&mut dyn ReflectArray>)) {
+            self.$ident.as_array_mut(func)
+        }
+
+        fn as_list(&self, func: &mut dyn FnMut(Option<&dyn ReflectList>)) {
+            self.$ident.as_list(func)
+        }
+
+        fn as_list_mut(&mut self, func: &mut dyn FnMut(Option<&mut dyn ReflectList>)) {
+            self.$ident.as_list_mut(func)
+        }
+
+        fn as_inheritable_variable(
+            &self,
+            func: &mut dyn FnMut(Option<&dyn ReflectInheritableVariable>),
+        ) {
+            self.$ident.as_inheritable_variable(func)
+        }
+
+        fn as_inheritable_variable_mut(
+            &mut self,
+            func: &mut dyn FnMut(Option<&mut dyn ReflectInheritableVariable>),
+        ) {
+            self.$ident.as_inheritable_variable_mut(func)
+        }
+
+        fn as_hash_map(&self, func: &mut dyn FnMut(Option<&dyn ReflectHashMap>)) {
+            self.$ident.as_hash_map(func)
+        }
+
+        fn as_hash_map_mut(&mut self, func: &mut dyn FnMut(Option<&mut dyn ReflectHashMap>)) {
+            self.$ident.as_hash_map_mut(func)
+        }
+    };
 }

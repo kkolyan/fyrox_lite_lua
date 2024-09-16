@@ -12,7 +12,7 @@ thread_local! {
 const SC_404: &str = "Fyrox ScriptContext is not available outside of main thread and ";
 
 /// the way to access Fyrox engine API from the Rust functions called from Lua
-pub(crate) fn with_script_context<T, F>(f: F) -> T
+pub fn with_script_context<T, F>(f: F) -> T
 where
     F: FnOnce(&mut StaticSc) -> T,
 {
@@ -22,7 +22,7 @@ where
     })
 }
 
-pub(crate) fn without_script_context<T, F>(sc: &mut ScriptContext, f: F) -> T
+pub fn without_script_context<T, F>(sc: &mut ScriptContext, f: F) -> T
 where
     F: FnOnce() -> T,
 {
@@ -53,7 +53,7 @@ where
     }
 }
 
-pub(crate) fn without_script_message_context<T, F>(sc: &mut ScriptMessageContext, f: F) -> T
+pub fn without_script_message_context<T, F>(sc: &mut ScriptMessageContext, f: F) -> T
 where
     F: FnOnce() -> T,
 {

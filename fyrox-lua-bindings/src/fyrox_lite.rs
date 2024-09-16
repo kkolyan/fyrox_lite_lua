@@ -3,7 +3,7 @@ use std::{
     ops::{Deref, DerefMut},
 };
 
-use crate::lua_script::LuaScript;
+use crate::script::LuaScript;
 use fyrox_lite_api::{
     lite_math::{LiteQuaternion, LiteVector3},
     lite_node::{LiteNode, LiteRoutingStrategy},
@@ -12,7 +12,8 @@ use fyrox_lite_api::{
 use mlua::{AnyUserData, UserData, UserDataRef, UserDataRefMut, Value};
 use send_wrapper::SendWrapper;
 
-struct Traitor<T>(pub T);
+#[derive(Clone, Copy, Debug)]
+pub struct Traitor<T>(pub T);
 
 impl<T> Deref for Traitor<T> {
     type Target = T;
@@ -213,8 +214,8 @@ impl UserData for Traitor<LiteNode> {
         });
         methods.add_method("get_script", |a, b, name: mlua::String| {
             b.find_script::<LuaScript, _>(|it| {
-                if it.script_name == name.to_string_lossy() {
-                    let script_data = it.script_data.clone();
+                if it.name == name.to_string_lossy() {
+                    let script_data = it.data.clone();
                     return Some(script_data);
                 }
                 None
