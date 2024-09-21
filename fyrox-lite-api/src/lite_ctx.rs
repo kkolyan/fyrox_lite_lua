@@ -6,7 +6,7 @@ use fyrox::{
 
 use crate::{
     lite_node::LiteNode,
-    script_context::{with_script_context, without_script_context, without_script_message_context},
+    script_context::{with_script_context, without_script_context},
 };
 
 pub trait LiteScript {
@@ -71,7 +71,7 @@ pub trait LiteScript {
             dt: ctx.dt,
         };
 
-        without_script_message_context(ctx, || {
+        without_script_context(ctx, || {
             self.on_message(message, &mut lite_ctx);
         });
     }

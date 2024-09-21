@@ -1,3 +1,4 @@
+pub mod os_event;
 pub mod typed_userdata;
 pub mod script_class;
 pub mod fyrox_lite;

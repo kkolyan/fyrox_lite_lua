@@ -13,7 +13,7 @@ use mlua::{AnyUserData, UserData, UserDataRef, UserDataRefMut, Value};
 use send_wrapper::SendWrapper;
 
 #[derive(Clone, Copy, Debug)]
-pub struct Traitor<T>(pub T);
+pub struct Traitor<T>(T);
 
 impl<T> Deref for Traitor<T> {
     type Target = T;
@@ -30,6 +30,10 @@ impl<T> DerefMut for Traitor<T> {
 }
 
 impl<T> Traitor<T> {
+    pub fn new(t: T) -> Self {
+        Self(t)
+    }
+    
     pub fn inner(&self) -> &T {
         &self.0
     }

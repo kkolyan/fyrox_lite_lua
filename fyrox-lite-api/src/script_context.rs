@@ -1,7 +1,10 @@
 use std::{cell::RefCell, mem};
 
 use fyrox::{
-    core::pool::Handle, engine::{GraphicsContext, ScriptMessageDispatcher}, scene::{node::Node, Scene}, script::{PluginsRefMut, ScriptContext, ScriptMessageContext, ScriptMessageSender}
+    core::pool::Handle,
+    engine::{GraphicsContext, ScriptMessageDispatcher},
+    scene::{node::Node, Scene},
+    script::{PluginsRefMut, ScriptContext, ScriptDeinitContext, ScriptMessageContext, ScriptMessageSender},
 };
 
 type StaticSc = UnifiedContext<'static, 'static, 'static>;
@@ -22,7 +25,7 @@ where
     })
 }
 
-pub fn without_script_context<T, F>(sc: &mut ScriptContext, f: F) -> T
+pub fn without_script_context<T, F>(sc: &mut dyn UnsafeAsUnifiedContext<'_, '_, '_>, f: F) -> T
 where
     F: FnOnce() -> T,
 {
@@ -34,16 +37,7 @@ where
                 "script context reentrancy is not supported"
             )
         });
-        let sc = sc as *mut ScriptContext;
-        let usc: &mut UnifiedContext<'_, '_, '_> = &mut UnifiedContext {
-            dt: sc.read().dt,
-            scene: sc.read().scene,
-            handle: sc.read().handle,
-            plugins: sc.read().plugins,
-            message_sender: sc.read().message_sender,
-            message_dispatcher: Some(sc.read().message_dispatcher),
-            graphics_context: sc.read().graphics_context,
-        };
+        let usc = &mut sc.as_unified_context();
         let usc: &mut UnifiedContext<'static, 'static, 'static> = mem::transmute(usc);
         SCRIPT_CONTEXT.replace(Some(usc));
         let result = f();
@@ -53,35 +47,72 @@ where
     }
 }
 
-pub fn without_script_message_context<T, F>(sc: &mut ScriptMessageContext, f: F) -> T
-where
-    F: FnOnce() -> T,
-{
-    // this code publishes local mut ref to threadlocal, and then takes it back. seems sound provided nobody else takes it from this threadlocal, which is asserted.
-    unsafe {
-        let sc = sc as *mut ScriptMessageContext;
-        let usc: &mut UnifiedContext<'_, '_, '_> = &mut UnifiedContext {
-            dt: sc.read().dt,
+pub trait UnsafeAsUnifiedContext<'a, 'b, 'c> {
+    unsafe fn as_unified_context(&mut self) -> UnifiedContext<'a, 'b, 'c>;
+    fn plugins(&mut self) -> &mut PluginsRefMut<'a>;
+}
+
+impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for ScriptContext<'a, 'b, 'c> {
+    unsafe fn as_unified_context(&mut self) -> UnifiedContext<'a, 'b, 'c> {
+        let sc = self as *mut ScriptContext;
+        UnifiedContext {
+            dt: Some(sc.read().dt),
             scene: sc.read().scene,
-            handle: sc.read().handle,
+            handle: Some(sc.read().handle),
             plugins: sc.read().plugins,
             message_sender: sc.read().message_sender,
             message_dispatcher: None,
             graphics_context: sc.read().graphics_context,
-        };
-        let usc: &mut UnifiedContext<'static, 'static, 'static> = mem::transmute(usc);
-        SCRIPT_CONTEXT.replace(Some(usc));
-        let result = f();
-        SCRIPT_CONTEXT.take()
-			.expect("threadlocally published mutable reference was taken from other party. memory safety compomised.");
-		result
+        }
+    }
+    
+    fn plugins(&mut self) -> &mut PluginsRefMut<'a> {
+        &mut self.plugins
+    }
+}
+
+impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for ScriptMessageContext<'a, 'b, 'c> {
+    unsafe fn as_unified_context(&mut self) -> UnifiedContext<'a, 'b, 'c> {
+        let sc = self as *mut ScriptMessageContext;
+        UnifiedContext {
+            dt: Some(sc.read().dt),
+            scene: sc.read().scene,
+            handle: Some(sc.read().handle),
+            plugins: sc.read().plugins,
+            message_sender: sc.read().message_sender,
+            message_dispatcher: None,
+            graphics_context: sc.read().graphics_context,
+        }
+    }
+    
+    fn plugins(&mut self) -> &mut PluginsRefMut<'a> {
+        &mut self.plugins
+    }
+}
+
+impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for ScriptDeinitContext<'a, 'b, 'c> {
+    unsafe fn as_unified_context(&mut self) -> UnifiedContext<'a, 'b, 'c> {
+        let sc = self as *mut ScriptDeinitContext;
+        UnifiedContext {
+            dt: None,
+            scene: sc.read().scene,
+            handle: None,
+            plugins: sc.read().plugins,
+            message_sender: sc.read().message_sender,
+            message_dispatcher: None,
+            graphics_context: sc.read().graphics_context,
+        }
+    }
+    
+    fn plugins(&mut self) -> &mut PluginsRefMut<'a> {
+        &mut self.plugins
     }
 }
 
 pub struct UnifiedContext<'a, 'b, 'c> {
-    pub dt: f32,
+    pub dt: Option<f32>,
     pub scene: &'b mut Scene,
-    pub handle: Handle<Node>,
+    pub handle: Option<Handle<Node>>,
     pub plugins: PluginsRefMut<'a>,
     pub message_sender: &'c ScriptMessageSender,
     pub message_dispatcher: Option<&'c mut ScriptMessageDispatcher>,

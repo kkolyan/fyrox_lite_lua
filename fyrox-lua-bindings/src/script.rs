@@ -1,4 +1,5 @@
 use super::script_data::ScriptData;
+use crate::fyrox_lite::Traitor;
 use crate::fyrox_utils::PluginsRefMut_Ext;
 use crate::lua_reflect_bindings::LuaTableKey;
 use crate::reflect_base;
@@ -16,9 +17,13 @@ use fyrox::script::BaseScript;
 use fyrox::script::ScriptContext;
 use fyrox::script::ScriptTrait;
 use fyrox_lite_api::script_context::without_script_context;
+use fyrox_lite_api::script_context::UnsafeAsUnifiedContext;
 use mlua::prelude::LuaResult;
 use mlua::FromLua;
 use mlua::Function;
+use mlua::IntoLua;
+use mlua::IntoLuaMulti;
+use mlua::Lua;
 use mlua::UserDataRefMut;
 use mlua::Value;
 use send_wrapper::SendWrapper;
@@ -33,8 +38,42 @@ pub struct LuaScript {
 }
 
 impl ScriptTrait for LuaScript {
-    fn on_update(&mut self, #[allow(unused_variables)] sc: &mut ScriptContext) {
-        let plugin = sc.plugins.lua_mut();
+    fn on_init(&mut self, ctx: &mut ScriptContext) {
+        self.invoke_callback(ctx, "on_init", |_lua| Ok(()));
+    }
+
+    fn on_start(&mut self, ctx: &mut ScriptContext) {
+        self.invoke_callback(ctx, "on_start", |_lua| Ok(()));
+    }
+
+    fn on_deinit(&mut self, ctx: &mut fyrox::script::ScriptDeinitContext) {
+        self.invoke_callback(ctx, "on_deinit", |_lua| Ok(()));
+    }
+
+    fn on_os_event(&mut self, event: &fyrox::event::Event<()>, ctx: &mut ScriptContext) {
+        self.invoke_callback(ctx, "on_os_event", |_lua| Ok(Traitor::new(event.clone())));
+    }
+
+    fn on_update(&mut self, ctx: &mut ScriptContext) {
+        self.invoke_callback(ctx, "on_update", |_lua| Ok(()));
+    }
+
+    fn on_message(
+        &mut self,
+        message: &mut dyn fyrox::script::ScriptMessagePayload,
+        ctx: &mut fyrox::script::ScriptMessageContext,
+    ) {
+        if let Some(lua_message) = message.downcast_ref::<SendWrapper<Value>>() {
+            self.invoke_callback(ctx, "on_init", |_lua| Ok(Value::clone(lua_message)));
+        } else {
+            panic!("non-lua messages not supported by lua scripts")
+        }
+    }
+}
+
+impl LuaScript {
+    fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(&mut self, ctx: &mut dyn UnsafeAsUnifiedContext<'a, 'b, 'c>, callback_name: &str, args: impl FnOnce(&'lua Lua) -> mlua::Result<A>) {
+        let plugin = ctx.plugins().lua_mut();
         if plugin.failed {
             // don't spam logs, though, plugin is completely broken at this point
             return;
@@ -61,7 +100,8 @@ impl ScriptTrait for LuaScript {
                 ScriptData::Unpacked(_) => panic!("WTF?"),
             }
         }
-        without_script_context(sc, || {
+        let lua = plugin.vm;
+        without_script_context(ctx, || {
             let script_object_ud = self
                 .data
                 .inner_unpacked()
@@ -72,11 +112,12 @@ impl ScriptTrait for LuaScript {
                 .unwrap()
                 .def
                 .class_data
-                .get::<_, Option<Function>>("on_update")
+                .get::<_, Option<Function>>(callback_name)
                 .unwrap();
 
             if let Some(callback) = callback {
-                callback.call::<_, ()>(script_object_ud).unwrap();
+                let args = args(lua).unwrap();
+                callback.call::<_, ()>((script_object_ud, args)).unwrap();
             }
         });
     }

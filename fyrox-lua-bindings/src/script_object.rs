@@ -76,13 +76,13 @@ impl UserData for ScriptObject {
                             ScriptFieldValue::String(it) => Value::String(lua.create_string(it)?),
                             ScriptFieldValue::Bool(it) => Value::Boolean(*it),
                             ScriptFieldValue::Node(it) => Value::UserData(
-                                lua.create_any_userdata(Traitor(LiteNode::from(*it)))?,
+                                lua.create_any_userdata(Traitor::new(LiteNode::from(*it)))?,
                             ),
                             ScriptFieldValue::Vector3(it) => Value::UserData(
-                                lua.create_userdata(Traitor(LiteVector3::from(*it)))?,
+                                lua.create_userdata(Traitor::new(LiteVector3::from(*it)))?,
                             ),
                             ScriptFieldValue::Quaternion(it) => Value::UserData(
-                                lua.create_userdata(Traitor(LiteQuaternion::from(*it)))?,
+                                lua.create_userdata(Traitor::new(LiteQuaternion::from(*it)))?,
                             ),
                         };
                         return Ok(result);

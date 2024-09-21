@@ -1,6 +1,6 @@
-use std::{borrow::Borrow, marker::PhantomData};
+use std::marker::PhantomData;
 
-use mlua::{AnyUserData, IntoLuaMulti, UserDataRef};
+use mlua::{AnyUserData, IntoLua};
 
 #[derive(Clone)]
 pub struct TypedUserData<'lua, T> {
@@ -16,17 +16,17 @@ impl<'lua, T: 'static> TypedUserData<'lua, T> {
         }
     }
 
-	pub fn borrow(&self) -> Result<std::cell::Ref<'_, T>, mlua::Error> {
-		self.ud.borrow()
-	}
+    pub fn borrow(&self) -> Result<std::cell::Ref<'_, T>, mlua::Error> {
+        self.ud.borrow()
+    }
 
-	pub fn borrow_mut(&self) -> Result<std::cell::RefMut<'_, T>, mlua::Error> {
-		self.ud.borrow_mut()
-	}
+    pub fn borrow_mut(&self) -> Result<std::cell::RefMut<'_, T>, mlua::Error> {
+        self.ud.borrow_mut()
+    }
 }
 
-impl<'lua, T> IntoLuaMulti<'lua> for TypedUserData<'lua, T> {
-    fn into_lua_multi(self, lua: &'lua mlua::Lua) -> mlua::Result<mlua::MultiValue<'lua>> {
-        self.ud.into_lua_multi(lua)
+impl<'lua, T> IntoLua<'lua> for TypedUserData<'lua, T> {
+    fn into_lua(self, lua: &'lua mlua::Lua) -> mlua::Result<mlua::Value<'lua>> {
+        self.ud.into_lua(lua)
     }
 }
