@@ -1,3 +1,4 @@
+use mlua::AnyUserData;
 use mlua::UserDataRefMut;
 use send_wrapper::SendWrapper;
 use std::fmt::Debug;
@@ -11,7 +12,7 @@ use crate::script_object::ScriptObject;
 /// because Visit is implemented in both modes.
 pub enum ScriptData {
     Packed(ScriptObject),
-    Unpacked(SendWrapper<UserDataRefMut<'static, ScriptObject>>),
+    Unpacked(SendWrapper<AnyUserData<'static>>),
 }
 
 impl ScriptData {
@@ -19,6 +20,20 @@ impl ScriptData {
         match self {
             ScriptData::Packed(_) => true,
             ScriptData::Unpacked(_) => false,
+        }
+    }
+
+    pub fn with_script_object<R>(&self, f: impl FnOnce(&ScriptObject) -> R) -> R {
+        match self {
+            ScriptData::Packed(it) => f(it),
+            ScriptData::Unpacked(it) => f(&it.borrow::<ScriptObject>().unwrap()),
+        }
+    }
+
+    pub fn with_script_object_mut<R>(&mut self, f: impl FnOnce(&mut ScriptObject) -> R) -> R {
+        match self {
+            ScriptData::Packed(it) => f(it),
+            ScriptData::Unpacked(it) => f(&mut it.borrow_mut::<ScriptObject>().unwrap()),
         }
     }
     pub fn as_script_object(&self) -> &ScriptObject {
@@ -31,7 +46,14 @@ impl ScriptData {
     pub fn as_script_object_mut(&mut self) -> &mut ScriptObject {
         match self {
             ScriptData::Packed(it) => it,
-            ScriptData::Unpacked(it) => it,
+            ScriptData::Unpacked(it) => it.borrow_mut::<ScriptObject>().unwrap(),
+        }
+    }
+
+    pub fn inner_unpacked(&mut self) -> UserDataRefMut<'static, ScriptObject> {
+        match self {
+            ScriptData::Packed(it) => panic!(),
+            ScriptData::Unpacked(it) => it.clone(),
         }
     }
 }

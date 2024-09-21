@@ -5,6 +5,7 @@ resolver = "2"
 
 [workspace.dependencies]
 fyrox = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false}
+fyrox_impl = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false, package = "fyrox-impl"}
 fyroxed_base = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false}
 
 # Separate build profiles for hot reloading. These profiles ensures that build artifacts for

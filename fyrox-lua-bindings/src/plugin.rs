@@ -1,5 +1,6 @@
 use crate::lua_utils::log_error;
 use crate::script::LuaScript;
+use crate::script_class::ScriptClass;
 use crate::script_data::ScriptData;
 use crate::script_def::ScriptDefinition;
 use crate::script_def::ScriptMetadata;
@@ -23,9 +24,15 @@ use fyrox::walkdir::DirEntry;
 use fyrox::walkdir::WalkDir;
 use mlua::Function;
 use mlua::Lua;
+use mlua::Table;
+use send_wrapper::SendWrapper;
+use std::borrow::BorrowMut;
+use std::cell::RefCell;
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::ops::DerefMut;
 use std::path::Path;
+use std::rc::Rc;
 use std::sync::Arc;
 
 #[derive(Visit, Reflect, Debug)]
@@ -81,6 +88,9 @@ impl Default for LuaPlugin {
     }
 }
 
+thread_local! {
+    static LOADING_CLASS_NAME: RefCell<Option<&'static str>> = Default::default();
+}
 impl Plugin for LuaPlugin {
     fn register(&self, context: PluginRegistrationContext) {
         // mlua has approach with lifetimes that makes very difficult storing Lua types
@@ -94,8 +104,38 @@ impl Plugin for LuaPlugin {
                 .eval::<()>(),
         );
 
+        let classes: Rc<RefCell<HashMap<&'static str, Table<'static>>>> = Default::default();
+
+        {
+            let classes = classes.clone();
+            lua.globals()
+                .set(
+                    "script_class",
+                    lua.create_function(move |lua, _args: ()| {
+                        LOADING_CLASS_NAME.with(|class_name| {
+                            let class_name = class_name
+                                .borrow()
+                                .expect("script_class() called out of permitted context");
+                            let table = lua.create_table()?;
+
+                            classes
+                                .as_ref()
+                                .borrow_mut()
+                                .insert(class_name, table.clone());
+
+                            Ok(ScriptClass {
+                                name: class_name,
+                                table: Default::default(),
+                            })
+                        })
+                    })
+                    .unwrap(),
+                )
+                .unwrap();
+        }
+
         for entry in WalkDir::new("scripts").into_iter().flatten() {
-            load_script(&context, lua, &entry);
+            load_script(&context, lua, &entry, classes.clone());
         }
     }
 
@@ -110,7 +150,12 @@ impl Plugin for LuaPlugin {
     }
 }
 
-fn load_script(context: &PluginRegistrationContext, lua: &mut Lua, entry: &DirEntry) {
+fn load_script(
+    context: &PluginRegistrationContext,
+    lua: &Lua,
+    entry: &DirEntry,
+    class_data: Rc<RefCell<HashMap<&'static str, Table<'static>>>>,
+) {
     if !entry.file_type().is_file() {
         return;
     }
@@ -128,6 +173,16 @@ fn load_script(context: &PluginRegistrationContext, lua: &mut Lua, entry: &DirEn
             return;
         }
     };
+
+    LOADING_CLASS_NAME.with(|class_name| {
+        *class_name.borrow_mut() = Some(metadata.class);
+        lua.globals()
+            .get::<_, Function>("require")
+            .unwrap()
+            .call::<&str, ()>(metadata.class)
+            .unwrap();
+        *class_name.borrow_mut() = None;
+    });
 
     let class_loading = lua
         .load("return function(x) require(x) end")
@@ -150,6 +205,7 @@ fn load_script(context: &PluginRegistrationContext, lua: &mut Lua, entry: &DirEn
     let assembly_name = "scripts/**.lua";
     let definition = Arc::new(ScriptDefinition {
         metadata,
+        class_data: SendWrapper::new(class_data.as_ref().borrow().get(name).unwrap().clone()),
         assembly_name,
     });
 

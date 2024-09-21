@@ -9,3 +9,6 @@ fyrox = {workspace = true}
 mlua = { version = "0.9.1", features = ["luau"] }
 send_wrapper = "0.6.0"
 extend = "1.1.3"
+
+[features]
+default = ["fyrox/dylib"]

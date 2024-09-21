@@ -1,3 +1,4 @@
+pub mod script_class;
 pub mod fyrox_lite;
 pub mod lua_script;
 pub mod lua_utils;

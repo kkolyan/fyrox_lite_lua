@@ -1,16 +1,20 @@
 use std::{any::TypeId, ops::Deref, sync::Arc};
 
 use fyrox::core::reflect::{FieldInfo, FieldValue, Reflect};
-use fyrox_lite_api::{lite_math::{LiteQuaternion, LiteVector3}, lite_node::LiteNode};
+use fyrox_lite_api::{
+    lite_math::{LiteQuaternion, LiteVector3},
+    lite_node::LiteNode,
+};
 use mlua::{MetaMethod, String, Table, UserData, UserDataRef, UserDataRefMut, Value};
 
 use crate::{fyrox_lite::Traitor, lua_error, lua_utils::OptionX, reflect_base};
 
 use super::{
-    script::{ ScriptFieldValue},
+    script::ScriptFieldValue,
     script_def::{ScriptDefinition, ScriptFieldValueType},
 };
 
+/// For MLua API integration
 #[derive(Debug, Clone)]
 pub struct ScriptObject {
     pub def: Arc<ScriptDefinition>,
@@ -31,62 +35,155 @@ impl ScriptObject {
                     ScriptFieldValueType::Bool => ScriptFieldValue::Bool(Default::default()),
                     ScriptFieldValueType::Node => ScriptFieldValue::Node(Default::default()),
                     ScriptFieldValueType::Vector3 => ScriptFieldValue::Vector3(Default::default()),
+                    ScriptFieldValueType::Quaternion => {
+                        ScriptFieldValue::Quaternion(Default::default())
+                    }
                 })
                 .collect(),
         }
     }
 }
 
+
+
 impl UserData for ScriptObject {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_meta_function(MetaMethod::Index.name(), |lua, (this, key): (UserDataRef<ScriptObject>, String)| {
-            let field_name = key.to_string_lossy();
-            let field_index = this.def.metadata.field_name_to_index.get(field_name.as_ref())
-                .lua_ok_or_else(|| lua_error!("unknown field {:?}.{:?}", this.def.metadata.class, key.to_str()))?;
-            let value = &this.values[*field_index];
-            let result = match value {
-                ScriptFieldValue::Number(it) => Value::Number(*it),
-                ScriptFieldValue::String(it) => Value::String(lua.create_string(it)?),
-                ScriptFieldValue::Bool(it) => Value::Boolean(*it),
-                ScriptFieldValue::Node(it) => Value::UserData(lua.create_any_userdata(Traitor(LiteNode::from(*it)))?),
-                ScriptFieldValue::Vector3(it) => Value::UserData(lua.create_userdata(Traitor(LiteVector3::from(*it)))?),
-                ScriptFieldValue::Quaternion(it) => Value::UserData(lua.create_userdata(Traitor(LiteQuaternion::from(*it)))?),
-            };
-            Ok(result)
-        });
-        methods.add_meta_function_mut(MetaMethod::NewIndex.name(), |lua, (mut this, key, value): (UserDataRefMut<ScriptObject>, String, Value)| {
-            let field_name = key.to_string_lossy();
-            let class = this.def.metadata.class;
-            let field_index = *this.def.metadata.field_name_to_index.get(field_name.as_ref())
-                .lua_ok_or_else(|| lua_error!("unknown field {}.`{}`", class, field_name))?;
-            let value_storage = &mut this.values[field_index];
-            match value_storage {
-                ScriptFieldValue::Number(it) => *it = value.as_f64().unwrap(),
-                ScriptFieldValue::String(it) => *it = value.as_string_lossy().unwrap().to_string(),
-                ScriptFieldValue::Bool(it) => *it = value.as_boolean().unwrap(),
-                ScriptFieldValue::Node(it) => *it = match value {
-                    Value::Nil => Default::default(),
-                    _ => extract_userdata_value::<Traitor<LiteNode>>(value, class, &field_name)?.inner().clone().into(),
-                },
-                ScriptFieldValue::Vector3(it) => *it = extract_userdata_value::<Traitor<LiteVector3>>(value, class, &field_name)?.inner().clone().into(),
-                ScriptFieldValue::Quaternion(it) => *it = extract_userdata_value::<Traitor<LiteQuaternion>>(value, class, &field_name)?.inner().clone().into(),
-            };
-            Ok(())
-        });
+        methods.add_meta_function(
+            MetaMethod::Index.name(),
+            |lua, (this, key): (Value, String)| {
+                // working with class
+                if let Value::Table(this) = this {
+                    return this.raw_get(key);
+                }
+                if let Value::UserData(this) = this {
+                    if let Ok(this) = this.borrow::<ScriptObject>() {
+                        let field_name = key.to_string_lossy();
+                        let field_index = this
+                            .def
+                            .metadata
+                            .field_name_to_index
+                            .get(field_name.as_ref())
+                            .lua_ok_or_else(|| {
+                                lua_error!(
+                                    "unknown field {:?}.{:?}",
+                                    this.def.metadata.class,
+                                    key.to_str()
+                                )
+                            })?;
+                        let value = &this.values[*field_index];
+                        let result = match value {
+                            ScriptFieldValue::Number(it) => Value::Number(*it),
+                            ScriptFieldValue::String(it) => Value::String(lua.create_string(it)?),
+                            ScriptFieldValue::Bool(it) => Value::Boolean(*it),
+                            ScriptFieldValue::Node(it) => Value::UserData(
+                                lua.create_any_userdata(Traitor(LiteNode::from(*it)))?,
+                            ),
+                            ScriptFieldValue::Vector3(it) => Value::UserData(
+                                lua.create_userdata(Traitor(LiteVector3::from(*it)))?,
+                            ),
+                            ScriptFieldValue::Quaternion(it) => Value::UserData(
+                                lua.create_userdata(Traitor(LiteQuaternion::from(*it)))?,
+                            ),
+                        };
+                        return Ok(result);
+                    }
+                }
+                Err(lua_error!("unexpected type"))
+            },
+        );
+        methods.add_meta_function_mut(
+            MetaMethod::NewIndex.name(),
+            |lua, (this, key, value): (Value, String, Value)| {
+                // working with class
+                if let Value::Table(this) = this {
+                    return this.raw_set(key, value);
+                }
+                if let Value::UserData(this) = this {
+                    // working with script instances
+                    if let Ok(mut this) = this.borrow_mut::<ScriptObject>() {
+                        let field_name = key.to_string_lossy();
+                        let class = this.def.metadata.class;
+                        let field_index = *this
+                            .def
+                            .metadata
+                            .field_name_to_index
+                            .get(field_name.as_ref())
+                            .lua_ok_or_else(|| {
+                                lua_error!("unknown field {}.`{}`", class, field_name)
+                            })?;
+                        let value_storage = &mut this.values[field_index];
+                        match value_storage {
+                            ScriptFieldValue::Number(it) => *it = value.as_f64().unwrap(),
+                            ScriptFieldValue::String(it) => {
+                                *it = value.as_string_lossy().unwrap().to_string()
+                            }
+                            ScriptFieldValue::Bool(it) => *it = value.as_boolean().unwrap(),
+                            ScriptFieldValue::Node(it) => {
+                                *it = match value {
+                                    Value::Nil => Default::default(),
+                                    _ => extract_userdata_value::<Traitor<LiteNode>>(
+                                        value,
+                                        class,
+                                        &field_name,
+                                    )?
+                                    .inner()
+                                    .clone()
+                                    .into(),
+                                }
+                            }
+                            ScriptFieldValue::Vector3(it) => {
+                                *it = extract_userdata_value::<Traitor<LiteVector3>>(
+                                    value,
+                                    class,
+                                    &field_name,
+                                )?
+                                .inner()
+                                .clone()
+                                .into()
+                            }
+                            ScriptFieldValue::Quaternion(it) => {
+                                *it = extract_userdata_value::<Traitor<LiteQuaternion>>(
+                                    value,
+                                    class,
+                                    &field_name,
+                                )?
+                                .inner()
+                                .clone()
+                                .into()
+                            }
+                        };
+                        return Ok(());
+                    }
+                }
+                Err(lua_error!("unexpected type"))
+            },
+        );
     }
 }
 
-fn extract_userdata_value<T: UserData +'static + Clone>(value: Value, class: &str, field: &str) -> mlua::Result<T> {
+fn extract_userdata_value<T: UserData + 'static + Clone>(
+    value: Value,
+    class: &str,
+    field: &str,
+) -> mlua::Result<T> {
     if let Value::UserData(value) = value {
         match value.borrow::<T>() {
             Ok(it) => return Ok(it.clone()),
             Err(err) => match err {
-                mlua::Error::UserDataBorrowError => panic!("immutable borrow failed while getting {}.`{}`", class, field),
+                mlua::Error::UserDataBorrowError => panic!(
+                    "immutable borrow failed while getting {}.`{}`",
+                    class, field
+                ),
                 err => return Err(err),
             },
         }
     }
-    Err(lua_error!("cannot assign {}.`{}` with {:?}", class, field, value))
+    Err(lua_error!(
+        "cannot assign {}.`{}` with {:?}",
+        class,
+        field,
+        value
+    ))
 }
 
 impl Reflect for ScriptObject {
@@ -110,6 +207,7 @@ impl Reflect for ScriptObject {
                     ScriptFieldValueType::Bool => "bool",
                     ScriptFieldValueType::Node => "Node",
                     ScriptFieldValueType::Vector3 => "Vector3",
+                    ScriptFieldValueType::Quaternion => "UnitQuaternion",
                 },
                 doc: it.description.unwrap_or(""),
                 value: match self.values.get(i).unwrap() {

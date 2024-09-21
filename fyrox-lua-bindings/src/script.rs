@@ -1,7 +1,7 @@
+use super::script_data::ScriptData;
 use crate::fyrox_utils::PluginsRefMut_Ext;
 use crate::lua_reflect_bindings::LuaTableKey;
 use crate::reflect_base;
-use super::script_data::ScriptData;
 use fyrox::core::algebra::UnitQuaternion;
 use fyrox::core::algebra::Vector3;
 use fyrox::core::log::Log;
@@ -16,6 +16,7 @@ use fyrox::script::ScriptTrait;
 use fyrox_lite_api::script_context::without_script_context;
 use mlua::prelude::LuaResult;
 use mlua::FromLua;
+use mlua::Function;
 use mlua::UserDataRefMut;
 use mlua::Value;
 use send_wrapper::SendWrapper;
@@ -60,6 +61,16 @@ impl ScriptTrait for LuaScript {
         }
         let lua = plugin.vm;
         without_script_context(sc, || {
+            let callback = self
+                .data
+                .as_script_object()
+                .def
+                .class_data
+                .get::<_, Option<Function>>("on_update")
+                .unwrap();
+            if let Some(callback) = callback {
+                callback.call::<_, ()>(self.data.as_script_object_mut()).unwrap()
+            }
         });
     }
 }

@@ -1,10 +1,13 @@
 use std::{collections::HashMap, fs, io::BufRead, path::Path};
 
 use fyrox::core::Uuid;
+use mlua::Table;
+use send_wrapper::SendWrapper;
 
 #[derive(Debug)]
 pub struct ScriptDefinition {
     pub metadata: ScriptMetadata,
+    pub class_data: SendWrapper<Table<'static>>,
     pub assembly_name: &'static str,
 }
 
@@ -31,6 +34,7 @@ pub enum ScriptFieldValueType {
     Bool,
     Node,
     Vector3,
+    Quaternion,
 }
 
 impl ScriptMetadata {
