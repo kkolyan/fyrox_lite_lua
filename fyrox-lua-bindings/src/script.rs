@@ -2,6 +2,8 @@ use super::script_data::ScriptData;
 use crate::fyrox_utils::PluginsRefMut_Ext;
 use crate::lua_reflect_bindings::LuaTableKey;
 use crate::reflect_base;
+use crate::script_object::ScriptObject;
+use crate::typed_userdata::TypedUserData;
 use fyrox::core::algebra::UnitQuaternion;
 use fyrox::core::algebra::Vector3;
 use fyrox::core::log::Log;
@@ -44,7 +46,7 @@ impl ScriptTrait for LuaScript {
                     let so = plugin
                         .vm
                         .create_userdata(it.clone())
-                        .and_then(|it| UserDataRefMut::from_lua(Value::UserData(it), plugin.vm))
+                        .map(TypedUserData::<ScriptObject>::new)
                         .map(SendWrapper::new)
                         .map(ScriptData::Unpacked);
                     match so {
@@ -59,17 +61,22 @@ impl ScriptTrait for LuaScript {
                 ScriptData::Unpacked(_) => panic!("WTF?"),
             }
         }
-        let lua = plugin.vm;
         without_script_context(sc, || {
-            let callback = self
+            let script_object_ud = self
                 .data
-                .as_script_object()
+                .inner_unpacked()
+                .expect("WTF, it's guaranteed to be unpacked here");
+
+            let callback = script_object_ud
+                .borrow()
+                .unwrap()
                 .def
                 .class_data
                 .get::<_, Option<Function>>("on_update")
                 .unwrap();
+
             if let Some(callback) = callback {
-                callback.call::<_, ()>(self.data.as_script_object_mut()).unwrap()
+                callback.call::<_, ()>(script_object_ud).unwrap();
             }
         });
     }
@@ -86,7 +93,7 @@ impl BaseScript for LuaScript {
         self
     }
     fn id(&self) -> Uuid {
-        self.data.as_script_object().def.metadata.uuid
+        self.data.with_script_object(|it| it.def.metadata.uuid)
     }
 }
 
@@ -94,19 +101,20 @@ impl Visit for LuaScript {
     fn visit(&mut self, name: &str, visitor: &mut Visitor) -> VisitResult {
         let mut guard = visitor.enter_region(name)?;
 
-        let def = self.data.as_script_object().def.clone();
-        for (i, field) in def.metadata.fields.iter().enumerate() {
-            match &mut self.data.as_script_object_mut().values[i] {
-                ScriptFieldValue::Number(it) => it.visit(&field.name, &mut guard),
-                ScriptFieldValue::String(it) => it.visit(&field.name, &mut guard),
-                ScriptFieldValue::Bool(it) => it.visit(&field.name, &mut guard),
-                ScriptFieldValue::Node(it) => it.visit(&field.name, &mut guard),
-                ScriptFieldValue::Vector3(it) => it.visit(&field.name, &mut guard),
-                ScriptFieldValue::Quaternion(it) => it.visit(&field.name, &mut guard),
-            }?;
-        }
-
-        Ok(())
+        self.data.with_script_object_mut(|it| {
+            let def = it.def.clone();
+            for (i, field) in def.metadata.fields.iter().enumerate() {
+                match &mut it.values[i] {
+                    ScriptFieldValue::Number(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::String(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::Bool(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::Node(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::Vector3(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::Quaternion(it) => it.visit(&field.name, &mut guard),
+                }?;
+            }
+            Ok(())
+        })
     }
 }
 
@@ -114,23 +122,24 @@ impl Reflect for LuaScript {
     reflect_base!();
 
     fn fields_info(&self, func: &mut dyn FnMut(&[FieldInfo])) {
-        self.data.as_script_object().fields_info(func)
+        self.data.with_script_object(|it| it.fields_info(func))
     }
 
     fn fields(&self, func: &mut dyn FnMut(&[&dyn Reflect])) {
-        self.data.as_script_object().fields(func)
+        self.data.with_script_object(|it| it.fields(func))
     }
 
     fn fields_mut(&mut self, func: &mut dyn FnMut(&mut [&mut dyn Reflect])) {
-        self.data.as_script_object_mut().fields_mut(func)
+        self.data.with_script_object_mut(|it| it.fields_mut(func))
     }
 
     fn field(&self, name: &str, func: &mut dyn FnMut(Option<&dyn Reflect>)) {
-        self.data.as_script_object().field(name, func)
+        self.data.with_script_object(|it| it.field(name, func))
     }
 
     fn field_mut(&mut self, name: &str, func: &mut dyn FnMut(Option<&mut dyn Reflect>)) {
-        self.data.as_script_object_mut().field_mut(name, func)
+        self.data
+            .with_script_object_mut(|it| it.field_mut(name, func))
     }
 }
 
