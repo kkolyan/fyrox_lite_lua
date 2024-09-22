@@ -888,6 +888,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "executor-lua"
+version = "0.1.0"
+dependencies = [
+ "fyrox",
+ "fyrox-lua-bindings",
+ "puffin",
+ "puffin_http",
+]
+
+[[package]]
 name = "exr"
 version = "1.72.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1253,7 +1263,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "fyrox-lite-lua-bindings"
+name = "fyrox-lua-bindings"
 version = "0.1.0"
 dependencies = [
  "extend",
