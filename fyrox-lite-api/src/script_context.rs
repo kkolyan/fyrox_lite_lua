@@ -1,10 +1,7 @@
 use std::{cell::RefCell, mem};
 
 use fyrox::{
-    core::pool::Handle,
-    engine::{GraphicsContext, ScriptMessageDispatcher},
-    scene::{node::Node, Scene},
-    script::{PluginsRefMut, ScriptContext, ScriptDeinitContext, ScriptMessageContext, ScriptMessageSender},
+    core::pool::Handle, engine::{AsyncSceneLoader, GraphicsContext, ScriptMessageDispatcher}, gui::UiContainer, plugin::PluginContext, scene::{node::Node, Scene}, script::{PluginsRefMut, ScriptContext, ScriptDeinitContext, ScriptMessageContext, ScriptMessageSender}
 };
 
 type StaticSc = UnifiedContext<'static, 'static, 'static>;
@@ -57,12 +54,14 @@ impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for ScriptContext<'a, 'b, 'c
         let sc = self as *mut ScriptContext;
         UnifiedContext {
             dt: Some(sc.read().dt),
-            scene: sc.read().scene,
+            scene: Some(sc.read().scene),
             handle: Some(sc.read().handle),
-            plugins: sc.read().plugins,
-            message_sender: sc.read().message_sender,
-            message_dispatcher: None,
+            plugins: Some(sc.read().plugins),
+            message_sender: Some(sc.read().message_sender),
+            message_dispatcher: Some(sc.read().message_dispatcher),
             graphics_context: sc.read().graphics_context,
+            async_scene_loader: None,
+            user_interfaces: None,
         }
     }
     
@@ -76,12 +75,14 @@ impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for ScriptMessageContext<'a,
         let sc = self as *mut ScriptMessageContext;
         UnifiedContext {
             dt: Some(sc.read().dt),
-            scene: sc.read().scene,
+            scene: Some(sc.read().scene),
             handle: Some(sc.read().handle),
-            plugins: sc.read().plugins,
-            message_sender: sc.read().message_sender,
+            plugins: Some(sc.read().plugins),
+            message_sender: Some(sc.read().message_sender),
             message_dispatcher: None,
             graphics_context: sc.read().graphics_context,
+            async_scene_loader: None,
+            user_interfaces: None,
         }
     }
     
@@ -95,12 +96,14 @@ impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for ScriptDeinitContext<'a, 
         let sc = self as *mut ScriptDeinitContext;
         UnifiedContext {
             dt: None,
-            scene: sc.read().scene,
+            scene: Some(sc.read().scene),
             handle: None,
-            plugins: sc.read().plugins,
-            message_sender: sc.read().message_sender,
+            plugins: Some(sc.read().plugins),
+            message_sender: Some(sc.read().message_sender),
             message_dispatcher: None,
             graphics_context: sc.read().graphics_context,
+            async_scene_loader: None,
+            user_interfaces: None,
         }
     }
     
@@ -109,12 +112,35 @@ impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for ScriptDeinitContext<'a, 
     }
 }
 
+impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for PluginContext<'a, 'b> {
+    unsafe fn as_unified_context(&mut self) -> UnifiedContext<'a, 'b, 'c> {
+        let sc = self as *mut PluginContext;
+        UnifiedContext {
+            dt: None,
+            scene: None,
+            handle: None,
+            plugins: None,
+            message_sender: None,
+            message_dispatcher: None,
+            graphics_context: sc.read().graphics_context,
+            async_scene_loader: Some(sc.read().async_scene_loader),
+            user_interfaces: Some(sc.read().user_interfaces),
+        }
+    }
+    
+    fn plugins(&mut self) -> &mut PluginsRefMut<'a> {
+        todo!()
+    }
+}
+
 pub struct UnifiedContext<'a, 'b, 'c> {
     pub dt: Option<f32>,
-    pub scene: &'b mut Scene,
+    pub scene: Option<&'b mut Scene>,
     pub handle: Option<Handle<Node>>,
-    pub plugins: PluginsRefMut<'a>,
-    pub message_sender: &'c ScriptMessageSender,
+    pub plugins: Option<PluginsRefMut<'a>>,
+    pub message_sender: Option<&'c ScriptMessageSender>,
     pub message_dispatcher: Option<&'c mut ScriptMessageDispatcher>,
     pub graphics_context: &'a mut GraphicsContext,
+    pub async_scene_loader: Option<&'a mut AsyncSceneLoader>,
+    pub user_interfaces: Option<&'a mut UiContainer>,
 }

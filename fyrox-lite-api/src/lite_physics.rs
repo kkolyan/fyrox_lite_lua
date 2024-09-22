@@ -21,6 +21,8 @@ impl LitePhysics {
     pub fn cast_ray(opts: LiteRayCastOptions, results: &mut Vec<LiteIntersection>) {
         with_script_context(|ctx| {
             ctx.scene
+                .as_mut()
+                .expect("scene unavailable")
                 .graph
                 .physics
                 .cast_ray(opts.into(), &mut QueryResultsStorageWrapper(results));
@@ -161,7 +163,7 @@ pub struct LiteRigidBody {
 impl LiteRigidBody {
     pub fn apply_force(&mut self, force: LiteVector3) {
         with_script_context(|ctx| {
-            ctx.scene.graph[self.handle]
+            ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
                 .as_rigid_body_mut()
                 .apply_force(force.into())
         })

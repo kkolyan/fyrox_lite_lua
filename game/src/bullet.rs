@@ -42,7 +42,7 @@ pub struct BulletSeed {
 impl Bullet {
     pub fn spawn(seed: BulletSeed) {
         let orientation = LiteQuaternion::face_towards(seed.direction, LiteVector3::y_axis());
-        let bullet = LitePrefab::from(seed.prefab).instantiate_at(seed.origin, orientation);
+        let bullet = LitePrefab::new(seed.prefab).instantiate_at(seed.origin, orientation);
         bullet.with_script::<Bullet>(|it| {
             it.params = BulletParams {
                 velocity: seed.direction.normalize().mul(seed.initial_velocity).into(),

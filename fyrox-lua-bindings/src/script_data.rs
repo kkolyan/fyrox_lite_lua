@@ -1,9 +1,13 @@
+use fyrox::core::visitor::Visit;
+use fyrox::core::visitor::VisitResult;
+use fyrox::core::visitor::Visitor;
 use mlua::AnyUserData;
 use mlua::UserDataRefMut;
 use send_wrapper::SendWrapper;
 use std::fmt::Debug;
 use std::fmt::Formatter;
 
+use crate::script::ScriptFieldValue;
 use crate::script_object::ScriptObject;
 use crate::typed_userdata::TypedUserData;
 
@@ -60,5 +64,29 @@ impl Clone for ScriptData {
             // will implement when know when cloning is really needed during game cycle
             ScriptData::Unpacked(_) => panic!("cloning for Lua-backed ScriptData is not supported"),
         }
+    }
+}
+
+impl Visit for ScriptData {
+    fn visit(&mut self, name: &str, visitor: &mut Visitor) -> VisitResult {
+        let mut guard = visitor.enter_region(name)?;
+
+        self.with_script_object_mut(|it| {
+            let def = it.def.clone();
+            for (i, field) in def.metadata.fields.iter().enumerate() {
+                match &mut it.values[i] {
+                    ScriptFieldValue::Number(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::String(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::Bool(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::Node(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::UiNode(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::Prefab(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::Vector3(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::Quaternion(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::RawLuaValue(_it) => todo!("Visit for RawLuaValue is not supported yet"),
+                }?;
+            }
+            Ok(())
+        })
     }
 }

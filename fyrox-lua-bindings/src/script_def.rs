@@ -13,11 +13,16 @@ pub struct ScriptDefinition {
 
 #[derive(Debug)]
 pub struct ScriptMetadata {
-    pub uuid: Uuid,
     pub class: &'static str,
-    pub parent_class: Option<String>,
+    pub kind: ScriptKind,
     pub fields: Vec<ScriptField>,
     pub field_name_to_index: HashMap<String, usize>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ScriptKind {
+    Script(Uuid),
+    Plugin,
 }
 
 #[derive(Debug)]
@@ -27,14 +32,18 @@ pub struct ScriptField {
     pub description: Option<&'static str>,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ScriptFieldValueType {
     Number,
     String,
     Bool,
     Node,
+    UiNode,
+    Prefab,
     Vector3,
     Quaternion,
+    // not available in editor, but supported to allow script type annotations
+    RawLuaValue,
 }
 
 impl ScriptMetadata {
@@ -114,6 +123,12 @@ impl ScriptMetadata {
                             "field" => {
                                 let mut parts = value.splitn(3, " ");
                                 let name = parts.next().unwrap().to_string();
+                                let private = name == "private";
+                                let name = if private {
+                                    parts.next().unwrap().to_string()
+                                } else {
+                                    name
+                                };
                                 match parts.next() {
                                     None => errors.push(format!(
                                         "failed to parse field type: {}",
@@ -123,12 +138,15 @@ impl ScriptMetadata {
                                         let ty = match it {
                                             "number" => Some(ScriptFieldValueType::Number),
                                             "string" => Some(ScriptFieldValueType::String),
-                                            "bool" => Some(ScriptFieldValueType::Bool),
+                                            "boolean" => Some(ScriptFieldValueType::Bool),
                                             "Node" => Some(ScriptFieldValueType::Node),
+                                            "UiNode" => Some(ScriptFieldValueType::UiNode),
+                                            "Prefab" => Some(ScriptFieldValueType::Prefab),
                                             "Vector3" => Some(ScriptFieldValueType::Vector3),
+                                            "Vector3[]" => Some(ScriptFieldValueType::RawLuaValue),
                                             unsupported => {
                                                 errors.push(format!(
-                                                    "type not supported: {}",
+                                                    "type not supported: {:?}",
                                                     unsupported
                                                 ));
                                                 None
@@ -161,11 +179,17 @@ impl ScriptMetadata {
                 }
             }
         }
-        if uuid.is_none() {
-            errors.push("uuid tag is missing".to_string());
-        }
         if class.is_none() {
             errors.push("class tag is missing".to_string());
+        }
+
+        let parent_class = parent_class.as_ref().map(|it| it.as_str());
+
+        if parent_class.is_none() || !(parent_class.unwrap() == "Script" || parent_class.unwrap() == "Plugin") {
+            errors.push("parent class is required to be either Script or Plugin".to_string());
+        };
+        if parent_class.is_some() && parent_class.unwrap() == "Script" && uuid.is_none() {
+            errors.push("uuid tag is required for class extending Script".to_string());
         }
         if !errors.is_empty() {
             return Err(errors);
@@ -175,10 +199,14 @@ impl ScriptMetadata {
             .enumerate()
             .map(|(i, v)| (v.name.clone(), i))
             .collect();
+        let kind =  match parent_class.unwrap() {
+            "Script" => ScriptKind::Script(uuid.unwrap()),
+            "Plugin" => ScriptKind::Plugin,
+            unknown => panic!("unknown ScriptKind constant: {:?}", unknown),
+        };
         Ok(ScriptMetadata {
-            uuid: uuid.unwrap(),
             class: class.unwrap(),
-            parent_class,
+            kind,
             fields,
             field_name_to_index,
         })

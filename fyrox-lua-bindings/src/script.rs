@@ -3,8 +3,10 @@ use crate::fyrox_lite::Traitor;
 use crate::fyrox_utils::PluginsRefMut_Ext;
 use crate::lua_reflect_bindings::LuaTableKey;
 use crate::reflect_base;
+use crate::script_def::ScriptKind;
 use crate::script_object::ScriptObject;
 use crate::typed_userdata::TypedUserData;
+use fyrox::asset::Resource;
 use fyrox::core::algebra::UnitQuaternion;
 use fyrox::core::algebra::Vector3;
 use fyrox::core::log::Log;
@@ -12,6 +14,8 @@ use fyrox::core::pool::Handle;
 use fyrox::core::reflect::prelude::*;
 use fyrox::core::type_traits::prelude::*;
 use fyrox::core::visitor::prelude::*;
+use fyrox::gui::UiNode;
+use fyrox::resource::model::Model;
 use fyrox::scene::node::Node;
 use fyrox::script::BaseScript;
 use fyrox::script::ScriptContext;
@@ -72,7 +76,7 @@ impl ScriptTrait for LuaScript {
 }
 
 impl LuaScript {
-    fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(&mut self, ctx: &mut dyn UnsafeAsUnifiedContext<'a, 'b, 'c>, callback_name: &str, args: impl FnOnce(&'lua Lua) -> mlua::Result<A>) {
+    pub fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(&mut self, ctx: &mut dyn UnsafeAsUnifiedContext<'a, 'b, 'c>, callback_name: &str, args: impl FnOnce(&'lua Lua) -> mlua::Result<A>) {
         let plugin = ctx.plugins().lua_mut();
         if plugin.failed {
             // don't spam logs, though, plugin is completely broken at this point
@@ -134,28 +138,16 @@ impl BaseScript for LuaScript {
         self
     }
     fn id(&self) -> Uuid {
-        self.data.with_script_object(|it| it.def.metadata.uuid)
+        self.data.with_script_object(|it| match it.def.metadata.kind {
+            ScriptKind::Script(uuid) => uuid,
+            ScriptKind::Plugin => panic!("not expected to be called for Plugin scripts"),
+        })
     }
 }
 
 impl Visit for LuaScript {
     fn visit(&mut self, name: &str, visitor: &mut Visitor) -> VisitResult {
-        let mut guard = visitor.enter_region(name)?;
-
-        self.data.with_script_object_mut(|it| {
-            let def = it.def.clone();
-            for (i, field) in def.metadata.fields.iter().enumerate() {
-                match &mut it.values[i] {
-                    ScriptFieldValue::Number(it) => it.visit(&field.name, &mut guard),
-                    ScriptFieldValue::String(it) => it.visit(&field.name, &mut guard),
-                    ScriptFieldValue::Bool(it) => it.visit(&field.name, &mut guard),
-                    ScriptFieldValue::Node(it) => it.visit(&field.name, &mut guard),
-                    ScriptFieldValue::Vector3(it) => it.visit(&field.name, &mut guard),
-                    ScriptFieldValue::Quaternion(it) => it.visit(&field.name, &mut guard),
-                }?;
-            }
-            Ok(())
-        })
+        self.data.visit(name, visitor)
     }
 }
 
@@ -192,8 +184,11 @@ pub enum ScriptFieldValue {
     String(String),
     Bool(bool),
     Node(Handle<Node>),
+    UiNode(Handle<UiNode>),
+    Prefab(Resource<Model>),
     Vector3(Vector3<f32>),
     Quaternion(UnitQuaternion<f32>),
+    RawLuaValue(SendWrapper<Value<'static>>),
 }
 
 impl ScriptFieldValue {
@@ -203,8 +198,11 @@ impl ScriptFieldValue {
             ScriptFieldValue::String(it) => it,
             ScriptFieldValue::Bool(it) => it,
             ScriptFieldValue::Node(it) => it,
+            ScriptFieldValue::UiNode(it) => it,
+            ScriptFieldValue::Prefab(it) => it,
             ScriptFieldValue::Vector3(it) => it,
             ScriptFieldValue::Quaternion(it) => it,
+            ScriptFieldValue::RawLuaValue(_it) => panic!("WTF, it shouldn't be reachable"),
         }
     }
     pub fn as_reflect(&self) -> &dyn Reflect {
@@ -213,8 +211,11 @@ impl ScriptFieldValue {
             ScriptFieldValue::String(it) => it,
             ScriptFieldValue::Bool(it) => it,
             ScriptFieldValue::Node(it) => it,
+            ScriptFieldValue::UiNode(it) => it,
+            ScriptFieldValue::Prefab(it) => it,
             ScriptFieldValue::Vector3(it) => it,
             ScriptFieldValue::Quaternion(it) => it,
+            ScriptFieldValue::RawLuaValue(_it) => panic!("WTF, it shouldn't be reachable"),
         }
     }
 }
@@ -226,8 +227,11 @@ impl Debug for ScriptFieldValue {
             ScriptFieldValue::String(it) => it.fmt(f),
             ScriptFieldValue::Bool(it) => it.fmt(f),
             ScriptFieldValue::Node(it) => it.fmt(f),
+            ScriptFieldValue::UiNode(it) => it.fmt(f),
+            ScriptFieldValue::Prefab(it) => it.fmt(f),
             ScriptFieldValue::Vector3(it) => it.fmt(f),
             ScriptFieldValue::Quaternion(it) => it.fmt(f),
+            ScriptFieldValue::RawLuaValue(it) => it.fmt(f),
         }
     }
 }

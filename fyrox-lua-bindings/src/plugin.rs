@@ -3,8 +3,10 @@ use crate::script::LuaScript;
 use crate::script_class::ScriptClass;
 use crate::script_data::ScriptData;
 use crate::script_def::ScriptDefinition;
+use crate::script_def::ScriptKind;
 use crate::script_def::ScriptMetadata;
 use crate::script_object::ScriptObject;
+use crate::typed_userdata::TypedUserData;
 use fyrox::core::log::Log;
 use fyrox::core::pool::Handle;
 use fyrox::core::reflect::prelude::*;
@@ -22,9 +24,12 @@ use fyrox::script::Script;
 use fyrox::script::ScriptContext;
 use fyrox::walkdir::DirEntry;
 use fyrox::walkdir::WalkDir;
+use fyrox_lite_api::lite_scene::load_scene_async;
+use fyrox_lite_api::wrapper_reflect;
 use mlua::Function;
 use mlua::Lua;
 use mlua::Table;
+use mlua::Value;
 use send_wrapper::SendWrapper;
 use std::borrow::BorrowMut;
 use std::cell::RefCell;
@@ -44,6 +49,8 @@ pub struct LuaPlugin {
     #[visit(skip)]
     #[reflect(hidden)]
     pub failed: bool,
+
+    scripts: RefCell<PluginScriptList>,
 }
 
 impl LuaPlugin {
@@ -84,6 +91,7 @@ impl Default for LuaPlugin {
         LuaPlugin {
             vm: Box::leak(Box::new(Lua::new())),
             failed: false,
+            scripts: Default::default(),
         }
     }
 }
@@ -133,13 +141,29 @@ impl Plugin for LuaPlugin {
                 )
                 .unwrap();
         }
+        lua.globals()
+            .set(
+                "load_scene_async",
+                lua.create_function_mut(|lua, scene_path: mlua::String| {
+                    load_scene_async(scene_path.to_str()?);
+                    Ok(())
+                })
+                .unwrap(),
+            )
+            .unwrap();
 
         for entry in WalkDir::new("scripts").into_iter().flatten() {
-            load_script(&context, lua, &entry, classes.clone());
+            load_script(
+                &context,
+                lua,
+                &entry,
+                classes.clone(),
+                &mut self.scripts.borrow_mut(),
+            );
         }
     }
 
-    fn init(&mut self, scene_path: Option<&str>, context: PluginContext) {
+    fn init(&mut self, scene_path: Option<&str>, mut context: PluginContext) {
         Lua::new()
             .load("print('hello Fyrox'); print(_VERSION)")
             .eval::<()>()
@@ -147,14 +171,31 @@ impl Plugin for LuaPlugin {
         context
             .async_scene_loader
             .request(scene_path.unwrap_or("data/scene.rgs"));
+
+        for script in self.scripts.borrow_mut().0.iter_mut() {
+            script.invoke_callback(&mut context, "init", |lua| {
+                if let Some(scene_path) = scene_path {
+                    Ok(Value::String(lua.create_string(scene_path)?))
+                } else {
+                    Ok(Value::Nil)
+                }
+            });
+        }
+    }
+
+    fn update(&mut self, context: &mut PluginContext) {
+        for script in self.scripts.borrow_mut().0.iter_mut() {
+            script.invoke_callback(context, "update", |_lua| Ok(()));
+        }
     }
 }
 
 fn load_script(
     context: &PluginRegistrationContext,
-    lua: &Lua,
+    lua: &'static Lua,
     entry: &DirEntry,
     class_data: Rc<RefCell<HashMap<&'static str, Table<'static>>>>,
+    plugin_scripts: &mut PluginScriptList,
 ) {
     if !entry.file_type().is_file() {
         return;
@@ -200,7 +241,6 @@ fn load_script(
     }
 
     let name = metadata.class;
-    let uuid = metadata.uuid;
 
     let assembly_name = "scripts/**.lua";
     let definition = Arc::new(ScriptDefinition {
@@ -209,25 +249,83 @@ fn load_script(
         assembly_name,
     });
 
-    context
-        .serialization_context
-        .script_constructors
-        .add_custom(
-            uuid,
-            ScriptConstructor {
-                constructor: Box::new(move || {
-                    Script::new(LuaScript {
-                        data: ScriptData::Packed(ScriptObject::new(&definition)),
+    match definition.metadata.kind {
+        ScriptKind::Script(uuid) => {
+            context
+                .serialization_context
+                .script_constructors
+                .add_custom(
+                    uuid,
+                    ScriptConstructor {
+                        constructor: Box::new(move || {
+                            Script::new(LuaScript {
+                                data: ScriptData::Packed(ScriptObject::new(&definition)),
+                                name: name.to_string(),
+                            })
+                        }),
                         name: name.to_string(),
-                    })
-                }),
+                        source_path: entry.path().to_string_lossy().to_string().leak(),
+                        assembly_name,
+                    },
+                );
+        }
+        ScriptKind::Plugin => {
+            plugin_scripts.inner_mut().push(LuaScript {
                 name: name.to_string(),
-                source_path: entry.path().to_string_lossy().to_string().leak(),
-                assembly_name,
-            },
-        );
+                data: ScriptData::Unpacked(SendWrapper::new(TypedUserData::new(
+                    lua.create_userdata(ScriptObject::new(&definition)).unwrap(),
+                ))),
+            });
+        }
+    }
+
     Log::info(format!(
         "script registered: {}",
         entry.path().to_string_lossy()
     ));
+}
+
+#[derive(Debug, Default, Clone)]
+struct PluginScriptList(Vec<LuaScript>);
+
+impl PluginScriptList {
+    pub fn inner(&self) -> &Vec<LuaScript> {
+        &self.0
+    }
+    pub fn inner_mut(&mut self) -> &mut Vec<LuaScript> {
+        &mut self.0
+    }
+}
+
+impl Visit for PluginScriptList {
+    fn visit(&mut self, name: &str, visitor: &mut Visitor) -> VisitResult {
+        let mut guard = visitor.enter_region(name)?;
+
+        for item in self.inner_mut().iter_mut() {
+            item.data.visit(item.name.as_str(), &mut guard)?;
+        }
+        Ok(())
+    }
+}
+
+impl Reflect for PluginScriptList {
+    wrapper_reflect! {0}
+
+    fn source_path() -> &'static str
+    where
+        Self: Sized,
+    {
+        file!()
+    }
+
+    fn assembly_name(&self) -> &'static str {
+        env!("CARGO_PKG_NAME")
+    }
+
+    fn type_assembly_name() -> &'static str
+    where
+        Self: Sized,
+    {
+        env!("CARGO_PKG_NAME")
+    }
 }

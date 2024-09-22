@@ -48,7 +48,7 @@ impl LiteScript for GuardChief {
 
                     let orientation = LiteQuaternion::from_axis_angle(LiteVector3::y_axis(), random());
 
-                    LitePrefab::from(self.gaurd_prefab.as_ref().unwrap().clone())
+                    LitePrefab::new(self.gaurd_prefab.as_ref().unwrap().clone())
                         .instantiate_at(position, orientation);
                     Log::info(format!("guard spawned at {:?}", position));
                 } else {

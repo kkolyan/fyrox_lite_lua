@@ -1,11 +1,11 @@
-use std::{any::TypeId, ops::Deref, sync::Arc};
+use std::{any::TypeId, mem, ops::Deref, sync::Arc};
 
 use fyrox::core::reflect::{FieldInfo, FieldValue, Reflect};
 use fyrox_lite_api::{
-    lite_math::{LiteQuaternion, LiteVector3},
-    lite_node::LiteNode,
+    lite_math::{LiteQuaternion, LiteVector3}, lite_node::LiteNode, lite_prefab::LitePrefab, lite_ui::LiteUiNode
 };
 use mlua::{MetaMethod, String, Table, UserData, UserDataRef, UserDataRefMut, Value};
+use send_wrapper::SendWrapper;
 
 use crate::{fyrox_lite::Traitor, lua_error, lua_utils::OptionX, reflect_base};
 
@@ -29,15 +29,18 @@ impl ScriptObject {
                 .metadata
                 .fields
                 .iter()
-                .map(|it| match it.ty {
+                .map(|it| match &it.ty {
                     ScriptFieldValueType::Number => ScriptFieldValue::Number(Default::default()),
                     ScriptFieldValueType::String => ScriptFieldValue::String(Default::default()),
                     ScriptFieldValueType::Bool => ScriptFieldValue::Bool(Default::default()),
                     ScriptFieldValueType::Node => ScriptFieldValue::Node(Default::default()),
+                    ScriptFieldValueType::Prefab => ScriptFieldValue::Prefab(Default::default()),
+                    ScriptFieldValueType::UiNode => ScriptFieldValue::Node(Default::default()),
                     ScriptFieldValueType::Vector3 => ScriptFieldValue::Vector3(Default::default()),
                     ScriptFieldValueType::Quaternion => {
                         ScriptFieldValue::Quaternion(Default::default())
                     }
+                    ScriptFieldValueType::RawLuaValue => ScriptFieldValue::RawLuaValue(SendWrapper::new(Value::Nil)),
                 })
                 .collect(),
         }
@@ -78,12 +81,19 @@ impl UserData for ScriptObject {
                             ScriptFieldValue::Node(it) => Value::UserData(
                                 lua.create_any_userdata(Traitor::new(LiteNode::from(*it)))?,
                             ),
+                            ScriptFieldValue::UiNode(it) => Value::UserData(
+                                lua.create_any_userdata(Traitor::new(LiteUiNode::new(*it)))?,
+                            ),
+                            ScriptFieldValue::Prefab(it) => Value::UserData(
+                                lua.create_any_userdata(Traitor::new(LitePrefab::new(it.clone())))?,
+                            ),
                             ScriptFieldValue::Vector3(it) => Value::UserData(
                                 lua.create_userdata(Traitor::new(LiteVector3::from(*it)))?,
                             ),
                             ScriptFieldValue::Quaternion(it) => Value::UserData(
                                 lua.create_userdata(Traitor::new(LiteQuaternion::from(*it)))?,
                             ),
+                            ScriptFieldValue::RawLuaValue(it) => Value::clone(it),
                         };
                         return Ok(result);
                     }
@@ -131,6 +141,32 @@ impl UserData for ScriptObject {
                                     .into(),
                                 }
                             }
+                            ScriptFieldValue::UiNode(it) => {
+                                *it = match value {
+                                    Value::Nil => Default::default(),
+                                    _ => extract_userdata_value::<Traitor<LiteUiNode>>(
+                                        value,
+                                        class,
+                                        &field_name,
+                                    )?
+                                    .inner()
+                                    .clone()
+                                    .inner(),
+                                }
+                            }
+                            ScriptFieldValue::Prefab(it) => {
+                                *it = match value {
+                                    Value::Nil => Default::default(),
+                                    _ => extract_userdata_value::<Traitor<LitePrefab>>(
+                                        value,
+                                        class,
+                                        &field_name,
+                                    )?
+                                    .inner()
+                                    .clone()
+                                    .inner(),
+                                }
+                            }
                             ScriptFieldValue::Vector3(it) => {
                                 *it = extract_userdata_value::<Traitor<LiteVector3>>(
                                     value,
@@ -151,6 +187,11 @@ impl UserData for ScriptObject {
                                 .clone()
                                 .into()
                             }
+                            ScriptFieldValue::RawLuaValue(it) => {
+                                // we use Lua interpreter as long as we use the process, so its lifetime is effectively static.
+                                let value: Value<'static> = unsafe { mem::transmute(value) };
+                                *it = SendWrapper::new(value)
+                            },
                         };
                         return Ok(());
                     }
@@ -195,6 +236,7 @@ impl Reflect for ScriptObject {
             .metadata
             .fields
             .iter()
+            .filter(|it| it.ty != ScriptFieldValueType::RawLuaValue)
             .enumerate()
             .map(|(i, it)| FieldInfo {
                 owner_type_id: TypeId::of::<ScriptObject>(),
@@ -206,8 +248,11 @@ impl Reflect for ScriptObject {
                     ScriptFieldValueType::String => "alloc::string::String",
                     ScriptFieldValueType::Bool => "bool",
                     ScriptFieldValueType::Node => "Node",
+                    ScriptFieldValueType::UiNode => "UiNode",
+                    ScriptFieldValueType::Prefab => "Prefab",
                     ScriptFieldValueType::Vector3 => "Vector3",
                     ScriptFieldValueType::Quaternion => "UnitQuaternion",
+                    ScriptFieldValueType::RawLuaValue => panic!("WTF, it's excluded above"),
                 },
                 doc: it.description.unwrap_or(""),
                 value: match self.values.get(i).unwrap() {
@@ -215,8 +260,11 @@ impl Reflect for ScriptObject {
                     ScriptFieldValue::String(it) => it,
                     ScriptFieldValue::Bool(it) => it,
                     ScriptFieldValue::Node(it) => it,
+                    ScriptFieldValue::UiNode(it) => it,
+                    ScriptFieldValue::Prefab(it) => it,
                     ScriptFieldValue::Vector3(it) => it,
                     ScriptFieldValue::Quaternion(it) => it,
+                    ScriptFieldValue::RawLuaValue(_it) => panic!("WTF, it's excluded above"),
                 },
                 reflect_value: self.values.get(i).unwrap().as_reflect(),
                 read_only: false,

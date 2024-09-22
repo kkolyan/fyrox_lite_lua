@@ -9,21 +9,26 @@ use crate::{
     script_context::with_script_context,
 };
 
+#[derive(Debug, Clone, Default)]
 pub struct LitePrefab {
     resource: Resource<Model>,
 }
 
-impl From<Resource<Model>> for LitePrefab {
-    fn from(value: Resource<Model>) -> Self {
-        Self { resource: value }
+impl LitePrefab {
+    pub fn new(resource: Resource<Model>) -> Self {
+        Self { resource }
     }
+
+    pub fn inner(&self) -> Resource<Model> {
+        self.resource.clone()
+    } 
 }
 
 impl LitePrefab {
     pub fn instantiate_at(&self, position: LiteVector3, orientation: LiteQuaternion) -> LiteNode {
         with_script_context(|ctx| {
             self.resource
-                .begin_instantiation(ctx.scene)
+                .begin_instantiation(ctx.scene.as_mut().expect("scene unavailable"))
                 .with_rotation(orientation.into())
                 .with_position(position.into())
                 .finish()

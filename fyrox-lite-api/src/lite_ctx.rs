@@ -97,6 +97,6 @@ pub struct LiteContext {
 impl LiteContext {
     // TODO contribute "take" method to "ctx.plugins"
     pub fn with_plugin<T: Plugin, R>(&mut self, f: impl FnOnce(&mut T) -> R) -> R {
-        with_script_context(|ctx| f(ctx.plugins.get_mut::<T>()))
+        with_script_context(|ctx| f(ctx.plugins.as_mut().expect("plugins not available").get_mut::<T>()))
     }
 }

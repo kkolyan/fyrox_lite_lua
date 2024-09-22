@@ -34,7 +34,7 @@ impl From<LiteNode> for Handle<Node> {
 impl LiteNode {
     pub fn as_rigid_body(&mut self) -> Option<LiteRigidBody> {
         with_script_context(|ctx| {
-            if ctx.scene.graph[self.handle].is_rigid_body() {
+            if ctx.scene.as_ref().expect("scene unavailable").graph[self.handle].is_rigid_body() {
                 Some(LiteRigidBody {
                     handle: self.handle,
                 })
@@ -45,16 +45,26 @@ impl LiteNode {
     }
 
     pub fn destroy(&mut self) {
-        with_script_context(|ctx| ctx.scene.graph.remove_node(self.handle));
+        with_script_context(|ctx| {
+            ctx.scene
+                .as_mut()
+                .expect("scene unavailable")
+                .graph
+                .remove_node(self.handle)
+        });
     }
 
     pub fn global_position(&self) -> LiteVector3 {
-        with_script_context(|ctx| ctx.scene.graph[self.handle].global_position().into())
+        with_script_context(|ctx| {
+            ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
+                .global_position()
+                .into()
+        })
     }
 
     pub fn local_position(&self) -> LiteVector3 {
         with_script_context(|ctx| {
-            (*ctx.scene.graph[self.handle]
+            (*ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
                 .local_transform()
                 .position()
                 .get_value_ref())
@@ -64,7 +74,7 @@ impl LiteNode {
 
     pub fn local_rotation(&self) -> LiteQuaternion {
         with_script_context(|ctx| {
-            (*ctx.scene.graph[self.handle]
+            (*ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
                 .local_transform()
                 .rotation()
                 .get_value_ref())
@@ -83,13 +93,15 @@ impl LiteNode {
                 LiteRoutingStrategy::Down => RoutingStrategy::Down,
             };
             ctx.message_sender
+                .as_mut()
+                .expect("message sender unavailable")
                 .send_hierarchical(self.handle, routing, payload);
         });
     }
 
     pub fn set_local_position(&self, new_pos: LiteVector3) {
         with_script_context(|ctx| {
-            ctx.scene.graph[self.handle]
+            ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
                 .local_transform_mut()
                 .set_position(new_pos.into());
         });
@@ -97,7 +109,7 @@ impl LiteNode {
 
     pub fn set_local_rotation(&self, value: LiteQuaternion) {
         with_script_context(|ctx| {
-            ctx.scene.graph[self.handle]
+            ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
                 .local_transform_mut()
                 .set_rotation(value.into());
         });
@@ -113,11 +125,11 @@ impl LiteNode {
 
     pub fn try_get_collider(&self) -> Option<LiteNode> {
         with_script_context(|ctx| {
-            ctx.scene.graph[self.handle]
+            ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
                 .children()
                 .iter()
                 .copied()
-                .find(|it| ctx.scene.graph[*it].is_collider())
+                .find(|it| ctx.scene.as_ref().expect("scene unavailable").graph[*it].is_collider())
                 .map(|it| it.into())
         })
     }
@@ -127,18 +139,22 @@ impl LiteNode {
     }
 
     pub fn parent(&self) -> LiteNode {
-        with_script_context(|ctx| ctx.scene.graph[self.handle].parent().into())
+        with_script_context(|ctx| {
+            ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
+                .parent()
+                .into()
+        })
     }
 
     pub fn with_script<T: ScriptTrait>(&self, f: impl FnOnce(&mut T)) {
         with_script_context(|ctx| {
-            let node = &mut ctx.scene.graph[self.handle];
+            let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
             f(node.try_get_script_mut::<T>().unwrap());
         })
     }
     pub fn find_script<T: ScriptTrait, R>(&self, f: impl Fn(&mut T) -> Option<R>) -> Option<R> {
         with_script_context(|ctx| {
-            let node = &mut ctx.scene.graph[self.handle];
+            let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
             for script in node.try_get_scripts_mut::<T>() {
                 if let Some(r) = f(script) {
                     return Some(r);
@@ -150,7 +166,9 @@ impl LiteNode {
 
     pub fn global_rotation(&self) -> LiteQuaternion {
         with_script_context(|ctx| {
-            let camera_global_transform = ctx.scene.graph[self.handle].global_transform();
+            let camera_global_transform = ctx.scene.as_mut().expect("scene unavailable").graph
+                [self.handle]
+                .global_transform();
 
             let rot = camera_global_transform.fixed_view::<3, 3>(0, 0);
             UnitQuaternion::from_matrix(&rot.into()).into()
@@ -158,12 +176,15 @@ impl LiteNode {
     }
 
     pub fn tag_is(&self, tag: &str) -> bool {
-        with_script_context(|ctx| ctx.scene.graph[self.handle].tag() == tag)
+        with_script_context(|ctx| {
+            ctx.scene.as_mut().expect("scene unavailable").graph[self.handle].tag() == tag
+        })
     }
 
     pub fn set_tag(&self, tag: &str) {
         with_script_context(|ctx| {
-            ctx.scene.graph[self.handle].set_tag(tag.to_string());
+            ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
+                .set_tag(tag.to_string());
         });
     }
 }
@@ -223,15 +244,15 @@ macro_rules! wrapper_reflect {
             self.$ident.fields_info(func)
         }
 
-        fn into_any(self: Box<Self>) -> Box<dyn Any> {
+        fn into_any(self: Box<Self>) -> Box<dyn std::any::Any> {
             self
         }
 
-        fn as_any(&self, func: &mut dyn FnMut(&dyn Any)) {
+        fn as_any(&self, func: &mut dyn FnMut(&dyn std::any::Any)) {
             fyrox::core::reflect::Reflect::as_any(&self.$ident, func)
         }
 
-        fn as_any_mut(&mut self, func: &mut dyn FnMut(&mut dyn Any)) {
+        fn as_any_mut(&mut self, func: &mut dyn FnMut(&mut dyn std::any::Any)) {
             fyrox::core::reflect::Reflect::as_any_mut(&mut self.$ident, func)
         }
 

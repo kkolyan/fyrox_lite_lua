@@ -8,6 +8,8 @@ use fyrox_lite_api::{
     lite_math::{LiteQuaternion, LiteVector3},
     lite_node::{LiteNode, LiteRoutingStrategy},
     lite_physics::LiteRigidBody,
+    lite_prefab::LitePrefab,
+    lite_ui::LiteUiNode,
 };
 use mlua::{AnyUserData, UserData, UserDataRef, UserDataRefMut, Value};
 use send_wrapper::SendWrapper;
@@ -33,7 +35,7 @@ impl<T> Traitor<T> {
     pub fn new(t: T) -> Self {
         Self(t)
     }
-    
+
     pub fn inner(&self) -> &T {
         &self.0
     }
@@ -156,6 +158,10 @@ impl UserData for Traitor<LiteQuaternion> {
 }
 
 impl UserData for Traitor<LiteRoutingStrategy> {}
+
+impl UserData for Traitor<LiteUiNode> {}
+
+impl UserData for Traitor<LitePrefab> {}
 
 #[allow(unused_variables)]
 impl UserData for Traitor<LiteNode> {
