@@ -27,16 +27,16 @@ use crate::game::Game;
 #[type_uuid(id = "c5671d19-9f1a-4286-8486-add4ebaadaec")]
 #[visit(optional)]
 pub struct Player {
-    sensitivity: f32,
+    sensitivity: f64,
     camera: Handle<Node>,
-    power: f32,
+    power: f64,
     bullet: Option<Resource<Model>>,
-    initial_bullet_velocity: f32,
-    shooting_range: f32,
-    reload_delay_sec: f32,
+    initial_bullet_velocity: f64,
+    shooting_range: f64,
+    reload_delay_sec: f64,
 
     #[reflect(hidden)]
-    reload_sec: f32,
+    reload_sec: f64,
 
     #[reflect(hidden)]
     published: bool,
@@ -47,6 +47,21 @@ pub struct Player {
     #[visit(skip)]
     #[reflect(hidden)]
     temp: TempState,
+    /*
+    ---@uuid c5671d19-9f1a-4286-8486-add4ebaadaec
+---@class Player : Script
+---@field sensitivity number
+---@field camera Node
+---@field power number
+---@field bullet Prefab
+---@field initial_bullet_velocity number
+---@field shooting_range number
+---@field reload_delay_sec number
+---@field private reload_sec number
+---@field private published boolean
+---@field private collider Node
+
+*/
 }
 
 #[derive(Debug, Default, Clone)]
@@ -62,13 +77,13 @@ pub struct TempState {
 impl Player {
     fn turn(&self, x: f32, ctx: &mut LiteContext) {
         // TODO use Quaternion instead
-        let rot_delta = LiteQuaternion::from_axis_angle(LiteVector3::y_axis(), self.sensitivity * x);
+        let rot_delta = LiteQuaternion::from_axis_angle(LiteVector3::y_axis(), self.sensitivity as f32 * x);
         ctx.node
             .set_local_rotation(ctx.node.local_rotation().mul__LiteQuaternion(rot_delta));
     }
 
     fn aim(&mut self, y: f32) {
-        self.temp.aim_y += y * self.sensitivity;
+        self.temp.aim_y += y * self.sensitivity as f32;
 
         self.temp.aim_y = self.temp.aim_y.clamp(-PI / 2.0, PI / 2.0);
 
@@ -87,9 +102,9 @@ impl Player {
             prefab,
             origin: camera_pos,
             direction: bullet_orientation.mul__LiteVector(LiteVector3::z_axis()),
-            initial_velocity: self.initial_bullet_velocity,
+            initial_velocity: self.initial_bullet_velocity as f32,
             author_collider: self.collider,
-            range: self.shooting_range,
+            range: self.shooting_range as f32,
         });
         println!("bullet spawned");
     }
@@ -123,7 +138,7 @@ impl LiteScript for Player {
     fn on_update(&mut self, ctx: &mut LiteContext) {
         profiling::scope!("Player::on_update");
         if self.reload_sec > 0.0 {
-            self.reload_sec -= ctx.dt;
+            self.reload_sec -= ctx.dt as f64;
         }
         if !self.published {
             self.published = true;
@@ -158,7 +173,7 @@ impl LiteScript for Player {
 
         let self_rotation = ctx.node.local_rotation();
         let move_delta = self_rotation.mul__LiteVector(move_delta);
-        let force = move_delta.mul(self.power);
+        let force = move_delta.mul(self.power as f32);
         ctx.node.as_rigid_body().unwrap().apply_force(force);
     }
 

@@ -30,6 +30,7 @@ pub struct ScriptField {
     pub name: String,
     pub ty: ScriptFieldValueType,
     pub description: Option<&'static str>,
+    pub private: bool,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -161,6 +162,7 @@ impl ScriptMetadata {
                                                 name,
                                                 ty,
                                                 description,
+                                                private,
                                             });
                                         }
                                     }

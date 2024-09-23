@@ -1,3 +1,5 @@
+use convert_case::Case;
+use convert_case::Casing;
 use fyrox::core::visitor::Visit;
 use fyrox::core::visitor::VisitResult;
 use fyrox::core::visitor::Visitor;
@@ -74,15 +76,16 @@ impl Visit for ScriptData {
         self.with_script_object_mut(|it| {
             let def = it.def.clone();
             for (i, field) in def.metadata.fields.iter().enumerate() {
+                let field_name = &field.name.to_case(Case::UpperCamel);
                 match &mut it.values[i] {
-                    ScriptFieldValue::Number(it) => it.visit(&field.name, &mut guard),
-                    ScriptFieldValue::String(it) => it.visit(&field.name, &mut guard),
-                    ScriptFieldValue::Bool(it) => it.visit(&field.name, &mut guard),
-                    ScriptFieldValue::Node(it) => it.visit(&field.name, &mut guard),
-                    ScriptFieldValue::UiNode(it) => it.visit(&field.name, &mut guard),
-                    ScriptFieldValue::Prefab(it) => it.visit(&field.name, &mut guard),
-                    ScriptFieldValue::Vector3(it) => it.visit(&field.name, &mut guard),
-                    ScriptFieldValue::Quaternion(it) => it.visit(&field.name, &mut guard),
+                    ScriptFieldValue::Number(it) => it.visit(field_name, &mut guard),
+                    ScriptFieldValue::String(it) => it.visit(field_name, &mut guard),
+                    ScriptFieldValue::Bool(it) => it.visit(field_name, &mut guard),
+                    ScriptFieldValue::Node(it) => it.visit(field_name, &mut guard),
+                    ScriptFieldValue::UiNode(it) => it.visit(field_name, &mut guard),
+                    ScriptFieldValue::Prefab(it) => it.visit(field_name, &mut guard),
+                    ScriptFieldValue::Vector3(it) => it.visit(field_name, &mut guard),
+                    ScriptFieldValue::Quaternion(it) => it.visit(field_name, &mut guard),
                     ScriptFieldValue::RawLuaValue(_it) => todo!("Visit for RawLuaValue is not supported yet"),
                 }?;
             }

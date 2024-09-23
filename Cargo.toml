@@ -4,9 +4,8 @@ members = [ "editor", "editor-lua", "executor", "executor-lua", "fyrox-lite-api"
 resolver = "2"
 
 [workspace.dependencies]
-fyrox = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false}
-fyrox_impl = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false, package = "fyrox-impl"}
-fyroxed_base = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false}
+fyrox = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f"}
+fyroxed_base = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f"}
 
 # Separate build profiles for hot reloading. These profiles ensures that build artifacts for
 # hot reloading will be placed into their own folders and does not interfere with standard (static)

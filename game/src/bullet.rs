@@ -16,14 +16,20 @@ use fyrox_lite_api::lite_node::LiteRoutingStrategy;
 use fyrox_lite_api::lite_physics::{LitePhysics, LiteRayCastOptions};
 use fyrox_lite_api::lite_prefab::LitePrefab;
 
-#[derive(Visit, Reflect, Debug, Clone, TypeUuidProvider, ComponentProvider, Default)]
+#[derive(Reflect, Debug, Clone, TypeUuidProvider, ComponentProvider, Default)]
 #[type_uuid(id = "12371d19-9f1a-4286-8486-add4ebaadaec")]
-#[visit(optional)]
 pub struct Bullet {
     pub params: BulletParams,
 }
 
+impl Visit for Bullet {
+    fn visit(&mut self, name: &str, visitor: &mut Visitor) -> VisitResult {
+        self.params.visit(name, visitor)
+    }
+}
+
 #[derive(Visit, Reflect, Debug, Clone, Default)]
+#[visit(optional)]
 pub struct BulletParams {
     pub velocity: Vector3<f32>,
     pub remaining_sec: f32,

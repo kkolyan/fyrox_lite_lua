@@ -185,7 +185,7 @@ pub enum ScriptFieldValue {
     Bool(bool),
     Node(Handle<Node>),
     UiNode(Handle<UiNode>),
-    Prefab(Resource<Model>),
+    Prefab(Option<Resource<Model>>),
     Vector3(Vector3<f32>),
     Quaternion(UnitQuaternion<f32>),
     RawLuaValue(SendWrapper<Value<'static>>),

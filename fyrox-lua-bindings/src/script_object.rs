@@ -1,6 +1,6 @@
 use std::{any::TypeId, mem, ops::Deref, sync::Arc};
 
-use fyrox::core::reflect::{FieldInfo, FieldValue, Reflect};
+use fyrox::{asset::Resource, core::{algebra::{UnitQuaternion, Vector3}, pool::Handle, reflect::{FieldInfo, FieldValue, Reflect}}, gui::UiNode, resource::model::Model, scene::node::Node};
 use fyrox_lite_api::{
     lite_math::{LiteQuaternion, LiteVector3}, lite_node::LiteNode, lite_prefab::LitePrefab, lite_ui::LiteUiNode
 };
@@ -85,7 +85,7 @@ impl UserData for ScriptObject {
                                 lua.create_any_userdata(Traitor::new(LiteUiNode::new(*it)))?,
                             ),
                             ScriptFieldValue::Prefab(it) => Value::UserData(
-                                lua.create_any_userdata(Traitor::new(LitePrefab::new(it.clone())))?,
+                                lua.create_any_userdata(Traitor::new(LitePrefab::new(it.clone().unwrap())))?,
                             ),
                             ScriptFieldValue::Vector3(it) => Value::UserData(
                                 lua.create_userdata(Traitor::new(LiteVector3::from(*it)))?,
@@ -157,14 +157,14 @@ impl UserData for ScriptObject {
                             ScriptFieldValue::Prefab(it) => {
                                 *it = match value {
                                     Value::Nil => Default::default(),
-                                    _ => extract_userdata_value::<Traitor<LitePrefab>>(
+                                    _ => Some(extract_userdata_value::<Traitor<LitePrefab>>(
                                         value,
                                         class,
                                         &field_name,
                                     )?
                                     .inner()
                                     .clone()
-                                    .inner(),
+                                    .inner()),
                                 }
                             }
                             ScriptFieldValue::Vector3(it) => {
@@ -238,20 +238,21 @@ impl Reflect for ScriptObject {
             .iter()
             .filter(|it| it.ty != ScriptFieldValueType::RawLuaValue)
             .enumerate()
+            .filter(|(_i, it)| !it.private)
             .map(|(i, it)| FieldInfo {
                 owner_type_id: TypeId::of::<ScriptObject>(),
                 name: it.name.as_str(),
                 display_name: it.name.as_str(),
                 description: it.name.as_str(),
                 type_name: match it.ty {
-                    ScriptFieldValueType::Number => "f32",
-                    ScriptFieldValueType::String => "alloc::string::String",
-                    ScriptFieldValueType::Bool => "bool",
-                    ScriptFieldValueType::Node => "Node",
-                    ScriptFieldValueType::UiNode => "UiNode",
-                    ScriptFieldValueType::Prefab => "Prefab",
-                    ScriptFieldValueType::Vector3 => "Vector3",
-                    ScriptFieldValueType::Quaternion => "UnitQuaternion",
+                    ScriptFieldValueType::Number => std::any::type_name::<f32>(),
+                    ScriptFieldValueType::String => std::any::type_name::<String>(),
+                    ScriptFieldValueType::Bool => std::any::type_name::<bool>(),
+                    ScriptFieldValueType::Node => std::any::type_name::<Handle<Node>>(),
+                    ScriptFieldValueType::UiNode => std::any::type_name::<Handle<UiNode>>(),
+                    ScriptFieldValueType::Prefab => std::any::type_name::<Option<Resource<Model>>>(),
+                    ScriptFieldValueType::Vector3 => std::any::type_name::<Vector3<f32>>(),
+                    ScriptFieldValueType::Quaternion => std::any::type_name::<UnitQuaternion<f32>>(),
                     ScriptFieldValueType::RawLuaValue => panic!("WTF, it's excluded above"),
                 },
                 doc: it.description.unwrap_or(""),
@@ -282,7 +283,9 @@ impl Reflect for ScriptObject {
         let fields = self
             .values
             .iter()
-            .map(|it| {
+            .enumerate()
+            .filter(|(i, _it)| !self.def.metadata.fields[*i].private)
+            .map(|(_i, it)| {
                 let it: &dyn Reflect = it.as_reflect();
                 it
             })
@@ -294,7 +297,9 @@ impl Reflect for ScriptObject {
         let mut fields = self
             .values
             .iter_mut()
-            .map(|it| {
+            .enumerate()
+            .filter(|(i, _it)| !self.def.metadata.fields[*i].private)
+            .map(|(_i, it)| {
                 let it: &mut dyn Reflect = it.as_reflect_mut();
                 it
             })

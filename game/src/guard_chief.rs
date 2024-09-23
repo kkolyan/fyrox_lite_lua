@@ -22,7 +22,7 @@ use crate::game::Game;
 #[visit(optional)]
 pub struct GuardChief {
     gaurd_prefab: Option<Resource<Model>>,
-    initial_count: usize,
+    initial_count: f64,
 
     #[reflect(hidden)]
     initialized: bool,
@@ -41,7 +41,7 @@ impl LiteScript for GuardChief {
         }
         if !self.initialized {
             self.initialized = true;
-            for _ in 0..self.initial_count {
+            for _ in 0..self.initial_count as usize {
                 let beacons = ctx.with_plugin::<Game, _>(|it| it.beacons.clone());
                 if !beacons.is_empty() {
                     let position = LiteVector3::from(beacons[random::<usize>() % beacons.len()]);
