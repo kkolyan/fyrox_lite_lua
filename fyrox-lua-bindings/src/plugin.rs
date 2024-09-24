@@ -165,10 +165,11 @@ impl Plugin for LuaPlugin {
     }
 
     fn init(&mut self, scene_path: Option<&str>, mut context: PluginContext) {
-        self.vm
-            .load("print('hello Fyrox'); print(_VERSION);")
-            .eval::<()>()
+        let lua_version = self.vm
+            .load("return _VERSION")
+            .eval::<mlua::String>()
             .unwrap();
+        println!("Lua Version: {}", lua_version.to_str().unwrap_or("unknown"));
         context
             .async_scene_loader
             .request(scene_path.unwrap_or("data/scene.rgs"));
