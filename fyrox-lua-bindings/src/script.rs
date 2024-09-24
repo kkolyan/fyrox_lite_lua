@@ -2,6 +2,7 @@ use super::script_data::ScriptData;
 use crate::fyrox_lite::Traitor;
 use crate::fyrox_utils::PluginsRefMut_Ext;
 use crate::lua_reflect_bindings::LuaTableKey;
+use crate::plugin::LuaPlugin;
 use crate::reflect_base;
 use crate::script_def::ScriptKind;
 use crate::script_object::ScriptObject;
@@ -43,88 +44,93 @@ pub struct LuaScript {
 
 impl ScriptTrait for LuaScript {
     fn on_init(&mut self, ctx: &mut ScriptContext) {
-        self.invoke_callback(ctx, "on_init", |_lua| Ok(()));
+        uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+        invoke_callback(&mut self.data, ctx.plugins.lua().vm, ctx, "on_init", |_lua| Ok(()));
     }
 
     fn on_start(&mut self, ctx: &mut ScriptContext) {
-        self.invoke_callback(ctx, "on_start", |_lua| Ok(()));
+        uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+        invoke_callback(&mut self.data, ctx.plugins.lua().vm, ctx, "on_start", |_lua| Ok(()));
     }
 
     fn on_deinit(&mut self, ctx: &mut fyrox::script::ScriptDeinitContext) {
-        self.invoke_callback(ctx, "on_deinit", |_lua| Ok(()));
+        uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+        invoke_callback(&mut self.data, ctx.plugins.lua().vm, ctx, "on_deinit", |_lua| Ok(()));
     }
 
     fn on_os_event(&mut self, event: &fyrox::event::Event<()>, ctx: &mut ScriptContext) {
-        self.invoke_callback(ctx, "on_os_event", |_lua| Ok(Traitor::new(event.clone())));
+        uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+        invoke_callback(&mut self.data, ctx.plugins.lua().vm, ctx, "on_os_event", |_lua| Ok(Traitor::new(event.clone())));
     }
 
     fn on_update(&mut self, ctx: &mut ScriptContext) {
-        self.invoke_callback(ctx, "on_update", |_lua| Ok(()));
+        uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+        invoke_callback(&mut self.data, ctx.plugins.lua().vm, ctx, "on_update", |_lua| Ok(()));
     }
 
     fn on_message(
         &mut self,
         message: &mut dyn fyrox::script::ScriptMessagePayload,
         ctx: &mut fyrox::script::ScriptMessageContext,
-    ) {
+    ) {;
         if let Some(lua_message) = message.downcast_ref::<SendWrapper<Value>>() {
-            self.invoke_callback(ctx, "on_init", |_lua| Ok(Value::clone(lua_message)));
+            uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+            invoke_callback(&mut self.data, ctx.plugins.lua().vm, ctx, "on_init", |_lua| Ok(Value::clone(lua_message)));
         } else {
             panic!("non-lua messages not supported by lua scripts")
         }
     }
 }
 
-impl LuaScript {
-    pub fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(&mut self, ctx: &mut dyn UnsafeAsUnifiedContext<'a, 'b, 'c>, callback_name: &str, args: impl FnOnce(&'lua Lua) -> mlua::Result<A>) {
-        let plugin = ctx.plugins().lua_mut();
-        if plugin.failed {
-            // don't spam logs, though, plugin is completely broken at this point
-            return;
-        }
-        if self.data.is_packed() {
-            // script was just loaded from the scene file or safe game. unpack it!
-            self.data = match &self.data {
-                ScriptData::Packed(it) => {
-                    let so = plugin
-                        .vm
-                        .create_userdata(it.clone())
-                        .map(TypedUserData::<ScriptObject>::new)
-                        .map(SendWrapper::new)
-                        .map(ScriptData::Unpacked);
-                    match so {
-                        Ok(it) => it,
-                        Err(err) => {
-                            Log::err(format!("failed to unpack LuaScript: {:?}", err));
-                            plugin.failed = true;
-                            return;
-                        }
+
+fn uppack_script_if_necessary(plugin: &mut LuaPlugin, data: &mut ScriptData) {
+    if plugin.failed {
+        // don't spam logs, though, plugin is completely broken at this point
+        return;
+    }
+    if data.is_packed() {
+        // script was just loaded from the scene file or safe game. unpack it!
+        *data = match data {
+            ScriptData::Packed(it) => {
+                let so = plugin
+                    .vm
+                    .create_userdata(it.clone())
+                    .map(TypedUserData::<ScriptObject>::new)
+                    .map(SendWrapper::new)
+                    .map(ScriptData::Unpacked);
+                match so {
+                    Ok(it) => it,
+                    Err(err) => {
+                        Log::err(format!("failed to unpack LuaScript: {:?}", err));
+                        plugin.failed = true;
+                        return;
                     }
                 }
-                ScriptData::Unpacked(_) => panic!("WTF?"),
             }
+            ScriptData::Unpacked(_) => panic!("WTF?"),
         }
-        let lua = plugin.vm;
-        without_script_context(ctx, || {
-            let script_object_ud = self
-                .data
-                .inner_unpacked()
-                .expect("WTF, it's guaranteed to be unpacked here");
-
-            let callback = script_object_ud
-                .borrow()
-                .unwrap()
-                .def
-                .class_data
-                .get::<_, Option<Function>>(callback_name)
-                .unwrap();
-
-            if let Some(callback) = callback {
-                let args = args(lua).unwrap();
-                callback.call::<_, ()>((script_object_ud, args)).unwrap();
-            }
-        });
     }
+}
+
+pub fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(data: &mut ScriptData, lua: &'static Lua, ctx: &mut dyn UnsafeAsUnifiedContext<'a, 'b, 'c>, callback_name: &str, args: impl FnOnce(&'lua Lua) -> mlua::Result<A>) {
+    without_script_context(ctx, || {
+        let script_object_ud = data
+            .inner_unpacked()
+            .expect("WTF, it's guaranteed to be unpacked here");
+
+        let callback = script_object_ud
+            .borrow()
+            .unwrap()
+            .def
+            .class_data
+            .get::<_, Option<Function>>(callback_name)
+            .unwrap();
+
+        if let Some(callback) = callback {
+            let args = args(lua).unwrap();
+            callback.call::<_, ()>((script_object_ud, args)).unwrap();
+        }
+    });
 }
 
 impl BaseScript for LuaScript {

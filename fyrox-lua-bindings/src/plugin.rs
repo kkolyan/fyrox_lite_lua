@@ -1,4 +1,5 @@
 use crate::lua_utils::log_error;
+use crate::script::invoke_callback;
 use crate::script::LuaScript;
 use crate::script_class::ScriptClass;
 use crate::script_data::ScriptData;
@@ -164,8 +165,8 @@ impl Plugin for LuaPlugin {
     }
 
     fn init(&mut self, scene_path: Option<&str>, mut context: PluginContext) {
-        Lua::new()
-            .load("print('hello Fyrox'); print(_VERSION)")
+        self.vm
+            .load("print('hello Fyrox'); print(_VERSION);")
             .eval::<()>()
             .unwrap();
         context
@@ -173,7 +174,7 @@ impl Plugin for LuaPlugin {
             .request(scene_path.unwrap_or("data/scene.rgs"));
 
         for script in self.scripts.borrow_mut().0.iter_mut() {
-            script.invoke_callback(&mut context, "init", |lua| {
+            invoke_callback(&mut script.data, self.vm, &mut context, "init", |lua| {
                 if let Some(scene_path) = scene_path {
                     Ok(Value::String(lua.create_string(scene_path)?))
                 } else {
@@ -185,7 +186,7 @@ impl Plugin for LuaPlugin {
 
     fn update(&mut self, context: &mut PluginContext) {
         for script in self.scripts.borrow_mut().0.iter_mut() {
-            script.invoke_callback(context, "update", |_lua| Ok(()));
+            invoke_callback(&mut script.data, self.vm, context, "update", |_lua| Ok(()));
         }
     }
 }

@@ -46,7 +46,6 @@ where
 
 pub trait UnsafeAsUnifiedContext<'a, 'b, 'c> {
     unsafe fn as_unified_context(&mut self) -> UnifiedContext<'a, 'b, 'c>;
-    fn plugins(&mut self) -> &mut PluginsRefMut<'a>;
 }
 
 impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for ScriptContext<'a, 'b, 'c> {
@@ -63,10 +62,6 @@ impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for ScriptContext<'a, 'b, 'c
             async_scene_loader: None,
             user_interfaces: None,
         }
-    }
-    
-    fn plugins(&mut self) -> &mut PluginsRefMut<'a> {
-        &mut self.plugins
     }
 }
 
@@ -85,10 +80,6 @@ impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for ScriptMessageContext<'a,
             user_interfaces: None,
         }
     }
-    
-    fn plugins(&mut self) -> &mut PluginsRefMut<'a> {
-        &mut self.plugins
-    }
 }
 
 impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for ScriptDeinitContext<'a, 'b, 'c> {
@@ -106,10 +97,6 @@ impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for ScriptDeinitContext<'a, 
             user_interfaces: None,
         }
     }
-    
-    fn plugins(&mut self) -> &mut PluginsRefMut<'a> {
-        &mut self.plugins
-    }
 }
 
 impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for PluginContext<'a, 'b> {
@@ -126,10 +113,6 @@ impl<'a, 'b, 'c> UnsafeAsUnifiedContext<'a, 'b, 'c> for PluginContext<'a, 'b> {
             async_scene_loader: Some(sc.read().async_scene_loader),
             user_interfaces: Some(sc.read().user_interfaces),
         }
-    }
-    
-    fn plugins(&mut self) -> &mut PluginsRefMut<'a> {
-        todo!()
     }
 }
 
