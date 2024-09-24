@@ -1,3 +1,5 @@
+use crate::fyrox_lite::LitePlugin;
+use crate::fyrox_lite_class::TExt;
 use crate::lua_utils::log_error;
 use crate::script::invoke_callback;
 use crate::script::LuaScript;
@@ -8,6 +10,7 @@ use crate::script_def::ScriptKind;
 use crate::script_def::ScriptMetadata;
 use crate::script_object::ScriptObject;
 use crate::typed_userdata::TypedUserData;
+use fyrox::core::color::Color;
 use fyrox::core::log::Log;
 use fyrox::core::pool::Handle;
 use fyrox::core::reflect::prelude::*;
@@ -15,6 +18,7 @@ use fyrox::core::reflect::Reflect;
 use fyrox::core::visitor::prelude::*;
 use fyrox::core::visitor::Visit;
 use fyrox::event::Event;
+use fyrox::gui::brush::Brush;
 use fyrox::gui::message::UiMessage;
 use fyrox::plugin::Plugin;
 use fyrox::plugin::PluginContext;
@@ -25,7 +29,12 @@ use fyrox::script::Script;
 use fyrox::script::ScriptContext;
 use fyrox::walkdir::DirEntry;
 use fyrox::walkdir::WalkDir;
-use fyrox_lite_api::lite_scene::load_scene_async;
+use fyrox::window::CursorGrabMode;
+use fyrox_lite_api::lite_math::LiteQuaternion;
+use fyrox_lite_api::lite_math::LiteVector3;
+use fyrox_lite_api::lite_scene::LiteScene;
+use fyrox_lite_api::lite_ui::LiteText;
+use fyrox_lite_api::lite_window::LiteWindow;
 use fyrox_lite_api::wrapper_reflect;
 use mlua::Function;
 use mlua::Lua;
@@ -51,7 +60,7 @@ pub struct LuaPlugin {
     #[reflect(hidden)]
     pub failed: bool,
 
-    scripts: RefCell<PluginScriptList>,
+    pub scripts: RefCell<PluginScriptList>,
 }
 
 impl LuaPlugin {
@@ -89,11 +98,17 @@ impl<'a, T> DerefMut for Mut<'a, T> {
 
 impl Default for LuaPlugin {
     fn default() -> Self {
+        let vm = Box::leak(Box::new(Lua::new()));
+        let lua_version = vm
+            .load("return _VERSION")
+            .eval::<mlua::String>()
+            .unwrap();
+        println!("Lua Version: {}", lua_version.to_str().unwrap_or("unknown"));
         LuaPlugin {
             // mlua has approach with lifetimes that makes very difficult storing Lua types
             // here and there in Rust. But we need a single Lua VM instance for the whole life
             // of game process, so that's ok to make it 'static.
-            vm: Box::leak(Box::new(Lua::new())),
+            vm,
             failed: false,
             scripts: Default::default(),
         }
@@ -140,16 +155,16 @@ impl Plugin for LuaPlugin {
                 )
                 .unwrap();
         }
-        self.vm.globals()
-            .set(
-                "load_scene_async",
-                self.vm.create_function_mut(|lua, scene_path: mlua::String| {
-                    load_scene_async(scene_path.to_str()?);
-                    Ok(())
-                })
-                .unwrap(),
-            )
-            .unwrap();
+
+        LiteScene::register_class(self.vm);
+        LiteText::register_class(self.vm);
+        Brush::register_class(self.vm);
+        Color::register_class(self.vm);
+        CursorGrabMode::register_class(self.vm);
+        LiteWindow::register_class(self.vm);
+        LitePlugin::register_class(self.vm);
+        LiteVector3::register_class(self.vm);
+        LiteQuaternion::register_class(self.vm);
 
         for entry in WalkDir::new("scripts").into_iter().flatten() {
             load_script(
@@ -163,11 +178,6 @@ impl Plugin for LuaPlugin {
     }
 
     fn init(&mut self, scene_path: Option<&str>, mut context: PluginContext) {
-        let lua_version = self.vm
-            .load("return _VERSION")
-            .eval::<mlua::String>()
-            .unwrap();
-        println!("Lua Version: {}", lua_version.to_str().unwrap_or("unknown"));
 
         for script in self.scripts.borrow_mut().0.iter_mut() {
             invoke_callback(&mut script.data, self.vm, &mut context, "init", |lua| {
@@ -282,7 +292,7 @@ fn load_script(
 }
 
 #[derive(Debug, Default, Clone)]
-struct PluginScriptList(Vec<LuaScript>);
+pub struct PluginScriptList(Vec<LuaScript>);
 
 impl PluginScriptList {
     pub fn inner(&self) -> &Vec<LuaScript> {

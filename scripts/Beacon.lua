@@ -2,10 +2,9 @@
 ---@class Beacon : Script
 Beacon = script_class()
 
----@param ctx ScriptContext
-function Beacon:on_update(ctx)
-    local pos = ctx.handle:global_position()
-    table.insert(ctx.plugins:get_mut("Game").beacons, pos)
-    ctx.handle:remove_node();
-    print("beacon registered: {:?}", ctx.handle);
+function Beacon:on_update()
+    local pos = self.node:global_position()
+    table.insert(Plugin:get("Game").beacons, pos)
+    self.node:destroy()
+    print("beacon registered: " .. tostring(self.node));
 end

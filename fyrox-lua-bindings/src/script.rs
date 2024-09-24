@@ -39,6 +39,7 @@ use send_wrapper::SendWrapper;
 use std::any::Any;
 use std::fmt::Debug;
 use std::fmt::Formatter;
+use std::process::exit;
 
 #[derive(Debug, Clone, ComponentProvider)]
 pub struct LuaScript {
@@ -174,7 +175,14 @@ pub fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(
 
         if let Some(Value::Function(callback)) = callback {
             let args = args(lua).unwrap();
-            callback.call::<_, ()>((script_object_ud, args)).unwrap();
+            match callback.call::<_, ()>((script_object_ud, args)) {
+                Ok(_) => {},
+                Err(err) => {
+                    Log::err(format!("callback \"{}:{}\" failed with Lua error:\n{}", class_name, callback_name, err));
+                    Log::warn("exiting to prevent error spamming (change this behavior in future)");
+                    exit(123);
+                },
+            };
         }
     });
 }

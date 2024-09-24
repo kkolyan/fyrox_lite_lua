@@ -2,7 +2,7 @@ use std::{any::TypeId, mem, ops::Deref, sync::Arc};
 
 use fyrox::{asset::Resource, core::{algebra::{UnitQuaternion, Vector3}, pool::Handle, reflect::{FieldInfo, FieldValue, Reflect}}, gui::UiNode, resource::model::Model, scene::node::Node};
 use fyrox_lite_api::{
-    lite_math::{LiteQuaternion, LiteVector3}, lite_node::LiteNode, lite_prefab::LitePrefab, lite_ui::LiteUiNode
+    lite_math::{LiteQuaternion, LiteVector3}, lite_node::LiteNode, lite_prefab::LitePrefab, lite_ui::LiteUiNode, script_context::with_script_context
 };
 use mlua::{MetaMethod, String, Table, UserData, UserDataRef, UserDataRefMut, Value};
 use send_wrapper::SendWrapper;
@@ -50,6 +50,13 @@ impl ScriptObject {
 
 
 impl UserData for ScriptObject {
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_field_method_get("node", |_lua, _this| {
+            with_script_context(|ctx| {
+                Ok(ctx.handle.map(|it| Traitor::new(LiteNode::from(it))))
+            })
+        });
+    }
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_meta_function(
             MetaMethod::Index.name(),

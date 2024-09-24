@@ -2,6 +2,7 @@
 [workspace]
 members = [ "editor", "editor-lua", "executor", "executor-lua", "fyrox-lite-api", "fyrox-lua-bindings", "game", "game-dylib"]
 resolver = "2"
+exclude = ["mlua"]
 
 [workspace.dependencies]
 fyrox = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f"}

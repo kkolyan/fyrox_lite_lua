@@ -62,27 +62,20 @@ function Player:fire(ctx)
 end
 
 
-function Player:on_init(ctx)
-    local _ = ctx
-        .graphics_context
-        :as_initialized_mut()
-        .window
-        :set_cursor_grab(CursorGrabMode.Confined);
+function Player:on_init()
+    Window:set_cursor_grab(CursorGrabMode.Confined);
 
-    self.collider = ctx
-        .handle
-        .try_get_collider(ctx.scene)
-        .expect("Collider not found under Player node");
+    self.collider = self.node:find_collider_in_children()
     end
 
 function Player:on_start(ctx)
-    ctx.message_dispatcher.subscribe_to("BulletHit", ctx.handle)
+    self.node:subscribe_to()
 end
 
 function Player:on_message(message, ctx)
     local _bullet = message.downcast_ref("BulletHit")
     if _bullet ~= nil then
-        ctx.plugins.get_mut("Game"):inc_wounds()
+        Plugin:get("Game"):inc_wounds()
         print("player wounded!")
     end
 end
@@ -93,7 +86,7 @@ function Player:on_update(ctx)
     end
     if not self.published then
         self.published = true;
-        ctx.plugins.get_mut("Game").player = ctx.handle;
+        Plugin:get("Game").player = self.node;
     end
 
     if fire then
@@ -103,7 +96,7 @@ function Player:on_update(ctx)
         end
     end
 
-    local move_delta = Vector3:zero();
+    local move_delta = Vector3.ZERO;
     if forward then
         move_delta.z = move_delta.z + 1.0
     end
@@ -117,22 +110,17 @@ function Player:on_update(ctx)
         move_delta.x = move_delta.x - 1.0
     end
 
-    if move_delta.magnitude() > 0.001 then
-        move_delta.normalize_mut();
+    if move_delta:magnitude() > 0.001 then
+        move_delta:normalize_inplace();
     end
 
-    local self_rotation = ctx.handle
-        .local_transform()
-        .rotation()
-        .clone();
-    local move_delta = self_rotation.transform_vector(move_delta);
-    local force = move_delta * self.power;
-    ctx.handle
-        .as_rigid_body_mut()
-        .apply_force(force);
+    local self_rotation = self.node:local_rotation()
+    local move_delta = self_rotation:mul(move_delta);
+    local force = move_delta:mul(self.power);
+    self.node:as_rigid_body():apply_force(force);
 end
 
-function Player:on_os_event(event, ctx)
+function Player:on_os_event(event)
     if event:is("WindowEvent") then
         local event = event.event
         if event:is("KeyboardInput") then

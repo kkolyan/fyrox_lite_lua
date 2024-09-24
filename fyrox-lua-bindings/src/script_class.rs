@@ -1,5 +1,6 @@
 use std::{collections::HashMap, mem};
 
+use fyrox::core::log::Log;
 use mlua::{MetaMethod, UserData};
 
 #[derive(Debug)]
@@ -7,6 +8,7 @@ pub struct ScriptClass {
 	pub name: &'static str,
     pub table: HashMap<String, mlua::Value<'static>>,
 }
+
 
 impl UserData for ScriptClass {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
@@ -17,7 +19,7 @@ impl UserData for ScriptClass {
                     // we use Lua the whole life of the program, so that seems sound
                     mem::transmute(v)
                 };
-                println!("method {}#{} registered", this.name, k.to_string_lossy());
+                Log::info(format!("register user-defined method: {}#{}", this.name, k.to_string_lossy()));
                 this.table.insert(k.to_string_lossy().to_string(), static_v);
                 Ok(())
             },

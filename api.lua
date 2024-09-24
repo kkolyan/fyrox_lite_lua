@@ -7,14 +7,20 @@
 ---@class Script
 Script = {}
 
+
+---@type Node
+Script.node = {}
+
 ---@class Plugin
 Plugin = {}
 
----@param ctx PluginContext
-function Plugin:update(ctx) end
+---@generic T
+---@param class `T`
+---@return T
+function Plugin:get(class) end
 
----@class PluginContext
-PluginContext = {}
+function Plugin:update() end
+
 
 ---@class Vector3
 Vector3 = {}
@@ -35,44 +41,66 @@ Prefab = {}
 ---@return Node
 function Prefab:instantiate_at() end
 
----@class ScriptContext
-
-ScriptContext = {}
-
 
 function script_class() end
 
 
----@return Plugin
-function plugin_class() end
-
-
 ---@class UiNode
 UiNode = {}
-
----@class TextBuilder
----@field font_size number?
----@field text string?
----@field widget WidgetBuilder?
-TextBuilder = {}
-
----@param b TextBuilder
----@return UiNode
-function TextBuilder:build(ui, b) end
-
----@class WidgetBuilder
----@field foreground Brush?
-WidgetBuilder = {}
 
 
 ---@class Brush
 Brush = {}
 
 ---@param color Color
-function Brush.Solid(color) end
+function Brush:solid(color) end
 
 ---@class Color
 Color = {}
 
 ---@type Color
 Color.BLACK = nil
+
+
+---@class Widget : UiNode
+---@field foreground Brush?
+Widget = {}
+
+---@class Text : Widget
+---@field font_size number
+Text = {}
+
+---@static
+---@param state Text
+---@return Text
+function Text:new(state) end
+
+---@param text string
+function Text:set_text_async(text) end
+
+
+---@class Scene
+Scene = {}
+
+---@param scene_path string
+function Scene:load_async(scene_path) end
+
+
+---@class CursorGrabMode
+CursorGrabMode = {}
+
+---@type CursorGrabMode
+CursorGrabMode.None = {}
+
+---@type CursorGrabMode
+CursorGrabMode.Locked = {}
+
+---@type CursorGrabMode
+CursorGrabMode.Confined = {}
+
+
+---@class Window
+Window = {}
+
+---@param mode CursorGrabMode
+function Window:set_cursor_grab(mode) end

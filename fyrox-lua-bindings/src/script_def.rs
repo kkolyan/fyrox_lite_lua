@@ -143,14 +143,8 @@ impl ScriptMetadata {
                                             "UiNode" => Some(ScriptFieldValueType::UiNode),
                                             "Prefab" => Some(ScriptFieldValueType::Prefab),
                                             "Vector3" => Some(ScriptFieldValueType::Vector3),
-                                            "Vector3[]" => Some(ScriptFieldValueType::RawLuaValue),
-                                            unsupported => {
-                                                errors.push(format!(
-                                                    "type not supported: {:?}",
-                                                    unsupported
-                                                ));
-                                                None
-                                            }
+                                            "Quaternion" => Some(ScriptFieldValueType::Quaternion),
+                                            _ => Some(ScriptFieldValueType::RawLuaValue),
                                         };
                                         if let Some(ty) = ty {
                                             let description = parts.next().map(|it| {

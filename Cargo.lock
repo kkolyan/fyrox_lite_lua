@@ -1268,6 +1268,7 @@ dependencies = [
 name = "fyrox-lite-api"
 version = "0.1.0"
 dependencies = [
+ "extend",
  "fyrox",
 ]
 

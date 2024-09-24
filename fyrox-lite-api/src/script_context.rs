@@ -1,7 +1,15 @@
 use std::{cell::RefCell, mem};
 
 use fyrox::{
-    core::pool::Handle, engine::{AsyncSceneLoader, GraphicsContext, ScriptMessageDispatcher}, gui::UiContainer, plugin::PluginContext, scene::{node::Node, Scene}, script::{PluginsRefMut, ScriptContext, ScriptDeinitContext, ScriptMessageContext, ScriptMessageSender}
+    core::pool::Handle,
+    engine::{AsyncSceneLoader, GraphicsContext, ScriptMessageDispatcher},
+    gui::UiContainer,
+    plugin::PluginContext,
+    scene::{node::Node, Scene},
+    script::{
+        PluginsRefMut, ScriptContext, ScriptDeinitContext, ScriptMessageContext,
+        ScriptMessageSender,
+    },
 };
 
 type StaticSc = UnifiedContext<'static, 'static, 'static>;
@@ -126,4 +134,22 @@ pub struct UnifiedContext<'a, 'b, 'c> {
     pub graphics_context: &'a mut GraphicsContext,
     pub async_scene_loader: Option<&'a mut AsyncSceneLoader>,
     pub user_interfaces: Option<&'a mut UiContainer>,
+}
+
+impl <'a> UnifiedContext<'a, '_, '_> {
+    pub fn ui(&mut self) -> &mut &'a mut UiContainer {
+        self.user_interfaces.as_mut().unwrap()
+    }
+}
+
+#[extend::ext]
+pub impl<'a> Option<&'a mut UiContainer> {
+    fn unwrap_ui<'x>(&'x mut self) -> &'a mut UiContainer
+    where
+        'x: 'a,
+    {
+        let r = self.as_mut();
+
+        r.expect("UI is available from plugin scripts only")
+    }
 }

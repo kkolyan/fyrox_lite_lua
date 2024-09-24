@@ -1,17 +1,26 @@
+#![allow(unused_variables)]
+
 use std::{
-    mem,
-    ops::{Deref, DerefMut},
+    borrow::Borrow, marker::{PhantomData, Sized}, mem, ops::{Deref, DerefMut}
 };
 
-use crate::script::LuaScript;
+use crate::{fyrox_lite_class::UserDataClass, fyrox_utils::PluginsRefMut_Ext, lua_error, script::LuaScript};
+use fyrox::{
+    core::{color::Color, log::Log},
+    gui::{brush::Brush, text::TextBuilder, widget::WidgetBuilder}, window::CursorGrabMode,
+};
 use fyrox_lite_api::{
     lite_math::{LiteQuaternion, LiteVector3},
     lite_node::{LiteNode, LiteRoutingStrategy},
     lite_physics::LiteRigidBody,
     lite_prefab::LitePrefab,
-    lite_ui::LiteUiNode,
+    lite_scene::LiteScene,
+    lite_ui::{LiteText, LiteUiNode}, lite_window::LiteWindow, script_context::with_script_context,
 };
-use mlua::{AnyUserData, UserData, UserDataRef, UserDataRefMut, Value};
+use mlua::{
+    AnyUserData, FromLuaMulti, Lua, MetaMethod, Table, UserData, UserDataMethods, UserDataRef,
+    UserDataRefMut, Value,
+};
 use send_wrapper::SendWrapper;
 
 #[derive(Clone, Copy, Debug)]
@@ -39,13 +48,21 @@ impl<T> Traitor<T> {
     pub fn inner(&self) -> &T {
         &self.0
     }
+
+    pub fn inner_mut(&mut self) -> &mut T {
+        &mut self.0
+    }
 }
 
 #[allow(unused_variables)]
 impl UserData for Traitor<LiteRigidBody> {
-    fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
+
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_meta_field(MetaMethod::Type.name(), "RigidBody");
+    }
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method_mut(
-            "name",
+            "apply_force",
             |lua, this, force: UserDataRef<Traitor<LiteVector3>>| {
                 this.apply_force(*force.inner());
                 Ok(())
@@ -56,8 +73,11 @@ impl UserData for Traitor<LiteRigidBody> {
 
 #[allow(unused_variables)]
 impl UserData for Traitor<LiteVector3> {
+    
     #[rustfmt::skip]
     fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_meta_field(MetaMethod::Type.name(), "Vector3");
+
         fields.add_field_method_get("x", |lua, this| Ok(this.0.get_x()));
         fields.add_field_method_get("y", |lua, this| Ok(this.0.get_y()));
         fields.add_field_method_get("z", |lua, this| Ok(this.0.get_z()));
@@ -65,19 +85,9 @@ impl UserData for Traitor<LiteVector3> {
         fields.add_field_method_set("x", |lua, this, value: f32| { this.0.set_x(value); Ok(()) });
         fields.add_field_method_set("y", |lua, this, value: f32| { this.0.set_y(value); Ok(()) });
         fields.add_field_method_set("z", |lua, this, value: f32| { this.0.set_z(value); Ok(()) });
-
-        fields.add_field_function_get("X", |lua, args| Ok(Traitor(LiteVector3::x_axis())));
-        fields.add_field_function_get("Y", |lua, args| Ok(Traitor(LiteVector3::y_axis())));
-        fields.add_field_function_get("X", |lua, args| Ok(Traitor(LiteVector3::z_axis())));
-
-        fields.add_field_function_get("ZERO", |lua, args| Ok(Traitor(LiteVector3::zero())));
     }
 
-    fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_function("new", |lua, (x, y, z): (f32, f32, f32)| {
-            Ok(Traitor(LiteVector3::new(x, y, z)))
-        });
-
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_function(
             "mul",
             |lua, (this, o): (UserDataRef<Traitor<LiteVector3>>, f32)| Ok(Traitor(this.mul(o))),
@@ -117,31 +127,29 @@ impl UserData for Traitor<LiteVector3> {
     }
 }
 
+impl UserData for UserDataClass<LiteVector3> {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("new", |lua, cls, (x, y, z): (f32, f32, f32)| {
+            Ok(Traitor::new(LiteVector3::new(x, y, z)))
+        });
+    }
+
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_field_function_get("X",|lua, this| Ok(Traitor(LiteVector3::x_axis())));
+        fields.add_field_function_get("Y", |lua, this| Ok(Traitor(LiteVector3::y_axis())));
+        fields.add_field_function_get("X", |lua, this| Ok(Traitor(LiteVector3::z_axis())));
+
+        fields.add_field_function_get("ZERO", |lua, this| Ok(Traitor(LiteVector3::zero())));
+    }
+}
+
 #[allow(unused_variables)]
 impl UserData for Traitor<LiteQuaternion> {
-    fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_function(
-            "face_towards",
-            |lua,
-             (dir, up): (
-                UserDataRef<Traitor<LiteVector3>>,
-                UserDataRef<Traitor<LiteVector3>>,
-            )| {
-                Ok(Traitor(LiteQuaternion::face_towards(
-                    *dir.inner(),
-                    *up.inner(),
-                )))
-            },
-        );
-        methods.add_function(
-            "from_axis_angle",
-            |lua, (axis, angle): (UserDataRef<Traitor<LiteVector3>>, f32)| {
-                Ok(Traitor(LiteQuaternion::from_axis_angle(
-                    *axis.inner(),
-                    angle,
-                )))
-            },
-        );
+
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_meta_field(MetaMethod::Type.name(), "Quaternion");
+    }
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_function(
             "mul",
             |lua, (this, o): (UserDataRef<Traitor<LiteQuaternion>>, AnyUserData)| {
@@ -157,6 +165,33 @@ impl UserData for Traitor<LiteQuaternion> {
     }
 }
 
+impl UserData for UserDataClass<LiteQuaternion> {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method(
+            "face_towards",
+            |lua, cls,
+             (dir, up): (
+                UserDataRef<Traitor<LiteVector3>>,
+                UserDataRef<Traitor<LiteVector3>>,
+            )| {
+                Ok(Traitor(LiteQuaternion::face_towards(
+                    *dir.inner(),
+                    *up.inner(),
+                )))
+            },
+        );
+        methods.add_method(
+            "from_axis_angle",
+            |lua, cls, (axis, angle): (UserDataRef<Traitor<LiteVector3>>, f32)| {
+                Ok(Traitor(LiteQuaternion::from_axis_angle(
+                    *axis.inner(),
+                    angle,
+                )))
+            },
+        );
+    }
+}
+
 impl UserData for Traitor<LiteRoutingStrategy> {}
 
 impl UserData for Traitor<LiteUiNode> {}
@@ -165,7 +200,13 @@ impl UserData for Traitor<LitePrefab> {}
 
 #[allow(unused_variables)]
 impl UserData for Traitor<LiteNode> {
-    fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
+
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_meta_field(MetaMethod::Type.name(), "Node");
+    }
+
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_meta_method(MetaMethod::ToString.name(), |lua, this, args: ()| Ok(format!("{:?}", this.inner())));
         methods.add_method("parent", |a, b, args: ()| Ok(Traitor(b.parent())));
         methods.add_method_mut("as_rigid_body", |a, b, args: ()| {
             Ok(b.as_rigid_body().map(Traitor))
@@ -231,6 +272,131 @@ impl UserData for Traitor<LiteNode> {
                 None
             });
             Ok(())
+        });
+    }
+}
+
+impl UserData for UserDataClass<LiteScene> {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method_mut("load_async", |lua, this, scene_path: mlua::String| {
+            LiteScene::load_async(scene_path.to_str()?);
+            Ok(())
+        });
+    }
+}
+
+impl UserData for UserDataClass<LiteText> {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method_mut("new", |lua, this, state: Table| {
+            let mut widget = WidgetBuilder::new();
+            if let Some(foreground) =
+                state.get::<_, Option<UserDataRef<Traitor<Brush>>>>("foreground")?
+            {
+                widget = widget.with_foreground(foreground.inner().clone())
+            }
+            let mut text = TextBuilder::new(widget);
+            if let Some(font_size) = state.get::<_, Option<f32>>("font_size")? {
+                text = text.with_font_size(font_size);
+            }
+            Ok(Traitor::new(LiteText::new(text)))
+        });
+    }
+}
+
+impl UserData for Traitor<LiteText> {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method_mut("set_text_async", |lua, this, text: mlua::String| {
+            this.inner_mut().set_text_async(text.to_str()?.to_string());
+            Ok(())
+        });
+    }
+
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_meta_field(MetaMethod::Type.name(), "Text");
+    }
+}
+
+impl UserData for Traitor<LiteScene> {
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_meta_field(MetaMethod::Type.name(), "Scene");
+    }
+}
+
+impl UserData for Traitor<Brush> {
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_meta_field(MetaMethod::Type.name(), "Brush");
+    }
+}
+
+impl UserData for UserDataClass<Brush> {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("solid", |lua, cls, color: UserDataRef<Traitor<Color>>| {
+            Ok(Traitor::new(Brush::Solid(*color.inner())))
+        });
+    }
+}
+
+impl UserData for Traitor<Color> {
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_meta_field(MetaMethod::Type.name(), "Color");
+    }
+}
+
+impl UserData for UserDataClass<Color> {
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_field("BLACK", Traitor::new(Color::BLACK));
+    }
+}
+
+impl UserData for Traitor<LiteWindow> {
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_meta_field(MetaMethod::Type.name(), "Window");
+    }
+}
+
+impl UserData for UserDataClass<LiteWindow> {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method_mut("set_cursor_grab", |lua, cls, mode: UserDataRef<Traitor<CursorGrabMode>>| {
+            let _ = LiteWindow::set_cursor_grab(*mode.borrow().inner());
+            Ok(())
+        });
+    }
+}
+
+impl UserData for Traitor<CursorGrabMode> {
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_meta_field(MetaMethod::Type.name(), "CursorGrabMode");
+    }
+}
+
+impl UserData for UserDataClass<CursorGrabMode> {
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_field("None", Traitor::new(CursorGrabMode::None));
+        fields.add_field("Locked", Traitor::new(CursorGrabMode::Locked));
+        fields.add_field("Confined", Traitor::new(CursorGrabMode::Confined));
+    }
+}
+
+pub struct LitePlugin;
+
+impl UserData for Traitor<LitePlugin> {
+    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
+        fields.add_meta_field(MetaMethod::Type.name(), "Plugin");
+    }
+}
+
+impl UserData for UserDataClass<LitePlugin> {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method_mut("get", |lua, cls, class_name: mlua::String| {
+            with_script_context(|ctx| {
+                let plugin = ctx.plugins.as_mut().ok_or_else(|| lua_error!("plugins not available here"))?;
+                for script in plugin.lua_mut().scripts.borrow_mut().inner_mut().iter_mut() {
+                    if script.name == class_name.to_str()? {
+                        return Ok(script.data.inner_unpacked().unwrap())
+                    }
+                }
+                Err(lua_error!("plugin not found: {}", class_name.to_str()?))
+            })
         });
     }
 }
