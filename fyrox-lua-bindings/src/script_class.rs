@@ -17,6 +17,7 @@ impl UserData for ScriptClass {
                     // we use Lua the whole life of the program, so that seems sound
                     mem::transmute(v)
                 };
+                println!("method {}#{} registered", this.name, k.to_string_lossy());
                 this.table.insert(k.to_string_lossy().to_string(), static_v);
                 Ok(())
             },

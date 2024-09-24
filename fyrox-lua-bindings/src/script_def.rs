@@ -7,7 +7,6 @@ use send_wrapper::SendWrapper;
 #[derive(Debug)]
 pub struct ScriptDefinition {
     pub metadata: ScriptMetadata,
-    pub class_data: SendWrapper<Table<'static>>,
     pub assembly_name: &'static str,
 }
 

@@ -247,7 +247,6 @@ fn load_script(
     let assembly_name = "scripts/**.lua";
     let definition = Arc::new(ScriptDefinition {
         metadata,
-        class_data: SendWrapper::new(class_data.as_ref().borrow().get(name).unwrap().clone()),
         assembly_name,
     });
 
