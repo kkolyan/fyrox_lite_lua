@@ -90,6 +90,9 @@ impl<'a, T> DerefMut for Mut<'a, T> {
 impl Default for LuaPlugin {
     fn default() -> Self {
         LuaPlugin {
+            // mlua has approach with lifetimes that makes very difficult storing Lua types
+            // here and there in Rust. But we need a single Lua VM instance for the whole life
+            // of game process, so that's ok to make it 'static.
             vm: Box::leak(Box::new(Lua::new())),
             failed: false,
             scripts: Default::default(),
@@ -102,14 +105,9 @@ thread_local! {
 }
 impl Plugin for LuaPlugin {
     fn register(&self, context: PluginRegistrationContext) {
-        // mlua has approach with lifetimes that makes very difficult storing Lua types
-        // here and there in Rust. But we need a single Lua VM instance for the whole life
-        // of game process, so that's ok to make it 'static.
-        let lua: &'static mut Lua = Box::leak(Box::new(Lua::new()));
-
         log_error(
             "set 'package.path'",
-            lua.load("package.path = 'scripts/?.lua;scripts/?/init.lua'")
+            self.vm.load("package.path = 'scripts/?.lua;scripts/?/init.lua'")
                 .eval::<()>(),
         );
 
@@ -117,10 +115,10 @@ impl Plugin for LuaPlugin {
 
         {
             let classes = classes.clone();
-            lua.globals()
+            self.vm.globals()
                 .set(
                     "script_class",
-                    lua.create_function(move |lua, _args: ()| {
+                    self.vm.create_function(move |lua, _args: ()| {
                         LOADING_CLASS_NAME.with(|class_name| {
                             let class_name = class_name
                                 .borrow()
@@ -142,10 +140,10 @@ impl Plugin for LuaPlugin {
                 )
                 .unwrap();
         }
-        lua.globals()
+        self.vm.globals()
             .set(
                 "load_scene_async",
-                lua.create_function_mut(|lua, scene_path: mlua::String| {
+                self.vm.create_function_mut(|lua, scene_path: mlua::String| {
                     load_scene_async(scene_path.to_str()?);
                     Ok(())
                 })
@@ -156,7 +154,7 @@ impl Plugin for LuaPlugin {
         for entry in WalkDir::new("scripts").into_iter().flatten() {
             load_script(
                 &context,
-                lua,
+                self.vm,
                 &entry,
                 classes.clone(),
                 &mut self.scripts.borrow_mut(),
@@ -170,9 +168,6 @@ impl Plugin for LuaPlugin {
             .eval::<mlua::String>()
             .unwrap();
         println!("Lua Version: {}", lua_version.to_str().unwrap_or("unknown"));
-        context
-            .async_scene_loader
-            .request(scene_path.unwrap_or("data/scene.rgs"));
 
         for script in self.scripts.borrow_mut().0.iter_mut() {
             invoke_callback(&mut script.data, self.vm, &mut context, "init", |lua| {

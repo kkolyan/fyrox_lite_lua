@@ -163,13 +163,12 @@ pub fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(
             .inner_unpacked()
             .expect("WTF, it's guaranteed to be unpacked here");
 
+        let class_name = script_object_ud.borrow().unwrap().def.metadata.class;
         // TODO optimize me
         let class = lua
             .globals()
-            .get::<_, UserDataRef<ScriptClass>>(
-                script_object_ud.borrow().unwrap().def.metadata.class,
-            )
-            .unwrap();
+            .get::<_, UserDataRef<ScriptClass>>(class_name)
+            .unwrap_or_else(|err| panic!("class not found: {}. error: {}", class_name, err));
 
         let callback = class.table.get(callback_name);
 
