@@ -1,5 +1,5 @@
 use super::script_data::ScriptData;
-use crate::fyrox_lite::Traitor;
+use crate::fyrox_lite_class::Traitor;
 use crate::fyrox_utils::PluginsRefMut_Ext;
 use crate::lua_reflect_bindings::LuaTableKey;
 use crate::plugin::LuaPlugin;

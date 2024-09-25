@@ -7,7 +7,7 @@ use fyrox_lite_api::{
 use mlua::{MetaMethod, String, Table, UserData, UserDataRef, UserDataRefMut, Value};
 use send_wrapper::SendWrapper;
 
-use crate::{fyrox_lite::Traitor, lua_error, lua_utils::OptionX, reflect_base};
+use crate::{fyrox_lite_class::Traitor, lua_error, lua_utils::OptionX, reflect_base};
 
 use super::{
     script::ScriptFieldValue,

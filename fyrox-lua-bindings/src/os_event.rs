@@ -6,7 +6,7 @@ use fyrox::{
 };
 use mlua::{IntoLua, Lua, MetaMethod, UserData, Value};
 
-use crate::{debug::VerboseLuaValue, fyrox_lite::Traitor, lua_error};
+use crate::{debug::VerboseLuaValue, fyrox_lite_class::Traitor, lua_error};
 
 #[derive(Clone, Debug)]
 pub struct RustEnum {

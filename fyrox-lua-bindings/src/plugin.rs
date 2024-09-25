@@ -1,6 +1,6 @@
 use crate::debug::var_dump;
 use crate::fyrox_lite::LitePlugin;
-use crate::fyrox_lite_class::TExt;
+use crate::fyrox_lite_class::FyroxUserData;
 use crate::lua_utils::log_error;
 use crate::script::invoke_callback;
 use crate::script::LuaScript;

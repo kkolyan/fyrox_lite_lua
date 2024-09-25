@@ -102,6 +102,12 @@ impl LiteQuaternion {
     }
 }
 
+impl Debug for LiteQuaternion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Debug::fmt(&self.0, f)
+    }
+}
+
 impl From<LiteQuaternion> for UnitQuaternion<f32> {
     fn from(value: LiteQuaternion) -> Self {
         value.0
