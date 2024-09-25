@@ -1,3 +1,4 @@
+use crate::debug::var_dump;
 use crate::fyrox_lite::LitePlugin;
 use crate::fyrox_lite_class::TExt;
 use crate::lua_utils::log_error;
@@ -99,10 +100,7 @@ impl<'a, T> DerefMut for Mut<'a, T> {
 impl Default for LuaPlugin {
     fn default() -> Self {
         let vm = Box::leak(Box::new(Lua::new()));
-        let lua_version = vm
-            .load("return _VERSION")
-            .eval::<mlua::String>()
-            .unwrap();
+        let lua_version = vm.load("return _VERSION").eval::<mlua::String>().unwrap();
         println!("Lua Version: {}", lua_version.to_str().unwrap_or("unknown"));
         LuaPlugin {
             // mlua has approach with lifetimes that makes very difficult storing Lua types
@@ -122,7 +120,8 @@ impl Plugin for LuaPlugin {
     fn register(&self, context: PluginRegistrationContext) {
         log_error(
             "set 'package.path'",
-            self.vm.load("package.path = 'scripts/?.lua;scripts/?/init.lua'")
+            self.vm
+                .load("package.path = 'scripts/?.lua;scripts/?/init.lua'")
                 .eval::<()>(),
         );
 
@@ -130,31 +129,48 @@ impl Plugin for LuaPlugin {
 
         {
             let classes = classes.clone();
-            self.vm.globals()
+            self.vm
+                .globals()
                 .set(
                     "script_class",
-                    self.vm.create_function(move |lua, _args: ()| {
-                        LOADING_CLASS_NAME.with(|class_name| {
-                            let class_name = class_name
-                                .borrow()
-                                .expect("script_class() called out of permitted context");
-                            let table = lua.create_table()?;
+                    self.vm
+                        .create_function(move |lua, _args: ()| {
+                            LOADING_CLASS_NAME.with(|class_name| {
+                                let class_name = class_name
+                                    .borrow()
+                                    .expect("script_class() called out of permitted context");
+                                let table = lua.create_table()?;
 
-                            classes
-                                .as_ref()
-                                .borrow_mut()
-                                .insert(class_name, table.clone());
+                                classes
+                                    .as_ref()
+                                    .borrow_mut()
+                                    .insert(class_name, table.clone());
 
-                            Ok(ScriptClass {
-                                name: class_name,
-                                table: Default::default(),
+                                Ok(ScriptClass {
+                                    name: class_name,
+                                    table: Default::default(),
+                                })
                             })
                         })
-                    })
-                    .unwrap(),
+                        .unwrap(),
                 )
                 .unwrap();
         }
+
+        self.vm
+            .globals()
+            .set(
+                "var_dump",
+                self.vm
+                    .create_function(|lua, (value, indent): (Value, Option<mlua::String>)| {
+                        match indent {
+                            Some(it) => var_dump(lua, value, it.to_str()?),
+                            None => var_dump(lua, value, ""),
+                        }
+                    })
+                    .unwrap(),
+            )
+            .unwrap();
 
         LiteScene::register_class(self.vm);
         LiteText::register_class(self.vm);
@@ -165,6 +181,7 @@ impl Plugin for LuaPlugin {
         LitePlugin::register_class(self.vm);
         LiteVector3::register_class(self.vm);
         LiteQuaternion::register_class(self.vm);
+        Log::register_class(self.vm);
 
         for entry in WalkDir::new("scripts").into_iter().flatten() {
             load_script(
@@ -178,7 +195,6 @@ impl Plugin for LuaPlugin {
     }
 
     fn init(&mut self, scene_path: Option<&str>, mut context: PluginContext) {
-
         for script in self.scripts.borrow_mut().0.iter_mut() {
             invoke_callback(&mut script.data, self.vm, &mut context, "init", |lua| {
                 if let Some(scene_path) = scene_path {
@@ -196,6 +212,7 @@ impl Plugin for LuaPlugin {
         }
     }
 }
+
 
 fn load_script(
     context: &PluginRegistrationContext,

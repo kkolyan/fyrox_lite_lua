@@ -6,19 +6,19 @@ use fyrox::{
 };
 use mlua::{IntoLua, Lua, MetaMethod, UserData, Value};
 
-use crate::{fyrox_lite::Traitor, lua_error};
+use crate::{debug::VerboseLuaValue, fyrox_lite::Traitor, lua_error};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct RustEnum {
     discriminant: &'static str,
     fields: Fields,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Fields {
     Unit,
-    Named(Vec<(&'static str, Value<'static>)>),
-    Positional(Vec<Value<'static>>),
+    Named(Vec<(&'static str, VerboseLuaValue<'static>)>),
+    Positional(Vec<VerboseLuaValue<'static>>),
 }
 
 impl RustEnum {
@@ -41,7 +41,7 @@ impl RustEnum {
                     .map(|(k, value)| {
                         // Safety: it's sound, because we use Lua during the whole life of application
                         let value: Value<'static> = unsafe { mem::transmute(value) };
-                        (k, value)
+                        (k, VerboseLuaValue::new(value))
                     })
                     .collect(),
             ),
@@ -56,7 +56,7 @@ impl RustEnum {
                     .map(|value| {
                         // Safety: it's sound, because we use Lua during the whole life of application
                         let value: Value<'static> = unsafe { mem::transmute(value) };
-                        value
+                        VerboseLuaValue::new(value)
                     })
                     .collect(),
             ),
@@ -70,7 +70,7 @@ impl UserData for RustEnum {
             Ok(this.discriminant == discriminant.to_str().unwrap())
         });
 
-        methods.add_method(MetaMethod::Index.name(), |_lua, this, key: mlua::Value| {
+        methods.add_meta_method(MetaMethod::Index.name(), |_lua, this, key: mlua::Value| {
             match &this.fields {
                 Fields::Unit => {
 					Err(lua_error!("constant-like enum {} doesn't have any data. attempted to access with key {:?}", this.discriminant, key))
@@ -79,17 +79,21 @@ impl UserData for RustEnum {
 					let key_str = key.as_str().ok_or_else(|| lua_error!("struct-like enum {} fields cannot be accessed with non-string key {:?}", this.discriminant, key))?;
 					for (k, value) in fields.iter() {
 						if *k == key_str {
-							return Ok(Value::clone(value));
+							return Ok(Value::clone(value.inner()));
 						}
 					}
 					Err(lua_error!("struct-like enum {} doesn't have a value for key {:?}", this.discriminant, key))
 				}
                 Fields::Positional(fields) => {
                     let index = key.as_usize().ok_or_else(|| lua_error!("tuple-like enum {} fields cannot be accessed with non-index key {:?}", this.discriminant, key))?;
-                    Ok(fields.get(index - 1).ok_or_else(|| lua_error!("index out of bounds: {}", index))?.clone())
+                    Ok(fields.get(index - 1).ok_or_else(|| lua_error!("index out of bounds: {}", index))?.inner().clone())
                 }
             }
         });
+
+		methods.add_meta_method(MetaMethod::ToString.name(), |_lua, this, _args: ()| {
+			Ok(format!("{:?}", this))
+		});
     }
 }
 

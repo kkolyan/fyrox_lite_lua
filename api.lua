@@ -104,3 +104,6 @@ Window = {}
 
 ---@param mode CursorGrabMode
 function Window:set_cursor_grab(mode) end
+
+---@param o any
+function var_dump(o) end

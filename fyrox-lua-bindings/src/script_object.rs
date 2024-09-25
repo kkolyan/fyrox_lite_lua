@@ -75,9 +75,9 @@ impl UserData for ScriptObject {
                             .get(field_name.as_ref())
                             .lua_ok_or_else(|| {
                                 lua_error!(
-                                    "unknown field {:?}.{:?}",
+                                    "unknown field \"{}.{}\"",
                                     this.def.metadata.class,
-                                    key.to_str()
+                                    key.to_string_lossy()
                                 )
                             })?;
                         let value = &this.values[*field_index];
@@ -86,13 +86,13 @@ impl UserData for ScriptObject {
                             ScriptFieldValue::String(it) => Value::String(lua.create_string(it)?),
                             ScriptFieldValue::Bool(it) => Value::Boolean(*it),
                             ScriptFieldValue::Node(it) => Value::UserData(
-                                lua.create_any_userdata(Traitor::new(LiteNode::from(*it)))?,
+                                lua.create_userdata(Traitor::new(LiteNode::from(*it)))?,
                             ),
                             ScriptFieldValue::UiNode(it) => Value::UserData(
-                                lua.create_any_userdata(Traitor::new(LiteUiNode::new(*it)))?,
+                                lua.create_userdata(Traitor::new(LiteUiNode::new(*it)))?,
                             ),
                             ScriptFieldValue::Prefab(it) => Value::UserData(
-                                lua.create_any_userdata(Traitor::new(LitePrefab::new(it.clone().unwrap())))?,
+                                lua.create_userdata(Traitor::new(LitePrefab::new(it.clone().unwrap())))?,
                             ),
                             ScriptFieldValue::Vector3(it) => Value::UserData(
                                 lua.create_userdata(Traitor::new(LiteVector3::from(*it)))?,
