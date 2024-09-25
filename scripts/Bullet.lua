@@ -5,6 +5,8 @@
 ---@field author_collider Node
 Bullet = script_class()
 
+Bullet.HitMessage = "BulletHit"
+
 
 ---@class BulletSeed
 ---@field prefab Prefab
@@ -24,7 +26,6 @@ function Bullet:spawn(seed)
     script.velocity = seed.direction:normalize():mul(seed.initial_velocity)
     script.remaining_sec = seed.range / seed.initial_velocity
     script.author_collider = seed.author_collider
-    var_dump("bullet spawned: ", script, seed);
 end
 
 ---@param ctx ScriptContext
@@ -48,8 +49,8 @@ function Bullet:on_update(dt)
 
     for i, hit in ipairs(results) do
         if hit.collider ~= self.author_collider then
-            hit.collider:send_hierarchical(RoutingStrategy.Up, "BulletHit")
-			self.node:destroy();
+            hit.collider:send_hierarchical(RoutingStrategy.Up, Bullet.HitMessage)
+			self.node:destroy()
             return;
         end
     end

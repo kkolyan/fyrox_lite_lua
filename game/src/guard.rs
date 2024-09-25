@@ -25,16 +25,16 @@ use crate::game::Game;
 #[visit(optional)]
 pub struct Guard {
     #[reflect(hidden)]
-    reloading_sec: f32,
+    reloading_sec: f64,
 
-    reload_delay_sec: f32,
+    reload_delay_sec: f64,
 
-    gun_height: f32,
+    gun_height: f64,
 
-    switch_waypoint_timeout_sec: f32,
+    switch_waypoint_timeout_sec: f64,
 
     #[reflect(hidden)]
-    waypoint_sec: f32,
+    waypoint_sec: f64,
 
     #[reflect(hidden)]
     current_waypoint: Option<Vector3<f32>>,
@@ -43,11 +43,11 @@ pub struct Guard {
     collider: Handle<Node>,
 
     bullet_prefab: Option<Resource<Model>>,
-    initial_bullet_velocity: f32,
-    attack_range: f32,
+    initial_bullet_velocity: f64,
+    attack_range: f64,
 
-    beacon_reached_distance: f32,
-    move_power: f32,
+    beacon_reached_distance: f64,
+    move_power: f64,
 }
 
 impl Guard {
@@ -65,11 +65,11 @@ impl Guard {
         if self.can_see_player(player_pos, sight_vector) {
             Bullet::spawn(BulletSeed {
                 prefab: self.bullet_prefab.as_ref().unwrap().clone(),
-                origin: self_pos.add(LiteVector3::new(0.0, self.gun_height, 0.0)),
+                origin: self_pos.add(LiteVector3::new(0.0, self.gun_height as f32, 0.0)),
                 direction: sight_vector,
-                initial_velocity: self.initial_bullet_velocity,
+                initial_velocity: self.initial_bullet_velocity as f32,
                 author_collider: self.collider,
-                range: self.attack_range,
+                range: self.attack_range as f32,
             });
             self.reloading_sec = self.reload_delay_sec;
             return true;
@@ -106,7 +106,7 @@ impl Guard {
     }
 
     fn move_to_waypoint(&mut self, ctx: &mut LiteContext) {
-        self.waypoint_sec += ctx.dt;
+        self.waypoint_sec += ctx.dt as f64;
         if self.waypoint_sec > self.switch_waypoint_timeout_sec {
             self.current_waypoint = None;
             self.waypoint_sec = 0.0;
@@ -121,10 +121,10 @@ impl Guard {
         }
         let pos = ctx.node.local_position();
         let vector_to_beacon = LiteVector3(self.current_waypoint.unwrap()).sub(pos);
-        if vector_to_beacon.magnitude() < self.beacon_reached_distance {
+        if vector_to_beacon.magnitude() < self.beacon_reached_distance as f32 {
             self.current_waypoint = None;
         } else {
-            let force = vector_to_beacon.normalize().mul(self.move_power);
+            let force = vector_to_beacon.normalize().mul(self.move_power as f32);
             ctx.node.as_rigid_body().unwrap().apply_force(force);
         }
     }
@@ -145,7 +145,7 @@ impl LiteScript for Guard {
 
     fn on_update(&mut self, ctx: &mut LiteContext) {
         if self.reloading_sec > 0.0 {
-            self.reloading_sec -= ctx.dt;
+            self.reloading_sec -= ctx.dt as f64;
         }
 
         if self.reloading_sec > 0.0 || !self.try_attack_player(ctx) {

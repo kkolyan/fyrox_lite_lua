@@ -1,5 +1,6 @@
 use std::{collections::HashMap, fs, io::BufRead, path::Path};
 
+use convert_case::Casing;
 use fyrox::core::Uuid;
 use mlua::Table;
 use send_wrapper::SendWrapper;
@@ -27,6 +28,7 @@ pub enum ScriptKind {
 #[derive(Debug)]
 pub struct ScriptField {
     pub name: String,
+    pub title: String,
     pub ty: ScriptFieldValueType,
     pub description: Option<&'static str>,
     pub private: bool,
@@ -151,11 +153,13 @@ impl ScriptMetadata {
                                                 let s: &'static str = it.to_string().leak();
                                                 s
                                             });
+                                            let title = name.to_case(convert_case::Case::Title);
                                             fields.push(ScriptField {
                                                 name,
                                                 ty,
                                                 description,
                                                 private,
+                                                title,
                                             });
                                         }
                                     }

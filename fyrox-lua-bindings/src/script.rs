@@ -250,7 +250,8 @@ pub enum ScriptFieldValue {
     Prefab(Option<Resource<Model>>),
     Vector3(Vector3<f32>),
     Quaternion(UnitQuaternion<f32>),
-    RawLuaValue(SendWrapper<Value<'static>>),
+    // Option is necessary to avoid creation of SendWrapper outside of main
+    RawLuaValue(Option<SendWrapper<Value<'static>>>),
 }
 
 impl ScriptFieldValue {

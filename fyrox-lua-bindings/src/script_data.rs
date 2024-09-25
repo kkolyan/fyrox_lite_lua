@@ -86,7 +86,7 @@ impl Visit for ScriptData {
                     ScriptFieldValue::Prefab(it) => it.visit(field_name, &mut guard),
                     ScriptFieldValue::Vector3(it) => it.visit(field_name, &mut guard),
                     ScriptFieldValue::Quaternion(it) => it.visit(field_name, &mut guard),
-                    ScriptFieldValue::RawLuaValue(_it) => todo!("Visit for RawLuaValue is not supported yet"),
+                    ScriptFieldValue::RawLuaValue(_it) => Ok(()),
                 }?;
             }
             Ok(())

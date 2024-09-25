@@ -69,7 +69,7 @@ impl ScriptObject {
                         ScriptFieldValue::Quaternion(Default::default())
                     }
                     ScriptFieldValueType::RawLuaValue => {
-                        ScriptFieldValue::RawLuaValue(SendWrapper::new(Value::Nil))
+                        ScriptFieldValue::RawLuaValue(None)
                     }
                 })
                 .collect(),
@@ -127,7 +127,7 @@ impl UserData for ScriptObject {
                                 ScriptFieldValue::Quaternion(it) => Value::UserData(
                                     lua.create_userdata(Traitor::new(LiteQuaternion::from(*it)))?,
                                 ),
-                                ScriptFieldValue::RawLuaValue(it) => Value::clone(it),
+                                ScriptFieldValue::RawLuaValue(it) => it.as_ref().map(|it| Value::clone(it)).unwrap_or(Value::Nil),
                             };
                             return Ok(result);
                         }
@@ -271,7 +271,7 @@ impl UserData for ScriptObject {
                             ScriptFieldValue::RawLuaValue(it) => {
                                 // we use Lua interpreter as long as we use the process, so its lifetime is effectively static.
                                 let value: Value<'static> = unsafe { mem::transmute(value) };
-                                *it = SendWrapper::new(value)
+                                *it = Some(SendWrapper::new(value))
                             }
                         };
                         return Ok(());
@@ -323,7 +323,7 @@ impl Reflect for ScriptObject {
             .map(|(i, it)| FieldInfo {
                 owner_type_id: TypeId::of::<ScriptObject>(),
                 name: it.name.as_str(),
-                display_name: it.name.as_str(),
+                display_name: it.title.as_str(),
                 description: it.name.as_str(),
                 type_name: match it.ty {
                     ScriptFieldValueType::Number => std::any::type_name::<f32>(),

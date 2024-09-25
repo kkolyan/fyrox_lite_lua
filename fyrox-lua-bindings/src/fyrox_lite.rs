@@ -203,6 +203,25 @@ impl FyroxUserData for LiteNode {
         methods.add_meta_method(MetaMethod::ToString.name(), |lua, this, args: ()| {
             Ok(format!("{:?}", this.inner()))
         });
+        methods.add_meta_function(
+            MetaMethod::Eq.name(),
+            |lua: &Lua,
+             (a, b): (
+                Option<UserDataRef<Traitor<LiteNode>>>,
+                Option<UserDataRef<Traitor<LiteNode>>>,
+            )| {
+                if a.is_none() && b.is_none() {
+                    return Ok(false);
+                }
+                let Some(a) = a else {
+                    return Ok(false);
+                };
+                let Some(b) = b else {
+                    return Ok(false);
+                };
+                Ok(a.inner() == b.inner())
+            },
+        );
         methods.add_method_mut(
             "add_script",
             |lua, this, script_class_name: mlua::String| {
@@ -239,9 +258,7 @@ impl FyroxUserData for LiteNode {
         methods.add_method_mut("as_rigid_body", |a, b, args: ()| {
             Ok(b.as_rigid_body().map(Traitor::new))
         });
-        methods.add_method("is_alive", |a, b, args: ()| {
-            Ok(b.is_alive())
-        });
+        methods.add_method("is_alive", |a, b, args: ()| Ok(b.is_alive()));
         methods.add_method_mut("destroy", |a, b, args: ()| {
             b.destroy();
             Ok(())
@@ -460,8 +477,12 @@ impl FyroxUserData for LitePhysics {
     fn add_class_methods<'lua, M: UserDataMethods<'lua, UserDataClass<Self>>>(methods: &mut M) {
         methods.add_method("cast_ray", |lua, cls, (opts, results): (Table, Table)| {
             let opts = LiteRayCastOptions {
-                ray_origin: *opts.get::<_, UserDataRef<Traitor<LiteVector3>>>("ray_origin")?.inner(),
-                ray_direction: *opts.get::<_, UserDataRef<Traitor<LiteVector3>>>("ray_direction")?.inner(),
+                ray_origin: *opts
+                    .get::<_, UserDataRef<Traitor<LiteVector3>>>("ray_origin")?
+                    .inner(),
+                ray_direction: *opts
+                    .get::<_, UserDataRef<Traitor<LiteVector3>>>("ray_direction")?
+                    .inner(),
                 max_len: opts.get::<_, f32>("max_len")?,
                 groups: Default::default(),
                 sort_results: opts.get::<_, bool>("sort_results")?,

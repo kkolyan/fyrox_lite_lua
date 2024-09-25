@@ -14,7 +14,7 @@ use crate::{
 };
 use fyrox::graph::BaseSceneGraph;
 
-#[derive(Clone, Copy, PartialEq, Default)]
+#[derive(Clone, Copy, Eq, PartialEq, Default)]
 pub struct LiteNode {
     handle: Handle<Node>,
 }
