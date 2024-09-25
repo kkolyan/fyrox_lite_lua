@@ -70,7 +70,7 @@ where
 {
 
     fn add_fields<'lua, F: UserDataFields<'lua, Self>>(fields: &mut F) {
-        fields.add_meta_field(MetaMethod::Type.name(), format!("Class<{}>", T::CLASS_NAME));
+        fields.add_meta_field(MetaMethod::Type.name(), T::CLASS_NAME);
         T::add_instance_fields(fields);
     }
 
@@ -87,7 +87,7 @@ where
     T: FyroxUserData,
 {
     fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
-        fields.add_meta_field(MetaMethod::Type.name(), T::CLASS_NAME);
+        fields.add_meta_field(MetaMethod::Type.name(), format!("Class<{}>", T::CLASS_NAME));
         T::add_class_fields(fields);
     }
 

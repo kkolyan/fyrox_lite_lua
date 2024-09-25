@@ -1,3 +1,4 @@
+pub mod fmt_pretty;
 pub mod debug;
 pub mod fyrox_lite_class;
 pub mod os_event;

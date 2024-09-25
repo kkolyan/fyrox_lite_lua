@@ -1,6 +1,7 @@
+use std::fmt::Debug;
+
 use fyrox::{
-    asset::Resource,
-    resource::model::{Model, ModelResourceExtension},
+    asset::{manager::ResourceManager, Resource}, core::reflect::ResolvePath, resource::model::{Model, ModelResourceExtension}
 };
 
 use crate::{
@@ -9,9 +10,19 @@ use crate::{
     script_context::with_script_context,
 };
 
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Default)]
 pub struct LitePrefab {
     resource: Resource<Model>,
+}
+
+impl Debug for LitePrefab {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.resource.header().kind.path() {
+            Some(it) => write!(f, "Prefab({:?})", it),
+            None => write!(f, "Prefab()"),
+        }
+        
+    }
 }
 
 impl LitePrefab {

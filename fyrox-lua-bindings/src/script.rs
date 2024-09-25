@@ -94,12 +94,13 @@ impl ScriptTrait for LuaScript {
 
     fn on_update(&mut self, ctx: &mut ScriptContext) {
         uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+        let dt = ctx.dt;
         invoke_callback(
             &mut self.data,
             ctx.plugins.lua().vm,
             ctx,
             "on_update",
-            |_lua| Ok(()),
+            |_lua| Ok(dt),
         );
     }
 

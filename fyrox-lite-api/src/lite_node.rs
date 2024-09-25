@@ -1,5 +1,5 @@
 use crate::wrapper_reflect;
-use std::any::Any;
+use std::{any::Any, fmt::Debug};
 
 use fyrox::{
     core::{algebra::UnitQuaternion, pool::Handle, reflect::*, visitor::Visit},
@@ -14,9 +14,15 @@ use crate::{
 };
 use fyrox::graph::BaseSceneGraph;
 
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
+#[derive(Clone, Copy, PartialEq, Default)]
 pub struct LiteNode {
     handle: Handle<Node>,
+}
+
+impl Debug for LiteNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Debug::fmt(&self.handle, f)
+    }
 }
 
 impl From<Handle<Node>> for LiteNode {
@@ -41,6 +47,28 @@ impl LiteNode {
             } else {
                 None
             }
+        })
+    }
+
+    pub fn name(&self) -> Option<String> {
+        with_script_context(|ctx| {
+            ctx.scene
+                .as_ref()
+                .expect("scene unavailable")
+                .graph
+                .try_get(self.handle)
+                .map(|it| it.name_owned())
+        })
+    }
+
+    pub fn is_alive(&self) -> bool {
+        with_script_context(|ctx| {
+            ctx.scene
+                .as_ref()
+                .expect("scene unavailable")
+                .graph
+                .try_get(self.handle)
+                .is_some()
         })
     }
 
@@ -152,6 +180,14 @@ impl LiteNode {
             f(node.try_get_script_mut::<T>().unwrap());
         })
     }
+
+    pub fn add_script<T: ScriptTrait>(&self, state: T) {
+        with_script_context(|ctx| {
+            let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
+            node.add_script(state);
+        })
+    }
+
     pub fn find_script<T: ScriptTrait, R>(&self, f: impl Fn(&mut T) -> Option<R>) -> Option<R> {
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];

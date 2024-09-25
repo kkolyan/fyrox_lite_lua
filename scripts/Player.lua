@@ -21,44 +21,38 @@ local fire = false
 
 
 ---@param x number
-function Player:turn(x, ctx)
-    local self_transform = ctx.handle.local_transform_mut();
-    local rot_delta = Rotation3:from_axis_angle(Vector3:y_axis(), self.sensitivity * x);
-    self_transform.set_rotation(self_transform.rotation().mul(rot_delta));
+function Player:turn(x)
+    local rot_delta = Quaternion:from_axis_angle(Vector3.Y, self.sensitivity * x);
+
+    self.node:set_local_rotation(self.node:local_rotation():mul(rot_delta))
 end
 
-function Player:aim(ctx, y)
+function Player:aim(y)
     aim_y = aim_y + y * self.sensitivity;
 
-    aim_y = aim_y.clamp(math.pi / 2.0, math.pi / 2.0);
+    aim_y = math.max(-math.pi / 2.0, math.min(aim_y, math.pi / 2.0))
 
-    local camera_transform = self.camera.local_transform_mut();
-    camera_transform.set_rotation(UnitQuaternion:from_axis_angle(
-        Vector3:x_axis(),
+    self.camera:set_local_rotation(Quaternion:from_axis_angle(
+        Vector3.X,
         aim_y
     ));
 end
 
-function Player:fire(ctx)
-    local camera_global_transform = self.camera.global_transform();
-    local camera_pos = self.camera.global_position();
+function Player:fire()
+    local camera_pos = self.camera:global_position();
 
-    local rot = camera_global_transform.fixed_view("3x3", 0, 0);
-    local bullet_orientation = UnitQuaternion:from_matrix(rot);
+    local bullet_orientation = self.camera:global_rotation();
 
-    local prefab = self.bullet.as_ref().unwrap().clone();
     Bullet:spawn(
-        ctx.scene,
         {
-            prefab = prefab,
+            prefab = self.bullet,
             origin = camera_pos,
-            direction = bullet_orientation.transform_vector(Vector3:z_axis()),
+            direction = bullet_orientation:mul(Vector3.Z),
             initial_velocity = self.initial_bullet_velocity,
             author_collider = self.collider,
             range = self.shooting_range
         }
     );
-    print("bullet spawned");
 end
 
 
@@ -80,9 +74,9 @@ function Player:on_message(message, ctx)
     end
 end
 
-function Player:on_update(ctx)
+function Player:on_update(dt)
     if self.reload_sec > 0.0 then
-        self.reload_sec = self.reload_sec - ctx.dt;
+        self.reload_sec = self.reload_sec - dt;
     end
     if not self.published then
         self.published = true;
@@ -92,7 +86,7 @@ function Player:on_update(ctx)
     if fire then
         if self.reload_sec <= 0.0 then
             self.reload_sec = self.reload_delay_sec;
-            self.fire(ctx);
+            self:fire();
         end
     end
 
@@ -149,11 +143,11 @@ function Player:on_os_event(event)
         end
     end
     if event:is("DeviceEvent") then
-        local event = event
+        local event = event.event
         if event:is("MouseMotion") then
             local x, y = table.unpack(event.delta)
-            self:turn(-x, ctx);
-            self:aim(y, ctx);
+            self:turn(-x);
+            self:aim(y);
         end
     end
 end

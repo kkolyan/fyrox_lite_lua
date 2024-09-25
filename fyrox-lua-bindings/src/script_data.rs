@@ -44,7 +44,7 @@ impl ScriptData {
         }
     }
 
-    pub fn inner_unpacked(&mut self) -> Option<TypedUserData<'static, ScriptObject>> {
+    pub fn inner_unpacked(&self) -> Option<TypedUserData<'static, ScriptObject>> {
         match self {
             ScriptData::Packed(_it) => None,
             ScriptData::Unpacked(it) => Some(TypedUserData::clone(it)),

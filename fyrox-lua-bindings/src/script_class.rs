@@ -1,12 +1,15 @@
-use std::{collections::HashMap, mem};
+use std::{collections::HashMap, mem, sync::Arc};
 
 use fyrox::core::log::Log;
 use mlua::{MetaMethod, UserData};
+
+use crate::script_def::ScriptDefinition;
 
 #[derive(Debug)]
 pub struct ScriptClass {
 	pub name: &'static str,
     pub table: HashMap<String, mlua::Value<'static>>,
+    pub def: Option<Arc<ScriptDefinition>>,
 }
 
 

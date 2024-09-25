@@ -1,4 +1,4 @@
-use std::mem;
+use std::{fmt::Debug, mem};
 
 use fyrox::{
     event::{DeviceEvent, ElementState, Event, KeyEvent, MouseButton, WindowEvent},
@@ -8,13 +8,29 @@ use mlua::{IntoLua, Lua, MetaMethod, UserData, Value};
 
 use crate::{debug::VerboseLuaValue, fyrox_lite_class::Traitor, lua_error};
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct RustEnum {
     discriminant: &'static str,
     fields: Fields,
 }
 
-#[derive(Clone, Debug)]
+impl Debug for RustEnum {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		match &self.fields {
+			Fields::Unit => write!(f, "{}", self.discriminant),
+			Fields::Named(vec) => {
+				let args = vec.iter().map(|(k,v)| format!("{:?}: {:?}", k, v)).collect::<Vec<_>>();
+				write!(f, "{} {{ {} }}", self.discriminant, args.join(", "))
+			},
+			Fields::Positional(vec) => {
+				let args = vec.iter().map(|it| format!("{:?}", it)).collect::<Vec<_>>();
+				write!(f, "{}( {} )", self.discriminant, args.join(", "))
+			},
+		}
+	}
+}
+
+#[derive(Clone)]
 pub enum Fields {
     Unit,
     Named(Vec<(&'static str, VerboseLuaValue<'static>)>),

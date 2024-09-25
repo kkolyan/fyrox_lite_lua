@@ -1,4 +1,6 @@
+use crate::debug::override_print;
 use crate::debug::var_dump;
+use crate::debug::VerboseLuaValue;
 use crate::fyrox_lite::LitePlugin;
 use crate::fyrox_lite_class::FyroxUserData;
 use crate::lua_utils::log_error;
@@ -33,13 +35,18 @@ use fyrox::walkdir::WalkDir;
 use fyrox::window::CursorGrabMode;
 use fyrox_lite_api::lite_math::LiteQuaternion;
 use fyrox_lite_api::lite_math::LiteVector3;
+use fyrox_lite_api::lite_node::LiteRoutingStrategy;
+use fyrox_lite_api::lite_physics::LitePhysics;
 use fyrox_lite_api::lite_scene::LiteScene;
 use fyrox_lite_api::lite_ui::LiteText;
 use fyrox_lite_api::lite_window::LiteWindow;
 use fyrox_lite_api::wrapper_reflect;
 use mlua::Function;
 use mlua::Lua;
+use mlua::MetaMethod;
+use mlua::MultiValue;
 use mlua::Table;
+use mlua::UserDataRefMut;
 use mlua::Value;
 use send_wrapper::SendWrapper;
 use std::borrow::BorrowMut;
@@ -102,6 +109,7 @@ impl Default for LuaPlugin {
         let vm = Box::leak(Box::new(Lua::new()));
         let lua_version = vm.load("return _VERSION").eval::<mlua::String>().unwrap();
         println!("Lua Version: {}", lua_version.to_str().unwrap_or("unknown"));
+        override_print(vm);
         LuaPlugin {
             // mlua has approach with lifetimes that makes very difficult storing Lua types
             // here and there in Rust. But we need a single Lua VM instance for the whole life
@@ -149,6 +157,7 @@ impl Plugin for LuaPlugin {
                                 Ok(ScriptClass {
                                     name: class_name,
                                     table: Default::default(),
+                                    def: Default::default(),
                                 })
                             })
                         })
@@ -162,12 +171,7 @@ impl Plugin for LuaPlugin {
             .set(
                 "var_dump",
                 self.vm
-                    .create_function(|lua, (value, indent): (Value, Option<mlua::String>)| {
-                        match indent {
-                            Some(it) => var_dump(lua, value, it.to_str()?),
-                            None => var_dump(lua, value, ""),
-                        }
-                    })
+                    .create_function(var_dump)
                     .unwrap(),
             )
             .unwrap();
@@ -182,6 +186,8 @@ impl Plugin for LuaPlugin {
         LiteVector3::register_class(self.vm);
         LiteQuaternion::register_class(self.vm);
         Log::register_class(self.vm);
+        LitePhysics::register_class(self.vm);
+        LiteRoutingStrategy::register_class(self.vm);
 
         for entry in WalkDir::new("scripts").into_iter().flatten() {
             load_script(
@@ -212,7 +218,6 @@ impl Plugin for LuaPlugin {
         }
     }
 }
-
 
 fn load_script(
     context: &PluginRegistrationContext,
@@ -272,6 +277,17 @@ fn load_script(
         assembly_name,
     });
 
+    let class = lua
+        .globals()
+        .get::<_, Option<UserDataRefMut<ScriptClass>>>(definition.metadata.class)
+        .unwrap();
+    let Some(mut class) = class else {
+        Log::err(format!("invalid class file: {:?}", entry.path()));
+        return;
+    };
+
+    class.def = Some(definition.clone());
+
     match definition.metadata.kind {
         ScriptKind::Script(uuid) => {
             context
@@ -283,7 +299,7 @@ fn load_script(
                         constructor: Box::new(move || {
                             Script::new(LuaScript {
                                 data: ScriptData::Packed(ScriptObject::new(&definition)),
-                                name: name.to_string(),
+                                name: definition.metadata.class.to_string(),
                             })
                         }),
                         name: name.to_string(),
