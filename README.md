@@ -13,7 +13,7 @@ In editor mode Lua scripts are attached the same way as Rust scripts attached in
 ## Current State
 That's just a demo. It provides a minimal feature set for the [demo shooter game](https://github.com/kkolyan/fyrox_guards_lua), which is a Lua port of a [demo shooter game for Fyrox](https://github.com/kkolyan/fyrox_guards).
 
-Exported Fyrox APIs:
+Exported Fyrox APIs ([annotations available](https://github.com/kkolyan/fyrox_lite_lua/blob/main/fyrox-lite.lua)):
 * Node graph.
 * RigidBody (3D)
 * Ray Casting
