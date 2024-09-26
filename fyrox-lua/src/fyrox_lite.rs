@@ -20,7 +20,7 @@ use fyrox::{
     gui::{brush::Brush, text::TextBuilder, widget::WidgetBuilder},
     window::CursorGrabMode,
 };
-use fyrox_lite_api::{
+use fyrox_lite::{
     lite_math::{LiteQuaternion, LiteVector3},
     lite_node::{LiteNode, LiteRoutingStrategy},
     lite_physics::{LitePhysics, LiteRayCastOptions, LiteRigidBody},

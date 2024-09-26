@@ -38,18 +38,18 @@ fn main() {
     #[cfg(feature = "dylib")]
     {
         #[cfg(target_os = "windows")]
-        let file_name = "game_dylib.dll";
+        let file_name = "fyrox-lua_dylib.dll";
         #[cfg(target_os = "linux")]
-        let file_name = "libgame_dylib.so";
+        let file_name = "libfyrox-lua_dylib.so";
         #[cfg(target_os = "macos")]
-        let file_name = "libgame_dylib.dylib";
+        let file_name = "libfyrox-lua_dylib.dylib";
         executor.add_dynamic_plugin(file_name, true, true).unwrap();
     }
 
     // Static linking.
     #[cfg(not(feature = "dylib"))]
     {
-		use fyrox_lua_bindings::plugin::LuaPlugin;
+		use fyrox_lua::plugin::LuaPlugin;
         executor.add_plugin(LuaPlugin::default());
     }
 

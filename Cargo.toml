@@ -1,6 +1,6 @@
 
 [workspace]
-members = [ "editor", "executor", "fyrox-lite-api", "fyrox-lua-bindings"]
+members = [ "editor", "executor", "fyrox-lite", "fyrox-lua"]
 resolver = "2"
 exclude = ["mlua"]
 

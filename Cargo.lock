@@ -836,11 +836,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "75b325c5dbd37f80359721ad39aca5a29fb04c89279657cffdda8736d0c0b9d2"
 
 [[package]]
-name = "editor-lua"
+name = "editor"
 version = "0.1.0"
 dependencies = [
  "fyrox",
- "fyrox-lua-bindings",
+ "fyrox-lua",
  "fyroxed_base",
 ]
 
@@ -878,11 +878,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "executor-lua"
+name = "executor"
 version = "0.1.0"
 dependencies = [
  "fyrox",
- "fyrox-lua-bindings",
+ "fyrox-lua",
  "puffin",
  "puffin_http",
 ]
@@ -1246,7 +1246,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "fyrox-lite-api"
+name = "fyrox-lite"
 version = "0.1.0"
 dependencies = [
  "extend",
@@ -1254,13 +1254,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "fyrox-lua-bindings"
+name = "fyrox-lua"
 version = "0.1.0"
 dependencies = [
  "convert_case",
  "extend",
  "fyrox",
- "fyrox-lite-api",
+ "fyrox-lite",
  "mlua",
  "send_wrapper",
 ]

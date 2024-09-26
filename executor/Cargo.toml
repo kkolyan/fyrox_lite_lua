@@ -1,15 +1,15 @@
 [package]
-name = "executor-lua"
+name = "executor"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 fyrox = { workspace = true }
-fyrox-lua-bindings = {path = "../fyrox-lua-bindings", optional = true}
+fyrox-lua = {path = "../fyrox-lua", optional = true}
 puffin = {version = "0.19.0", optional = true}
 puffin_http = {version = "0.16.0", optional = true}
 
 [features]
-default = ["fyrox-lua-bindings"]
+default = ["fyrox-lua"]
 dylib = ["fyrox/dylib"]
 profiling = ["dep:puffin", "dep:puffin_http"]

@@ -1,10 +1,10 @@
 [package]
-name = "fyrox-lua-bindings"
+name = "fyrox-lua"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-fyrox-lite-api = {path = "../fyrox-lite-api"}
+fyrox-lite = {path = "../fyrox-lite"}
 fyrox = {workspace = true}
 mlua = { version = "0.9.1", features = ["luau"] }
 # mlua = { path = "../mlua", features = ["luau"] }
@@ -13,4 +13,5 @@ extend = "1.2.0"
 convert_case = "0.6.0"
 
 [features]
-default = ["fyrox/dylib"]
+default = ["fyrox/default"]
+dylib-engine = ["fyrox/dylib"]
