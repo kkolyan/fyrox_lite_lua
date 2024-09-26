@@ -1,7 +1,5 @@
 use fyrox::{
-    event::Event,
-    plugin::Plugin,
-    script::{ScriptContext, ScriptMessageContext, ScriptMessagePayload},
+    core::pool::Handle, event::Event, plugin::Plugin, scene::node::Node, script::{ScriptContext, ScriptMessageContext, ScriptMessagePayload}
 };
 
 use crate::{
@@ -29,10 +27,7 @@ pub trait LiteScript {
     }
 
     fn redispatch_init(&mut self, ctx: &mut ScriptContext) {
-        let mut lite_ctx = LiteContext {
-            node: ctx.handle.into(),
-            dt: ctx.dt,
-        };
+        let mut lite_ctx = LiteContext::new(ctx.handle, ctx.dt);
 
         without_script_context(ctx, || {
             self.on_init(&mut lite_ctx);
@@ -40,10 +35,7 @@ pub trait LiteScript {
     }
 
     fn redispatch_start(&mut self, ctx: &mut ScriptContext) {
-        let mut lite_ctx = LiteContext {
-            node: ctx.handle.into(),
-            dt: ctx.dt,
-        };
+        let mut lite_ctx = LiteContext::new(ctx.handle, ctx.dt);
 
         without_script_context(ctx, || {
             self.on_start(&mut lite_ctx);
@@ -51,10 +43,7 @@ pub trait LiteScript {
     }
 
     fn redispatch_update(&mut self, ctx: &mut ScriptContext) {
-        let mut lite_ctx = LiteContext {
-            node: ctx.handle.into(),
-            dt: ctx.dt,
-        };
+        let mut lite_ctx = LiteContext::new(ctx.handle, ctx.dt);
 
         without_script_context(ctx, || {
             self.on_update(&mut lite_ctx);
@@ -63,13 +52,10 @@ pub trait LiteScript {
 
     fn redispatch_message(
         &mut self,
-        #[allow(unused_variables)] message: &mut dyn ScriptMessagePayload,
-        #[allow(unused_variables)] ctx: &mut ScriptMessageContext,
+        message: &mut dyn ScriptMessagePayload,
+        ctx: &mut ScriptMessageContext,
     ) {
-        let mut lite_ctx = LiteContext {
-            node: ctx.handle.into(),
-            dt: ctx.dt,
-        };
+        let mut lite_ctx = LiteContext::new(ctx.handle, ctx.dt);
 
         without_script_context(ctx, || {
             self.on_message(message, &mut lite_ctx);
@@ -77,10 +63,7 @@ pub trait LiteScript {
     }
 
     fn redispatch_os_event(&mut self, event: &Event<()>, ctx: &mut ScriptContext) {
-        let mut lite_ctx = LiteContext {
-            node: ctx.handle.into(),
-            dt: ctx.dt,
-        };
+        let mut lite_ctx = LiteContext::new(ctx.handle, ctx.dt);
 
         without_script_context(ctx, || {
             self.on_os_event(event, &mut lite_ctx);
@@ -95,6 +78,13 @@ pub struct LiteContext {
 }
 
 impl LiteContext {
+
+    pub fn new(handle: Handle<Node>, dt: f32) -> Self {
+        Self { 
+            node: LiteNode::new(handle),
+            dt
+        }
+    }
     // TODO contribute "take" method to "ctx.plugins"
     pub fn with_plugin<T: Plugin, R>(&mut self, f: impl FnOnce(&mut T) -> R) -> R {
         with_script_context(|ctx| f(ctx.plugins.as_mut().expect("plugins not available").get_mut::<T>()))

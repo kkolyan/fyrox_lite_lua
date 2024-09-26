@@ -60,7 +60,7 @@ pub fn eval_script(lua: &Lua, code: &str) {
 
 pub fn set_package_loaded<'lua, V: IntoLuaMulti<'lua>>(lua: &'lua Lua, key: &str, value: V) {
     eval_func::<_, ()>(
-        &lua,
+        lua,
         "return function(key, value)
                 package.loaded[key] = value
               end",
@@ -117,7 +117,7 @@ pub trait ValueX {
 
 impl ValueX for Value<'_> {
     fn as_value(&self) -> &Value {
-        return self;
+        self
     }
 }
 

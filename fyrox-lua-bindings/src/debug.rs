@@ -1,8 +1,8 @@
-use std::{any::Any, collections::HashSet, fmt::Debug};
+use std::{collections::HashSet, fmt::Debug};
 
-use mlua::{AnyUserData, Function, Lua, MetaMethod, MultiValue, Value};
+use mlua::{Lua, MultiValue, Value};
 
-use crate::{fmt_pretty::fmt_pretty, os_event::RustEnum};
+use crate::fmt_pretty::fmt_pretty;
 
 pub fn var_dump(_lua: &Lua, args: MultiValue) -> mlua::Result<()> {
     for i in 0..args.len() {

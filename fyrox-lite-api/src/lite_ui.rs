@@ -3,7 +3,7 @@ use fyrox::{
     gui::{message::MessageDirection, text::{TextBuilder, TextMessage}, UiNode},
 };
 
-use crate::script_context::{with_script_context, OptionaUiContainerExt};
+use crate::script_context::with_script_context;
 
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct LiteUiNode {

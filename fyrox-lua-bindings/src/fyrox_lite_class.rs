@@ -75,7 +75,7 @@ where
     }
 
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_meta_method(MetaMethod::ToString.name(), |lua, this, args: ()| {
+        methods.add_meta_method(MetaMethod::ToString.name(), |_lua, this, _args: ()| {
             Ok(format!("{:?}", this.inner()))
         });
         T::add_instance_methods(methods);

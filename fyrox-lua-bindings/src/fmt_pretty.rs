@@ -26,7 +26,7 @@ pub fn fmt_pretty(
 		t @ Value::Table(_) => write!(fmt, "table: {:?}", t.to_pointer()),
 		f @ Value::Function(_) => write!(fmt, "function: {:?}", f.to_pointer()),
 		t @ Value::Thread(_) => write!(fmt, "thread: {:?}", t.to_pointer()),
-		u @ Value::UserData(ud) => {
+		u @ Value::UserData(_ud) => {
 			// Try `__name/__type` first then `__tostring`
 			let name = u.to_string().ok();
 			let s = name

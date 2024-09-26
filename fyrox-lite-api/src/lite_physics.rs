@@ -53,7 +53,7 @@ impl<'a> QueryResultsStorage for QueryResultsStorageWrapper<'a> {
 impl From<&LiteIntersection> for Intersection {
     fn from(value: &LiteIntersection) -> Self {
         Self {
-            collider: value.collider.into(),
+            collider: value.collider.inner(),
             normal: value.normal,
             position: value.position,
             feature: value.feature,
@@ -65,7 +65,7 @@ impl From<&LiteIntersection> for Intersection {
 impl From<&Intersection> for LiteIntersection {
     fn from(value: &Intersection) -> Self {
         Self {
-            collider: value.collider.into(),
+            collider: LiteNode::new(value.collider),
             normal: value.normal,
             position: value.position,
             feature: value.feature,

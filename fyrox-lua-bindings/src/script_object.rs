@@ -5,7 +5,7 @@ use fyrox::{
     core::{
         algebra::{UnitQuaternion, Vector3},
         pool::Handle,
-        reflect::{FieldInfo, FieldValue, Reflect},
+        reflect::{FieldInfo, Reflect},
     },
     gui::UiNode,
     resource::model::Model,
@@ -18,11 +18,15 @@ use fyrox_lite_api::{
     lite_ui::LiteUiNode,
     script_context::with_script_context,
 };
-use mlua::{MetaMethod, String, Table, UserData, UserDataRef, UserDataRefMut, Value};
+use mlua::{MetaMethod, String, UserData, UserDataRef, Value};
 use send_wrapper::SendWrapper;
 
 use crate::{
-    debug::VerboseLuaValue, fyrox_lite_class::Traitor, lua_error, lua_utils::{OptionX, ValueX}, reflect_base,
+    debug::VerboseLuaValue,
+    fyrox_lite_class::{FyroxUserData, Traitor},
+    lua_error,
+    lua_utils::{OptionX, ValueX},
+    reflect_base,
     script_class::ScriptClass,
 };
 
@@ -43,7 +47,10 @@ impl Debug for ScriptObject {
         let class_name = self.def.metadata.class;
         let mut fields = Vec::new();
         for (i, field) in self.def.metadata.fields.iter().enumerate() {
-            fields.push(format!("{} ({:?}): {:?}", field.name, field.ty, self.values[i]));
+            fields.push(format!(
+                "{} ({:?}): {:?}",
+                field.name, field.ty, self.values[i]
+            ));
         }
         write!(f, "{}{{ {} }}", class_name, fields.join(", "))
     }
@@ -68,9 +75,7 @@ impl ScriptObject {
                     ScriptFieldValueType::Quaternion => {
                         ScriptFieldValue::Quaternion(Default::default())
                     }
-                    ScriptFieldValueType::RawLuaValue => {
-                        ScriptFieldValue::RawLuaValue(None)
-                    }
+                    ScriptFieldValueType::RawLuaValue => ScriptFieldValue::RawLuaValue(None),
                 })
                 .collect(),
         }
@@ -80,11 +85,11 @@ impl ScriptObject {
 impl UserData for ScriptObject {
     fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
         fields.add_field_method_get("node", |_lua, _this| {
-            with_script_context(|ctx| Ok(ctx.handle.map(|it| Traitor::new(LiteNode::from(it)))))
+            with_script_context(|ctx| Ok(ctx.handle.map(|it| Traitor::new(LiteNode::new(it)))))
         });
     }
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_meta_method(MetaMethod::ToString.name(), |lua, this, args: ()| {
+        methods.add_meta_method(MetaMethod::ToString.name(), |_lua, this, _args: ()| {
             Ok(format!("{:?}", this))
         });
         methods.add_meta_function(
@@ -111,7 +116,7 @@ impl UserData for ScriptObject {
                                 }
                                 ScriptFieldValue::Bool(it) => Value::Boolean(*it),
                                 ScriptFieldValue::Node(it) => Value::UserData(
-                                    lua.create_userdata(Traitor::new(LiteNode::from(*it)))?,
+                                    lua.create_userdata(Traitor::new(LiteNode::new(*it)))?,
                                 ),
                                 ScriptFieldValue::UiNode(it) => Value::UserData(
                                     lua.create_userdata(Traitor::new(LiteUiNode::new(*it)))?,
@@ -127,7 +132,10 @@ impl UserData for ScriptObject {
                                 ScriptFieldValue::Quaternion(it) => Value::UserData(
                                     lua.create_userdata(Traitor::new(LiteQuaternion::from(*it)))?,
                                 ),
-                                ScriptFieldValue::RawLuaValue(it) => it.as_ref().map(|it| Value::clone(it)).unwrap_or(Value::Nil),
+                                ScriptFieldValue::RawLuaValue(it) => it
+                                    .as_ref()
+                                    .map(|it| Value::clone(it.deref()))
+                                    .unwrap_or(Value::Nil),
                             };
                             return Ok(result);
                         }
@@ -155,7 +163,7 @@ impl UserData for ScriptObject {
         );
         methods.add_meta_function_mut(
             MetaMethod::NewIndex.name(),
-            |lua, (this, key, value): (Value, String, Value)| {
+            |_lua, (this, key, value): (Value, String, Value)| {
                 // working with class
                 if let Value::Table(this) = this {
                     return this.raw_set(key, value);
@@ -198,38 +206,35 @@ impl UserData for ScriptObject {
                                         )
                                     })?;
                             }
-                            ScriptFieldValue::Bool(it) => *it = value.as_boolean()
-                            .ok_or_else(|| {
-                                lua_error!(
-                                    "cannot assign {}.{} with {:?}",
-                                    class,
-                                    field_name,
-                                    VerboseLuaValue::new(value)
-                                )
-                            })?,
+                            ScriptFieldValue::Bool(it) => {
+                                *it = value.as_boolean().ok_or_else(|| {
+                                    lua_error!(
+                                        "cannot assign {}.{} with {:?}",
+                                        class,
+                                        field_name,
+                                        VerboseLuaValue::new(value)
+                                    )
+                                })?
+                            }
                             ScriptFieldValue::Node(it) => {
                                 *it = match value {
                                     Value::Nil => Default::default(),
-                                    _ => extract_userdata_value::<Traitor<LiteNode>>(
+                                    _ => extract_userdata_value::<LiteNode>(
                                         value,
                                         class,
                                         &field_name,
                                     )?
-                                    .inner()
-                                    .clone()
-                                    .into(),
+                                    .inner(),
                                 }
                             }
                             ScriptFieldValue::UiNode(it) => {
                                 *it = match value {
                                     Value::Nil => Default::default(),
-                                    _ => extract_userdata_value::<Traitor<LiteUiNode>>(
+                                    _ => extract_userdata_value::<LiteUiNode>(
                                         value,
                                         class,
                                         &field_name,
                                     )?
-                                    .inner()
-                                    .clone()
                                     .inner(),
                                 }
                             }
@@ -237,35 +242,29 @@ impl UserData for ScriptObject {
                                 *it = match value {
                                     Value::Nil => Default::default(),
                                     _ => Some(
-                                        extract_userdata_value::<Traitor<LitePrefab>>(
+                                        extract_userdata_value::<LitePrefab>(
                                             value,
                                             class,
                                             &field_name,
                                         )?
-                                        .inner()
-                                        .clone()
                                         .inner(),
                                     ),
                                 }
                             }
                             ScriptFieldValue::Vector3(it) => {
-                                *it = extract_userdata_value::<Traitor<LiteVector3>>(
+                                *it = extract_userdata_value::<LiteVector3>(
                                     value,
                                     class,
                                     &field_name,
                                 )?
-                                .inner()
-                                .clone()
                                 .into()
                             }
                             ScriptFieldValue::Quaternion(it) => {
-                                *it = extract_userdata_value::<Traitor<LiteQuaternion>>(
+                                *it = extract_userdata_value::<LiteQuaternion>(
                                     value,
                                     class,
                                     &field_name,
                                 )?
-                                .inner()
-                                .clone()
                                 .into()
                             }
                             ScriptFieldValue::RawLuaValue(it) => {
@@ -283,14 +282,14 @@ impl UserData for ScriptObject {
     }
 }
 
-fn extract_userdata_value<T: UserData + 'static + Clone>(
+fn extract_userdata_value<T: FyroxUserData + 'static + Clone>(
     value: Value,
     class: &str,
     field: &str,
 ) -> mlua::Result<T> {
     if let Value::UserData(value) = value {
-        match value.borrow::<T>() {
-            Ok(it) => return Ok(it.clone()),
+        match value.borrow::<Traitor<T>>() {
+            Ok(it) => return Ok(it.inner().clone()),
             Err(err) => match err {
                 mlua::Error::UserDataBorrowError => panic!(
                     "immutable borrow failed while getting {}.`{}`",

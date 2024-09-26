@@ -2,8 +2,6 @@ use std::{collections::HashMap, fs, io::BufRead, path::Path};
 
 use convert_case::Casing;
 use fyrox::core::Uuid;
-use mlua::Table;
-use send_wrapper::SendWrapper;
 
 #[derive(Debug)]
 pub struct ScriptDefinition {
@@ -100,7 +98,7 @@ impl ScriptMetadata {
                         match tag {
                             "uuid" => {
                                 if uuid.is_some() {
-                                    errors.push(format!("duplicated uuid tag"));
+                                    errors.push("duplicated uuid tag".to_string());
                                 }
                                 match Uuid::parse_str(value) {
                                     Ok(value) => {
@@ -116,7 +114,7 @@ impl ScriptMetadata {
                             }
                             "class" => {
                                 if class.is_some() {
-                                    errors.push(format!("duplicated class tag"));
+                                    errors.push("duplicated class tag".to_string());
                                 }
                                 let mut parts = value.splitn(2, ":");
                                 class = Some(parts.next().unwrap().trim().to_string().leak());
@@ -182,7 +180,7 @@ impl ScriptMetadata {
             errors.push("class tag is missing".to_string());
         }
 
-        let parent_class = parent_class.as_ref().map(|it| it.as_str());
+        let parent_class = parent_class.as_deref();
 
         if parent_class.is_none() || !(parent_class.unwrap() == "Script" || parent_class.unwrap() == "Plugin") {
             errors.push("parent class is required to be either Script or Plugin".to_string());

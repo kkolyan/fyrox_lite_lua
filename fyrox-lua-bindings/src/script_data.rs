@@ -3,8 +3,6 @@ use convert_case::Casing;
 use fyrox::core::visitor::Visit;
 use fyrox::core::visitor::VisitResult;
 use fyrox::core::visitor::Visitor;
-use mlua::AnyUserData;
-use mlua::UserDataRefMut;
 use send_wrapper::SendWrapper;
 use std::fmt::Debug;
 use std::fmt::Formatter;

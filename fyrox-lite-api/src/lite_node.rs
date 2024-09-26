@@ -1,5 +1,5 @@
 use crate::wrapper_reflect;
-use std::{any::Any, fmt::Debug};
+use std::fmt::Debug;
 
 use fyrox::{
     core::{algebra::UnitQuaternion, pool::Handle, reflect::*, visitor::Visit},
@@ -25,15 +25,13 @@ impl Debug for LiteNode {
     }
 }
 
-impl From<Handle<Node>> for LiteNode {
-    fn from(value: Handle<Node>) -> Self {
-        LiteNode { handle: value }
+impl LiteNode {
+    pub fn new(handle: Handle<Node>) -> Self {
+        Self { handle }
     }
-}
 
-impl From<LiteNode> for Handle<Node> {
-    fn from(value: LiteNode) -> Self {
-        value.handle
+    pub fn inner(&self) -> Handle<Node> {
+        self.handle
     }
 }
 
@@ -159,7 +157,7 @@ impl LiteNode {
                 .iter()
                 .copied()
                 .find(|it| ctx.scene.as_ref().expect("scene unavailable").graph[*it].is_collider())
-                .map(|it| it.into())
+                .map(LiteNode::new)
         })
     }
 
@@ -169,9 +167,9 @@ impl LiteNode {
 
     pub fn parent(&self) -> LiteNode {
         with_script_context(|ctx| {
-            ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
-                .parent()
-                .into()
+            LiteNode::new(
+                ctx.scene.as_mut().expect("scene unavailable").graph[self.handle].parent(),
+            )
         })
     }
 

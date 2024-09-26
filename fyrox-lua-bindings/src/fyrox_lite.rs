@@ -2,10 +2,7 @@
 
 use std::{
     borrow::Borrow,
-    fmt::Debug,
-    marker::{PhantomData, Sized},
     mem,
-    ops::{Deref, DerefMut},
 };
 
 use crate::{
@@ -34,7 +31,7 @@ use fyrox_lite_api::{
     script_context::with_script_context,
 };
 use mlua::{
-    AnyUserData, FromLuaMulti, Lua, MetaMethod, MultiValue, Table, UserData, UserDataFields,
+    AnyUserData, Lua, MetaMethod, MultiValue, Table, UserDataFields,
     UserDataMethods, UserDataRef, UserDataRefMut, Value,
 };
 use send_wrapper::SendWrapper;
@@ -132,12 +129,12 @@ impl FyroxUserData for LiteQuaternion {
             |lua, (this, o): (UserDataRef<Traitor<LiteQuaternion>>, AnyUserData)| {
                 if let Ok(o) = o.borrow::<Traitor<LiteVector3>>() {
                     return Ok(
-                        lua.create_userdata(Traitor::new(this.mul__LiteVector(o.inner().clone())))
+                        lua.create_userdata(Traitor::new(this.mul__LiteVector(*o.inner())))
                     );
                 }
                 if let Ok(o) = o.borrow::<Traitor<LiteQuaternion>>() {
                     return Ok(lua.create_userdata(Traitor::new(
-                        this.mul__LiteQuaternion(o.inner().clone()),
+                        this.mul__LiteQuaternion(*o.inner()),
                     )));
                 }
                 Err(mlua::Error::runtime("invalid operand type"))
@@ -203,12 +200,13 @@ impl FyroxUserData for LiteNode {
         methods.add_meta_method(MetaMethod::ToString.name(), |lua, this, args: ()| {
             Ok(format!("{:?}", this.inner()))
         });
+        type LiteNodeRef<'a> = UserDataRef<'a, Traitor<LiteNode>>;
         methods.add_meta_function(
             MetaMethod::Eq.name(),
             |lua: &Lua,
              (a, b): (
-                Option<UserDataRef<Traitor<LiteNode>>>,
-                Option<UserDataRef<Traitor<LiteNode>>>,
+                Option<LiteNodeRef>,
+                Option<LiteNodeRef>,
             )| {
                 if a.is_none() && b.is_none() {
                     return Ok(false);
@@ -292,14 +290,14 @@ impl FyroxUserData for LiteNode {
         methods.add_method_mut(
             "set_local_position",
             |a, b, value: UserDataRef<Traitor<LiteVector3>>| {
-                b.set_local_position(value.inner().clone());
+                b.set_local_position(*value.inner());
                 Ok(())
             },
         );
         methods.add_method_mut(
             "set_local_rotation",
             |a, b, value: UserDataRef<Traitor<LiteQuaternion>>| {
-                b.set_local_rotation(value.inner().clone());
+                b.set_local_rotation(*value.inner());
                 Ok(())
             },
         );

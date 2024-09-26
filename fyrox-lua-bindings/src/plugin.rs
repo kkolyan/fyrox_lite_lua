@@ -1,6 +1,5 @@
 use crate::debug::override_print;
 use crate::debug::var_dump;
-use crate::debug::VerboseLuaValue;
 use crate::fyrox_lite::LitePlugin;
 use crate::fyrox_lite_class::FyroxUserData;
 use crate::lua_utils::log_error;
@@ -15,18 +14,14 @@ use crate::script_object::ScriptObject;
 use crate::typed_userdata::TypedUserData;
 use fyrox::core::color::Color;
 use fyrox::core::log::Log;
-use fyrox::core::pool::Handle;
 use fyrox::core::reflect::prelude::*;
 use fyrox::core::reflect::Reflect;
 use fyrox::core::visitor::prelude::*;
 use fyrox::core::visitor::Visit;
-use fyrox::event::Event;
 use fyrox::gui::brush::Brush;
-use fyrox::gui::message::UiMessage;
 use fyrox::plugin::Plugin;
 use fyrox::plugin::PluginContext;
 use fyrox::plugin::PluginRegistrationContext;
-use fyrox::scene::Scene;
 use fyrox::script::constructor::ScriptConstructor;
 use fyrox::script::Script;
 use fyrox::script::ScriptContext;
@@ -43,19 +38,12 @@ use fyrox_lite_api::lite_window::LiteWindow;
 use fyrox_lite_api::wrapper_reflect;
 use mlua::Function;
 use mlua::Lua;
-use mlua::MetaMethod;
-use mlua::MultiValue;
-use mlua::Table;
 use mlua::UserDataRefMut;
 use mlua::Value;
 use send_wrapper::SendWrapper;
-use std::borrow::BorrowMut;
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::ops::Deref;
 use std::ops::DerefMut;
-use std::path::Path;
-use std::rc::Rc;
 use std::sync::Arc;
 
 #[derive(Visit, Reflect, Debug)]
@@ -133,26 +121,17 @@ impl Plugin for LuaPlugin {
                 .eval::<()>(),
         );
 
-        let classes: Rc<RefCell<HashMap<&'static str, Table<'static>>>> = Default::default();
-
         {
-            let classes = classes.clone();
             self.vm
                 .globals()
                 .set(
                     "script_class",
                     self.vm
-                        .create_function(move |lua, _args: ()| {
+                        .create_function(move |_lua, _args: ()| {
                             LOADING_CLASS_NAME.with(|class_name| {
                                 let class_name = class_name
                                     .borrow()
                                     .expect("script_class() called out of permitted context");
-                                let table = lua.create_table()?;
-
-                                classes
-                                    .as_ref()
-                                    .borrow_mut()
-                                    .insert(class_name, table.clone());
 
                                 Ok(ScriptClass {
                                     name: class_name,
@@ -194,7 +173,6 @@ impl Plugin for LuaPlugin {
                 &context,
                 self.vm,
                 &entry,
-                classes.clone(),
                 &mut self.scripts.borrow_mut(),
             );
         }
@@ -223,7 +201,6 @@ fn load_script(
     context: &PluginRegistrationContext,
     lua: &'static Lua,
     entry: &DirEntry,
-    class_data: Rc<RefCell<HashMap<&'static str, Table<'static>>>>,
     plugin_scripts: &mut PluginScriptList,
 ) {
     if !entry.file_type().is_file() {

@@ -53,6 +53,9 @@ where
 }
 
 pub trait UnsafeAsUnifiedContext<'a, 'b, 'c> {
+    /// # Safety
+    /// We realy on UnifiedContext never outlives the short window, where the original structure (Self) is not used anyhow.
+    /// This all needed to hide different types of contexts behind one. That's probably possible to hide it behind enum variants, but I have up. Maybe later.
     unsafe fn as_unified_context(&mut self) -> UnifiedContext<'a, 'b, 'c>;
 }
 
