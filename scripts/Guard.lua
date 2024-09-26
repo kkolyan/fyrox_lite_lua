@@ -95,7 +95,6 @@ function Guard:move_to_waypoint(dt)
 end
 
 
----@param ctx ScriptContext
 function Guard:on_init()
     self.collider = self.node:find_collider_in_children()
     if not self.collider then
@@ -118,6 +117,7 @@ function Guard:on_update(dt)
 end
 
 function Guard:on_message(message)
+    print("on_message", message)
     local bullet = message == Bullet.HitMessage
     if bullet then
         self.node:destroy()

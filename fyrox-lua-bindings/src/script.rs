@@ -115,7 +115,7 @@ impl ScriptTrait for LuaScript {
                 &mut self.data,
                 ctx.plugins.lua().vm,
                 ctx,
-                "on_init",
+                "on_message",
                 |_lua| Ok(Value::clone(lua_message)),
             );
         } else {

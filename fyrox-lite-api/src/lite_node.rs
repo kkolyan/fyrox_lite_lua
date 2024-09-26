@@ -114,6 +114,7 @@ impl LiteNode {
     pub fn send_hierarchical<T>(&self, routing: LiteRoutingStrategy, payload: T)
     where
         T: ScriptMessagePayload,
+        T: Debug,
     {
         with_script_context(|ctx| {
             let routing = match routing {

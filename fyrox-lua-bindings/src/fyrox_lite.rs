@@ -277,13 +277,18 @@ impl FyroxUserData for LiteNode {
         });
         methods.add_method_mut(
             "send_hierarchical",
-            |a, b, (routing_strategy, value): (UserDataRef<Traitor<LiteRoutingStrategy>>, Value)| {
+            |a, this, (routing_strategy, value): (UserDataRef<Traitor<LiteRoutingStrategy>>, Value)| {
                 // we use Lua interpreter as long as we use the process, so its lifetime is effectively static.
                 let value: Value<'static> = unsafe { mem::transmute(value) };
-                b.send_hierarchical(routing_strategy.inner().clone(), SendWrapper::new(value));
+                this.send_hierarchical(*routing_strategy.inner(), SendWrapper::new(value));
                 Ok(())
             },
         );
+        methods.add_method_mut("subscribe_to", |a, this, args: ()| {
+            // TODO contribute to Fyrox a way to identify subscription by a value
+            this.subscribe_to::<SendWrapper<Value>>();
+            Ok(())
+        });
         methods.add_method_mut(
             "set_local_position",
             |a, b, value: UserDataRef<Traitor<LiteVector3>>| {
@@ -298,11 +303,6 @@ impl FyroxUserData for LiteNode {
                 Ok(())
             },
         );
-        methods.add_method_mut("subscribe_to", |a, b, args: ()| {
-            // TODO contribute to Fyrox a way to identify subscription by a value
-            b.subscribe_to::<SendWrapper<Value>>();
-            Ok(())
-        });
         methods.add_method("find_collider_in_children", |a, b, args: ()| {
             // TODO contribute to Fyrox a way to identify subscription by a value
             Ok(b.try_get_collider().map(Traitor::new))

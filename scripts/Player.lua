@@ -62,12 +62,12 @@ function Player:on_init()
     self.collider = self.node:find_collider_in_children()
     end
 
-function Player:on_start(ctx)
+function Player:on_start()
     self.node:subscribe_to()
 end
 
-function Player:on_message(message, ctx)
-    local _bullet = message.downcast_ref("BulletHit")
+function Player:on_message(message)
+    local _bullet = message == Bullet.HitMessage
     if _bullet ~= nil then
         Plugin:get("Game"):inc_wounds()
         print("player wounded!")
