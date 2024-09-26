@@ -25,8 +25,8 @@ fn main() {
     // Static linking.
     #[cfg(not(feature = "dylib"))]
     {
-        use fyrox_no_lua::game::Game;
-        editor.add_game_plugin(Game::default());
+		use fyrox_lua_bindings::plugin::LuaPlugin;
+        editor.add_game_plugin(LuaPlugin::default());
     }
 
     editor.run(event_loop)

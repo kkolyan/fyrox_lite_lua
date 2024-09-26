@@ -836,15 +836,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "75b325c5dbd37f80359721ad39aca5a29fb04c89279657cffdda8736d0c0b9d2"
 
 [[package]]
-name = "editor"
-version = "0.1.0"
-dependencies = [
- "fyrox",
- "fyrox_no_lua",
- "fyroxed_base",
-]
-
-[[package]]
 name = "editor-lua"
 version = "0.1.0"
 dependencies = [
@@ -884,16 +875,6 @@ checksum = "534c5cf6194dfab3db3242765c03bbe257cf92f22b38f6bc0c58d59108a820ba"
 dependencies = [
  "libc",
  "windows-sys 0.52.0",
-]
-
-[[package]]
-name = "executor"
-version = "0.1.0"
-dependencies = [
- "fyrox",
- "fyrox_no_lua",
- "puffin",
- "puffin_http",
 ]
 
 [[package]]
@@ -1360,16 +1341,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fyrox_no_lua"
-version = "0.1.0"
-dependencies = [
- "extend",
- "fyrox",
- "fyrox-lite-api",
- "profiling",
-]
-
-[[package]]
 name = "fyroxed_base"
 version = "0.21.1"
 source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
@@ -1387,13 +1358,6 @@ dependencies = [
  "strum",
  "strum_macros",
  "toml",
-]
-
-[[package]]
-name = "game_dylib"
-version = "0.1.0"
-dependencies = [
- "fyrox_no_lua",
 ]
 
 [[package]]
@@ -2579,7 +2543,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "43d84d1d7a6ac92673717f9f6d1518374ef257669c24ebc5ac25d5033828be58"
 dependencies = [
  "profiling-procmacros",
- "puffin",
 ]
 
 [[package]]
