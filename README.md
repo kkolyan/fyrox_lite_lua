@@ -11,7 +11,7 @@ bindings are supposed to target this API.
 In editor mode Lua scripts are attached the same way as Rust scripts attached in vanilla Fyrox.
 
 ## Current State
-That's just a demo. It provides a minimal feature set for the [demo shooter game](https://github.com/kkolyan/fyrox_guards_lua), which is a Lua port of a [demo shooter game for Fyrox](https://github.com/kkolyan/fyrox_guards).
+That's just a demo. It provides a minimal feature set for the [demo shooter game in Lua](https://github.com/kkolyan/fyrox_guards_lua), which is a port of a [demo shooter game in Rust](https://github.com/kkolyan/fyrox_guards).
 
 Exported Fyrox APIs ([annotations available](https://github.com/kkolyan/fyrox_lite_lua/blob/main/fyrox-lite.lua)):
 * Node graph.
