@@ -4,10 +4,10 @@ Scripting languages support for Fyrox Engine.
 ## Structure
 It consists from two logically separated things:
 
-**Fyrox Lite** - A Rust library. Provides GC-friendly facade above Fyrox API. Scripting language
+_**Fyrox Lite**_ - A Rust library. Provides GC-friendly facade above Fyrox API. Scripting language
 bindings are supposed to target this API.
 
-**Fyrox Lite Lua** - Technically, that's a Fyrox game. Provides Lua bindings for Fyrox Lite. 
+_**Fyrox Lite Lua**_ - Technically, that's a Fyrox game. Provides Lua bindings for Fyrox Lite. 
 In editor mode Lua scripts are attached the same way as Rust scripts attached in vanilla Fyrox.
 
 ## Current State
