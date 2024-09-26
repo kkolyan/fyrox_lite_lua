@@ -1,17 +1,19 @@
-use crate::wrapper_reflect;
+use crate::lite_math::{PodQuaternion, PodVector3};
+use crate::user_types::*;
+use crate::{wrapper_reflect};
 use std::fmt::Debug;
 
+extern crate fyrox_lite_macro;
+
+use fyrox::core::algebra::Vector3;
 use fyrox::{
     core::{algebra::UnitQuaternion, pool::Handle, reflect::*, visitor::Visit},
     scene::node::Node,
     script::{RoutingStrategy, ScriptMessagePayload, ScriptTrait},
 };
+use fyrox_lite_macro::fyrox_lite_engine_class;
 
-use crate::{
-    lite_math::{LiteQuaternion, LiteVector3},
-    lite_physics::LiteRigidBody,
-    script_context::with_script_context,
-};
+use crate::{lite_physics::LiteRigidBody, script_context::with_script_context};
 use fyrox::graph::BaseSceneGraph;
 
 #[derive(Clone, Copy, Eq, PartialEq, Default)]
@@ -35,6 +37,7 @@ impl LiteNode {
     }
 }
 
+// #[fyrox_lite_engine_class(Node)]
 impl LiteNode {
     pub fn as_rigid_body(&mut self) -> Option<LiteRigidBody> {
         with_script_context(|ctx| {
@@ -80,7 +83,7 @@ impl LiteNode {
         });
     }
 
-    pub fn global_position(&self) -> LiteVector3 {
+    pub fn global_position(&self) -> PodVector3 {
         with_script_context(|ctx| {
             ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
                 .global_position()
@@ -88,23 +91,25 @@ impl LiteNode {
         })
     }
 
-    pub fn local_position(&self) -> LiteVector3 {
+    pub fn local_position(&self) -> PodVector3 {
         with_script_context(|ctx| {
-            (*ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
+            ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
                 .local_transform()
                 .position()
-                .get_value_ref())
-            .into()
+                .get_value_ref()
+                .to_owned()
+                .into()
         })
     }
 
-    pub fn local_rotation(&self) -> LiteQuaternion {
+    pub fn local_rotation(&self) -> PodQuaternion {
         with_script_context(|ctx| {
-            (*ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
+            ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
                 .local_transform()
                 .rotation()
-                .get_value_ref())
-            .into()
+                .get_value_ref()
+                .to_owned()
+                .into()
         })
     }
 
@@ -126,7 +131,7 @@ impl LiteNode {
         });
     }
 
-    pub fn set_local_position(&self, new_pos: LiteVector3) {
+    pub fn set_local_position(&self, new_pos: PodVector3) {
         with_script_context(|ctx| {
             ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
                 .local_transform_mut()
@@ -134,7 +139,7 @@ impl LiteNode {
         });
     }
 
-    pub fn set_local_rotation(&self, value: LiteQuaternion) {
+    pub fn set_local_rotation(&self, value: PodQuaternion) {
         with_script_context(|ctx| {
             ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
                 .local_transform_mut()
@@ -199,14 +204,20 @@ impl LiteNode {
         })
     }
 
-    pub fn global_rotation(&self) -> LiteQuaternion {
+    pub fn global_rotation(&self) -> PodQuaternion {
         with_script_context(|ctx| {
             let camera_global_transform = ctx.scene.as_mut().expect("scene unavailable").graph
                 [self.handle]
                 .global_transform();
 
             let rot = camera_global_transform.fixed_view::<3, 3>(0, 0);
-            UnitQuaternion::from_matrix(&rot.into()).into()
+            let r = UnitQuaternion::from_matrix(&rot.into());
+            PodQuaternion {
+                x: r.i,
+                y: r.j,
+                z: r.k,
+                w: r.w,
+            }
         })
     }
 

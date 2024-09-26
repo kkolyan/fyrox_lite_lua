@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 fyrox-lite = {path = "../fyrox-lite"}
+fyrox-lite-math = {path = "../fyrox-lite-math"}
 fyrox = {workspace = true}
 mlua = { version = "0.9.1", features = ["luau"] }
 # mlua = { path = "../mlua", features = ["luau"] }

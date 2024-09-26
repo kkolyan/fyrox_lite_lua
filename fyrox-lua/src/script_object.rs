@@ -11,8 +11,8 @@ use fyrox::{
     resource::model::Model,
     scene::node::Node,
 };
+use fyrox_lite_math::{LiteQuaternion, LiteVector3};
 use fyrox_lite::{
-    lite_math::{LiteQuaternion, LiteVector3},
     lite_node::LiteNode,
     lite_prefab::LitePrefab,
     lite_ui::LiteUiNode,

@@ -16,12 +16,12 @@ use crate::{
     typed_userdata::TypedUserData,
 };
 use fyrox::{
-    core::{color::Color, log::Log},
+    core::{algebra::{UnitQuaternion, Vector3}, color::Color, log::Log},
     gui::{brush::Brush, text::TextBuilder, widget::WidgetBuilder},
     window::CursorGrabMode,
 };
+use fyrox_lite_math::{LiteQuaternion, LiteVector3};
 use fyrox_lite::{
-    lite_math::{LiteQuaternion, LiteVector3},
     lite_node::{LiteNode, LiteRoutingStrategy},
     lite_physics::{LitePhysics, LiteRayCastOptions, LiteRigidBody},
     lite_prefab::LitePrefab,
@@ -43,7 +43,8 @@ impl FyroxUserData for LiteRigidBody {
         methods.add_method_mut(
             "apply_force",
             |lua, this, force: UserDataRef<Traitor<LiteVector3>>| {
-                this.apply_force(*force.inner());
+                let force: Vector3<f32> = force.inner().0;
+                this.apply_force(force.into());
                 Ok(())
             },
         );
@@ -185,8 +186,10 @@ impl FyroxUserData for LitePrefab {
                 UserDataRef<Traitor<LiteVector3>>,
                 UserDataRef<Traitor<LiteQuaternion>>,
             )| {
+                let pos: Vector3<f32> = pos.inner().to_owned().into();
+                let rot: UnitQuaternion<f32> = rot.inner().to_owned().into();
                 Ok(Traitor::new(
-                    this.instantiate_at(*pos.inner(), *rot.inner()),
+                    this.instantiate_at(pos.into(), rot.into()),
                 ))
             },
         );
@@ -262,16 +265,16 @@ impl FyroxUserData for LiteNode {
             Ok(())
         });
         methods.add_method_mut("global_position", |a, b, args: ()| {
-            Ok(Traitor::new(b.global_position()))
+            Ok(Traitor::new(LiteVector3::from(b.global_position())))
         });
         methods.add_method_mut("global_rotation", |a, b, args: ()| {
-            Ok(Traitor::new(b.global_rotation()))
+            Ok(Traitor::new(LiteQuaternion::from(b.global_rotation())))
         });
         methods.add_method_mut("local_position", |a, b, args: ()| {
-            Ok(Traitor::new(b.local_position()))
+            Ok(Traitor::new(LiteVector3::from(b.local_position())))
         });
         methods.add_method_mut("local_rotation", |a, b, args: ()| {
-            Ok(Traitor::new(b.local_rotation()))
+            Ok(Traitor::new(LiteQuaternion::from(b.local_rotation())))
         });
         methods.add_method_mut(
             "send_hierarchical",
@@ -290,14 +293,14 @@ impl FyroxUserData for LiteNode {
         methods.add_method_mut(
             "set_local_position",
             |a, b, value: UserDataRef<Traitor<LiteVector3>>| {
-                b.set_local_position(*value.inner());
+                b.set_local_position(Vector3::from(value.inner().to_owned()).into());
                 Ok(())
             },
         );
         methods.add_method_mut(
             "set_local_rotation",
             |a, b, value: UserDataRef<Traitor<LiteQuaternion>>| {
-                b.set_local_rotation(*value.inner());
+                b.set_local_rotation(UnitQuaternion::from(value.inner().to_owned()).into());
                 Ok(())
             },
         );
@@ -475,12 +478,16 @@ impl FyroxUserData for LitePhysics {
     fn add_class_methods<'lua, M: UserDataMethods<'lua, UserDataClass<Self>>>(methods: &mut M) {
         methods.add_method("cast_ray", |lua, cls, (opts, results): (Table, Table)| {
             let opts = LiteRayCastOptions {
-                ray_origin: *opts
+                ray_origin: opts
                     .get::<_, UserDataRef<Traitor<LiteVector3>>>("ray_origin")?
-                    .inner(),
-                ray_direction: *opts
+                    .inner()
+                    .to_owned()
+                    .into(),
+                ray_direction: opts
                     .get::<_, UserDataRef<Traitor<LiteVector3>>>("ray_direction")?
-                    .inner(),
+                    .inner()
+                    .to_owned()
+                    .into(),
                 max_len: opts.get::<_, f32>("max_len")?,
                 groups: Default::default(),
                 sort_results: opts.get::<_, bool>("sort_results")?,

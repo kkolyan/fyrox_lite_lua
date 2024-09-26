@@ -1,121 +1,49 @@
-use std::fmt::{Debug, Display};
+use fyrox::core::algebra::{Quaternion, UnitQuaternion, Vector3};
 
-use fyrox::core::{
-    algebra::{Unit, UnitQuaternion, Vector3},
-    num_traits::Zero,
-};
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct PodVector3 {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+}
 
-use std::ops::Mul;
-
-#[derive(Clone, Copy)]
-pub struct LiteVector3(pub Vector3<f32>);
-
-impl Debug for LiteVector3 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self.0)
+impl From<Vector3<f32>> for PodVector3 {
+    fn from(v: Vector3<f32>) -> Self {
+        Self {
+            x: v.x,
+            y: v.y,
+            z: v.z,
+        }
     }
 }
 
-impl Display for LiteVector3 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
+impl From<PodVector3> for Vector3<f32> {
+    fn from(v: PodVector3) -> Self {
+        Self::new(v.x, v.y, v.z)
     }
 }
 
-impl LiteVector3 {
-    #[rustfmt::skip]    pub fn get_x(&self) -> f32 { self.0.x }
-    #[rustfmt::skip]    pub fn get_y(&self) -> f32 { self.0.y }
-    #[rustfmt::skip]    pub fn get_z(&self) -> f32 { self.0.z }
-    #[rustfmt::skip]    pub fn set_x(&mut self, value: f32) { self.0.x = value; }
-    #[rustfmt::skip]    pub fn set_y(&mut self, value: f32) { self.0.y = value; }
-    #[rustfmt::skip]    pub fn set_z(&mut self, value: f32) { self.0.z = value; }
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct PodQuaternion {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+    pub w: f32,
+}
 
-    #[rustfmt::skip]    pub fn x_axis() -> Self { Vector3::x_axis().into_inner().into() }
-    #[rustfmt::skip]    pub fn y_axis() -> Self { Vector3::y_axis().into_inner().into() }
-    #[rustfmt::skip]    pub fn z_axis() -> Self { Vector3::z_axis().into_inner().into() }
-
-    pub fn zero() -> Self {
-        Vector3::zero().into()
-    }
-    pub fn new(x: f32, y: f32, z: f32) -> LiteVector3 {
-        LiteVector3(Vector3::new(x, y, z))
-    }
-    pub fn mul(&self, o: f32) -> LiteVector3 {
-        LiteVector3(self.0 * o)
-    }
-
-    pub fn add(&self, o: LiteVector3) -> LiteVector3 {
-        LiteVector3(self.0 + o.0)
-    }
-
-    pub fn normalize(&self) -> LiteVector3 {
-        LiteVector3(self.0.normalize())
-    }
-
-    pub fn sub(&self, o: LiteVector3) -> LiteVector3 {
-        LiteVector3(self.0 - o.0)
-    }
-
-    pub fn magnitude(&self) -> f32 {
-        self.0.magnitude()
-    }
-
-    pub fn normalize_inplace(&mut self) {
-        self.0.normalize_mut();
+impl From<UnitQuaternion<f32>> for PodQuaternion {
+    fn from(v: UnitQuaternion<f32>) -> Self {
+        Self {
+            x: v.i,
+            y: v.j,
+            z: v.k,
+            w: v.w,
+        }
     }
 }
 
-impl From<Vector3<f32>> for LiteVector3 {
-    fn from(value: Vector3<f32>) -> Self {
-        LiteVector3(value)
-    }
-}
-
-impl From<LiteVector3> for Vector3<f32> {
-    fn from(value: LiteVector3) -> Self {
-        value.0
-    }
-}
-
-#[derive(Clone, Copy)]
-pub struct LiteQuaternion(UnitQuaternion<f32>);
-
-impl LiteQuaternion {
-    pub fn face_towards(dir: LiteVector3, up: LiteVector3) -> LiteQuaternion {
-        LiteQuaternion(UnitQuaternion::face_towards(&dir.into(), &up.into()))
-    }
-    pub fn from_axis_angle(axis: LiteVector3, angle: f32) -> LiteQuaternion {
-        LiteQuaternion(UnitQuaternion::from_axis_angle(
-            &Unit::new_normalize(Vector3::from(axis)),
-            angle,
-        ))
-    }
-
-    #[allow(non_snake_case)]
-    pub fn mul__LiteVector(&self, o: LiteVector3) -> LiteVector3 {
-        LiteVector3(self.0.mul(&o.0))
-    }
-
-    #[allow(non_snake_case)]
-    pub fn mul__LiteQuaternion(&self, rot_delta: LiteQuaternion) -> LiteQuaternion {
-        LiteQuaternion(self.0.mul(&rot_delta.0))
-    }
-}
-
-impl Debug for LiteQuaternion {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        Debug::fmt(&self.0, f)
-    }
-}
-
-impl From<LiteQuaternion> for UnitQuaternion<f32> {
-    fn from(value: LiteQuaternion) -> Self {
-        value.0
-    }
-}
-
-impl From<UnitQuaternion<f32>> for LiteQuaternion {
-    fn from(value: UnitQuaternion<f32>) -> Self {
-        LiteQuaternion(value)
+impl From<PodQuaternion> for UnitQuaternion<f32> {
+    fn from(v: PodQuaternion) -> Self {
+        UnitQuaternion::from_quaternion(Quaternion::new(v.w, v.x, v.y, v.z))
     }
 }

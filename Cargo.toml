@@ -1,11 +1,12 @@
 
 [workspace]
-members = [ "editor", "executor", "fyrox-lite", "fyrox-lua"]
+members = [ "editor", "executor", "fyrox-lite", "fyrox-lite-macro", "fyrox-lite-macro-lib", "fyrox-lite-math", "fyrox-lua"]
 resolver = "2"
 exclude = ["mlua"]
 
 [workspace.dependencies]
 fyrox = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f"}
+fyrox-core = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f"}
 fyroxed_base = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f"}
 # fyrox = {path = "c:/dev/rust/Fyrox/fyrox", default-features = false}
 # fyroxed_base = {path = "c:/dev/rust/Fyrox/editor", default-features = false}

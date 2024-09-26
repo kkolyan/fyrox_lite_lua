@@ -6,7 +6,7 @@ use fyrox::{
 };
 
 use crate::{
-    lite_math::{LiteQuaternion, LiteVector3},
+    lite_math::{PodQuaternion, PodVector3},
     lite_node::LiteNode,
     script_context::with_script_context,
 };
@@ -36,7 +36,7 @@ impl LitePrefab {
 }
 
 impl LitePrefab {
-    pub fn instantiate_at(&self, position: LiteVector3, orientation: LiteQuaternion) -> LiteNode {
+    pub fn instantiate_at(&self, position: PodVector3, orientation: PodQuaternion) -> LiteNode {
         with_script_context(|ctx| {
             LiteNode::new(
                 self.resource

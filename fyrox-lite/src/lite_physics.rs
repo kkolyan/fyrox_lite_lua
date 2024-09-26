@@ -12,7 +12,7 @@ use fyrox::{
     },
 };
 
-use crate::{lite_math::LiteVector3, lite_node::LiteNode, script_context::with_script_context};
+use crate::{lite_math::PodVector3, lite_node::LiteNode, script_context::with_script_context};
 
 #[derive(Debug)]
 pub struct LitePhysics;
@@ -120,10 +120,10 @@ pub struct LiteIntersection {
 }
 pub struct LiteRayCastOptions {
     /// A ray origin.
-    pub ray_origin: LiteVector3,
+    pub ray_origin: PodVector3,
 
     /// A ray direction. Can be non-normalized.
-    pub ray_direction: LiteVector3,
+    pub ray_direction: PodVector3,
 
     /// Maximum distance of cast.
     pub max_len: f32,
@@ -161,7 +161,7 @@ pub struct LiteRigidBody {
 }
 
 impl LiteRigidBody {
-    pub fn apply_force(&mut self, force: LiteVector3) {
+    pub fn apply_force(&mut self, force: PodVector3) {
         with_script_context(|ctx| {
             ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
                 .as_rigid_body_mut()

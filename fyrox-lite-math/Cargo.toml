@@ -1,0 +1,9 @@
+[package]
+name = "fyrox-lite-math"
+description = "Optional package for language bindings. Useful if language doesn't have powerful enough math libraries"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fyrox-lite = {path = "../fyrox-lite"}
+fyrox-core = {workspace = true}
