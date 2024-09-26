@@ -23,7 +23,7 @@ Exported Fyrox APIs ([annotations available](https://github.com/kkolyan/fyrox_li
 1. Reloading of scripts in editor
 2. Automatic bindings generation (including docs and annotations) based on the Fyrox Lite for Lua.
 3. Support for C# or some another popular statically typed language with GC, using the same approach.
-4API expansion.
+4. API expansion.
 
 # How to run
 ```sh
