@@ -7,8 +7,7 @@ It consists from two logically separated things:
 _**Fyrox Lite**_ - A Rust library. Provides GC-friendly facade above Fyrox API. Scripting language
 bindings are supposed to target this API.
 
-_**Fyrox Lite Lua**_ - Technically, that's a Fyrox game. Provides Lua bindings for Fyrox Lite. 
-In editor mode Lua scripts are attached the same way as Rust scripts attached in vanilla Fyrox.
+_**Fyrox Lite Lua**_ - Technically, that's a Fyrox game, but completely driven by user-provided Lua scripts. User can bind Lua scripts to nodes in editor the same way as with Rust scripts in vanilla Fyrox. [Lua annotations](https://luals.github.io/wiki/annotations/) are used to define Lua scripts metadata.
 
 ## Current State
 That's just a demo. It provides a minimal feature set for the [demo shooter game in Lua](https://github.com/kkolyan/fyrox_guards_lua), which is a port of a [demo shooter game in Rust](https://github.com/kkolyan/fyrox_guards).
