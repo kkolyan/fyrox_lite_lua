@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use fyrox_lite_model::{DataType, Domain};
-use fyrox_lite_parser::{extract_ty::extract_ty, visit_impl::extract_engine_class, visit_struct::extract_pod_struct};
+use fyrox_lite_parser::{extract_engine_class::extract_engine_class, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, extract_ty::extract_ty};
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, quote_spanned};
 use syn::{
@@ -17,22 +17,42 @@ use crate::generate_static_assertions;
 pub fn fyrox_lite_pod(attr: TokenStream, item: TokenStream) -> TokenStream {
     match parse2::<syn::Item>(item) {
         Ok(it) => match it {
-            syn::Item::Enum(_) => {
+            syn::Item::Enum(item) => {
+                let mut errors = Vec::new();
+
+                let mut types = Vec::new();
+                let ident = extract_pod_enum(attr, &item, &mut errors, &mut types)
+                    .map(|(rust_class_name, _class)| rust_class_name);
+
+                let field_assertions = generate_static_assertions(types.iter());
+
+                let errors = errors
+                    .into_iter()
+                    .map(|it| it.into_compile_error())
+                    .collect::<TokenStream>();
+
+                let impl_lite_data_type =
+                    ident.map(|ident| quote! {impl crate::LiteDataType for #ident {}});
+
                 quote! {
+                    #errors
                     #[derive(Debug, Clone)]
-                    #it
+                    #item
+
+                    #impl_lite_data_type
+                    #field_assertions
                 }
             }
-            syn::Item::Struct(struct_) => {
+            syn::Item::Struct(item) => {
                 let mut errors = Vec::new();
 
                 extract_pod_struct(
                     attr,
-                    &struct_,
+                    &item,
                     &mut errors,
                 );
 
-                let ident = &struct_.ident;
+                let ident = &item.ident;
 
                 let errors = errors
                     .into_iter()
@@ -40,11 +60,11 @@ pub fn fyrox_lite_pod(attr: TokenStream, item: TokenStream) -> TokenStream {
                     .collect::<TokenStream>();
 
                 let field_assertions =
-                    generate_static_assertions(struct_.fields.iter().map(|it| &it.ty));
+                    generate_static_assertions(item.fields.iter().map(|it| &it.ty));
                 quote! {
                     #errors
                     #[derive(Debug, Clone)]
-                    #struct_
+                    #item
 
                     impl crate::LiteDataType for #ident {}
                     #field_assertions

@@ -6,7 +6,7 @@ pub struct LiteScene;
 
 #[fyrox_lite_engine_class("Scene")]
 impl LiteScene {
-    pub fn load_async(scene_path: &str) {
+    pub fn load_async(scene_path: String) {
         with_script_context(|sc| {
             sc.async_scene_loader
                 .as_mut()

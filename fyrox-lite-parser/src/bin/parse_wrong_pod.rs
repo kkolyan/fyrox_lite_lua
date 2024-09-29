@@ -1,5 +1,5 @@
 
-use fyrox_lite_parser::visit_struct::extract_pod_struct;
+use fyrox_lite_parser::extract_pod_struct::extract_pod_struct;
 use quote::quote;
 use syn::{parse_quote, ItemStruct};
 

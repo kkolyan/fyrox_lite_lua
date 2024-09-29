@@ -1,7 +1,7 @@
 use std::{collections::HashMap, fs, path::Path, str::FromStr};
 
 use fyrox_lite_model::{DataType, Domain, EngineClass, Field, PodClass, PodClassName};
-use fyrox_lite_parser::{extract_ty::extract_ty, visit_impl::extract_engine_class, visit_struct::{extract_pod_struct}};
+use fyrox_lite_parser::{extract_engine_class::extract_engine_class, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, extract_ty::extract_ty};
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{parse2, Ident, TraitBoundModifier};
@@ -27,7 +27,6 @@ fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<Ident, Stri
 
     for item in file.items {
         match item {
-            syn::Item::Enum(it) => {},
             syn::Item::Impl(it) => {
                 if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite_engine_class", &mut vec![]) {
                     if let Some((rust_name, class)) = extract_engine_class(attr, &it, &mut vec![], &mut vec![]) {
@@ -41,6 +40,14 @@ fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<Ident, Stri
                     if let Some((rust_name, class)) = extract_pod_struct(attr, &it, &mut vec![]) {
                         aliases.insert(rust_name.clone(), class.class_name.0.clone());
                         domain.pod_classes.push(class);
+                    }
+                }
+            },
+            syn::Item::Enum(it) => {
+                if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite_pod", &mut vec![]) {
+                    if let Some((rust_name, class)) = extract_pod_enum(attr, &it, &mut vec![], &mut vec![]) {
+                        aliases.insert(rust_name.clone(), class.class_name.0.clone());
+                        domain.enum_classes.push(class);
                     }
                 }
             },

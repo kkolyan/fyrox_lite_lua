@@ -27,7 +27,7 @@ use fyrox_lite::{
     lite_scene::LiteScene,
     lite_ui::{LiteText, LiteUiNode},
     lite_window::LiteWindow,
-    script_context::with_script_context, spi::{DynamicArray, LiteOrdering},
+    script_context::with_script_context,
 };
 use mlua::{
     AnyUserData, Lua, MetaMethod, MultiValue, Table, UserDataFields,
@@ -334,7 +334,7 @@ impl FyroxUserData for LiteScene {
 
     fn add_class_methods<'lua, M: UserDataMethods<'lua, UserDataClass<Self>>>(methods: &mut M) {
         methods.add_method_mut("load_async", |lua, this, scene_path: mlua::String| {
-            LiteScene::load_async(scene_path.to_str()?);
+            LiteScene::load_async(scene_path.to_str()?.to_string());
             Ok(())
         });
     }
@@ -491,8 +491,7 @@ impl FyroxUserData for LitePhysics {
                 groups: Default::default(),
                 sort_results: opts.get::<_, bool>("sort_results")?,
             };
-            let mut results_vec = Vec::new();
-            LitePhysics::cast_ray(opts, &mut VecRefMut(&mut results_vec));
+            let results_vec = LitePhysics::cast_ray(opts);
             for result in results_vec {
                 let hit = lua.create_table()?;
                 hit.set("collider", Traitor::new(result.collider))?;
@@ -500,25 +499,5 @@ impl FyroxUserData for LitePhysics {
             }
             Ok(())
         });
-    }
-}
-
-struct VecRefMut<'a, T>(&'a mut Vec<T>);
-
-impl <'a, T> DynamicArray<T> for VecRefMut<'a, T> {
-    fn add(&mut self,item:T) {
-        self.0.push(item);
-    }
-
-    fn sort(&mut self,cmp: &mut dyn FnMut(&T, &T) -> LiteOrdering) {
-        self.0.sort_by(|a, b| match cmp(a, b) {
-            LiteOrdering::Less => Ordering::Less,
-            LiteOrdering::Equal => Ordering::Equal,
-            LiteOrdering::Greater => Ordering::Greater,
-        });
-    }
-
-    fn clear(&mut self) {
-        self.0.clear();
     }
 }

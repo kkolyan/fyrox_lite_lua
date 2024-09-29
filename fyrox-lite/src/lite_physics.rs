@@ -6,36 +6,55 @@ use fyrox::{
         pool::Handle,
     },
     scene::{
-        collider,
-        graph::physics::{FeatureId, Intersection, QueryResultsStorage, RayCastOptions},
-        node::Node,
+        collider::{BitMask, InteractionGroups}, graph::physics::{FeatureId, Intersection, QueryResultsStorage, RayCastOptions}, node::Node
     },
 };
-use fyrox_lite_macro::fyrox_lite_pod;
+use fyrox_lite_macro::{fyrox_lite_engine_class, fyrox_lite_pod};
 
-use crate::{lite_math::PodVector3, lite_node::LiteNode, script_context::with_script_context, spi::{DynamicArray, LiteOrdering}};
+use crate::{lite_math::PodVector3, lite_node::LiteNode, script_context::with_script_context};
 
 #[derive(Debug)]
 pub struct LitePhysics;
 
+#[fyrox_lite_engine_class]
 impl LitePhysics {
-    pub fn cast_ray(opts: LiteRayCastOptions, results: &mut dyn DynamicArray<LiteIntersection>) {
+    /// Exclude from the query any collider attached to a fixed rigid-body and colliders with no rigid-body attached.
+    const EXCLUDE_FIXED: i32 = 1 << 1;
+    /// Exclude from the query any collider attached to a kinematic rigid-body.
+    const EXCLUDE_KINEMATIC: i32 = 1 << 2;
+    /// Exclude from the query any collider attached to a dynamic rigid-body.
+    const EXCLUDE_DYNAMIC: i32 = 1 << 3;
+    /// Exclude from the query any collider that is a sensor.
+    const EXCLUDE_SENSORS: i32 = 1 << 4;
+    /// Exclude from the query any collider that is not a sensor.
+    const EXCLUDE_SOLIDS: i32 = 1 << 5;
+    /// Excludes all colliders not attached to a dynamic rigid-body.
+    const ONLY_DYNAMIC: i32 = LitePhysics::EXCLUDE_FIXED | LitePhysics::EXCLUDE_KINEMATIC;
+    /// Excludes all colliders not attached to a kinematic rigid-body.
+    const ONLY_KINEMATIC: i32 = LitePhysics::EXCLUDE_DYNAMIC | LitePhysics::EXCLUDE_FIXED;
+    /// Exclude all colliders attached to a non-fixed rigid-body
+    /// (this will not exclude colliders not attached to any rigid-body).
+    const ONLY_FIXED: i32 = LitePhysics::EXCLUDE_DYNAMIC | LitePhysics::EXCLUDE_KINEMATIC;
+
+    pub fn cast_ray(opts: LiteRayCastOptions) -> Vec<LiteIntersection>{
         with_script_context(|ctx| {
+            let mut results = Vec::new();
             ctx.scene
                 .as_mut()
                 .expect("scene unavailable")
                 .graph
                 .physics
-                .cast_ray(opts.into(), &mut QueryResultsStorageWrapper(results));
-        });
+                .cast_ray(opts.into(), &mut QueryResultsStorageWrapper(&mut results));
+            results
+        })
     }
 }
 
-struct QueryResultsStorageWrapper<'a>(&'a mut dyn DynamicArray<LiteIntersection>);
+struct QueryResultsStorageWrapper<'a>(&'a mut Vec<LiteIntersection>);
 
 impl <'a> QueryResultsStorage for QueryResultsStorageWrapper<'a> {
     fn push(&mut self, intersection: Intersection) -> bool {
-        self.0.add(LiteIntersection::from(&intersection));
+        self.0.push(LiteIntersection::from(&intersection));
         true
     }
 
@@ -47,21 +66,21 @@ impl <'a> QueryResultsStorage for QueryResultsStorageWrapper<'a> {
         &mut self,
         mut cmp: C,
     ) {
-        self.0.sort(&mut |a, b| match cmp(&a.into(), &b.into()) {
-            Ordering::Less => LiteOrdering::Less,
-            Ordering::Equal => LiteOrdering::Equal,
-            Ordering::Greater => LiteOrdering::Greater,
-        })
+        self.0.sort_by(&mut |a: &LiteIntersection, b: &LiteIntersection| cmp(&a.into(), &b.into()))
     }
 }
-
 impl From<&LiteIntersection> for Intersection {
     fn from(value: &LiteIntersection) -> Self {
         Self {
             collider: value.collider.inner(),
-            normal: value.normal,
-            position: value.position,
-            feature: value.feature,
+            normal: value.normal.into(),
+            position: Vector3::from(value.position).into(),
+            feature: match value.feature {
+                LiteFeatureId::Vertex(it) => FeatureId::Vertex(it as u32),
+                LiteFeatureId::Edge(it) => FeatureId::Edge(it as u32),
+                LiteFeatureId::Face(it) => FeatureId::Face(it as u32),
+                LiteFeatureId::Unknown => FeatureId::Unknown,
+            },
             toi: value.toi,
         }
     }
@@ -71,10 +90,15 @@ impl From<&Intersection> for LiteIntersection {
     fn from(value: &Intersection) -> Self {
         Self {
             collider: LiteNode::new(value.collider),
-            normal: value.normal,
-            position: value.position,
-            feature: value.feature,
+            normal: value.normal.into(),
+            position: PodVector3::from(Vector3::new(value.position.x, value.position.y, value.position.z)),
             toi: value.toi,
+            feature: match value.feature {
+                FeatureId::Vertex(it) => LiteFeatureId::Vertex(it as i32),
+                FeatureId::Edge(it) => LiteFeatureId::Edge(it as i32),
+                FeatureId::Face(it) => LiteFeatureId::Face(it as i32),
+                FeatureId::Unknown => LiteFeatureId::Unknown,
+            },
         }
     }
 }
@@ -110,8 +134,34 @@ pub struct LiteIntersection {
     /// A position of the intersection in world coordinates.
     pub position: PodVector3,
 
+    /// Additional data that contains a kind of the feature with which
+    /// intersection was detected as well as its index.
+    ///
+    /// # Important notes.
+    ///
+    /// FeatureId::Face might have index that is greater than amount of triangles in
+    /// a triangle mesh, this means that intersection was detected from "back" side of
+    /// a face. To "fix" that index, simply subtract amount of triangles of a triangle
+    /// mesh from the value.
+    pub feature: LiteFeatureId,
+
     /// Distance from the ray origin.
     pub toi: f32,
+}
+
+
+/// Shape-dependent identifier.
+#[derive(Copy, Hash, PartialEq, Eq)]
+#[fyrox_lite_pod("FeatureId")]
+pub enum LiteFeatureId {
+    /// Shape-dependent identifier of a vertex.
+    Vertex(i32),
+    /// Shape-dependent identifier of an edge.
+    Edge(i32),
+    /// Shape-dependent identifier of a face.
+    Face(i32),
+    /// Unknown identifier.
+    Unknown,
 }
 
 #[fyrox_lite_pod("RayCastOptions")]
@@ -155,7 +205,10 @@ impl From<LiteRayCastOptions> for RayCastOptions {
             ray_origin: Point3::from(Vector3::from(ray_origin)),
             ray_direction: ray_direction.into(),
             max_len,
-            groups,
+            groups: InteractionGroups {
+                memberships: BitMask(groups.memberships as u32),
+                filter: BitMask(groups.filter as u32),
+            },
             sort_results,
         }
     }

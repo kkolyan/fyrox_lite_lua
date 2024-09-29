@@ -1,9 +1,11 @@
-use fyrox_lite_model::{DataType, EngineClass, EngineClassName, Method, Signature};
+use fyrox_lite_model::{
+    BinaryOp, Constant, ConstantValue, DataType, EngineClass, EngineClassName, Method, Signature
+};
 use proc_macro2::TokenStream;
 use quote::ToTokens;
-use syn::{spanned::Spanned, Ident};
+use syn::{punctuated::Punctuated, spanned::Spanned, Ident};
 
-use crate::extract_ty::extract_ty;
+use crate::{extract_expression::extract_expression, extract_ty::{extract_ty, extract_ty_path}};
 
 pub fn extract_engine_class(
     attr: TokenStream,
@@ -34,8 +36,9 @@ pub fn extract_engine_class(
         parent: None,
         class_name: EngineClassName(class_name),
         methods: Default::default(),
+        constants: Default::default(),
     };
-    'methods: for it in item.items.iter() {
+    'items: for it in item.items.iter() {
         match it {
             syn::ImplItem::Fn(it) => {
                 let mut instance = false;
@@ -55,7 +58,7 @@ pub fn extract_engine_class(
                         }
                         Err(err) => {
                             errors.push(err);
-                            continue 'methods;
+                            continue 'items;
                         }
                     }
                 }
@@ -72,7 +75,7 @@ pub fn extract_engine_class(
                                     Ok(it) => it,
                                     Err(err) => {
                                         errors.push(err);
-                                        continue 'methods;
+                                        continue 'items;
                                     }
                                 })
                             }
@@ -80,10 +83,29 @@ pub fn extract_engine_class(
                     },
                 });
             }
+            syn::ImplItem::Const(it) => {
+                pod.constants.push(Constant {
+                    const_name: it.ident.to_string(),
+                    ty: match extract_ty(&it.ty) {
+                        Ok(it) => it,
+                        Err(err) => {
+                            errors.push(err);
+                            continue 'items;
+                        }
+                    },
+                    value: match extract_expression(&it.expr) {
+                        Ok(it) => it,
+                        Err(err) => {
+                            errors.push(err);
+                            continue 'items;
+                        },
+                    },
+                });
+            }
             _ => {
                 errors.push(syn::Error::new_spanned(
                     it,
-                    "Fyrox Lite: only functions allowed in Engine Class definitions",
+                    "Fyrox Lite: only functions and constants allowed in Engine Class definitions",
                 ));
             }
         }

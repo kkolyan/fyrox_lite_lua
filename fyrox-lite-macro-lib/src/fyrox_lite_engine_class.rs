@@ -2,7 +2,7 @@ use std::ops::Deref;
 
 use fyrox_lite_model::{DataType, Domain};
 use fyrox_lite_parser::{
-    extract_ty::extract_ty, visit_impl::extract_engine_class, visit_struct::extract_pod_struct,
+    extract_ty::extract_ty, extract_engine_class::extract_engine_class, extract_pod_struct::extract_pod_struct,
 };
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, quote_spanned};

@@ -11,7 +11,7 @@ use fyrox::{
     scene::node::Node,
     script::{RoutingStrategy, ScriptMessagePayload, ScriptTrait},
 };
-use fyrox_lite_macro::fyrox_lite_engine_class;
+use fyrox_lite_macro::{fyrox_lite_engine_class, fyrox_lite_pod};
 
 use crate::{lite_physics::LiteRigidBody, script_context::with_script_context};
 use fyrox::graph::BaseSceneGraph;
@@ -178,13 +178,6 @@ impl LiteNode {
         })
     }
 
-    pub fn with_script<T: ScriptTrait>(&self, f: impl FnOnce(&mut T)) {
-        with_script_context(|ctx| {
-            let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
-            f(node.try_get_script_mut::<T>().unwrap());
-        })
-    }
-
     pub fn add_script<T: ScriptTrait>(&self, state: T) {
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
@@ -221,13 +214,13 @@ impl LiteNode {
         })
     }
 
-    pub fn tag_is(&self, tag: &str) -> bool {
+    pub fn tag_is(&self, tag: String) -> bool {
         with_script_context(|ctx| {
             ctx.scene.as_mut().expect("scene unavailable").graph[self.handle].tag() == tag
         })
     }
 
-    pub fn set_tag(&self, tag: &str) {
+    pub fn set_tag(&self, tag: String) {
         with_script_context(|ctx| {
             ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
                 .set_tag(tag.to_string());
@@ -235,7 +228,8 @@ impl LiteNode {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Copy)]
+#[fyrox_lite_pod]
 pub enum LiteRoutingStrategy {
     /// An message will be passed to the specified root node and then to every node up in the hierarchy.
     Up,
