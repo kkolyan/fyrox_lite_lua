@@ -219,6 +219,7 @@ pub struct LiteRigidBody {
     pub handle: Handle<Node>,
 }
 
+#[fyrox_lite_engine_class("RigidBody")]
 impl LiteRigidBody {
     pub fn apply_force(&mut self, force: PodVector3) {
         with_script_context(|ctx| {

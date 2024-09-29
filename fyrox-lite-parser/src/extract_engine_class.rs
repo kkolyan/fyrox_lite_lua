@@ -1,11 +1,16 @@
+use std::collections::HashMap;
+
 use fyrox_lite_model::{
-    BinaryOp, Constant, ConstantValue, DataType, EngineClass, EngineClassName, Method, Signature
+    BinaryOp, Constant, ConstantValue, DataType, EngineClass, EngineClassName, Method, Signature,
 };
 use proc_macro2::TokenStream;
 use quote::ToTokens;
-use syn::{punctuated::Punctuated, spanned::Spanned, Ident};
+use syn::{punctuated::Punctuated, spanned::Spanned, Ident, TraitBoundModifier, TypeParamBound};
 
-use crate::{extract_expression::extract_expression, extract_ty::{extract_ty, extract_ty_path}};
+use crate::{
+    extract_expression::extract_expression,
+    extract_ty::{extract_ty, extract_ty_path},
+};
 
 pub fn extract_engine_class(
     attr: TokenStream,
@@ -13,7 +18,7 @@ pub fn extract_engine_class(
     errors: &mut Vec<syn::Error>,
     types: &mut Vec<syn::Type>,
 ) -> Option<(Ident, EngineClass)> {
-    let rust_name = match extract_ty(&item.self_ty) {
+    let rust_name = match extract_ty(&item.self_ty, None) {
         Ok(it) => {
             if let DataType::UnresolvedClass(it) = it {
                 Some(Ident::new(it.as_str(), item.self_ty.span()))
@@ -41,6 +46,51 @@ pub fn extract_engine_class(
     'items: for it in item.items.iter() {
         match it {
             syn::ImplItem::Fn(it) => {
+                let mut generic_params: HashMap<&Ident, DataType> = Default::default();
+                for gp in it.sig.generics.params.iter() {
+                    match gp {
+                        syn::GenericParam::Type(param) => {
+                            if param.bounds.len() == 1 {
+                                let bound =
+                                    param.bounds.iter().next().expect("WTF, just checked size");
+                                if let TypeParamBound::Trait(it) = bound {
+                                    if it.lifetimes.is_none() {
+                                        if let TraitBoundModifier::None = it.modifier {
+                                            if it.path.to_token_stream().to_string() == "UserScript"
+                                                && !generic_params.contains_key(&param.ident)
+                                            {
+                                                generic_params
+                                                    .insert(&param.ident, DataType::UserScript);
+                                                continue;
+                                            }
+                                            if it.path.to_token_stream().to_string()
+                                                == "UserScriptMessage"
+                                                && !generic_params.contains_key(&param.ident)
+                                            {
+                                                generic_params.insert(
+                                                    &param.ident,
+                                                    DataType::UserScriptMessage,
+                                                );
+                                                continue;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            errors.push(syn::Error::new_spanned(
+                                gp,
+                                "Fyrox Lite: unexpected generic param",
+                            ));
+                        }
+                        _ => {
+                            errors.push(syn::Error::new_spanned(
+                                gp,
+                                "Fyrox Lite: lifetime and const generic params are not allowed",
+                            ));
+                        }
+                    }
+                }
                 let mut instance = false;
                 let mut params = Vec::new();
                 'params: for it in it.sig.inputs.iter() {
@@ -51,16 +101,16 @@ pub fn extract_engine_class(
                         }
                         syn::FnArg::Typed(pat_type) => pat_type.ty.as_ref(),
                     };
-                    types.push(ty.clone());
-                    match extract_ty(ty) {
-                        Ok(it) => {
-                            params.push(it);
-                        }
-                        Err(err) => {
-                            errors.push(err);
-                            continue 'items;
-                        }
-                    }
+					types.push(ty.clone());
+					match extract_ty(ty, Some(&generic_params)) {
+						Ok(it) => {
+							params.push(it);
+						}
+						Err(err) => {
+							errors.push(err);
+							continue 'items;
+						}
+					}
                 }
                 pod.methods.push(Method {
                     method_name: it.sig.ident.to_token_stream().to_string(),
@@ -70,14 +120,14 @@ pub fn extract_engine_class(
                         return_ty: match &it.sig.output {
                             syn::ReturnType::Default => None,
                             syn::ReturnType::Type(_rarrow, ty) => {
-                                types.push(ty.as_ref().clone());
-                                Some(match extract_ty(ty) {
-                                    Ok(it) => it,
-                                    Err(err) => {
-                                        errors.push(err);
-                                        continue 'items;
-                                    }
-                                })
+								types.push(ty.as_ref().clone());
+								Some(match extract_ty(ty, Some(&generic_params)) {
+									Ok(it) => it,
+									Err(err) => {
+										errors.push(err);
+										continue 'items;
+									}
+								})
                             }
                         },
                     },
@@ -86,7 +136,7 @@ pub fn extract_engine_class(
             syn::ImplItem::Const(it) => {
                 pod.constants.push(Constant {
                     const_name: it.ident.to_string(),
-                    ty: match extract_ty(&it.ty) {
+                    ty: match extract_ty(&it.ty, None) {
                         Ok(it) => it,
                         Err(err) => {
                             errors.push(err);
@@ -98,7 +148,7 @@ pub fn extract_engine_class(
                         Err(err) => {
                             errors.push(err);
                             continue 'items;
-                        },
+                        }
                     },
                 });
             }
@@ -111,4 +161,21 @@ pub fn extract_engine_class(
         }
     }
     rust_name.map(|rust_name| (rust_name, pod))
+}
+
+fn extract_ty_generic_param(
+    ty: &syn::Type,
+    generic_params: &HashMap<&Ident, DataType>,
+) -> Option<DataType> {
+    if generic_params.is_empty() {
+        return None;
+    }
+    let syn::Type::Path(it) = ty else {
+        return None;
+    };
+    if it.qself.is_some() {
+        return None;
+    }
+    let it = it.path.get_ident()?;
+    generic_params.get(it).cloned()
 }

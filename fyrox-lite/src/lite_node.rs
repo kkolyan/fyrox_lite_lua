@@ -1,4 +1,5 @@
 use crate::lite_math::{PodQuaternion, PodVector3};
+use crate::spi::{ProxyScript, UserScript, UserScriptMessage};
 use crate::user_types::*;
 use crate::{wrapper_reflect};
 use std::fmt::Debug;
@@ -114,10 +115,7 @@ impl LiteNode {
     }
 
     /// Sends a hierarchical script message with the given payload.
-    pub fn send_hierarchical<T>(&self, routing: LiteRoutingStrategy, payload: T)
-    where
-        T: ScriptMessagePayload,
-        T: Debug,
+    pub fn send_hierarchical<T: UserScriptMessage>(&self, routing: LiteRoutingStrategy, payload: T)
     {
         with_script_context(|ctx| {
             let routing = match routing {
@@ -147,7 +145,7 @@ impl LiteNode {
         });
     }
 
-    pub fn subscribe_to<T: 'static>(&self) {
+    pub fn subscribe_to<T: UserScriptMessage>(&self) {
         with_script_context(|ctx| {
             ctx.message_dispatcher.as_mut()
             .expect("cannot subscribe from on_message callback. do it in on_init, on_start or on_update")
@@ -178,18 +176,18 @@ impl LiteNode {
         })
     }
 
-    pub fn add_script<T: ScriptTrait>(&self, state: T) {
+    pub fn add_script<T: UserScript>(&self, state: T) {
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
-            node.add_script(state);
+            node.add_script(state.into_proxy_script());
         })
     }
 
-    pub fn find_script<T: ScriptTrait, R>(&self, f: impl Fn(&mut T) -> Option<R>) -> Option<R> {
+    pub fn find_script<T: UserScript>(&self, class_name: String) -> Option<T> {
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
-            for script in node.try_get_scripts_mut::<T>() {
-                if let Some(r) = f(script) {
+            for script in node.try_get_scripts_mut::<T::ProxyScriptType>() {
+                if let Some(r) = T::extract_from(script, &class_name) {
                     return Some(r);
                 }
             }

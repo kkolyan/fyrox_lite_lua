@@ -82,7 +82,7 @@ pub(crate) fn extract_expression(it: &syn::Expr) -> syn::Result<ConstantValue> {
                 Some(it) => it.into_value(),
                 None => panic!("WTF: no elements in path? {:?}", expr),
             };
-            let owner = match extract_ty_path(expr.qself.as_ref(), &owner, expr) {
+            let owner = match extract_ty_path(expr.qself.as_ref(), &owner, expr, None) {
                 Ok(it) => match it {
                     DataType::UnresolvedClass(it) => {
                         if it == "Self" {

@@ -27,7 +27,7 @@ pub fn extract_pod_enum(
 					types.push(field.ty.clone());
                     fields.push(Field {
                         field_name: field.ident.as_ref().expect("WTF, we are in the 'named' clause").to_string(),
-                        ty: match extract_ty(&field.ty) {
+                        ty: match extract_ty(&field.ty, None) {
 							Ok(it) => it,
 							Err(err) => {
 								errors.push(err);
@@ -44,7 +44,7 @@ pub fn extract_pod_enum(
                 let mut fields = Vec::new();
                 for field in syn_fields.unnamed.iter() {
 					types.push(field.ty.clone());
-                    fields.push(match extract_ty(&field.ty) {
+                    fields.push(match extract_ty(&field.ty, None) {
 						Ok(it) => it,
 						Err(err) => {
 							errors.push(err);

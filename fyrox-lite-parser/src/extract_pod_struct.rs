@@ -22,7 +22,7 @@ pub fn extract_pod_struct(
     for field in item.fields.iter() {
         pod.fields.push(Field {
             field_name: field.ident.to_token_stream().to_string(),
-            ty: match extract_ty(&field.ty) {
+            ty: match extract_ty(&field.ty, None) {
                 Ok(it) => it,
                 Err(err) => {
                     errors.push(err);

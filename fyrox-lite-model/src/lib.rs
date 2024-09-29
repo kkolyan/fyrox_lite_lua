@@ -77,7 +77,7 @@ pub struct Signature {
 }
 
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum DataType {
     UnresolvedClass(String),
     Bool,
@@ -89,9 +89,9 @@ pub enum DataType {
     String,
     Vec(Box<DataType>),
     /// trait in Lite, manual implementation on language binding side
-    Script,
+    UserScript,
     /// fixed type (unknown for Lite) for send_hierarchical/subscribe_to/on_message (we can't make it generic outside of Rust)
-    Message,
+    UserScriptMessage,
     Pod(PodClassName),
     EngineObject(EngineClassName),
     Option(Box<DataType>),
