@@ -3,7 +3,7 @@ pub mod fyrox_lite_engine_class;
 use std::ops::Deref;
 
 use fyrox_lite_model::{DataType, Domain};
-use fyrox_lite_parser::{extract_ty::extract_ty, extract_engine_class::extract_engine_class, extract_pod_struct::extract_pod_struct};
+use fyrox_lite_parser::{extract_ty::extract_ty, extract_engine_class::extract_engine_class_and_inject_assertions, extract_pod_struct::extract_pod_struct};
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, quote_spanned};
 use syn::{

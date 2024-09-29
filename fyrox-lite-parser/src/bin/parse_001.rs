@@ -1,7 +1,7 @@
 use std::{collections::HashMap, fs, path::Path, str::FromStr};
 
 use fyrox_lite_model::{DataType, Domain, EngineClass, Field, PodClass, PodClassName};
-use fyrox_lite_parser::{extract_engine_class::extract_engine_class, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, extract_ty::extract_ty};
+use fyrox_lite_parser::{extract_engine_class::extract_engine_class_and_inject_assertions, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, extract_ty::extract_ty};
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{parse2, Ident, TraitBoundModifier};
@@ -27,9 +27,9 @@ fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<Ident, Stri
 
     for item in file.items {
         match item {
-            syn::Item::Impl(it) => {
+            syn::Item::Impl(mut it) => {
                 if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite_engine_class", &mut vec![]) {
-                    if let Some((rust_name, class)) = extract_engine_class(attr, &it, &mut vec![], &mut vec![]) {
+                    if let Some((rust_name, class)) = extract_engine_class_and_inject_assertions(attr, &mut it, &mut vec![]) {
                         aliases.insert(rust_name.clone(), class.class_name.0.clone());
                         domain.engine_classes.push(class);
                     }

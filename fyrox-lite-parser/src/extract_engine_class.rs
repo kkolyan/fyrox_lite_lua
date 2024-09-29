@@ -5,18 +5,19 @@ use fyrox_lite_model::{
 };
 use proc_macro2::TokenStream;
 use quote::ToTokens;
-use syn::{punctuated::Punctuated, spanned::Spanned, Ident, TraitBoundModifier, TypeParamBound};
+use syn::{
+    parse_quote, parse_quote_spanned, punctuated::Punctuated, spanned::Spanned, Ident, TraitBoundModifier, TypeParamBound
+};
 
 use crate::{
     extract_expression::extract_expression,
     extract_ty::{extract_ty, extract_ty_path},
 };
 
-pub fn extract_engine_class(
+pub fn extract_engine_class_and_inject_assertions(
     attr: TokenStream,
-    item: &syn::ItemImpl,
+    item: &mut syn::ItemImpl,
     errors: &mut Vec<syn::Error>,
-    types: &mut Vec<syn::Type>,
 ) -> Option<(Ident, EngineClass)> {
     let rust_name = match extract_ty(&item.self_ty, None) {
         Ok(it) => {
@@ -43,11 +44,12 @@ pub fn extract_engine_class(
         methods: Default::default(),
         constants: Default::default(),
     };
-    'items: for it in item.items.iter() {
+    'items: for it in item.items.iter_mut() {
         match it {
-            syn::ImplItem::Fn(it) => {
+            syn::ImplItem::Fn(func) => {
+                let mut types: Vec<syn::Type> = Default::default();
                 let mut generic_params: HashMap<&Ident, DataType> = Default::default();
-                for gp in it.sig.generics.params.iter() {
+                for gp in func.sig.generics.params.iter() {
                     match gp {
                         syn::GenericParam::Type(param) => {
                             if param.bounds.len() == 1 {
@@ -93,7 +95,7 @@ pub fn extract_engine_class(
                 }
                 let mut instance = false;
                 let mut params = Vec::new();
-                'params: for it in it.sig.inputs.iter() {
+                'params: for it in func.sig.inputs.iter() {
                     let ty = match it {
                         syn::FnArg::Receiver(_receiver) => {
                             instance = true;
@@ -101,37 +103,51 @@ pub fn extract_engine_class(
                         }
                         syn::FnArg::Typed(pat_type) => pat_type.ty.as_ref(),
                     };
-					types.push(ty.clone());
-					match extract_ty(ty, Some(&generic_params)) {
-						Ok(it) => {
-							params.push(it);
-						}
-						Err(err) => {
-							errors.push(err);
-							continue 'items;
-						}
-					}
+                    types.push(ty.clone());
+                    match extract_ty(ty, Some(&generic_params)) {
+                        Ok(it) => {
+                            params.push(it);
+                        }
+                        Err(err) => {
+                            errors.push(err);
+                            continue 'items;
+                        }
+                    }
                 }
                 pod.methods.push(Method {
-                    method_name: it.sig.ident.to_token_stream().to_string(),
+                    method_name: func.sig.ident.to_token_stream().to_string(),
                     instance,
                     signature: Signature {
                         params,
-                        return_ty: match &it.sig.output {
+                        return_ty: match &func.sig.output {
                             syn::ReturnType::Default => None,
                             syn::ReturnType::Type(_rarrow, ty) => {
-								types.push(ty.as_ref().clone());
-								Some(match extract_ty(ty, Some(&generic_params)) {
-									Ok(it) => it,
-									Err(err) => {
-										errors.push(err);
-										continue 'items;
-									}
-								})
+                                types.push(ty.as_ref().clone());
+                                Some(match extract_ty(ty, Some(&generic_params)) {
+                                    Ok(it) => it,
+                                    Err(err) => {
+                                        errors.push(err);
+                                        continue 'items;
+                                    }
+                                })
                             }
                         },
                     },
                 });
+                let static_assertions = types
+                    .into_iter()
+                    .map::<syn::Stmt, _>(|ty| {
+						let span = ty.span();
+                        parse_quote_spanned! {span =>
+                            {
+								#[allow(unused_imports)]
+                                use crate::LiteDataType;
+                                <#ty>::compiles_if_type_is_allowed();
+                            }
+                        }
+                    })
+                    .collect::<Vec<_>>();
+                func.block.stmts.splice(0..0, static_assertions);
             }
             syn::ImplItem::Const(it) => {
                 pod.constants.push(Constant {
