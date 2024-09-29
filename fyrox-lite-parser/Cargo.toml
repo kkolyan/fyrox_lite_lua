@@ -1,0 +1,12 @@
+[package]
+name = "fyrox-lite-parser"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fyrox-lite-model = {path = "../fyrox-lite-model"}
+syn = {version = "2.0.77", features = ["full", "extra-traits"]}
+quote = "1.0.37"
+proc-macro2 = "1.0.86"
+serde = "1.0.210"
+serde_yaml = "0.9.33"

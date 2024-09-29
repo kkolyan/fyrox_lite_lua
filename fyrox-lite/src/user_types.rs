@@ -23,4 +23,4 @@ use fyrox_lite_macro::{fyrox_lite_pod, fyrox_lite_user_class};
 // }
 
 // #[fyrox_lite_pod]
-pub struct LiteRayCastOptionsTrait {}
+// pub struct LiteRayCastOptionsTrait {}

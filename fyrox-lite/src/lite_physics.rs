@@ -11,14 +11,15 @@ use fyrox::{
         node::Node,
     },
 };
+use fyrox_lite_macro::fyrox_lite_pod;
 
-use crate::{lite_math::PodVector3, lite_node::LiteNode, script_context::with_script_context};
+use crate::{lite_math::PodVector3, lite_node::LiteNode, script_context::with_script_context, spi::{DynamicArray, LiteOrdering}};
 
 #[derive(Debug)]
 pub struct LitePhysics;
 
 impl LitePhysics {
-    pub fn cast_ray(opts: LiteRayCastOptions, results: &mut Vec<LiteIntersection>) {
+    pub fn cast_ray(opts: LiteRayCastOptions, results: &mut dyn DynamicArray<LiteIntersection>) {
         with_script_context(|ctx| {
             ctx.scene
                 .as_mut()
@@ -30,11 +31,11 @@ impl LitePhysics {
     }
 }
 
-struct QueryResultsStorageWrapper<'a>(&'a mut Vec<LiteIntersection>);
+struct QueryResultsStorageWrapper<'a>(&'a mut dyn DynamicArray<LiteIntersection>);
 
-impl<'a> QueryResultsStorage for QueryResultsStorageWrapper<'a> {
+impl <'a> QueryResultsStorage for QueryResultsStorageWrapper<'a> {
     fn push(&mut self, intersection: Intersection) -> bool {
-        self.0.push(LiteIntersection::from(&intersection));
+        self.0.add(LiteIntersection::from(&intersection));
         true
     }
 
@@ -46,7 +47,11 @@ impl<'a> QueryResultsStorage for QueryResultsStorageWrapper<'a> {
         &mut self,
         mut cmp: C,
     ) {
-        self.0.sort_by(|a, b| cmp(&a.into(), &b.into()))
+        self.0.sort(&mut |a, b| match cmp(&a.into(), &b.into()) {
+            Ordering::Less => LiteOrdering::Less,
+            Ordering::Equal => LiteOrdering::Equal,
+            Ordering::Greater => LiteOrdering::Greater,
+        })
     }
 }
 
@@ -93,31 +98,23 @@ pub trait LiteQueryResultsStorage {
 }
 
 /// A ray intersection result.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(PartialEq)]
+#[fyrox_lite_pod("Intersection")]
 pub struct LiteIntersection {
     /// A handle of the collider with which intersection was detected.
     pub collider: LiteNode,
 
     /// A normal at the intersection position.
-    pub normal: Vector3<f32>,
+    pub normal: PodVector3,
 
     /// A position of the intersection in world coordinates.
-    pub position: Point3<f32>,
-
-    /// Additional data that contains a kind of the feature with which
-    /// intersection was detected as well as its index.
-    ///
-    /// # Important notes.
-    ///
-    /// FeatureId::Face might have index that is greater than amount of triangles in
-    /// a triangle mesh, this means that intersection was detected from "back" side of
-    /// a face. To "fix" that index, simply subtract amount of triangles of a triangle
-    /// mesh from the value.
-    pub feature: FeatureId,
+    pub position: PodVector3,
 
     /// Distance from the ray origin.
     pub toi: f32,
 }
+
+#[fyrox_lite_pod("RayCastOptions")]
 pub struct LiteRayCastOptions {
     /// A ray origin.
     pub ray_origin: PodVector3,
@@ -129,10 +126,19 @@ pub struct LiteRayCastOptions {
     pub max_len: f32,
 
     /// Groups to check.
-    pub groups: collider::InteractionGroups,
+    pub groups: LiteInteractionGroups,
 
     /// Whether to sort intersections from closest to farthest.
     pub sort_results: bool,
+}
+
+#[derive(Copy, PartialEq, Eq)]
+#[fyrox_lite_pod("InteractionGroups")]
+pub struct LiteInteractionGroups {
+    /// Groups memberships.
+    pub memberships: i32,
+    /// Groups filter.
+    pub filter: i32,
 }
 
 impl From<LiteRayCastOptions> for RayCastOptions {

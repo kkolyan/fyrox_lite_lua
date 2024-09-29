@@ -37,7 +37,7 @@ impl LiteNode {
     }
 }
 
-// #[fyrox_lite_engine_class(Node)]
+#[fyrox_lite_engine_class(Node)]
 impl LiteNode {
     pub fn as_rigid_body(&mut self) -> Option<LiteRigidBody> {
         with_script_context(|ctx| {

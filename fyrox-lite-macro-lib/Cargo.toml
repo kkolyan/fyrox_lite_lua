@@ -7,3 +7,6 @@ edition = "2021"
 syn = "2.0.77"
 quote = "1.0.37"
 proc-macro2 = "1.0.86"
+fyrox-lite-parser = {path = "../fyrox-lite-parser"}
+fyrox-lite-model = {path = "../fyrox-lite-model"}
+uuid = {version = "1.10.0", features = ["v4"]}

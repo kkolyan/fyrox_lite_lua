@@ -7,3 +7,7 @@ edition = "2021"
 fyrox = { workspace = true }
 extend = "1.2.0"
 fyrox-lite-macro = { path = "../fyrox-lite-macro" }
+
+[features]
+default = ["fyrox/fyrox-impl"]
+dylib = ["fyrox/dylib"]
