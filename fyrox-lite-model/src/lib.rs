@@ -77,9 +77,10 @@ pub struct Signature {
 }
 
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum DataType {
     UnresolvedClass(String),
+    Unit,
     Bool,
     Byte,
     I32,
@@ -92,9 +93,15 @@ pub enum DataType {
     UserScript,
     /// fixed type (unknown for Lite) for send_hierarchical/subscribe_to/on_message (we can't make it generic outside of Rust)
     UserScriptMessage,
+    /// stub argument to call UserScript-type parameterized methods
+    UserScriptGenericStub,
     Pod(PodClassName),
     EngineObject(EngineClassName),
     Option(Box<DataType>),
+    /// Error should be universal scripting language specific type, so it is not presented here
+    Result {
+        ok: Box<DataType>
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]

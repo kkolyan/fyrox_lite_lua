@@ -37,6 +37,7 @@ pub fn fyrox_lite_engine_class(attr: TokenStream, item: TokenStream) -> TokenStr
                     #errors
                     #item
 
+                    // impl_lite_data_type
                     #impl_lite_data_type
                 }
             }

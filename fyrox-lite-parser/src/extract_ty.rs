@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use fyrox_lite_model::DataType;
 use quote::ToTokens;
-use syn::Ident;
+use syn::{GenericArgument, Ident};
 
 pub fn extract_ty_path(
     qself: Option<&syn::QSelf>,
@@ -16,6 +16,14 @@ pub fn extract_ty_path(
             "Fyrox Lite: Self is not allowed",
         ));
     }
+    if let Some(ident) = extract_user_script_associated_type(qself, path, generic_params) {
+        if ident == "UserScriptMessage" {
+            return Ok(DataType::UserScriptMessage);
+        }
+        if ident == "UserScriptGenericStub" {
+            return Ok(DataType::UserScriptGenericStub);
+        }
+    }
     if path.segments.len() > 1 {
         return Err(syn::Error::new_spanned(
             &path.segments,
@@ -24,17 +32,44 @@ pub fn extract_ty_path(
     }
     let segment = &path.segments[0];
     if segment.ident == "Vec" {
-        return Ok(DataType::Vec(Box::new(extract_single_type_param(segment, generic_params)?)));
+        return Ok(DataType::Vec(Box::new(extract_single_type_param(
+            segment,
+            generic_params,
+        )?)));
     }
     if segment.ident == "Option" {
         return Ok(DataType::Option(Box::new(extract_single_type_param(
-            segment, generic_params,
+            segment,
+            generic_params,
         )?)));
+    }
+    if segment.ident == "Result" {
+        if let syn::PathArguments::AngleBracketed(args) = &segment.arguments {
+            if args.args.len() == 2 {
+                let result_ok = &args.args[0];
+                let result_err = &args.args[1];
+                if let GenericArgument::Type(result_type) = result_ok {
+                    if let GenericArgument::Type(syn::Type::Path(it)) = result_err {
+                        if let Some(ident) = extract_user_script_associated_type(it.qself.as_ref(), &it.path, generic_params)
+                        {
+                            if ident == "LangSpecificError" {
+                                return Ok(DataType::Result {
+                                    ok: match extract_ty(result_type, generic_params) {
+                                        Ok(it) => Box::new(it),
+                                        Err(err) => return Err(err),
+                                    },
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     let syn::PathArguments::None = &segment.arguments else {
         return Err(syn::Error::new_spanned(
             &path.segments,
-            "Fyrox Lite: generics allowed for `Vec` and `Option` only",
+            "Fyrox Lite: unexpected generics",
         ));
     };
     Ok(match segment.ident.to_string().as_str() {
@@ -49,13 +84,47 @@ pub fn extract_ty_path(
     })
 }
 
+fn extract_user_script_associated_type<'a>(
+    qself: Option<&'a syn::QSelf>,
+    path: &'a syn::Path,
+    generic_params: Option<&HashMap<&Ident, DataType>>,
+) -> Option<&'a Ident> {
+    if let Some(generic_params) = generic_params {
+        if let Some((user_script_type, _data_type)) = generic_params
+            .iter()
+            .find(|(_ident, data_type)| **data_type == DataType::UserScript)
+        {
+            if qself.is_none()
+                && path.segments.len() == 2
+                && path.segments[0].ident == **user_script_type
+            {
+                return Some(&path.segments[1].ident);
+            }
+        }
+    }
+    None
+}
+
 pub fn extract_ty(
     ty: &syn::Type,
     generic_params: Option<&HashMap<&Ident, DataType>>,
 ) -> syn::Result<fyrox_lite_model::DataType> {
     match ty {
         syn::Type::Path(it) => extract_ty_path(it.qself.as_ref(), &it.path, it, generic_params),
-        _ => Err(syn::Error::new_spanned(ty, "Fyrox Lite: not allowed type")),
+        syn::Type::Tuple(it) => {
+            if it.elems.is_empty() {
+                Ok(DataType::Unit)
+            } else {
+                Err(syn::Error::new_spanned(
+                    ty,
+                    "Fyrox Lite: tuples not allowed",
+                ))
+            }
+        }
+        _ => Err(syn::Error::new_spanned(
+            ty,
+            format!("Fyrox Lite: not allowed type: {:?}", ty),
+        )),
     }
 }
 

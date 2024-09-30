@@ -1,8 +1,6 @@
 #![allow(unused_variables)]
 
-use std::{
-    borrow::Borrow, cmp::Ordering, mem
-};
+use std::{borrow::Borrow, cmp::Ordering, mem};
 
 use crate::{
     debug::VerboseLuaValue,
@@ -15,25 +13,33 @@ use crate::{
     typed_userdata::TypedUserData,
 };
 use fyrox::{
-    core::{algebra::{UnitQuaternion, Vector3}, color::Color, log::Log},
-    gui::{brush::Brush, text::TextBuilder, widget::WidgetBuilder},
+    core::{
+        algebra::{UnitQuaternion, Vector3},
+        color,
+        log::Log,
+    },
+    gui::{brush, text, widget},
     window::CursorGrabMode,
 };
-use fyrox_lite_math::{LiteQuaternion, LiteVector3};
 use fyrox_lite::{
     lite_node::{LiteNode, LiteRoutingStrategy},
     lite_physics::{LitePhysics, LiteRayCastOptions, LiteRigidBody},
     lite_prefab::LitePrefab,
     lite_scene::LiteScene,
-    lite_ui::{LiteText, LiteUiNode},
-    lite_window::LiteWindow,
+    lite_ui::{Brush, Color, LiteText, LiteUiNode},
+    lite_window::{LiteCursorGrabMode, LiteWindow},
     script_context::with_script_context,
+    spi::UserScript,
+    LiteDataType,
 };
+use fyrox_lite_math::{LiteQuaternion, LiteVector3};
 use mlua::{
-    AnyUserData, Lua, MetaMethod, MultiValue, Table, UserDataFields,
-    UserDataMethods, UserDataRef, UserDataRefMut, Value,
+    AnyUserData, Lua, MetaMethod, MultiValue, Table, UserDataFields, UserDataMethods, UserDataRef,
+    UserDataRefMut, Value,
 };
 use send_wrapper::SendWrapper;
+
+type UserScriptImpl<'a> = TypedUserData<'a, ScriptObject>;
 
 impl FyroxUserData for LiteRigidBody {
     const CLASS_NAME: &'static str = "RigidBody";
@@ -128,14 +134,12 @@ impl FyroxUserData for LiteQuaternion {
             "mul",
             |lua, (this, o): (UserDataRef<Traitor<LiteQuaternion>>, AnyUserData)| {
                 if let Ok(o) = o.borrow::<Traitor<LiteVector3>>() {
-                    return Ok(
-                        lua.create_userdata(Traitor::new(this.mul__LiteVector(*o.inner())))
-                    );
+                    return Ok(lua.create_userdata(Traitor::new(this.mul__LiteVector(*o.inner()))));
                 }
                 if let Ok(o) = o.borrow::<Traitor<LiteQuaternion>>() {
-                    return Ok(lua.create_userdata(Traitor::new(
-                        this.mul__LiteQuaternion(*o.inner()),
-                    )));
+                    return Ok(
+                        lua.create_userdata(Traitor::new(this.mul__LiteQuaternion(*o.inner())))
+                    );
                 }
                 Err(mlua::Error::runtime("invalid operand type"))
             },
@@ -187,13 +191,41 @@ impl FyroxUserData for LitePrefab {
             )| {
                 let pos: Vector3<f32> = pos.inner().to_owned().into();
                 let rot: UnitQuaternion<f32> = rot.inner().to_owned().into();
-                Ok(Traitor::new(
-                    this.instantiate_at(pos.into(), rot.into()),
-                ))
+                Ok(Traitor::new(this.instantiate_at(pos.into(), rot.into())))
             },
         );
     }
 }
+
+impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
+    type ProxyScript = LuaScript;
+
+    type LangSpecificError = mlua::Error;
+    
+    type UserScriptMessage = Traitor<SendWrapper<Value<'static>>>;
+
+    type UserScriptGenericStub = ();
+
+    fn extract_from(proxy: &Self::ProxyScript, class_name: &str) -> Option<Self> {
+        if proxy.name == class_name {
+            let script_data = proxy.data.inner_unpacked();
+            return Some(script_data.expect("expected to be unpacked here"));
+        }
+        None
+    }
+
+    fn into_proxy_script(self) -> mlua::Result<Self::ProxyScript> {
+        let name = self.borrow()?.def.metadata.class.to_string();
+        // it's sound, because Lua outlives a process
+        let ud: TypedUserData<'static, ScriptObject> = unsafe { mem::transmute(self) };
+        let data = crate::script_data::ScriptData::Unpacked(SendWrapper::new(ud));
+        Ok(LuaScript { name, data })
+    }
+}
+
+impl LiteDataType for Traitor<SendWrapper<Value<'static>>> {}
+
+impl<'a> LiteDataType for TypedUserData<'a, ScriptObject> {}
 
 impl FyroxUserData for LiteNode {
     const CLASS_NAME: &'static str = "Node";
@@ -205,11 +237,7 @@ impl FyroxUserData for LiteNode {
         type LiteNodeRef<'a> = UserDataRef<'a, Traitor<LiteNode>>;
         methods.add_meta_function(
             MetaMethod::Eq.name(),
-            |lua: &Lua,
-             (a, b): (
-                Option<LiteNodeRef>,
-                Option<LiteNodeRef>,
-            )| {
+            |lua: &Lua, (a, b): (Option<LiteNodeRef>, Option<LiteNodeRef>)| {
                 if a.is_none() && b.is_none() {
                     return Ok(false);
                 }
@@ -244,13 +272,7 @@ impl FyroxUserData for LiteNode {
                 };
                 let obj = lua.create_userdata(ScriptObject::new(def))?;
                 let ud = TypedUserData::<ScriptObject>::new(obj);
-                // it's sound, because Lua outlives a process
-                let ud: TypedUserData<'static, ScriptObject> = unsafe { mem::transmute(ud) };
-                let data = crate::script_data::ScriptData::Unpacked(SendWrapper::new(ud));
-                this.inner().add_script(LuaScript {
-                    name: script_class_name.to_string(),
-                    data,
-                });
+                this.inner().add_script(ud);
                 Ok(this.get_script(script_class_name))
             },
         );
@@ -280,13 +302,13 @@ impl FyroxUserData for LiteNode {
             |a, this, (routing_strategy, value): (UserDataRef<Traitor<LiteRoutingStrategy>>, Value)| {
                 // we use Lua interpreter as long as we use the process, so its lifetime is effectively static.
                 let value: Value<'static> = unsafe { mem::transmute(value) };
-                this.send_hierarchical(*routing_strategy.inner(), SendWrapper::new(value));
+                this.send_hierarchical::<UserScriptImpl>(*routing_strategy.inner(), Traitor::new(SendWrapper::new(value)));
                 Ok(())
             },
         );
         methods.add_method_mut("subscribe_to", |a, this, args: ()| {
             // TODO contribute to Fyrox a way to identify subscription by a value
-            this.subscribe_to::<SendWrapper<Value>>();
+            this.subscribe_to::<UserScriptImpl>(());
             Ok(())
         });
         methods.add_method_mut(
@@ -319,13 +341,7 @@ impl FyroxUserData for LiteNode {
 
 impl Traitor<LiteNode> {
     fn get_script(&self, class_name: &str) -> Option<TypedUserData<'static, ScriptObject>> {
-        self.find_script::<LuaScript, _>(|it| {
-            if it.name == class_name {
-                let script_data = it.data.inner_unpacked();
-                return Some(script_data.expect("expected to be unpacked here"));
-            }
-            None
-        })
+        self.find_script(class_name.to_string())
     }
 }
 
@@ -344,16 +360,10 @@ impl FyroxUserData for LiteText {
     const CLASS_NAME: &'static str = "Text";
     fn add_class_methods<'lua, M: UserDataMethods<'lua, UserDataClass<Self>>>(methods: &mut M) {
         methods.add_method_mut("new", |lua, this, state: Table| {
-            let mut widget = WidgetBuilder::new();
-            if let Some(foreground) =
-                state.get::<_, Option<UserDataRef<Traitor<Brush>>>>("foreground")?
-            {
-                widget = widget.with_foreground(foreground.inner().clone())
-            }
-            let mut text = TextBuilder::new(widget);
-            if let Some(font_size) = state.get::<_, Option<f32>>("font_size")? {
-                text = text.with_font_size(font_size);
-            }
+            let text = fyrox_lite::lite_ui::TextBuilder {
+                foregound: state.get::<_, Option<UserDataRef<Traitor<Brush>>>>("foreground")?.map(|it| it.inner().clone()),
+                font_size: state.get::<_, Option<f32>>("font_size")?,
+            };
             Ok(Traitor::new(LiteText::new(text)))
         });
     }
@@ -370,8 +380,8 @@ impl FyroxUserData for Brush {
     const CLASS_NAME: &'static str = "Brush";
 
     fn add_class_methods<'lua, M: UserDataMethods<'lua, UserDataClass<Self>>>(methods: &mut M) {
-        methods.add_method("solid", |lua, cls, color: UserDataRef<Traitor<Color>>| {
-            Ok(Traitor::new(Brush::Solid(*color.inner())))
+        methods.add_method("solid", |lua, cls, color: UserDataRef<Color>| {
+            Ok(Traitor::new(Brush::Solid(*color)))
         });
     }
 }
@@ -380,7 +390,7 @@ impl FyroxUserData for Color {
     const CLASS_NAME: &'static str = "Color";
 
     fn add_class_fields<'lua, F: UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
-        fields.add_field("BLACK", Traitor::new(Color::BLACK));
+        fields.add_field("BLACK", Traitor::new(Color {r: 0, g: 0, b: 0, a: 1}));
     }
 }
 
@@ -390,7 +400,7 @@ impl FyroxUserData for LiteWindow {
     fn add_class_methods<'lua, M: UserDataMethods<'lua, UserDataClass<Self>>>(methods: &mut M) {
         methods.add_method_mut(
             "set_cursor_grab",
-            |lua, cls, mode: UserDataRef<Traitor<CursorGrabMode>>| {
+            |lua, cls, mode: UserDataRef<Traitor<LiteCursorGrabMode>>| {
                 let _ = LiteWindow::set_cursor_grab(*mode.borrow().inner());
                 Ok(())
             },
@@ -398,13 +408,13 @@ impl FyroxUserData for LiteWindow {
     }
 }
 
-impl FyroxUserData for CursorGrabMode {
+impl FyroxUserData for LiteCursorGrabMode {
     const CLASS_NAME: &'static str = "CursorGrabMode";
 
     fn add_class_fields<'lua, F: UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
-        fields.add_field("None", Traitor::new(CursorGrabMode::None));
-        fields.add_field("Locked", Traitor::new(CursorGrabMode::Locked));
-        fields.add_field("Confined", Traitor::new(CursorGrabMode::Confined));
+        fields.add_field("None", Traitor::new(LiteCursorGrabMode::None));
+        fields.add_field("Locked", Traitor::new(LiteCursorGrabMode::Locked));
+        fields.add_field("Confined", Traitor::new(LiteCursorGrabMode::Confined));
     }
 }
 

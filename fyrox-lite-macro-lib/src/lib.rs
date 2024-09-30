@@ -33,6 +33,7 @@ fn generate_static_assertions<'a>(items: impl Iterator<Item = &'a syn::Type>) ->
             let static_assertions_fn =
                 Ident::new(format!("static_assertions_for_{}", id).as_str(), span);
             quote_spanned! {span =>
+                #[allow(dead_code)]
                 fn #static_assertions_fn() {
                     use crate::LiteDataType;
                     <#ty>::compiles_if_type_is_allowed();

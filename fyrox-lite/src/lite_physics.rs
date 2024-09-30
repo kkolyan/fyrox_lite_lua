@@ -182,7 +182,7 @@ pub struct LiteRayCastOptions {
     pub sort_results: bool,
 }
 
-#[derive(Copy, PartialEq, Eq)]
+#[derive(Copy, PartialEq, Eq, Default)]
 #[fyrox_lite_pod("InteractionGroups")]
 pub struct LiteInteractionGroups {
     /// Groups memberships.

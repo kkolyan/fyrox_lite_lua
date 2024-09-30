@@ -1,16 +1,14 @@
 use crate::lite_math::{PodQuaternion, PodVector3};
-use crate::spi::{ProxyScript, UserScript, UserScriptMessage};
-use crate::user_types::*;
-use crate::{wrapper_reflect};
+use crate::spi::{UserScript};
+use crate::wrapper_reflect;
 use std::fmt::Debug;
 
 extern crate fyrox_lite_macro;
 
-use fyrox::core::algebra::Vector3;
 use fyrox::{
     core::{algebra::UnitQuaternion, pool::Handle, reflect::*, visitor::Visit},
     scene::node::Node,
-    script::{RoutingStrategy, ScriptMessagePayload, ScriptTrait},
+    script::RoutingStrategy,
 };
 use fyrox_lite_macro::{fyrox_lite_engine_class, fyrox_lite_pod};
 
@@ -115,7 +113,7 @@ impl LiteNode {
     }
 
     /// Sends a hierarchical script message with the given payload.
-    pub fn send_hierarchical<T: UserScriptMessage>(&self, routing: LiteRoutingStrategy, payload: T)
+    pub fn send_hierarchical<T: UserScript>(&self, routing: LiteRoutingStrategy, payload: T::UserScriptMessage)
     {
         with_script_context(|ctx| {
             let routing = match routing {
@@ -145,11 +143,11 @@ impl LiteNode {
         });
     }
 
-    pub fn subscribe_to<T: UserScriptMessage>(&self) {
+    pub fn subscribe_to<T: UserScript>(&self, _stub: T::UserScriptGenericStub) {
         with_script_context(|ctx| {
             ctx.message_dispatcher.as_mut()
             .expect("cannot subscribe from on_message callback. do it in on_init, on_start or on_update")
-            .subscribe_to::<T>(self.handle);
+            .subscribe_to::<T::UserScriptMessage>(self.handle);
         });
     }
 
@@ -176,17 +174,18 @@ impl LiteNode {
         })
     }
 
-    pub fn add_script<T: UserScript>(&self, state: T) {
+    pub fn add_script<T: UserScript>(&self, state: T) -> Result<(), T::LangSpecificError> {
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
-            node.add_script(state.into_proxy_script());
+            node.add_script(state.into_proxy_script()?);
+            Ok(())
         })
     }
 
     pub fn find_script<T: UserScript>(&self, class_name: String) -> Option<T> {
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
-            for script in node.try_get_scripts_mut::<T::ProxyScriptType>() {
+            for script in node.try_get_scripts_mut::<T::ProxyScript>() {
                 if let Some(r) = T::extract_from(script, &class_name) {
                     return Some(r);
                 }
