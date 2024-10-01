@@ -2,9 +2,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Default, PartialEq)]
 pub struct Domain {
-    pub engine_classes: Vec<EngineClass>,
-    pub struct_classes: Vec<StructClass>,
-    pub enum_classes: Vec<EnumClass>,
+    pub items: Vec<DomainItem>,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub enum DomainItem {
+    EngineClass(EngineClass),
+    StructClass(StructClass),
+    EnumClass(EnumClass),
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]

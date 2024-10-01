@@ -1,595 +1,629 @@
 {
-  "engine_classes": [
+  "items": [
     {
-      "class_name": "Node",
-      "methods": [
-        {
-          "instance": true,
-          "method_name": "as_rigid_body",
-          "signature": {
-            "return_ty": {
-              "Option": {
-                "EngineObject": "RigidBody"
+      "StructClass": {
+        "class_name": "Vector3",
+        "fields": [
+          {
+            "field_name": "x",
+            "ty": "F32"
+          },
+          {
+            "field_name": "y",
+            "ty": "F32"
+          },
+          {
+            "field_name": "z",
+            "ty": "F32"
+          }
+        ]
+      }
+    },
+    {
+      "StructClass": {
+        "class_name": "Vector2",
+        "fields": [
+          {
+            "field_name": "x",
+            "ty": "F32"
+          },
+          {
+            "field_name": "y",
+            "ty": "F32"
+          }
+        ]
+      }
+    },
+    {
+      "StructClass": {
+        "class_name": "Quaternion",
+        "fields": [
+          {
+            "field_name": "x",
+            "ty": "F32"
+          },
+          {
+            "field_name": "y",
+            "ty": "F32"
+          },
+          {
+            "field_name": "z",
+            "ty": "F32"
+          },
+          {
+            "field_name": "w",
+            "ty": "F32"
+          }
+        ]
+      }
+    },
+    {
+      "EngineClass": {
+        "class_name": "Node",
+        "methods": [
+          {
+            "instance": true,
+            "method_name": "as_rigid_body",
+            "signature": {
+              "return_ty": {
+                "Option": {
+                  "EngineObject": "RigidBody"
+                }
               }
             }
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "name",
-          "signature": {
-            "return_ty": {
-              "Option": "String"
+          },
+          {
+            "instance": true,
+            "method_name": "name",
+            "signature": {
+              "return_ty": {
+                "Option": "String"
+              }
             }
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "is_alive",
-          "signature": {
-            "return_ty": "Bool"
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "destroy",
-          "signature": {}
-        },
-        {
-          "instance": true,
-          "method_name": "global_position",
-          "signature": {
-            "return_ty": {
-              "Struct": "Vector3"
+          },
+          {
+            "instance": true,
+            "method_name": "is_alive",
+            "signature": {
+              "return_ty": "Bool"
             }
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "local_position",
-          "signature": {
-            "return_ty": {
-              "Struct": "Vector3"
-            }
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "local_rotation",
-          "signature": {
-            "return_ty": {
-              "Struct": "Quaternion"
-            }
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "send_hierarchical",
-          "signature": {
-            "params": [
-              {
-                "Enum": "RoutingStrategy"
-              },
-              "UserScriptMessage"
-            ]
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "set_local_position",
-          "signature": {
-            "params": [
-              {
+          },
+          {
+            "instance": true,
+            "method_name": "destroy",
+            "signature": {}
+          },
+          {
+            "instance": true,
+            "method_name": "global_position",
+            "signature": {
+              "return_ty": {
                 "Struct": "Vector3"
               }
-            ]
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "set_local_rotation",
-          "signature": {
-            "params": [
-              {
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "local_position",
+            "signature": {
+              "return_ty": {
+                "Struct": "Vector3"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "local_rotation",
+            "signature": {
+              "return_ty": {
                 "Struct": "Quaternion"
               }
-            ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "send_hierarchical",
+            "signature": {
+              "params": [
+                {
+                  "Enum": "RoutingStrategy"
+                },
+                "UserScriptMessage"
+              ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "set_local_position",
+            "signature": {
+              "params": [
+                {
+                  "Struct": "Vector3"
+                }
+              ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "set_local_rotation",
+            "signature": {
+              "params": [
+                {
+                  "Struct": "Quaternion"
+                }
+              ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "subscribe_to",
+            "signature": {
+              "params": [
+                "UserScriptGenericStub"
+              ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "try_get_collider",
+            "signature": {
+              "return_ty": {
+                "Option": {
+                  "EngineObject": "Node"
+                }
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "is_valid",
+            "signature": {
+              "return_ty": "Bool"
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "parent",
+            "signature": {
+              "return_ty": {
+                "EngineObject": "Node"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "add_script",
+            "signature": {
+              "params": [
+                "UserScript"
+              ],
+              "return_ty": {
+                "Result": {
+                  "ok": "Unit"
+                }
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "find_script",
+            "signature": {
+              "params": [
+                "String"
+              ],
+              "return_ty": {
+                "Option": "UserScript"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "global_rotation",
+            "signature": {
+              "return_ty": {
+                "Struct": "Quaternion"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "tag_is",
+            "signature": {
+              "params": [
+                "String"
+              ],
+              "return_ty": "Bool"
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "set_tag",
+            "signature": {
+              "params": [
+                "String"
+              ]
+            }
           }
-        },
-        {
-          "instance": true,
-          "method_name": "subscribe_to",
-          "signature": {
-            "params": [
-              "UserScriptGenericStub"
-            ]
+        ]
+      }
+    },
+    {
+      "EnumClass": {
+        "class_name": "RoutingStrategy",
+        "variants": [
+          {
+            "tag": "Up"
+          },
+          {
+            "tag": "Down"
           }
-        },
-        {
-          "instance": true,
-          "method_name": "try_get_collider",
-          "signature": {
-            "return_ty": {
-              "Option": {
+        ]
+      }
+    },
+    {
+      "StructClass": {
+        "class_name": "Intersection",
+        "fields": [
+          {
+            "field_name": "collider",
+            "ty": {
+              "EngineObject": "Node"
+            }
+          },
+          {
+            "field_name": "normal",
+            "ty": {
+              "Struct": "Vector3"
+            }
+          },
+          {
+            "field_name": "position",
+            "ty": {
+              "Struct": "Vector3"
+            }
+          },
+          {
+            "field_name": "feature",
+            "ty": {
+              "Enum": "FeatureId"
+            }
+          },
+          {
+            "field_name": "toi",
+            "ty": "F32"
+          }
+        ]
+      }
+    },
+    {
+      "EnumClass": {
+        "class_name": "FeatureId",
+        "variants": [
+          {
+            "tag": "Vertex",
+            "value": {
+              "fields": [
+                "I32"
+              ]
+            }
+          },
+          {
+            "tag": "Edge",
+            "value": {
+              "fields": [
+                "I32"
+              ]
+            }
+          },
+          {
+            "tag": "Face",
+            "value": {
+              "fields": [
+                "I32"
+              ]
+            }
+          },
+          {
+            "tag": "Unknown"
+          }
+        ]
+      }
+    },
+    {
+      "StructClass": {
+        "class_name": "RayCastOptions",
+        "fields": [
+          {
+            "field_name": "ray_origin",
+            "ty": {
+              "Struct": "Vector3"
+            }
+          },
+          {
+            "field_name": "ray_direction",
+            "ty": {
+              "Struct": "Vector3"
+            }
+          },
+          {
+            "field_name": "max_len",
+            "ty": "F32"
+          },
+          {
+            "field_name": "groups",
+            "ty": {
+              "Struct": "InteractionGroups"
+            }
+          },
+          {
+            "field_name": "sort_results",
+            "ty": "Bool"
+          }
+        ]
+      }
+    },
+    {
+      "StructClass": {
+        "class_name": "InteractionGroups",
+        "fields": [
+          {
+            "field_name": "memberships",
+            "ty": "I32"
+          },
+          {
+            "field_name": "filter",
+            "ty": "I32"
+          }
+        ]
+      }
+    },
+    {
+      "EngineClass": {
+        "class_name": "RigidBody",
+        "methods": [
+          {
+            "instance": true,
+            "method_name": "apply_force",
+            "signature": {
+              "params": [
+                {
+                  "Struct": "Vector3"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "EngineClass": {
+        "class_name": "Prefab",
+        "methods": [
+          {
+            "instance": true,
+            "method_name": "instantiate_at",
+            "signature": {
+              "params": [
+                {
+                  "Struct": "Vector3"
+                },
+                {
+                  "Struct": "Quaternion"
+                }
+              ],
+              "return_ty": {
                 "EngineObject": "Node"
               }
             }
           }
-        },
-        {
-          "instance": true,
-          "method_name": "is_valid",
-          "signature": {
-            "return_ty": "Bool"
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "parent",
-          "signature": {
-            "return_ty": {
-              "EngineObject": "Node"
+        ]
+      }
+    },
+    {
+      "EngineClass": {
+        "class_name": "Scene",
+        "methods": [
+          {
+            "instance": false,
+            "method_name": "load_async",
+            "signature": {
+              "params": [
+                "String"
+              ]
             }
           }
-        },
-        {
-          "instance": true,
-          "method_name": "add_script",
-          "signature": {
-            "params": [
-              "UserScript"
-            ],
-            "return_ty": {
-              "Result": {
-                "ok": "Unit"
-              }
+        ]
+      }
+    },
+    {
+      "EngineClass": {
+        "class_name": "Text",
+        "methods": [
+          {
+            "instance": true,
+            "method_name": "set_text_async",
+            "signature": {
+              "params": [
+                "String"
+              ]
             }
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "find_script",
-          "signature": {
-            "params": [
-              "String"
-            ],
-            "return_ty": {
-              "Option": "UserScript"
-            }
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "global_rotation",
-          "signature": {
-            "return_ty": {
-              "Struct": "Quaternion"
-            }
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "tag_is",
-          "signature": {
-            "params": [
-              "String"
-            ],
-            "return_ty": "Bool"
-          }
-        },
-        {
-          "instance": true,
-          "method_name": "set_tag",
-          "signature": {
-            "params": [
-              "String"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "class_name": "RigidBody",
-      "methods": [
-        {
-          "instance": true,
-          "method_name": "apply_force",
-          "signature": {
-            "params": [
-              {
-                "Struct": "Vector3"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "class_name": "Prefab",
-      "methods": [
-        {
-          "instance": true,
-          "method_name": "instantiate_at",
-          "signature": {
-            "params": [
-              {
-                "Struct": "Vector3"
-              },
-              {
-                "Struct": "Quaternion"
-              }
-            ],
-            "return_ty": {
-              "EngineObject": "Node"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "class_name": "Scene",
-      "methods": [
-        {
-          "instance": false,
-          "method_name": "load_async",
-          "signature": {
-            "params": [
-              "String"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "class_name": "Text",
-      "methods": [
-        {
-          "instance": true,
-          "method_name": "set_text_async",
-          "signature": {
-            "params": [
-              "String"
-            ]
-          }
-        },
-        {
-          "instance": false,
-          "method_name": "new",
-          "signature": {
-            "params": [
-              {
-                "Struct": "TextBuilder"
-              }
-            ],
-            "return_ty": {
-              "EngineObject": "Text"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "class_name": "Window",
-      "methods": [
-        {
-          "instance": false,
-          "method_name": "set_cursor_grab",
-          "signature": {
-            "params": [
-              {
-                "Enum": "CursorGrabMode"
-              }
-            ]
-          }
-        }
-      ]
-    }
-  ],
-  "struct_classes": [
-    {
-      "class_name": "Vector3",
-      "fields": [
-        {
-          "field_name": "x",
-          "ty": "F32"
-        },
-        {
-          "field_name": "y",
-          "ty": "F32"
-        },
-        {
-          "field_name": "z",
-          "ty": "F32"
-        }
-      ]
-    },
-    {
-      "class_name": "Vector2",
-      "fields": [
-        {
-          "field_name": "x",
-          "ty": "F32"
-        },
-        {
-          "field_name": "y",
-          "ty": "F32"
-        }
-      ]
-    },
-    {
-      "class_name": "Quaternion",
-      "fields": [
-        {
-          "field_name": "x",
-          "ty": "F32"
-        },
-        {
-          "field_name": "y",
-          "ty": "F32"
-        },
-        {
-          "field_name": "z",
-          "ty": "F32"
-        },
-        {
-          "field_name": "w",
-          "ty": "F32"
-        }
-      ]
-    },
-    {
-      "class_name": "Intersection",
-      "fields": [
-        {
-          "field_name": "collider",
-          "ty": {
-            "EngineObject": "Node"
-          }
-        },
-        {
-          "field_name": "normal",
-          "ty": {
-            "Struct": "Vector3"
-          }
-        },
-        {
-          "field_name": "position",
-          "ty": {
-            "Struct": "Vector3"
-          }
-        },
-        {
-          "field_name": "feature",
-          "ty": {
-            "Enum": "FeatureId"
-          }
-        },
-        {
-          "field_name": "toi",
-          "ty": "F32"
-        }
-      ]
-    },
-    {
-      "class_name": "RayCastOptions",
-      "fields": [
-        {
-          "field_name": "ray_origin",
-          "ty": {
-            "Struct": "Vector3"
-          }
-        },
-        {
-          "field_name": "ray_direction",
-          "ty": {
-            "Struct": "Vector3"
-          }
-        },
-        {
-          "field_name": "max_len",
-          "ty": "F32"
-        },
-        {
-          "field_name": "groups",
-          "ty": {
-            "Struct": "InteractionGroups"
-          }
-        },
-        {
-          "field_name": "sort_results",
-          "ty": "Bool"
-        }
-      ]
-    },
-    {
-      "class_name": "InteractionGroups",
-      "fields": [
-        {
-          "field_name": "memberships",
-          "ty": "I32"
-        },
-        {
-          "field_name": "filter",
-          "ty": "I32"
-        }
-      ]
-    },
-    {
-      "class_name": "TextBuilder",
-      "fields": [
-        {
-          "field_name": "foregound",
-          "ty": {
-            "Option": {
-              "Enum": "Brush"
-            }
-          }
-        },
-        {
-          "field_name": "font_size",
-          "ty": {
-            "Option": "F32"
-          }
-        }
-      ]
-    },
-    {
-      "class_name": "Color",
-      "fields": [
-        {
-          "field_name": "r",
-          "ty": "Byte"
-        },
-        {
-          "field_name": "g",
-          "ty": "Byte"
-        },
-        {
-          "field_name": "b",
-          "ty": "Byte"
-        },
-        {
-          "field_name": "a",
-          "ty": "Byte"
-        }
-      ]
-    },
-    {
-      "class_name": "GradientPoint",
-      "fields": [
-        {
-          "field_name": "stop",
-          "ty": "F32"
-        },
-        {
-          "field_name": "color",
-          "ty": {
-            "Struct": "Color"
-          }
-        }
-      ]
-    }
-  ],
-  "enum_classes": [
-    {
-      "class_name": "RoutingStrategy",
-      "variants": [
-        {
-          "tag": "Up"
-        },
-        {
-          "tag": "Down"
-        }
-      ]
-    },
-    {
-      "class_name": "FeatureId",
-      "variants": [
-        {
-          "tag": "Vertex",
-          "value": {
-            "fields": [
-              "I32"
-            ]
-          }
-        },
-        {
-          "tag": "Edge",
-          "value": {
-            "fields": [
-              "I32"
-            ]
-          }
-        },
-        {
-          "tag": "Face",
-          "value": {
-            "fields": [
-              "I32"
-            ]
-          }
-        },
-        {
-          "tag": "Unknown"
-        }
-      ]
-    },
-    {
-      "class_name": "Brush",
-      "variants": [
-        {
-          "tag": "Solid",
-          "value": {
-            "fields": [
-              {
-                "Struct": "Color"
-              }
-            ]
-          }
-        },
-        {
-          "tag": "LinearGradient",
-          "value": {
-            "fields": [
-              {
-                "field_name": "from",
-                "ty": {
-                  "Struct": "Vector2"
+          },
+          {
+            "instance": false,
+            "method_name": "new",
+            "signature": {
+              "params": [
+                {
+                  "Struct": "TextBuilder"
                 }
-              },
-              {
-                "field_name": "to",
-                "ty": {
-                  "Struct": "Vector2"
+              ],
+              "return_ty": {
+                "EngineObject": "Text"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "StructClass": {
+        "class_name": "TextBuilder",
+        "fields": [
+          {
+            "field_name": "foregound",
+            "ty": {
+              "Option": {
+                "Enum": "Brush"
+              }
+            }
+          },
+          {
+            "field_name": "font_size",
+            "ty": {
+              "Option": "F32"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "EnumClass": {
+        "class_name": "Brush",
+        "variants": [
+          {
+            "tag": "Solid",
+            "value": {
+              "fields": [
+                {
+                  "Struct": "Color"
                 }
-              },
-              {
-                "field_name": "stops",
-                "ty": {
-                  "Vec": {
-                    "Struct": "GradientPoint"
+              ]
+            }
+          },
+          {
+            "tag": "LinearGradient",
+            "value": {
+              "fields": [
+                {
+                  "field_name": "from",
+                  "ty": {
+                    "Struct": "Vector2"
+                  }
+                },
+                {
+                  "field_name": "to",
+                  "ty": {
+                    "Struct": "Vector2"
+                  }
+                },
+                {
+                  "field_name": "stops",
+                  "ty": {
+                    "Vec": {
+                      "Struct": "GradientPoint"
+                    }
                   }
                 }
-              }
-            ]
-          }
-        },
-        {
-          "tag": "RadialGradient",
-          "value": {
-            "fields": [
-              {
-                "field_name": "center",
-                "ty": {
-                  "Struct": "Vector2"
-                }
-              },
-              {
-                "field_name": "stops",
-                "ty": {
-                  "Vec": {
-                    "Struct": "GradientPoint"
+              ]
+            }
+          },
+          {
+            "tag": "RadialGradient",
+            "value": {
+              "fields": [
+                {
+                  "field_name": "center",
+                  "ty": {
+                    "Struct": "Vector2"
+                  }
+                },
+                {
+                  "field_name": "stops",
+                  "ty": {
+                    "Vec": {
+                      "Struct": "GradientPoint"
+                    }
                   }
                 }
-              }
-            ]
+              ]
+            }
           }
-        }
-      ]
+        ]
+      }
     },
     {
-      "class_name": "CursorGrabMode",
-      "variants": [
-        {
-          "tag": "None"
-        },
-        {
-          "tag": "Confined"
-        },
-        {
-          "tag": "Locked"
-        }
-      ]
+      "StructClass": {
+        "class_name": "Color",
+        "fields": [
+          {
+            "field_name": "r",
+            "ty": "Byte"
+          },
+          {
+            "field_name": "g",
+            "ty": "Byte"
+          },
+          {
+            "field_name": "b",
+            "ty": "Byte"
+          },
+          {
+            "field_name": "a",
+            "ty": "Byte"
+          }
+        ]
+      }
+    },
+    {
+      "StructClass": {
+        "class_name": "GradientPoint",
+        "fields": [
+          {
+            "field_name": "stop",
+            "ty": "F32"
+          },
+          {
+            "field_name": "color",
+            "ty": {
+              "Struct": "Color"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "EngineClass": {
+        "class_name": "Window",
+        "methods": [
+          {
+            "instance": false,
+            "method_name": "set_cursor_grab",
+            "signature": {
+              "params": [
+                {
+                  "Enum": "CursorGrabMode"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "EnumClass": {
+        "class_name": "CursorGrabMode",
+        "variants": [
+          {
+            "tag": "None"
+          },
+          {
+            "tag": "Confined"
+          },
+          {
+            "tag": "Locked"
+          }
+        ]
+      }
     }
   ]
 }

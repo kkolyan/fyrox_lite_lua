@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fs, path::Path, str::FromStr};
 
-use fyrox_lite_model::{DataType, Domain, EngineClass, Field, StructClass, ClassName};
+use fyrox_lite_model::{ClassName, DataType, Domain, DomainItem, EngineClass, Field, StructClass};
 use crate::{extract_engine_class::extract_engine_class_and_inject_assertions, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, extract_ty::extract_ty, RustSymbol};
 use proc_macro2::TokenStream;
 use quote::ToTokens;
@@ -17,7 +17,7 @@ pub fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<String,
                 if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite", &mut vec![]) {
                     if let Some((rust_name, class)) = extract_engine_class_and_inject_assertions(attr, &mut it, &mut vec![]) {
                         aliases.insert(class.class_name.0.clone(), RustSymbol(rust_name.to_string().clone()));
-                        domain.engine_classes.push(class);
+                        domain.items.push(DomainItem::EngineClass(class));
                     }
                 }
             },
@@ -25,7 +25,7 @@ pub fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<String,
                 if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite", &mut vec![]) {
                     if let Some((rust_name, class)) = extract_pod_struct(attr, &it, &mut vec![]) {
                         aliases.insert(class.class_name.0.clone(), RustSymbol(rust_name.to_string().clone()));
-                        domain.struct_classes.push(class);
+                        domain.items.push(DomainItem::StructClass(class));
                     }
                 }
             },
@@ -33,7 +33,7 @@ pub fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<String,
                 if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite", &mut vec![]) {
                     if let Some((rust_name, class)) = extract_pod_enum(attr, &it, &mut vec![], &mut vec![]) {
                         aliases.insert(class.class_name.0.clone(), RustSymbol(rust_name.to_string().clone()));
-                        domain.enum_classes.push(class);
+                        domain.items.push(DomainItem::EnumClass(class));
                     }
                 }
             },
