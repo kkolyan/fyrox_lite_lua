@@ -1,11 +1,8 @@
 use fyrox_lite_model::{
-    BinaryOp, Constant, ConstantValue, DataType, EngineClass, ClassName, Method, Signature
+    BinaryOp, ConstantValue, DataType, ClassName
 };
-use proc_macro2::TokenStream;
-use quote::ToTokens;
-use syn::{punctuated::Punctuated, spanned::Spanned, Ident};
 
-use crate::extract_ty::{extract_ty, extract_ty_path};
+use crate::extract_ty::extract_ty_path;
 
 
 

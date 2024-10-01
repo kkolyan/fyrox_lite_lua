@@ -5,7 +5,6 @@
 //     type Quaternion: QuaternionTrait;
 // }
 
-use std::{any::Any, fmt::Debug};
 
 use fyrox::script::{ScriptMessagePayload, ScriptTrait};
 

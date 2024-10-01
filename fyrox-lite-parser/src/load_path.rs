@@ -1,10 +1,10 @@
 use std::{collections::HashMap, fs, path::Path, str::FromStr};
 
-use fyrox_lite_model::{ClassName, DataType, Domain, DomainItem, EngineClass, Field, StructClass};
-use crate::{extract_engine_class::extract_engine_class_and_inject_assertions, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, extract_ty::extract_ty, RustSymbol};
+use fyrox_lite_model::{Domain, DomainItem};
+use crate::{extract_engine_class::extract_engine_class_and_inject_assertions, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, RustSymbol};
 use proc_macro2::TokenStream;
 use quote::ToTokens;
-use syn::{parse2, Ident, TraitBoundModifier};
+use syn::parse2;
 
 
 pub fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<String, RustSymbol>) {
@@ -37,15 +37,10 @@ pub fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<String,
                     }
                 }
             },
-            syn::Item::Trait(it) => {},
             _ => {}
         }
     }
 }
-
-
-
-fn visit_enum(it: &syn::ItemEnum, domain: &mut Domain) {}
 
 fn extract_attr(attrs: &[syn::Attribute], attr_name: &str, errors: &mut Vec<syn::Error>) -> Option<TokenStream> {
     

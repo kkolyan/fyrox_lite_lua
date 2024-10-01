@@ -56,6 +56,7 @@ pub fn extract_ty_path(
                 let result_ok = &args.args[0];
                 let result_err = &args.args[1];
                 if let GenericArgument::Type(result_type) = result_ok {
+                    #[allow(clippy::collapsible_match)]
                     if let GenericArgument::Type(syn::Type::Path(it)) = result_err {
                         if let Some(ident) = extract_user_script_associated_type(
                             it.qself.as_ref(),

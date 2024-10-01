@@ -1,6 +1,6 @@
 #![allow(unused_variables)]
 
-use std::{borrow::Borrow, cmp::Ordering, mem};
+use std::{borrow::Borrow, mem};
 
 use crate::{
     debug::VerboseLuaValue,
@@ -12,15 +12,10 @@ use crate::{
     script_object::ScriptObject,
     typed_userdata::TypedUserData,
 };
-use fyrox::{
-    core::{
+use fyrox::core::{
         algebra::{UnitQuaternion, Vector3},
-        color,
         log::Log,
-    },
-    gui::{brush, text, widget},
-    window::CursorGrabMode,
-};
+    };
 use fyrox_lite::{
     lite_node::{LiteNode, LiteRoutingStrategy},
     lite_physics::{LitePhysics, LiteRayCastOptions, LiteRigidBody},
@@ -272,7 +267,7 @@ impl FyroxUserData for LiteNode {
                 };
                 let obj = lua.create_userdata(ScriptObject::new(def))?;
                 let ud = TypedUserData::<ScriptObject>::new(obj);
-                this.inner().add_script(ud);
+                this.inner().add_script(ud)?;
                 Ok(this.get_script(script_class_name))
             },
         );
@@ -401,7 +396,7 @@ impl FyroxUserData for LiteWindow {
         methods.add_method_mut(
             "set_cursor_grab",
             |lua, cls, mode: UserDataRef<Traitor<LiteCursorGrabMode>>| {
-                let _ = LiteWindow::set_cursor_grab(*mode.borrow().inner());
+                LiteWindow::set_cursor_grab(*mode.borrow().inner());
                 Ok(())
             },
         );

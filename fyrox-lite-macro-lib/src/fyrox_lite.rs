@@ -1,16 +1,11 @@
-use std::ops::Deref;
 
-use fyrox_lite_model::{DataType, Domain};
-use fyrox_lite_parser::{extract_engine_class::extract_engine_class_and_inject_assertions, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, extract_ty::extract_ty};
-use proc_macro2::{Span, TokenStream};
-use quote::{quote, quote_spanned};
+use fyrox_lite_parser::{extract_engine_class::extract_engine_class_and_inject_assertions, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct};
+use proc_macro2::TokenStream;
+use quote::quote;
 use syn::{
-    parse::{self, Parse},
-    parse2, parse_quote,
+    parse2,
     spanned::Spanned,
-    Ident,
 };
-use uuid::Uuid;
 
 use crate::generate_static_assertions;
 
@@ -96,18 +91,7 @@ pub fn fyrox_lite(attr: TokenStream, item: TokenStream) -> TokenStream {
             it => {
                 let error = syn::Error::new(
                     attr.span(),
-                    "fyrox_lite allowed only for impl declarations",
-                )
-                .into_compile_error();
-                quote! {
-                    #error
-                    #it
-                }
-            }
-            it => {
-                let error = syn::Error::new(
-                    attr.span(),
-                    "fyrox_lite allowed only for struct or enum declarations",
+                    "fyrox_lite allowed only for impl, struct or enum declarations",
                 )
                 .into_compile_error();
                 quote! {

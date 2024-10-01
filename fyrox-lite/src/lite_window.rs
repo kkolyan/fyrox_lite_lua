@@ -1,5 +1,5 @@
-use fyrox::{error::ExternalError, window::CursorGrabMode};
-use fyrox_lite_macro::{fyrox_lite};
+use fyrox::{core::log::Log, window::CursorGrabMode};
+use fyrox_lite_macro::fyrox_lite;
 
 use crate::script_context::with_script_context;
 
@@ -9,14 +9,18 @@ pub struct LiteWindow;
 impl LiteWindow {
     pub fn set_cursor_grab(mode: LiteCursorGrabMode) {
         with_script_context(|ctx| {
-            ctx.graphics_context
+            let result = ctx
+                .graphics_context
                 .as_initialized_mut()
                 .window
                 .set_cursor_grab(match mode {
                     LiteCursorGrabMode::None => CursorGrabMode::None,
                     LiteCursorGrabMode::Confined => CursorGrabMode::Confined,
                     LiteCursorGrabMode::Locked => CursorGrabMode::Locked,
-                })
+                });
+            if let Err(err) = result {
+                Log::err(format!("set_cursor_grab failed: {}", err));
+            }
         });
     }
 }

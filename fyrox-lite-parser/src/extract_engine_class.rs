@@ -1,17 +1,17 @@
 use std::collections::HashMap;
 
 use fyrox_lite_model::{
-    BinaryOp, ClassName, Constant, ConstantValue, DataType, EngineClass, Method, Signature
+    ClassName, Constant, DataType, EngineClass, Method, Signature
 };
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{
-    parse_quote, parse_quote_spanned, punctuated::Punctuated, spanned::Spanned, Ident, TraitBoundModifier, TypeParamBound
+    parse_quote_spanned, spanned::Spanned, Ident, TraitBoundModifier, TypeParamBound
 };
 
 use crate::{
     extract_expression::extract_expression,
-    extract_ty::{extract_ty, extract_ty_path},
+    extract_ty::extract_ty,
 };
 
 pub fn extract_engine_class_and_inject_assertions(
@@ -177,21 +177,4 @@ pub fn extract_engine_class_and_inject_assertions(
         }
     }
     rust_name.map(|rust_name| (rust_name, pod))
-}
-
-fn extract_ty_generic_param(
-    ty: &syn::Type,
-    generic_params: &HashMap<&Ident, DataType>,
-) -> Option<DataType> {
-    if generic_params.is_empty() {
-        return None;
-    }
-    let syn::Type::Path(it) = ty else {
-        return None;
-    };
-    if it.qself.is_some() {
-        return None;
-    }
-    let it = it.path.get_ident()?;
-    generic_params.get(it).cloned()
 }

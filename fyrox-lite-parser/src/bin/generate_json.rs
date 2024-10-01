@@ -1,10 +1,7 @@
-use std::{collections::HashMap, fs, path::Path, str::FromStr};
+use std::fs;
 
-use fyrox_lite_model::{DataType, Domain, EngineClass, Field, StructClass, ClassName};
-use fyrox_lite_parser::{extract_engine_class::extract_engine_class_and_inject_assertions, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, extract_ty::extract_ty, load_path::load_path, resolve_classes::resolve_classes};
-use proc_macro2::TokenStream;
-use quote::ToTokens;
-use syn::{parse2, Ident, TraitBoundModifier};
+use fyrox_lite_model::Domain;
+use fyrox_lite_parser::{load_path::load_path, resolve_classes::resolve_classes};
 
 fn main() {
     let mut domain = Domain::default();

@@ -25,7 +25,6 @@ use fyrox::script::Script;
 use fyrox::script::ScriptContext;
 use fyrox::walkdir::DirEntry;
 use fyrox::walkdir::WalkDir;
-use fyrox::window::CursorGrabMode;
 use fyrox_lite::lite_ui::Brush;
 use fyrox_lite::lite_ui::Color;
 use fyrox_lite::lite_window::LiteCursorGrabMode;

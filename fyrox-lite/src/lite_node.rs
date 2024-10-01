@@ -1,5 +1,5 @@
 use crate::lite_math::{PodQuaternion, PodVector3};
-use crate::spi::{UserScript};
+use crate::spi::UserScript;
 use crate::wrapper_reflect;
 use std::fmt::Debug;
 
@@ -10,7 +10,7 @@ use fyrox::{
     scene::node::Node,
     script::RoutingStrategy,
 };
-use fyrox_lite_macro::{fyrox_lite};
+use fyrox_lite_macro::fyrox_lite;
 
 use crate::{lite_physics::LiteRigidBody, script_context::with_script_context};
 use fyrox::graph::BaseSceneGraph;
@@ -113,8 +113,11 @@ impl LiteNode {
     }
 
     /// Sends a hierarchical script message with the given payload.
-    pub fn send_hierarchical<T: UserScript>(&self, routing: LiteRoutingStrategy, payload: T::UserScriptMessage)
-    {
+    pub fn send_hierarchical<T: UserScript>(
+        &self,
+        routing: LiteRoutingStrategy,
+        payload: T::UserScriptMessage,
+    ) {
         with_script_context(|ctx| {
             let routing = match routing {
                 LiteRoutingStrategy::Up => RoutingStrategy::Up,

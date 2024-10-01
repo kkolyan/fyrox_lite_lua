@@ -6,10 +6,12 @@ use fyrox::{
         pool::Handle,
     },
     scene::{
-        collider::{BitMask, InteractionGroups}, graph::physics::{FeatureId, Intersection, QueryResultsStorage, RayCastOptions}, node::Node
+        collider::{BitMask, InteractionGroups},
+        graph::physics::{FeatureId, Intersection, QueryResultsStorage, RayCastOptions},
+        node::Node,
     },
 };
-use fyrox_lite_macro::{fyrox_lite};
+use fyrox_lite_macro::fyrox_lite;
 
 use crate::{lite_math::PodVector3, lite_node::LiteNode, script_context::with_script_context};
 
@@ -36,7 +38,7 @@ impl LitePhysics {
     /// (this will not exclude colliders not attached to any rigid-body).
     const ONLY_FIXED: i32 = LitePhysics::EXCLUDE_DYNAMIC | LitePhysics::EXCLUDE_KINEMATIC;
 
-    pub fn cast_ray(opts: LiteRayCastOptions) -> Vec<LiteIntersection>{
+    pub fn cast_ray(opts: LiteRayCastOptions) -> Vec<LiteIntersection> {
         with_script_context(|ctx| {
             let mut results = Vec::new();
             ctx.scene
@@ -52,7 +54,7 @@ impl LitePhysics {
 
 struct QueryResultsStorageWrapper<'a>(&'a mut Vec<LiteIntersection>);
 
-impl <'a> QueryResultsStorage for QueryResultsStorageWrapper<'a> {
+impl<'a> QueryResultsStorage for QueryResultsStorageWrapper<'a> {
     fn push(&mut self, intersection: Intersection) -> bool {
         self.0.push(LiteIntersection::from(&intersection));
         true
@@ -66,7 +68,8 @@ impl <'a> QueryResultsStorage for QueryResultsStorageWrapper<'a> {
         &mut self,
         mut cmp: C,
     ) {
-        self.0.sort_by(&mut |a: &LiteIntersection, b: &LiteIntersection| cmp(&a.into(), &b.into()))
+        self.0
+            .sort_by(&mut |a: &LiteIntersection, b: &LiteIntersection| cmp(&a.into(), &b.into()))
     }
 }
 impl From<&LiteIntersection> for Intersection {
@@ -91,7 +94,11 @@ impl From<&Intersection> for LiteIntersection {
         Self {
             collider: LiteNode::new(value.collider),
             normal: value.normal.into(),
-            position: PodVector3::from(Vector3::new(value.position.x, value.position.y, value.position.z)),
+            position: PodVector3::from(Vector3::new(
+                value.position.x,
+                value.position.y,
+                value.position.z,
+            )),
             toi: value.toi,
             feature: match value.feature {
                 FeatureId::Vertex(it) => LiteFeatureId::Vertex(it as i32),
@@ -148,7 +155,6 @@ pub struct LiteIntersection {
     /// Distance from the ray origin.
     pub toi: f32,
 }
-
 
 /// Shape-dependent identifier.
 #[derive(Copy, Hash, PartialEq, Eq)]

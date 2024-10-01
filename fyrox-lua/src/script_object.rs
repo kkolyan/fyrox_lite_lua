@@ -16,13 +16,13 @@ use fyrox_lite::{
     lite_node::LiteNode,
     lite_prefab::LitePrefab,
     lite_ui::LiteUiNode,
-    script_context::with_script_context, spi::UserScript, LiteDataType,
+    script_context::with_script_context,
 };
 use mlua::{MetaMethod, String, UserData, UserDataRef, Value};
 use send_wrapper::SendWrapper;
 
 use crate::{
-    debug::VerboseLuaValue, fyrox_lite_class::{FyroxUserData, Traitor}, lua_error, lua_utils::{OptionX, ValueX}, reflect_base, script::LuaScript, script_class::ScriptClass, typed_userdata::TypedUserData
+    debug::VerboseLuaValue, fyrox_lite_class::{FyroxUserData, Traitor}, lua_error, lua_utils::{OptionX, ValueX}, reflect_base, script_class::ScriptClass
 };
 
 use super::{

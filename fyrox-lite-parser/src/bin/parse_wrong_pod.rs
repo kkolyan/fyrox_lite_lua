@@ -42,6 +42,7 @@ fn main() {
     });
     if let Some(error) = error {
         let var_name: syn::Result<()> = Err(error);
+        #[allow(clippy::unnecessary_literal_unwrap)]
         var_name.unwrap();
     }
 }
