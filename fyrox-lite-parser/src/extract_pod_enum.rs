@@ -1,6 +1,6 @@
 use std::cell::Ref;
 
-use fyrox_lite_model::{EnumClass, EnumClassName, EnumValue, EnumVariant, Field};
+use fyrox_lite_model::{EnumClass, ClassName, EnumValue, EnumVariant, Field};
 use proc_macro2::TokenStream;
 use syn::Ident;
 
@@ -14,7 +14,7 @@ pub fn extract_pod_enum(
 ) -> Option<(Ident, EnumClass)> {
     let class_name = attr.to_string();
     let mut class = EnumClass {
-        class_name: EnumClassName(class_name),
+        class_name: ClassName(class_name),
         variants: Default::default(),
     };
 	'variants:

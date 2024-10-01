@@ -14,10 +14,10 @@ pub fn resolve_classes(domain: &mut Domain, aliases: &mut HashMap<String, RustSy
             DataType::EngineObject(class.class_name.clone()),
         );
     }
-    for class in domain.pod_classes.iter() {
+    for class in domain.struct_classes.iter() {
         classes.insert(
             aliases[&class.class_name.0].clone(),
-            DataType::Pod(class.class_name.clone()),
+            DataType::Struct(class.class_name.clone()),
         );
     }
     for class in domain.enum_classes.iter() {
@@ -30,7 +30,7 @@ pub fn resolve_classes(domain: &mut Domain, aliases: &mut HashMap<String, RustSy
     for class in domain.engine_classes.iter_mut() {
         resolve_classes_engine_class(class, &classes);
     }
-    for class in domain.pod_classes.iter_mut() {
+    for class in domain.struct_classes.iter_mut() {
         resolve_classes_pod_class(class, &classes);
     }
     for class in domain.enum_classes.iter_mut() {
@@ -76,7 +76,7 @@ fn resolve_classes_enum_class(
 }
 
 fn resolve_classes_pod_class(
-    class: &mut fyrox_lite_model::PodClass,
+    class: &mut fyrox_lite_model::StructClass,
     classes: &HashMap<RustSymbol, DataType>,
 ) {
     for field in class.fields.iter_mut() {

@@ -1,5 +1,5 @@
 use fyrox_lite_model::{
-    BinaryOp, Constant, ConstantValue, DataType, EngineClass, EngineClassName, Method, Signature
+    BinaryOp, Constant, ConstantValue, DataType, EngineClass, ClassName, Method, Signature
 };
 use proc_macro2::TokenStream;
 use quote::ToTokens;
@@ -104,7 +104,7 @@ pub(crate) fn extract_expression(it: &syn::Expr) -> syn::Result<ConstantValue> {
                     return Err(err);
                 },
             };
-            Ok(ConstantValue::Reference { owner: EngineClassName(owner), constant_name: name.ident.to_string() })
+            Ok(ConstantValue::Reference { owner: ClassName(owner), constant_name: name.ident.to_string() })
         }
         _ => {
             Err(syn::Error::new_spanned(

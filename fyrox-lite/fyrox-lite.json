@@ -40,7 +40,7 @@
           "method_name": "global_position",
           "signature": {
             "return_ty": {
-              "Pod": "Vector3"
+              "Struct": "Vector3"
             }
           }
         },
@@ -49,7 +49,7 @@
           "method_name": "local_position",
           "signature": {
             "return_ty": {
-              "Pod": "Vector3"
+              "Struct": "Vector3"
             }
           }
         },
@@ -58,7 +58,7 @@
           "method_name": "local_rotation",
           "signature": {
             "return_ty": {
-              "Pod": "Quaternion"
+              "Struct": "Quaternion"
             }
           }
         },
@@ -80,7 +80,7 @@
           "signature": {
             "params": [
               {
-                "Pod": "Vector3"
+                "Struct": "Vector3"
               }
             ]
           }
@@ -91,7 +91,7 @@
           "signature": {
             "params": [
               {
-                "Pod": "Quaternion"
+                "Struct": "Quaternion"
               }
             ]
           }
@@ -163,7 +163,7 @@
           "method_name": "global_rotation",
           "signature": {
             "return_ty": {
-              "Pod": "Quaternion"
+              "Struct": "Quaternion"
             }
           }
         },
@@ -197,7 +197,7 @@
           "signature": {
             "params": [
               {
-                "Pod": "Vector3"
+                "Struct": "Vector3"
               }
             ]
           }
@@ -213,10 +213,10 @@
           "signature": {
             "params": [
               {
-                "Pod": "Vector3"
+                "Struct": "Vector3"
               },
               {
-                "Pod": "Quaternion"
+                "Struct": "Quaternion"
               }
             ],
             "return_ty": {
@@ -258,7 +258,7 @@
           "signature": {
             "params": [
               {
-                "Pod": "TextBuilder"
+                "Struct": "TextBuilder"
               }
             ],
             "return_ty": {
@@ -349,13 +349,13 @@
         {
           "field_name": "normal",
           "ty": {
-            "Pod": "Vector3"
+            "Struct": "Vector3"
           }
         },
         {
           "field_name": "position",
           "ty": {
-            "Pod": "Vector3"
+            "Struct": "Vector3"
           }
         },
         {
@@ -376,13 +376,13 @@
         {
           "field_name": "ray_origin",
           "ty": {
-            "Pod": "Vector3"
+            "Struct": "Vector3"
           }
         },
         {
           "field_name": "ray_direction",
           "ty": {
-            "Pod": "Vector3"
+            "Struct": "Vector3"
           }
         },
         {
@@ -392,7 +392,7 @@
         {
           "field_name": "groups",
           "ty": {
-            "Pod": "InteractionGroups"
+            "Struct": "InteractionGroups"
           }
         },
         {
@@ -464,7 +464,7 @@
         {
           "field_name": "color",
           "ty": {
-            "Pod": "Color"
+            "Struct": "Color"
           }
         }
       ]
@@ -522,7 +522,7 @@
           "value": {
             "fields": [
               {
-                "Pod": "Color"
+                "Struct": "Color"
               }
             ]
           }
@@ -534,20 +534,20 @@
               {
                 "field_name": "from",
                 "ty": {
-                  "Pod": "Vector2"
+                  "Struct": "Vector2"
                 }
               },
               {
                 "field_name": "to",
                 "ty": {
-                  "Pod": "Vector2"
+                  "Struct": "Vector2"
                 }
               },
               {
                 "field_name": "stops",
                 "ty": {
                   "Vec": {
-                    "Pod": "GradientPoint"
+                    "Struct": "GradientPoint"
                   }
                 }
               }
@@ -561,14 +561,14 @@
               {
                 "field_name": "center",
                 "ty": {
-                  "Pod": "Vector2"
+                  "Struct": "Vector2"
                 }
               },
               {
                 "field_name": "stops",
                 "ty": {
                   "Vec": {
-                    "Pod": "GradientPoint"
+                    "Struct": "GradientPoint"
                   }
                 }
               }

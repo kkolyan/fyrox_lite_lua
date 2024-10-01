@@ -3,20 +3,17 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug, Default, PartialEq)]
 pub struct Domain {
     pub engine_classes: Vec<EngineClass>,
-    pub pod_classes: Vec<PodClass>,
+    pub struct_classes: Vec<StructClass>,
     pub enum_classes: Vec<EnumClass>,
 }
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Hash)]
-pub struct EngineClassName(pub String);
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct EngineClass {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
-    pub parent: Option<EngineClassName>,
+    pub parent: Option<ClassName>,
 
-    pub class_name: EngineClassName,
+    pub class_name: ClassName,
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
     #[serde(default)]
@@ -47,26 +44,23 @@ pub struct Constant {
     pub value: ConstantValue,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Hash)]
-pub struct PodClassName(pub String);
-
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct PodClass {
+pub struct StructClass {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
-    pub parent: Option<PodClassName>,
+    pub parent: Option<ClassName>,
 
-    pub class_name: PodClassName,
+    pub class_name: ClassName,
 
     pub fields: Vec<Field>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Hash)]
-pub struct EnumClassName(pub String);
+pub struct ClassName(pub String);
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct EnumClass {
-    pub class_name: EnumClassName,
+    pub class_name: ClassName,
     pub variants: Vec<EnumVariant>,
 }
 
@@ -126,9 +120,9 @@ pub enum DataType {
     UserScriptMessage,
     /// stub argument to call UserScript-type parameterized methods
     UserScriptGenericStub,
-    Pod(PodClassName),
-    Enum(EnumClassName),
-    EngineObject(EngineClassName),
+    Struct(ClassName),
+    Enum(ClassName),
+    EngineObject(ClassName),
     Option(Box<DataType>),
     /// Error should be universal scripting language specific type, so it is not presented here
     Result {
@@ -143,7 +137,7 @@ pub enum ConstantValue {
     Float(f32),
     String(String),
     Reference {
-        owner: EngineClassName,
+        owner: ClassName,
         constant_name: String,
     },
     BinaryOp {

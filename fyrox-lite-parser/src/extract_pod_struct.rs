@@ -11,12 +11,12 @@ pub fn extract_pod_struct(
     attr: TokenStream,
     item: &syn::ItemStruct,
     errors: &mut Vec<syn::Error>,
-) -> Option<(Ident, PodClass)> {
+) -> Option<(Ident, StructClass)> {
     let class_name = attr.to_string();
     let rust_name = item.ident.clone();
-    let mut pod = PodClass {
+    let mut pod = StructClass {
         parent: None,
-        class_name: PodClassName(class_name),
+        class_name: ClassName(class_name),
         fields: Default::default(),
     };
     for field in item.fields.iter() {

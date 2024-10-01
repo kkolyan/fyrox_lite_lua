@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use fyrox_lite_model::{
-    BinaryOp, Constant, ConstantValue, DataType, EngineClass, EngineClassName, Method, Signature,
+    BinaryOp, ClassName, Constant, ConstantValue, DataType, EngineClass, Method, Signature
 };
 use proc_macro2::TokenStream;
 use quote::ToTokens;
@@ -40,7 +40,7 @@ pub fn extract_engine_class_and_inject_assertions(
     let class_name = attr.to_string();
     let mut pod = EngineClass {
         parent: None,
-        class_name: EngineClassName(class_name),
+        class_name: ClassName(class_name),
         methods: Default::default(),
         constants: Default::default(),
     };
