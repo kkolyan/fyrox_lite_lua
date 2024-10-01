@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, PartialEq)]
 pub struct Domain {
     pub engine_classes: Vec<EngineClass>,
     pub pod_classes: Vec<PodClass>,
@@ -10,34 +10,37 @@ pub struct Domain {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct EngineClassName(pub String);
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct EngineClass {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
     pub parent: Option<EngineClassName>,
 
     pub class_name: EngineClassName,
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default)]
     pub methods: Vec<Method>,
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default)]
     pub constants: Vec<Constant>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Method {
     pub instance: bool,
     pub method_name: String,
     pub signature: Signature,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Field {
     pub field_name: String,
     pub ty: DataType,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Constant {
     pub const_name: String,
     pub ty: DataType,
@@ -47,9 +50,10 @@ pub struct Constant {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct PodClassName(pub String);
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct PodClass {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
     pub parent: Option<PodClassName>,
 
     pub class_name: PodClassName,
@@ -60,21 +64,22 @@ pub struct PodClass {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct EnumClassName(pub String);
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct EnumClass {
     pub class_name: EnumClassName,
     pub variants: Vec<EnumVariant>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct EnumVariant {
     pub tag: String,
 
     #[serde(skip_serializing_if = "EnumValue::is_unit")]
+    #[serde(default = "EnumValue::unit")]
     pub value: EnumValue,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(untagged)]
 pub enum EnumValue {
     Unit,
@@ -86,14 +91,20 @@ impl EnumValue {
     fn is_unit(&self) -> bool {
         matches!(self, EnumValue::Unit)
     }
+
+    fn unit() -> EnumValue {
+        EnumValue::Unit
+    }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Signature {
     #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default)]
     pub params: Vec<DataType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
     pub return_ty: Option<DataType>,
 }
 
@@ -125,7 +136,7 @@ pub enum DataType {
     },
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub enum ConstantValue {
     Bool(bool),
     Integer(i32),
@@ -142,7 +153,7 @@ pub enum ConstantValue {
     },
 }
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub enum BinaryOp {
     Add,
     Sub,

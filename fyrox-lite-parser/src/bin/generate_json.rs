@@ -22,5 +22,7 @@ fn main() {
 
     resolve_classes(&mut domain, &mut aliases);
     let s = serde_json::to_string_pretty(&domain).unwrap();
+    let deserialized : Domain = serde_json::from_str(s.as_str()).unwrap();
+    assert_eq!(domain, deserialized);
     fs::write("fyrox-lite/fyrox-lite.json", s).unwrap();
 }
