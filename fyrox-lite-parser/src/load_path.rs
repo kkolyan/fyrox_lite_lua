@@ -14,7 +14,7 @@ pub fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<String,
     for item in file.items {
         match item {
             syn::Item::Impl(mut it) => {
-                if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite_engine_class", &mut vec![]) {
+                if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite", &mut vec![]) {
                     if let Some((rust_name, class)) = extract_engine_class_and_inject_assertions(attr, &mut it, &mut vec![]) {
                         aliases.insert(class.class_name.0.clone(), RustSymbol(rust_name.to_string().clone()));
                         domain.engine_classes.push(class);
@@ -22,7 +22,7 @@ pub fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<String,
                 }
             },
             syn::Item::Struct(it) => {
-                if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite_pod", &mut vec![]) {
+                if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite", &mut vec![]) {
                     if let Some((rust_name, class)) = extract_pod_struct(attr, &it, &mut vec![]) {
                         aliases.insert(class.class_name.0.clone(), RustSymbol(rust_name.to_string().clone()));
                         domain.struct_classes.push(class);
@@ -30,7 +30,7 @@ pub fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<String,
                 }
             },
             syn::Item::Enum(it) => {
-                if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite_pod", &mut vec![]) {
+                if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite", &mut vec![]) {
                     if let Some((rust_name, class)) = extract_pod_enum(attr, &it, &mut vec![], &mut vec![]) {
                         aliases.insert(class.class_name.0.clone(), RustSymbol(rust_name.to_string().clone()));
                         domain.enum_classes.push(class);

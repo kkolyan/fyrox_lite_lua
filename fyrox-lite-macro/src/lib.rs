@@ -8,17 +8,6 @@ extern crate proc_macro;
 /// * it's up to language provider to expose `get_` and `set_` instance methods as a fields or properties, if language allows it.
 /// * example: `#[class_impl(MyClass)]`
 #[proc_macro_attribute]
-pub fn fyrox_lite_engine_class(attr: TokenStream, item: TokenStream) -> TokenStream {
-    fyrox_lite_macro_lib::fyrox_lite_engine_class::fyrox_lite_engine_class(attr.into(), item.into()).into()
-}
-
-/// placed on the trait declaration
-#[proc_macro_attribute]
-pub fn fyrox_lite_user_class(attr: TokenStream, item: TokenStream) -> TokenStream {
-    fyrox_lite_macro_lib::fyrox_lite_user_class(attr.into(), item.into()).into()
-}
-
-#[proc_macro_attribute]
-pub fn fyrox_lite_pod(attr: TokenStream, item: TokenStream) -> TokenStream {
-    fyrox_lite_macro_lib::fyrox_lite_pod::fyrox_lite_pod(attr.into(), item.into()).into()
+pub fn fyrox_lite(attr: TokenStream, item: TokenStream) -> TokenStream {
+    fyrox_lite_macro_lib::fyrox_lite::fyrox_lite(attr.into(), item.into()).into()
 }

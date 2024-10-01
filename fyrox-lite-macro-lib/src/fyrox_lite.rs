@@ -14,7 +14,7 @@ use uuid::Uuid;
 
 use crate::generate_static_assertions;
 
-pub fn fyrox_lite_pod(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn fyrox_lite(attr: TokenStream, item: TokenStream) -> TokenStream {
     match parse2::<syn::Item>(item) {
         Ok(it) => match it {
             syn::Item::Enum(item) => {
@@ -71,10 +71,43 @@ pub fn fyrox_lite_pod(attr: TokenStream, item: TokenStream) -> TokenStream {
 
                 }
             }
+            syn::Item::Impl(mut item) => {
+                let mut errors = Vec::new();
+
+                let ident = extract_engine_class_and_inject_assertions(attr, &mut item, &mut errors)
+                    .map(|(rust_class_name, _class)| rust_class_name);
+
+                let errors = errors
+                    .into_iter()
+                    .map(|it| it.into_compile_error())
+                    .collect::<TokenStream>();
+
+                let impl_lite_data_type =
+                    ident.map(|ident| quote! {impl crate::LiteDataType for #ident {}});
+
+                quote! {
+                    #errors
+                    #item
+
+                    // impl_lite_data_type
+                    #impl_lite_data_type
+                }
+            }
             it => {
                 let error = syn::Error::new(
                     attr.span(),
-                    "fyrox_lite_pod allowed only for struct or enum declarations",
+                    "fyrox_lite allowed only for impl declarations",
+                )
+                .into_compile_error();
+                quote! {
+                    #error
+                    #it
+                }
+            }
+            it => {
+                let error = syn::Error::new(
+                    attr.span(),
+                    "fyrox_lite allowed only for struct or enum declarations",
                 )
                 .into_compile_error();
                 quote! {

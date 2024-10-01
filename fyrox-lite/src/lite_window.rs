@@ -1,11 +1,11 @@
 use fyrox::{error::ExternalError, window::CursorGrabMode};
-use fyrox_lite_macro::{fyrox_lite_engine_class, fyrox_lite_pod};
+use fyrox_lite_macro::{fyrox_lite};
 
 use crate::script_context::with_script_context;
 
 pub struct LiteWindow;
 
-#[fyrox_lite_engine_class(Window)]
+#[fyrox_lite(Window)]
 impl LiteWindow {
     pub fn set_cursor_grab(mode: LiteCursorGrabMode) {
         with_script_context(|ctx| {
@@ -22,7 +22,7 @@ impl LiteWindow {
 }
 
 #[derive(Copy, PartialEq, Eq, Hash)]
-#[fyrox_lite_pod(CursorGrabMode)]
+#[fyrox_lite(CursorGrabMode)]
 pub enum LiteCursorGrabMode {
     /// No grabbing of the cursor is performed.
     None,

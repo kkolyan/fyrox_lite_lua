@@ -285,7 +285,7 @@
       ]
     }
   ],
-  "pod_classes": [
+  "struct_classes": [
     {
       "class_name": "Vector3",
       "fields": [

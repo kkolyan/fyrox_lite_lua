@@ -5,7 +5,7 @@ use syn::{parse_quote, ItemStruct};
 
 fn main() {
     let struct_: ItemStruct = parse_quote! {
-        	#[fyrox_lite_pod(Intersection)]
+        	#[fyrox_lite(Intersection)]
             /// A ray intersection result.
             #[derive(PartialEq)]
             pub struct LiteIntersection {

@@ -4,7 +4,7 @@ use fyrox::{
     asset::Resource,
     resource::model::{Model, ModelResourceExtension},
 };
-use fyrox_lite_macro::fyrox_lite_engine_class;
+use fyrox_lite_macro::fyrox_lite;
 
 use crate::{
     lite_math::{PodQuaternion, PodVector3},
@@ -36,7 +36,7 @@ impl LitePrefab {
     }
 }
 
-#[fyrox_lite_engine_class(Prefab)]
+#[fyrox_lite(Prefab)]
 impl LitePrefab {
     pub fn instantiate_at(&self, position: PodVector3, orientation: PodQuaternion) -> LiteNode {
         with_script_context(|ctx| {

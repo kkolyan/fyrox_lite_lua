@@ -10,7 +10,7 @@ use fyrox::{
     scene::node::Node,
     script::RoutingStrategy,
 };
-use fyrox_lite_macro::{fyrox_lite_engine_class, fyrox_lite_pod};
+use fyrox_lite_macro::{fyrox_lite};
 
 use crate::{lite_physics::LiteRigidBody, script_context::with_script_context};
 use fyrox::graph::BaseSceneGraph;
@@ -36,7 +36,7 @@ impl LiteNode {
     }
 }
 
-#[fyrox_lite_engine_class(Node)]
+#[fyrox_lite(Node)]
 impl LiteNode {
     pub fn as_rigid_body(&mut self) -> Option<LiteRigidBody> {
         with_script_context(|ctx| {
@@ -226,7 +226,7 @@ impl LiteNode {
 }
 
 #[derive(Copy)]
-#[fyrox_lite_pod(RoutingStrategy)]
+#[fyrox_lite(RoutingStrategy)]
 pub enum LiteRoutingStrategy {
     /// An message will be passed to the specified root node and then to every node up in the hierarchy.
     Up,

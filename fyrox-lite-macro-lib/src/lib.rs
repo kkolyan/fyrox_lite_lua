@@ -1,5 +1,4 @@
-pub mod fyrox_lite_pod;
-pub mod fyrox_lite_engine_class;
+pub mod fyrox_lite;
 use std::ops::Deref;
 
 use fyrox_lite_model::{DataType, Domain};

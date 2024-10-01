@@ -8,15 +8,7 @@
 use std::{any::Any, fmt::Debug};
 
 use fyrox::script::{ScriptMessagePayload, ScriptTrait};
-use fyrox_lite_macro::{fyrox_lite_pod, fyrox_lite_user_class};
 
-
-// pub trait ProxyScript : ScriptTrait {
-// 	// type UserScriptType: UserScript<ProxyScriptType=Self>;
-// 	// fn as_any(&self) -> &dyn Any;
-// 	// fn as_any_mut(&mut self) -> &mut dyn Any;
-// 	// fn as_instance_of(&self, class_name: &str) -> Option<Self::UserScriptType>;
-// }
 
 pub trait UserScript : Sized + LiteDataType {
 	type ProxyScript: ScriptTrait;

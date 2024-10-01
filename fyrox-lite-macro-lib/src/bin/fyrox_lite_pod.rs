@@ -1,9 +1,9 @@
-use fyrox_lite_macro_lib::fyrox_lite_pod::fyrox_lite_pod;
+use fyrox_lite_macro_lib::fyrox_lite::fyrox_lite;
 use quote::quote;
 
 fn main() {
 	let attr = quote! {
-		#[fyrox_lite_pod(Intersection)]
+		#[fyrox_lite(Intersection)]
 	};
 	let item = quote! {
 		/// A ray intersection result.
@@ -33,6 +33,6 @@ fn main() {
 			pub toi: f32,
 		}
 	};
-	let result = fyrox_lite_pod(attr, item);
+	let result = fyrox_lite(attr, item);
 	println!("{}", result);
 }
