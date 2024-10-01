@@ -58,15 +58,15 @@ fn resolve_classes_enum_class(
     class: &mut fyrox_lite_model::EnumClass,
     classes: &HashMap<RustSymbol, DataType>,
 ) {
-    for (_name, variant) in class.variants.iter_mut() {
-        match variant {
-            fyrox_lite_model::EnumVariant::Unit => {},
-            fyrox_lite_model::EnumVariant::Tuple { fields } => {
+    for variant in class.variants.iter_mut() {
+        match &mut variant.value {
+            fyrox_lite_model::EnumValue::Unit => {},
+            fyrox_lite_model::EnumValue::Tuple { fields } => {
 				for field in fields.iter_mut() {
 					*field = resolve_type(field, classes);
 				}
 			},
-            fyrox_lite_model::EnumVariant::Struct { fields } => {
+            fyrox_lite_model::EnumValue::Struct { fields } => {
 				for field in fields.iter_mut() {
 					field.ty = resolve_type(&field.ty, classes);
 				}

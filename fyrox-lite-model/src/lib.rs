@@ -12,9 +12,15 @@ pub struct EngineClassName(pub String);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EngineClass {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub parent: Option<EngineClassName>,
+
     pub class_name: EngineClassName,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub methods: Vec<Method>,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub constants: Vec<Constant>,
 }
 
@@ -43,8 +49,11 @@ pub struct PodClassName(pub String);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PodClass {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub parent: Option<PodClassName>,
+
     pub class_name: PodClassName,
+
     pub fields: Vec<Field>,
 }
 
@@ -54,26 +63,39 @@ pub struct EnumClassName(pub String);
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EnumClass {
     pub class_name: EnumClassName,
-    pub variants: Vec<(String, EnumVariant)>
+    pub variants: Vec<EnumVariant>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub enum EnumVariant {
+pub struct EnumVariant {
+    pub tag: String,
+
+    #[serde(skip_serializing_if = "EnumValue::is_unit")]
+    pub value: EnumValue,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum EnumValue {
     Unit,
-    Tuple {
-        fields: Vec<DataType>
-    },
-    Struct {
-        fields: Vec<Field>
-    },
+    Tuple { fields: Vec<DataType> },
+    Struct { fields: Vec<Field> },
+}
+
+impl EnumValue {
+    fn is_unit(&self) -> bool {
+        matches!(self, EnumValue::Unit)
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Signature {
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub params: Vec<DataType>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub return_ty: Option<DataType>,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum DataType {
@@ -99,7 +121,7 @@ pub enum DataType {
     Option(Box<DataType>),
     /// Error should be universal scripting language specific type, so it is not presented here
     Result {
-        ok: Box<DataType>
+        ok: Box<DataType>,
     },
 }
 

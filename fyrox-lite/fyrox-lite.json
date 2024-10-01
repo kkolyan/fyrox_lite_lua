@@ -1,14 +1,12 @@
 {
   "engine_classes": [
     {
-      "parent": null,
       "class_name": "Node",
       "methods": [
         {
           "instance": true,
           "method_name": "as_rigid_body",
           "signature": {
-            "params": [],
             "return_ty": {
               "Option": {
                 "EngineObject": "RigidBody"
@@ -20,7 +18,6 @@
           "instance": true,
           "method_name": "name",
           "signature": {
-            "params": [],
             "return_ty": {
               "Option": "String"
             }
@@ -30,23 +27,18 @@
           "instance": true,
           "method_name": "is_alive",
           "signature": {
-            "params": [],
             "return_ty": "Bool"
           }
         },
         {
           "instance": true,
           "method_name": "destroy",
-          "signature": {
-            "params": [],
-            "return_ty": null
-          }
+          "signature": {}
         },
         {
           "instance": true,
           "method_name": "global_position",
           "signature": {
-            "params": [],
             "return_ty": {
               "Pod": "Vector3"
             }
@@ -56,7 +48,6 @@
           "instance": true,
           "method_name": "local_position",
           "signature": {
-            "params": [],
             "return_ty": {
               "Pod": "Vector3"
             }
@@ -66,7 +57,6 @@
           "instance": true,
           "method_name": "local_rotation",
           "signature": {
-            "params": [],
             "return_ty": {
               "Pod": "Quaternion"
             }
@@ -81,8 +71,7 @@
                 "Enum": "RoutingStrategy"
               },
               "UserScriptMessage"
-            ],
-            "return_ty": null
+            ]
           }
         },
         {
@@ -93,8 +82,7 @@
               {
                 "Pod": "Vector3"
               }
-            ],
-            "return_ty": null
+            ]
           }
         },
         {
@@ -105,8 +93,7 @@
               {
                 "Pod": "Quaternion"
               }
-            ],
-            "return_ty": null
+            ]
           }
         },
         {
@@ -115,15 +102,13 @@
           "signature": {
             "params": [
               "UserScriptGenericStub"
-            ],
-            "return_ty": null
+            ]
           }
         },
         {
           "instance": true,
           "method_name": "try_get_collider",
           "signature": {
-            "params": [],
             "return_ty": {
               "Option": {
                 "EngineObject": "Node"
@@ -135,7 +120,6 @@
           "instance": true,
           "method_name": "is_valid",
           "signature": {
-            "params": [],
             "return_ty": "Bool"
           }
         },
@@ -143,7 +127,6 @@
           "instance": true,
           "method_name": "parent",
           "signature": {
-            "params": [],
             "return_ty": {
               "EngineObject": "Node"
             }
@@ -179,7 +162,6 @@
           "instance": true,
           "method_name": "global_rotation",
           "signature": {
-            "params": [],
             "return_ty": {
               "Pod": "Quaternion"
             }
@@ -201,15 +183,12 @@
           "signature": {
             "params": [
               "String"
-            ],
-            "return_ty": null
+            ]
           }
         }
-      ],
-      "constants": []
+      ]
     },
     {
-      "parent": null,
       "class_name": "RigidBody",
       "methods": [
         {
@@ -220,15 +199,12 @@
               {
                 "Pod": "Vector3"
               }
-            ],
-            "return_ty": null
+            ]
           }
         }
-      ],
-      "constants": []
+      ]
     },
     {
-      "parent": null,
       "class_name": "Prefab",
       "methods": [
         {
@@ -248,11 +224,9 @@
             }
           }
         }
-      ],
-      "constants": []
+      ]
     },
     {
-      "parent": null,
       "class_name": "Scene",
       "methods": [
         {
@@ -261,15 +235,12 @@
           "signature": {
             "params": [
               "String"
-            ],
-            "return_ty": null
+            ]
           }
         }
-      ],
-      "constants": []
+      ]
     },
     {
-      "parent": null,
       "class_name": "Text",
       "methods": [
         {
@@ -278,8 +249,7 @@
           "signature": {
             "params": [
               "String"
-            ],
-            "return_ty": null
+            ]
           }
         },
         {
@@ -296,11 +266,9 @@
             }
           }
         }
-      ],
-      "constants": []
+      ]
     },
     {
-      "parent": null,
       "class_name": "Window",
       "methods": [
         {
@@ -311,17 +279,14 @@
               {
                 "Enum": "CursorGrabMode"
               }
-            ],
-            "return_ty": null
+            ]
           }
         }
-      ],
-      "constants": []
+      ]
     }
   ],
   "pod_classes": [
     {
-      "parent": null,
       "class_name": "Vector3",
       "fields": [
         {
@@ -339,7 +304,6 @@
       ]
     },
     {
-      "parent": null,
       "class_name": "Vector2",
       "fields": [
         {
@@ -353,7 +317,6 @@
       ]
     },
     {
-      "parent": null,
       "class_name": "Quaternion",
       "fields": [
         {
@@ -375,7 +338,6 @@
       ]
     },
     {
-      "parent": null,
       "class_name": "Intersection",
       "fields": [
         {
@@ -409,7 +371,6 @@
       ]
     },
     {
-      "parent": null,
       "class_name": "RayCastOptions",
       "fields": [
         {
@@ -441,7 +402,6 @@
       ]
     },
     {
-      "parent": null,
       "class_name": "InteractionGroups",
       "fields": [
         {
@@ -455,7 +415,6 @@
       ]
     },
     {
-      "parent": null,
       "class_name": "TextBuilder",
       "fields": [
         {
@@ -475,7 +434,6 @@
       ]
     },
     {
-      "parent": null,
       "class_name": "Color",
       "fields": [
         {
@@ -497,7 +455,6 @@
       ]
     },
     {
-      "parent": null,
       "class_name": "GradientPoint",
       "fields": [
         {
@@ -517,139 +474,121 @@
     {
       "class_name": "RoutingStrategy",
       "variants": [
-        [
-          "Up",
-          "Unit"
-        ],
-        [
-          "Down",
-          "Unit"
-        ]
+        {
+          "tag": "Up"
+        },
+        {
+          "tag": "Down"
+        }
       ]
     },
     {
       "class_name": "FeatureId",
       "variants": [
-        [
-          "Vertex",
-          {
-            "Tuple": {
-              "fields": [
-                "I32"
-              ]
-            }
+        {
+          "tag": "Vertex",
+          "value": {
+            "fields": [
+              "I32"
+            ]
           }
-        ],
-        [
-          "Edge",
-          {
-            "Tuple": {
-              "fields": [
-                "I32"
-              ]
-            }
+        },
+        {
+          "tag": "Edge",
+          "value": {
+            "fields": [
+              "I32"
+            ]
           }
-        ],
-        [
-          "Face",
-          {
-            "Tuple": {
-              "fields": [
-                "I32"
-              ]
-            }
+        },
+        {
+          "tag": "Face",
+          "value": {
+            "fields": [
+              "I32"
+            ]
           }
-        ],
-        [
-          "Unknown",
-          "Unit"
-        ]
+        },
+        {
+          "tag": "Unknown"
+        }
       ]
     },
     {
       "class_name": "Brush",
       "variants": [
-        [
-          "Solid",
-          {
-            "Tuple": {
-              "fields": [
-                {
-                  "Pod": "Color"
-                }
-              ]
-            }
+        {
+          "tag": "Solid",
+          "value": {
+            "fields": [
+              {
+                "Pod": "Color"
+              }
+            ]
           }
-        ],
-        [
-          "LinearGradient",
-          {
-            "Struct": {
-              "fields": [
-                {
-                  "field_name": "from",
-                  "ty": {
-                    "Pod": "Vector2"
-                  }
-                },
-                {
-                  "field_name": "to",
-                  "ty": {
-                    "Pod": "Vector2"
-                  }
-                },
-                {
-                  "field_name": "stops",
-                  "ty": {
-                    "Vec": {
-                      "Pod": "GradientPoint"
-                    }
+        },
+        {
+          "tag": "LinearGradient",
+          "value": {
+            "fields": [
+              {
+                "field_name": "from",
+                "ty": {
+                  "Pod": "Vector2"
+                }
+              },
+              {
+                "field_name": "to",
+                "ty": {
+                  "Pod": "Vector2"
+                }
+              },
+              {
+                "field_name": "stops",
+                "ty": {
+                  "Vec": {
+                    "Pod": "GradientPoint"
                   }
                 }
-              ]
-            }
+              }
+            ]
           }
-        ],
-        [
-          "RadialGradient",
-          {
-            "Struct": {
-              "fields": [
-                {
-                  "field_name": "center",
-                  "ty": {
-                    "Pod": "Vector2"
-                  }
-                },
-                {
-                  "field_name": "stops",
-                  "ty": {
-                    "Vec": {
-                      "Pod": "GradientPoint"
-                    }
+        },
+        {
+          "tag": "RadialGradient",
+          "value": {
+            "fields": [
+              {
+                "field_name": "center",
+                "ty": {
+                  "Pod": "Vector2"
+                }
+              },
+              {
+                "field_name": "stops",
+                "ty": {
+                  "Vec": {
+                    "Pod": "GradientPoint"
                   }
                 }
-              ]
-            }
+              }
+            ]
           }
-        ]
+        }
       ]
     },
     {
       "class_name": "CursorGrabMode",
       "variants": [
-        [
-          "None",
-          "Unit"
-        ],
-        [
-          "Confined",
-          "Unit"
-        ],
-        [
-          "Locked",
-          "Unit"
-        ]
+        {
+          "tag": "None"
+        },
+        {
+          "tag": "Confined"
+        },
+        {
+          "tag": "Locked"
+        }
       ]
     }
   ]

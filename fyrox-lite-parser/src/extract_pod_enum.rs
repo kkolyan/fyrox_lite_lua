@@ -1,6 +1,6 @@
 use std::cell::Ref;
 
-use fyrox_lite_model::{EnumClass, EnumClassName, EnumVariant, Field};
+use fyrox_lite_model::{EnumClass, EnumClassName, EnumValue, EnumVariant, Field};
 use proc_macro2::TokenStream;
 use syn::Ident;
 
@@ -38,7 +38,10 @@ pub fn extract_pod_enum(
                 }
                 class
                     .variants
-                    .push((variant_name.to_string(), EnumVariant::Struct { fields }));
+                    .push(EnumVariant {
+                        tag: variant_name.to_string(),
+                        value: EnumValue::Struct { fields },
+                    });
             }
             syn::Fields::Unnamed(syn_fields) => {
                 let mut fields = Vec::new();
@@ -54,10 +57,16 @@ pub fn extract_pod_enum(
                 }
                 class
                     .variants
-                    .push((variant_name.to_string(), EnumVariant::Tuple { fields }));
+                    .push(EnumVariant {
+                        tag: variant_name.to_string(),
+                        value: EnumValue::Tuple { fields },
+                    });
 			},
             syn::Fields::Unit => {
-				class.variants.push((variant_name.to_string(), EnumVariant::Unit));
+				class.variants.push(EnumVariant {
+                     tag: variant_name.to_string(),
+                      value: EnumValue::Unit
+                 });
 			},
         }
     }
