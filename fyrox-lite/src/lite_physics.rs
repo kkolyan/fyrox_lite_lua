@@ -123,7 +123,7 @@ pub trait LiteQueryResultsStorage {
 
 /// A ray intersection result.
 #[derive(PartialEq)]
-#[fyrox_lite_pod("Intersection")]
+#[fyrox_lite_pod(Intersection)]
 pub struct LiteIntersection {
     /// A handle of the collider with which intersection was detected.
     pub collider: LiteNode,
@@ -152,7 +152,7 @@ pub struct LiteIntersection {
 
 /// Shape-dependent identifier.
 #[derive(Copy, Hash, PartialEq, Eq)]
-#[fyrox_lite_pod("FeatureId")]
+#[fyrox_lite_pod(FeatureId)]
 pub enum LiteFeatureId {
     /// Shape-dependent identifier of a vertex.
     Vertex(i32),
@@ -164,7 +164,7 @@ pub enum LiteFeatureId {
     Unknown,
 }
 
-#[fyrox_lite_pod("RayCastOptions")]
+#[fyrox_lite_pod(RayCastOptions)]
 pub struct LiteRayCastOptions {
     /// A ray origin.
     pub ray_origin: PodVector3,
@@ -183,7 +183,7 @@ pub struct LiteRayCastOptions {
 }
 
 #[derive(Copy, PartialEq, Eq, Default)]
-#[fyrox_lite_pod("InteractionGroups")]
+#[fyrox_lite_pod(InteractionGroups)]
 pub struct LiteInteractionGroups {
     /// Groups memberships.
     pub memberships: i32,
@@ -219,7 +219,7 @@ pub struct LiteRigidBody {
     pub handle: Handle<Node>,
 }
 
-#[fyrox_lite_engine_class("RigidBody")]
+#[fyrox_lite_engine_class(RigidBody)]
 impl LiteRigidBody {
     pub fn apply_force(&mut self, force: PodVector3) {
         with_script_context(|ctx| {

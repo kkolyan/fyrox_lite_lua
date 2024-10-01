@@ -1,27 +1,13 @@
 use std::{collections::HashMap, fs, path::Path, str::FromStr};
 
 use fyrox_lite_model::{DataType, Domain, EngineClass, Field, PodClass, PodClassName};
-use fyrox_lite_parser::{extract_engine_class::extract_engine_class_and_inject_assertions, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, extract_ty::extract_ty};
+use crate::{extract_engine_class::extract_engine_class_and_inject_assertions, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, extract_ty::extract_ty, RustSymbol};
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{parse2, Ident, TraitBoundModifier};
 
-fn main() {
-    let mut domain = Domain::default();
-    let mut aliases = Default::default();
-    let dir = "fyrox-lite/src";
-    for entry in fs::read_dir(dir).unwrap().flatten() {
-        if entry.file_type().unwrap().is_dir() {
-            continue;
-        }
-        if !entry.file_name().to_string_lossy().ends_with(".rs") {
-            continue;
-        }
-        load_path(&entry.path(), &mut domain, &mut aliases);
-    }
-}
 
-fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<Ident, String>) {
+pub fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<String, RustSymbol>) {
     let text = fs::read_to_string(path).unwrap();
     let file = parse2::<syn::File>(TokenStream::from_str(&text).unwrap()).unwrap();
 
@@ -30,7 +16,7 @@ fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<Ident, Stri
             syn::Item::Impl(mut it) => {
                 if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite_engine_class", &mut vec![]) {
                     if let Some((rust_name, class)) = extract_engine_class_and_inject_assertions(attr, &mut it, &mut vec![]) {
-                        aliases.insert(rust_name.clone(), class.class_name.0.clone());
+                        aliases.insert(class.class_name.0.clone(), RustSymbol(rust_name.to_string().clone()));
                         domain.engine_classes.push(class);
                     }
                 }
@@ -38,7 +24,7 @@ fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<Ident, Stri
             syn::Item::Struct(it) => {
                 if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite_pod", &mut vec![]) {
                     if let Some((rust_name, class)) = extract_pod_struct(attr, &it, &mut vec![]) {
-                        aliases.insert(rust_name.clone(), class.class_name.0.clone());
+                        aliases.insert(class.class_name.0.clone(), RustSymbol(rust_name.to_string().clone()));
                         domain.pod_classes.push(class);
                     }
                 }
@@ -46,7 +32,7 @@ fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<Ident, Stri
             syn::Item::Enum(it) => {
                 if let Some(attr) = extract_attr(&it.attrs, "fyrox_lite_pod", &mut vec![]) {
                     if let Some((rust_name, class)) = extract_pod_enum(attr, &it, &mut vec![], &mut vec![]) {
-                        aliases.insert(rust_name.clone(), class.class_name.0.clone());
+                        aliases.insert(class.class_name.0.clone(), RustSymbol(rust_name.to_string().clone()));
                         domain.enum_classes.push(class);
                     }
                 }
@@ -63,12 +49,12 @@ fn visit_enum(it: &syn::ItemEnum, domain: &mut Domain) {}
 
 fn extract_attr(attrs: &[syn::Attribute], attr_name: &str, errors: &mut Vec<syn::Error>) -> Option<TokenStream> {
     
-    let pod = attrs
+    let attr = attrs
         .iter()
         .find(|it| it.path().to_token_stream().to_string() == attr_name);
-    let pod = pod?;
-    match pod.meta.require_list() {
-        Ok(it) => Some(it.to_token_stream()),
+    let attr = attr?;
+    match attr.meta.require_list() {
+        Ok(it) => Some(it.tokens.to_token_stream()),
         Err(err) => {
             errors.push(err);
             None

@@ -17,11 +17,18 @@ pub fn extract_ty_path(
         ));
     }
     if let Some(ident) = extract_user_script_associated_type(qself, path, generic_params) {
-        if ident == "UserScriptMessage" {
-            return Ok(DataType::UserScriptMessage);
-        }
-        if ident == "UserScriptGenericStub" {
-            return Ok(DataType::UserScriptGenericStub);
+        match ident {
+            UserScriptBasedType::Named(ident) => {
+                if ident == "UserScriptMessage" {
+                    return Ok(DataType::UserScriptMessage);
+                }
+                if ident == "UserScriptGenericStub" {
+                    return Ok(DataType::UserScriptGenericStub);
+                }
+            }
+            UserScriptBasedType::Itself => {
+                return Ok(DataType::UserScript);
+            },
         }
     }
     if path.segments.len() > 1 {
@@ -50,15 +57,20 @@ pub fn extract_ty_path(
                 let result_err = &args.args[1];
                 if let GenericArgument::Type(result_type) = result_ok {
                     if let GenericArgument::Type(syn::Type::Path(it)) = result_err {
-                        if let Some(ident) = extract_user_script_associated_type(it.qself.as_ref(), &it.path, generic_params)
-                        {
-                            if ident == "LangSpecificError" {
-                                return Ok(DataType::Result {
-                                    ok: match extract_ty(result_type, generic_params) {
-                                        Ok(it) => Box::new(it),
-                                        Err(err) => return Err(err),
-                                    },
-                                });
+                        if let Some(ident) = extract_user_script_associated_type(
+                            it.qself.as_ref(),
+                            &it.path,
+                            generic_params,
+                        ) {
+                            if let UserScriptBasedType::Named(ident) = ident {
+                                if ident == "LangSpecificError" {
+                                    return Ok(DataType::Result {
+                                        ok: match extract_ty(result_type, generic_params) {
+                                            Ok(it) => Box::new(it),
+                                            Err(err) => return Err(err),
+                                        },
+                                    });
+                                }
                             }
                         }
                     }
@@ -84,21 +96,31 @@ pub fn extract_ty_path(
     })
 }
 
+enum UserScriptBasedType<'a> {
+    Itself,
+    Named(&'a Ident),
+}
+
 fn extract_user_script_associated_type<'a>(
     qself: Option<&'a syn::QSelf>,
     path: &'a syn::Path,
     generic_params: Option<&HashMap<&Ident, DataType>>,
-) -> Option<&'a Ident> {
+) -> Option<UserScriptBasedType<'a>> {
     if let Some(generic_params) = generic_params {
         if let Some((user_script_type, _data_type)) = generic_params
             .iter()
             .find(|(_ident, data_type)| **data_type == DataType::UserScript)
         {
             if qself.is_none()
-                && path.segments.len() == 2
+                && !path.segments.is_empty()
                 && path.segments[0].ident == **user_script_type
             {
-                return Some(&path.segments[1].ident);
+                if path.segments.len() == 1 {
+                    return Some(UserScriptBasedType::Itself);
+                }
+                if path.segments.len() == 2 {
+                    return Some(UserScriptBasedType::Named(&path.segments[1].ident));
+                }
             }
         }
     }

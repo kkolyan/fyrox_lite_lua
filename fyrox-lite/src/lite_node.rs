@@ -226,7 +226,7 @@ impl LiteNode {
 }
 
 #[derive(Copy)]
-#[fyrox_lite_pod]
+#[fyrox_lite_pod(RoutingStrategy)]
 pub enum LiteRoutingStrategy {
     /// An message will be passed to the specified root node and then to every node up in the hierarchy.
     Up,

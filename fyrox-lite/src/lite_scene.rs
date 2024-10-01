@@ -4,7 +4,7 @@ use crate::script_context::with_script_context;
 
 pub struct LiteScene;
 
-#[fyrox_lite_engine_class("Scene")]
+#[fyrox_lite_engine_class(Scene)]
 impl LiteScene {
     pub fn load_async(scene_path: String) {
         with_script_context(|sc| {

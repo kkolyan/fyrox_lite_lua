@@ -1,5 +1,3 @@
-pub mod raw;
-
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -96,6 +94,7 @@ pub enum DataType {
     /// stub argument to call UserScript-type parameterized methods
     UserScriptGenericStub,
     Pod(PodClassName),
+    Enum(EnumClassName),
     EngineObject(EngineClassName),
     Option(Box<DataType>),
     /// Error should be universal scripting language specific type, so it is not presented here

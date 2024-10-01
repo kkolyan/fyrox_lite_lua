@@ -3,7 +3,7 @@ use quote::quote;
 
 fn main() {
 	let attr = quote! {
-		#[fyrox_lite_pod("Intersection")]
+		#[fyrox_lite_pod(Intersection)]
 	};
 	let item = quote! {
 		/// A ray intersection result.

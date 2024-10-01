@@ -42,7 +42,7 @@ impl LiteText {
     }
 }
 
-#[fyrox_lite_engine_class("Text")]
+#[fyrox_lite_engine_class(Text)]
 impl LiteText {
     pub fn set_text_async(&self, text: String) {
         with_script_context(|ctx| {
@@ -94,7 +94,7 @@ impl From<Brush> for brush::Brush {
     }
 }
 
-#[fyrox_lite_pod]
+#[fyrox_lite_pod(TextBuilder)]
 pub struct TextBuilder {
     pub foregound: Option<Brush>,
     pub font_size: Option<f32>,
@@ -102,7 +102,7 @@ pub struct TextBuilder {
 
 /// Brush defines a way to fill an arbitrary surface.
 #[derive(PartialEq)]
-#[fyrox_lite_pod]
+#[fyrox_lite_pod(Brush)]
 pub enum Brush {
     /// A brush, that fills a surface with a solid color.
     Solid(Color),
@@ -127,7 +127,7 @@ pub enum Brush {
 }
 
 #[derive(Copy, PartialOrd, PartialEq, Eq)]
-#[fyrox_lite_pod]
+#[fyrox_lite_pod(Color)]
 pub struct Color {
     // Do not change order! OpenGL requires this order!
     pub r: u8,
@@ -137,7 +137,7 @@ pub struct Color {
 }
 
 #[derive(PartialEq)]
-#[fyrox_lite_pod]
+#[fyrox_lite_pod(GradientPoint)]
 pub struct GradientPoint {
     /// A distance from an origin of the gradient.
     pub stop: f32,
