@@ -1292,6 +1292,7 @@ version = "0.1.0"
 dependencies = [
  "fyrox-core",
  "fyrox-lite",
+ "fyrox-lite-macro",
 ]
 
 [[package]]

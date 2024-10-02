@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
-use fyrox_lite_model::{ClassName, Constant, DataType, EngineClass, Method, NamedValue, RustQualifiedName, Signature};
+use fyrox_lite_model::{
+    ClassName, Constant, DataType, EngineClass, Method, Param, RustQualifiedName, Signature
+};
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{parse_quote_spanned, spanned::Spanned, Ident, TraitBoundModifier, TypeParamBound};
@@ -86,8 +88,9 @@ pub fn extract_engine_class_and_inject_assertions(
                 }
                 let mut instance = false;
                 let mut params = Vec::new();
-                'params: for args in func.sig.inputs.iter() {
-                    let arg = match args {
+                let arg_count = func.sig.inputs.len();
+                'params: for (i, fn_arg) in func.sig.inputs.iter_mut().enumerate() {
+                    let arg = match fn_arg {
                         syn::FnArg::Receiver(_receiver) => {
                             instance = true;
                             continue 'params;
@@ -98,7 +101,30 @@ pub fn extract_engine_class_and_inject_assertions(
                     types.push(ty.clone());
                     match extract_ty(ty, Some(&generic_params)) {
                         Ok(it) => {
-                            params.push(NamedValue {
+                            // handle #[variadic]
+                            let variadic_index = arg.attrs.iter_mut().enumerate()
+                            .find(|(_i, it)| {
+                                it.path()
+                                    .get_ident()
+                                    .map(|it| it == "variadic")
+                                    .unwrap_or_default()
+                            })
+                            .map(|(i, _)| i);
+                            let variadic = match variadic_index {
+                                Some(index) => {
+                                    arg.attrs.remove(index);
+                                    true
+                                }
+                                None => false
+                            };
+                            if variadic && i != arg_count - 1 {
+                                errors.push(syn::Error::new_spanned(
+                                    fn_arg,
+                                    "Fyrox Lite: only the last parameter could be variadic",
+                                ));
+                                continue 'items;
+                            }
+                            params.push(Param {
                                 name: match arg.pat.as_ref() {
                                     syn::Pat::Ident(pat_ident) => pat_ident.ident.to_string(),
                                     _ => {
@@ -110,6 +136,7 @@ pub fn extract_engine_class_and_inject_assertions(
                                     }
                                 },
                                 ty: it,
+                                variadic,
                             });
                         }
                         Err(err) => {

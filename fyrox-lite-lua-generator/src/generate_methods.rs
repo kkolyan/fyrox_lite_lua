@@ -1,13 +1,12 @@
 use std::borrow::Cow;
 
-use fyrox_lite_model::{DataType, EngineClass, NamedValue};
+use fyrox_lite_model::{DataType, EngineClass};
 use to_vec::ToVec;
 
 use crate::{
     context::GenerationContext,
-    mlua_to_rust_expr::{mlua_to_rust_expr, rust_expr_to_mlua},
-    templating::render,
-    type_to_mlua::type_to_mlua,
+    expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua},
+    templating::render
 };
 
 pub fn generate_methods(

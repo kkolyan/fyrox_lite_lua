@@ -5,15 +5,20 @@ use fyrox_lite_model::Domain;
 use crate::{load_path::load_path, resolve_classes::resolve_classes};
 
 pub fn generate_domain(dir: &str) -> Domain {
+    println!("generating domain from dir {}", dir);
     let mut domain = Domain::default();
     let mut aliases = Default::default();
     for entry in fs::read_dir(dir).unwrap().flatten() {
+        println!("checking entry {:?}", entry);
         if entry.file_type().unwrap().is_dir() {
+            println!("skipping, because dir");
             continue;
         }
         if !entry.file_name().to_string_lossy().ends_with(".rs") {
+            println!("skipping, because non-rust");
             continue;
         }
+        println!("loading...");
         load_path(&entry.path(), &mut domain, &mut aliases);
     }
 

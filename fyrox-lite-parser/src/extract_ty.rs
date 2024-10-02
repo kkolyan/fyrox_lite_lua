@@ -86,6 +86,12 @@ pub fn extract_ty_path(
         ));
     };
     Ok(match segment.ident.to_string().as_str() {
+        "Self" => {
+            return Err(syn::Error::new_spanned(
+                &path.segments,
+                "Fyrox Lite: Self is not allowed",
+            ));
+        }
         "bool" => DataType::Bool,
         "u8" => DataType::Byte,
         "i32" => DataType::I32,

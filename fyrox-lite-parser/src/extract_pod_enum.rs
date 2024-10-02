@@ -1,4 +1,4 @@
-use fyrox_lite_model::{ClassName, EnumClass, EnumValue, EnumVariant, NamedValue, RustQualifiedName};
+use fyrox_lite_model::{ClassName, EnumClass, EnumValue, EnumVariant, Field, RustQualifiedName};
 use proc_macro2::TokenStream;
 use syn::Ident;
 
@@ -20,7 +20,7 @@ pub fn extract_pod_enum(
                 let mut fields = Vec::new();
                 for field in syn_fields.named.iter() {
                     types.push(field.ty.clone());
-                    fields.push(NamedValue {
+                    fields.push(Field {
                         name: field
                             .ident
                             .as_ref()

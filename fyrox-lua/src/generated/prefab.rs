@@ -2,6 +2,7 @@
 		#![allow(unused_variables)]
 
 		use fyrox_lite::*;
+		use fyrox_lite_math::*;
 		use mlua;
 
 		use crate::{
@@ -20,7 +21,7 @@
 		
 				methods.add_method_mut(
 					"instantiate_at",
-					|lua, this, (position, orientation): (TypedUserData<Traitor<fyrox_lite_math::LiteVector3>>, TypedUserData<Traitor<fyrox_lite_math::LiteQuaternion>>)| {
+					|lua, this, (position, orientation): (TypedUserData<Traitor<vec::LiteVector3>>, TypedUserData<Traitor<quat::LiteQuaternion>>)| {
 			
 						let position = position.borrow()?.inner().clone().into();
 				

@@ -11,7 +11,11 @@ pub fn load_path(path: &Path, domain: &mut Domain, aliases: &mut HashMap<String,
     let text = fs::read_to_string(path).unwrap();
     let file = parse2::<syn::File>(TokenStream::from_str(&text).unwrap()).unwrap();
 
-    let mod_name = path.file_name().unwrap().to_str().unwrap().replace(".rs", "");
+    let mut mod_name = path.file_name().unwrap().to_str().unwrap().replace(".rs", "");
+    if mod_name == "lib" {
+        mod_name = "".to_string();
+    }
+    println!("mod name: {}", mod_name);
 
     for item in file.items {
         match item {
@@ -48,7 +52,7 @@ fn extract_attr(attrs: &[syn::Attribute], attr_name: &str, errors: &mut Vec<syn:
     
     let attr = attrs
         .iter()
-        .find(|it| it.path().to_token_stream().to_string() == attr_name);
+        .find(|it| it.path().get_ident().map(|it| it == attr_name).unwrap_or_default());
     let attr = attr?;
     match attr.meta.require_list() {
         Ok(it) => Some(it.tokens.to_token_stream()),

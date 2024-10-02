@@ -1,6 +1,53 @@
 {
   "classes": [
     {
+      "Engine": {
+        "class_name": "Log",
+        "rust_struct_path": "lite_log::LiteLog",
+        "methods": [
+          {
+            "instance": false,
+            "method_name": "info",
+            "signature": {
+              "params": [
+                {
+                  "name": "msg",
+                  "ty": "String",
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "warn",
+            "signature": {
+              "params": [
+                {
+                  "name": "msg",
+                  "ty": "String",
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "err",
+            "signature": {
+              "params": [
+                {
+                  "name": "msg",
+                  "ty": "String",
+                  "variadic": false
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "Struct": {
         "class_name": "Vector3",
         "rust_struct_path": "lite_math::PodVector3",
@@ -133,11 +180,13 @@
                   "name": "routing",
                   "ty": {
                     "Object": "RoutingStrategy"
-                  }
+                  },
+                  "variadic": false
                 },
                 {
                   "name": "payload",
-                  "ty": "UserScriptMessage"
+                  "ty": "UserScriptMessage",
+                  "variadic": false
                 }
               ]
             }
@@ -151,7 +200,8 @@
                   "name": "new_pos",
                   "ty": {
                     "Object": "Vector3"
-                  }
+                  },
+                  "variadic": false
                 }
               ]
             }
@@ -165,7 +215,8 @@
                   "name": "value",
                   "ty": {
                     "Object": "Quaternion"
-                  }
+                  },
+                  "variadic": false
                 }
               ]
             }
@@ -177,7 +228,8 @@
               "params": [
                 {
                   "name": "_stub",
-                  "ty": "UserScriptGenericStub"
+                  "ty": "UserScriptGenericStub",
+                  "variadic": false
                 }
               ]
             }
@@ -216,7 +268,8 @@
               "params": [
                 {
                   "name": "state",
-                  "ty": "UserScript"
+                  "ty": "UserScript",
+                  "variadic": false
                 }
               ],
               "return_ty": {
@@ -233,11 +286,13 @@
               "params": [
                 {
                   "name": "class_name",
-                  "ty": "String"
+                  "ty": "String",
+                  "variadic": false
                 },
                 {
                   "name": "_stub",
-                  "ty": "UserScriptGenericStub"
+                  "ty": "UserScriptGenericStub",
+                  "variadic": false
                 }
               ],
               "return_ty": {
@@ -261,7 +316,8 @@
               "params": [
                 {
                   "name": "tag",
-                  "ty": "String"
+                  "ty": "String",
+                  "variadic": false
                 }
               ],
               "return_ty": "Bool"
@@ -274,7 +330,8 @@
               "params": [
                 {
                   "name": "tag",
-                  "ty": "String"
+                  "ty": "String",
+                  "variadic": false
                 }
               ]
             }
@@ -292,6 +349,174 @@
           },
           {
             "tag": "Down"
+          }
+        ]
+      }
+    },
+    {
+      "Engine": {
+        "class_name": "Physics",
+        "rust_struct_path": "lite_physics::LitePhysics",
+        "methods": [
+          {
+            "instance": false,
+            "method_name": "cast_ray",
+            "signature": {
+              "params": [
+                {
+                  "name": "opts",
+                  "ty": {
+                    "Object": "RayCastOptions"
+                  },
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Vec": {
+                  "Object": "Intersection"
+                }
+              }
+            }
+          }
+        ],
+        "constants": [
+          {
+            "const_name": "EXCLUDE_FIXED",
+            "ty": "I32",
+            "value": {
+              "BinaryOp": {
+                "op": "Shl",
+                "left": {
+                  "Integer": 1
+                },
+                "right": {
+                  "Integer": 1
+                }
+              }
+            }
+          },
+          {
+            "const_name": "EXCLUDE_KINEMATIC",
+            "ty": "I32",
+            "value": {
+              "BinaryOp": {
+                "op": "Shl",
+                "left": {
+                  "Integer": 1
+                },
+                "right": {
+                  "Integer": 2
+                }
+              }
+            }
+          },
+          {
+            "const_name": "EXCLUDE_DYNAMIC",
+            "ty": "I32",
+            "value": {
+              "BinaryOp": {
+                "op": "Shl",
+                "left": {
+                  "Integer": 1
+                },
+                "right": {
+                  "Integer": 3
+                }
+              }
+            }
+          },
+          {
+            "const_name": "EXCLUDE_SENSORS",
+            "ty": "I32",
+            "value": {
+              "BinaryOp": {
+                "op": "Shl",
+                "left": {
+                  "Integer": 1
+                },
+                "right": {
+                  "Integer": 4
+                }
+              }
+            }
+          },
+          {
+            "const_name": "EXCLUDE_SOLIDS",
+            "ty": "I32",
+            "value": {
+              "BinaryOp": {
+                "op": "Shl",
+                "left": {
+                  "Integer": 1
+                },
+                "right": {
+                  "Integer": 5
+                }
+              }
+            }
+          },
+          {
+            "const_name": "ONLY_DYNAMIC",
+            "ty": "I32",
+            "value": {
+              "BinaryOp": {
+                "op": "BitOr",
+                "left": {
+                  "Reference": {
+                    "owner": "LitePhysics",
+                    "constant_name": "EXCLUDE_FIXED"
+                  }
+                },
+                "right": {
+                  "Reference": {
+                    "owner": "LitePhysics",
+                    "constant_name": "EXCLUDE_KINEMATIC"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "const_name": "ONLY_KINEMATIC",
+            "ty": "I32",
+            "value": {
+              "BinaryOp": {
+                "op": "BitOr",
+                "left": {
+                  "Reference": {
+                    "owner": "LitePhysics",
+                    "constant_name": "EXCLUDE_DYNAMIC"
+                  }
+                },
+                "right": {
+                  "Reference": {
+                    "owner": "LitePhysics",
+                    "constant_name": "EXCLUDE_FIXED"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "const_name": "ONLY_FIXED",
+            "ty": "I32",
+            "value": {
+              "BinaryOp": {
+                "op": "BitOr",
+                "left": {
+                  "Reference": {
+                    "owner": "LitePhysics",
+                    "constant_name": "EXCLUDE_DYNAMIC"
+                  }
+                },
+                "right": {
+                  "Reference": {
+                    "owner": "LitePhysics",
+                    "constant_name": "EXCLUDE_KINEMATIC"
+                  }
+                }
+              }
+            }
           }
         ]
       }
@@ -431,7 +656,8 @@
                   "name": "force",
                   "ty": {
                     "Object": "Vector3"
-                  }
+                  },
+                  "variadic": false
                 }
               ]
             }
@@ -453,13 +679,15 @@
                   "name": "position",
                   "ty": {
                     "Object": "Vector3"
-                  }
+                  },
+                  "variadic": false
                 },
                 {
                   "name": "orientation",
                   "ty": {
                     "Object": "Quaternion"
-                  }
+                  },
+                  "variadic": false
                 }
               ],
               "return_ty": {
@@ -482,12 +710,19 @@
               "params": [
                 {
                   "name": "scene_path",
-                  "ty": "String"
+                  "ty": "String",
+                  "variadic": false
                 }
               ]
             }
           }
         ]
+      }
+    },
+    {
+      "Engine": {
+        "class_name": "UiNode",
+        "rust_struct_path": "lite_ui::LiteUiNode"
       }
     },
     {
@@ -502,7 +737,8 @@
               "params": [
                 {
                   "name": "text",
-                  "ty": "String"
+                  "ty": "String",
+                  "variadic": false
                 }
               ]
             }
@@ -516,7 +752,8 @@
                   "name": "state",
                   "ty": {
                     "Object": "TextBuilder"
-                  }
+                  },
+                  "variadic": false
                 }
               ],
               "return_ty": {
@@ -671,7 +908,8 @@
                   "name": "mode",
                   "ty": {
                     "Object": "CursorGrabMode"
-                  }
+                  },
+                  "variadic": false
                 }
               ]
             }

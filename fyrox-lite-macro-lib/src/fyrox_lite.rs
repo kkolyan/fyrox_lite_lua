@@ -9,10 +9,13 @@ use syn::{parse2, spanned::Spanned};
 use crate::generate_static_assertions;
 
 pub fn fyrox_lite(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let mut errors = Vec::new();
+    if attr.is_empty() {
+        errors.push(syn::Error::new_spanned(&attr, "expected a (target lang) class name in parentheses: `fyrox_lite(MyClass)`"));
+    }
     match parse2::<syn::Item>(item) {
         Ok(it) => match it {
             syn::Item::Enum(item) => {
-                let mut errors = Vec::new();
 
                 let mut types = Vec::new();
                 let ident = extract_pod_enum("dontcare", attr, &item, &mut errors, &mut types)
@@ -38,7 +41,6 @@ pub fn fyrox_lite(attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
             }
             syn::Item::Struct(item) => {
-                let mut errors = Vec::new();
 
                 extract_pod_struct("dontcare", attr, &item, &mut errors);
 
@@ -62,7 +64,6 @@ pub fn fyrox_lite(attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
             }
             syn::Item::Impl(mut item) => {
-                let mut errors = Vec::new();
 
                 let ident = extract_engine_class_and_inject_assertions(
                     "dontcare",

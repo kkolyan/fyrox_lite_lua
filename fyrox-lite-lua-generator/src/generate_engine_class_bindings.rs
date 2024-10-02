@@ -1,16 +1,15 @@
 use core::fmt;
 
 use convert_case::{Case, Casing};
-use fyrox_lite_model::{DataType, Domain, EngineClass, NamedValue, RustQualifiedName};
+use fyrox_lite_model::{DataType, Domain, EngineClass, RustQualifiedName, StructClass};
 use std::{collections::HashMap, fmt::Write, ops::Deref};
 use to_vec::ToVec;
 
 use crate::{
-    code_model::Mod, context::GenerationContext, generate_methods::generate_methods,
-    mlua_to_rust_expr::mlua_to_rust_expr, templating::render, type_to_mlua::type_to_mlua,
+    code_model::Mod, context::GenerationContext, generate_methods::generate_methods, templating::render
 };
 
-pub fn generate_class_bindings(it: &EngineClass, ctx: &GenerationContext) -> Mod {
+pub fn generate_engine_class_bindings(it: &EngineClass, ctx: &GenerationContext) -> Mod {
     let mut s: String = Default::default();
 
     render(
@@ -19,6 +18,7 @@ pub fn generate_class_bindings(it: &EngineClass, ctx: &GenerationContext) -> Mod
 		#![allow(unused_variables)]
 
 		use fyrox_lite::*;
+		use fyrox_lite_math::*;
 		use mlua;
 
 		use crate::{

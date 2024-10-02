@@ -2,6 +2,7 @@
 		#![allow(unused_variables)]
 
 		use fyrox_lite::*;
+		use fyrox_lite_math::*;
 		use mlua;
 
 		use crate::{

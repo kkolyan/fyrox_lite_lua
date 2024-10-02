@@ -1,8 +1,19 @@
+pub mod named_value;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Default, PartialEq)]
 pub struct Domain {
     pub classes: Vec<Class>,
+}
+
+impl Domain {
+    pub fn merge_all(domains: impl IntoIterator<Item=Domain>) -> Self {
+        let mut classes = Vec::new();
+        for domain in domains {
+            classes.extend(domain.classes);
+        }
+        Self {classes}
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -57,9 +68,24 @@ pub struct Method {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct NamedValue {
+pub struct Field {
     pub name: String,
+
     pub ty: DataType,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct Param {
+    pub name: String,
+
+    pub ty: DataType,
+
+    #[serde(skip_serializing_if = "is_false")]
+    pub variadic: bool,
+}
+
+fn is_false(value: &bool) -> bool {
+    *value
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -76,10 +102,10 @@ pub struct StructClass {
     pub parent: Option<ClassName>,
 
     pub class_name: ClassName,
-    
+
     pub rust_struct_path: RustQualifiedName,
 
-    pub fields: Vec<NamedValue>,
+    pub fields: Vec<Field>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Hash)]
@@ -91,7 +117,7 @@ pub struct RustQualifiedName(pub String);
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct EnumClass {
     pub class_name: ClassName,
-    
+
     pub rust_struct_path: RustQualifiedName,
 
     pub variants: Vec<EnumVariant>,
@@ -111,7 +137,7 @@ pub struct EnumVariant {
 pub enum EnumValue {
     Unit,
     Tuple { fields: Vec<DataType> },
-    Struct { fields: Vec<NamedValue> },
+    Struct { fields: Vec<Field> },
 }
 
 impl EnumValue {
@@ -128,7 +154,7 @@ impl EnumValue {
 pub struct Signature {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     #[serde(default)]
-    pub params: Vec<NamedValue>,
+    pub params: Vec<Param>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]

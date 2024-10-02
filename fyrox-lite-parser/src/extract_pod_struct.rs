@@ -15,7 +15,7 @@ pub fn extract_pod_struct(
     let rust_name = item.ident.clone();
     let mut fields = Vec::new();
     for field in item.fields.iter() {
-        fields.push(NamedValue {
+        fields.push(Field {
             name: field.ident.to_token_stream().to_string(),
             ty: match extract_ty(&field.ty, None) {
                 Ok(it) => it,

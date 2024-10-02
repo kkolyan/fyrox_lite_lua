@@ -18,7 +18,7 @@ use crate::{lite_math::PodVector3, lite_node::LiteNode, script_context::with_scr
 #[derive(Debug)]
 pub struct LitePhysics;
 
-#[fyrox_lite]
+#[fyrox_lite(Physics)]
 impl LitePhysics {
     /// Exclude from the query any collider attached to a fixed rigid-body and colliders with no rigid-body attached.
     const EXCLUDE_FIXED: i32 = 1 << 1;

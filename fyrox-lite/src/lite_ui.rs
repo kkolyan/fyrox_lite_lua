@@ -27,18 +27,25 @@ impl LiteUiNode {
     }
 }
 
+#[fyrox_lite(UiNode)]
+impl LiteUiNode {
+    
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct LiteText {
     handle: Handle<UiNode>,
 }
 
 impl LiteText {
-    pub fn from(handle: Handle<UiNode>) -> Self {
-        Self { handle }
-    }
-
     pub fn inner(&self) -> Handle<UiNode> {
         self.handle
+    }
+}
+
+impl From<Handle<UiNode>> for LiteText {
+    fn from(handle: Handle<UiNode>) -> Self {
+        Self { handle }
     }
 }
 
