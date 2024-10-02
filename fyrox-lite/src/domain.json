@@ -1,65 +1,69 @@
 {
-  "items": [
+  "classes": [
     {
-      "StructClass": {
+      "Struct": {
         "class_name": "Vector3",
+        "rust_struct_path": "lite_math::PodVector3",
         "fields": [
           {
-            "field_name": "x",
+            "name": "x",
             "ty": "F32"
           },
           {
-            "field_name": "y",
+            "name": "y",
             "ty": "F32"
           },
           {
-            "field_name": "z",
+            "name": "z",
             "ty": "F32"
           }
         ]
       }
     },
     {
-      "StructClass": {
+      "Struct": {
         "class_name": "Vector2",
+        "rust_struct_path": "lite_math::PodVector2",
         "fields": [
           {
-            "field_name": "x",
+            "name": "x",
             "ty": "F32"
           },
           {
-            "field_name": "y",
+            "name": "y",
             "ty": "F32"
           }
         ]
       }
     },
     {
-      "StructClass": {
+      "Struct": {
         "class_name": "Quaternion",
+        "rust_struct_path": "lite_math::PodQuaternion",
         "fields": [
           {
-            "field_name": "x",
+            "name": "x",
             "ty": "F32"
           },
           {
-            "field_name": "y",
+            "name": "y",
             "ty": "F32"
           },
           {
-            "field_name": "z",
+            "name": "z",
             "ty": "F32"
           },
           {
-            "field_name": "w",
+            "name": "w",
             "ty": "F32"
           }
         ]
       }
     },
     {
-      "EngineClass": {
+      "Engine": {
         "class_name": "Node",
+        "rust_struct_path": "lite_node::LiteNode",
         "methods": [
           {
             "instance": true,
@@ -67,7 +71,7 @@
             "signature": {
               "return_ty": {
                 "Option": {
-                  "EngineObject": "RigidBody"
+                  "Object": "RigidBody"
                 }
               }
             }
@@ -98,7 +102,7 @@
             "method_name": "global_position",
             "signature": {
               "return_ty": {
-                "Struct": "Vector3"
+                "Object": "Vector3"
               }
             }
           },
@@ -107,7 +111,7 @@
             "method_name": "local_position",
             "signature": {
               "return_ty": {
-                "Struct": "Vector3"
+                "Object": "Vector3"
               }
             }
           },
@@ -116,7 +120,7 @@
             "method_name": "local_rotation",
             "signature": {
               "return_ty": {
-                "Struct": "Quaternion"
+                "Object": "Quaternion"
               }
             }
           },
@@ -126,9 +130,15 @@
             "signature": {
               "params": [
                 {
-                  "Enum": "RoutingStrategy"
+                  "name": "routing",
+                  "ty": {
+                    "Object": "RoutingStrategy"
+                  }
                 },
-                "UserScriptMessage"
+                {
+                  "name": "payload",
+                  "ty": "UserScriptMessage"
+                }
               ]
             }
           },
@@ -138,7 +148,10 @@
             "signature": {
               "params": [
                 {
-                  "Struct": "Vector3"
+                  "name": "new_pos",
+                  "ty": {
+                    "Object": "Vector3"
+                  }
                 }
               ]
             }
@@ -149,7 +162,10 @@
             "signature": {
               "params": [
                 {
-                  "Struct": "Quaternion"
+                  "name": "value",
+                  "ty": {
+                    "Object": "Quaternion"
+                  }
                 }
               ]
             }
@@ -159,7 +175,10 @@
             "method_name": "subscribe_to",
             "signature": {
               "params": [
-                "UserScriptGenericStub"
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub"
+                }
               ]
             }
           },
@@ -169,7 +188,7 @@
             "signature": {
               "return_ty": {
                 "Option": {
-                  "EngineObject": "Node"
+                  "Object": "Node"
                 }
               }
             }
@@ -186,7 +205,7 @@
             "method_name": "parent",
             "signature": {
               "return_ty": {
-                "EngineObject": "Node"
+                "Object": "Node"
               }
             }
           },
@@ -195,7 +214,10 @@
             "method_name": "add_script",
             "signature": {
               "params": [
-                "UserScript"
+                {
+                  "name": "state",
+                  "ty": "UserScript"
+                }
               ],
               "return_ty": {
                 "Result": {
@@ -209,7 +231,14 @@
             "method_name": "find_script",
             "signature": {
               "params": [
-                "String"
+                {
+                  "name": "class_name",
+                  "ty": "String"
+                },
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub"
+                }
               ],
               "return_ty": {
                 "Option": "UserScript"
@@ -221,7 +250,7 @@
             "method_name": "global_rotation",
             "signature": {
               "return_ty": {
-                "Struct": "Quaternion"
+                "Object": "Quaternion"
               }
             }
           },
@@ -230,7 +259,10 @@
             "method_name": "tag_is",
             "signature": {
               "params": [
-                "String"
+                {
+                  "name": "tag",
+                  "ty": "String"
+                }
               ],
               "return_ty": "Bool"
             }
@@ -240,7 +272,10 @@
             "method_name": "set_tag",
             "signature": {
               "params": [
-                "String"
+                {
+                  "name": "tag",
+                  "ty": "String"
+                }
               ]
             }
           }
@@ -248,8 +283,9 @@
       }
     },
     {
-      "EnumClass": {
+      "Enum": {
         "class_name": "RoutingStrategy",
+        "rust_struct_path": "lite_node::LiteRoutingStrategy",
         "variants": [
           {
             "tag": "Up"
@@ -261,43 +297,45 @@
       }
     },
     {
-      "StructClass": {
+      "Struct": {
         "class_name": "Intersection",
+        "rust_struct_path": "lite_physics::LiteIntersection",
         "fields": [
           {
-            "field_name": "collider",
+            "name": "collider",
             "ty": {
-              "EngineObject": "Node"
+              "Object": "Node"
             }
           },
           {
-            "field_name": "normal",
+            "name": "normal",
             "ty": {
-              "Struct": "Vector3"
+              "Object": "Vector3"
             }
           },
           {
-            "field_name": "position",
+            "name": "position",
             "ty": {
-              "Struct": "Vector3"
+              "Object": "Vector3"
             }
           },
           {
-            "field_name": "feature",
+            "name": "feature",
             "ty": {
-              "Enum": "FeatureId"
+              "Object": "FeatureId"
             }
           },
           {
-            "field_name": "toi",
+            "name": "toi",
             "ty": "F32"
           }
         ]
       }
     },
     {
-      "EnumClass": {
+      "Enum": {
         "class_name": "FeatureId",
+        "rust_struct_path": "lite_physics::LiteFeatureId",
         "variants": [
           {
             "tag": "Vertex",
@@ -330,56 +368,59 @@
       }
     },
     {
-      "StructClass": {
+      "Struct": {
         "class_name": "RayCastOptions",
+        "rust_struct_path": "lite_physics::LiteRayCastOptions",
         "fields": [
           {
-            "field_name": "ray_origin",
+            "name": "ray_origin",
             "ty": {
-              "Struct": "Vector3"
+              "Object": "Vector3"
             }
           },
           {
-            "field_name": "ray_direction",
+            "name": "ray_direction",
             "ty": {
-              "Struct": "Vector3"
+              "Object": "Vector3"
             }
           },
           {
-            "field_name": "max_len",
+            "name": "max_len",
             "ty": "F32"
           },
           {
-            "field_name": "groups",
+            "name": "groups",
             "ty": {
-              "Struct": "InteractionGroups"
+              "Object": "InteractionGroups"
             }
           },
           {
-            "field_name": "sort_results",
+            "name": "sort_results",
             "ty": "Bool"
           }
         ]
       }
     },
     {
-      "StructClass": {
+      "Struct": {
         "class_name": "InteractionGroups",
+        "rust_struct_path": "lite_physics::LiteInteractionGroups",
         "fields": [
           {
-            "field_name": "memberships",
+            "name": "memberships",
             "ty": "I32"
           },
           {
-            "field_name": "filter",
+            "name": "filter",
             "ty": "I32"
           }
         ]
       }
     },
     {
-      "EngineClass": {
+      "Engine": {
         "class_name": "RigidBody",
+        "rust_struct_path": "lite_physics::LiteRigidBody",
         "methods": [
           {
             "instance": true,
@@ -387,7 +428,10 @@
             "signature": {
               "params": [
                 {
-                  "Struct": "Vector3"
+                  "name": "force",
+                  "ty": {
+                    "Object": "Vector3"
+                  }
                 }
               ]
             }
@@ -396,8 +440,9 @@
       }
     },
     {
-      "EngineClass": {
+      "Engine": {
         "class_name": "Prefab",
+        "rust_struct_path": "lite_prefab::LitePrefab",
         "methods": [
           {
             "instance": true,
@@ -405,14 +450,20 @@
             "signature": {
               "params": [
                 {
-                  "Struct": "Vector3"
+                  "name": "position",
+                  "ty": {
+                    "Object": "Vector3"
+                  }
                 },
                 {
-                  "Struct": "Quaternion"
+                  "name": "orientation",
+                  "ty": {
+                    "Object": "Quaternion"
+                  }
                 }
               ],
               "return_ty": {
-                "EngineObject": "Node"
+                "Object": "Node"
               }
             }
           }
@@ -420,15 +471,19 @@
       }
     },
     {
-      "EngineClass": {
+      "Engine": {
         "class_name": "Scene",
+        "rust_struct_path": "lite_scene::LiteScene",
         "methods": [
           {
             "instance": false,
             "method_name": "load_async",
             "signature": {
               "params": [
-                "String"
+                {
+                  "name": "scene_path",
+                  "ty": "String"
+                }
               ]
             }
           }
@@ -436,15 +491,19 @@
       }
     },
     {
-      "EngineClass": {
+      "Engine": {
         "class_name": "Text",
+        "rust_struct_path": "lite_ui::LiteText",
         "methods": [
           {
             "instance": true,
             "method_name": "set_text_async",
             "signature": {
               "params": [
-                "String"
+                {
+                  "name": "text",
+                  "ty": "String"
+                }
               ]
             }
           },
@@ -454,11 +513,14 @@
             "signature": {
               "params": [
                 {
-                  "Struct": "TextBuilder"
+                  "name": "state",
+                  "ty": {
+                    "Object": "TextBuilder"
+                  }
                 }
               ],
               "return_ty": {
-                "EngineObject": "Text"
+                "Object": "Text"
               }
             }
           }
@@ -466,19 +528,20 @@
       }
     },
     {
-      "StructClass": {
+      "Struct": {
         "class_name": "TextBuilder",
+        "rust_struct_path": "lite_ui::TextBuilder",
         "fields": [
           {
-            "field_name": "foregound",
+            "name": "foregound",
             "ty": {
               "Option": {
-                "Enum": "Brush"
+                "Object": "Brush"
               }
             }
           },
           {
-            "field_name": "font_size",
+            "name": "font_size",
             "ty": {
               "Option": "F32"
             }
@@ -487,15 +550,16 @@
       }
     },
     {
-      "EnumClass": {
+      "Enum": {
         "class_name": "Brush",
+        "rust_struct_path": "lite_ui::Brush",
         "variants": [
           {
             "tag": "Solid",
             "value": {
               "fields": [
                 {
-                  "Struct": "Color"
+                  "Object": "Color"
                 }
               ]
             }
@@ -505,22 +569,22 @@
             "value": {
               "fields": [
                 {
-                  "field_name": "from",
+                  "name": "from",
                   "ty": {
-                    "Struct": "Vector2"
+                    "Object": "Vector2"
                   }
                 },
                 {
-                  "field_name": "to",
+                  "name": "to",
                   "ty": {
-                    "Struct": "Vector2"
+                    "Object": "Vector2"
                   }
                 },
                 {
-                  "field_name": "stops",
+                  "name": "stops",
                   "ty": {
                     "Vec": {
-                      "Struct": "GradientPoint"
+                      "Object": "GradientPoint"
                     }
                   }
                 }
@@ -532,16 +596,16 @@
             "value": {
               "fields": [
                 {
-                  "field_name": "center",
+                  "name": "center",
                   "ty": {
-                    "Struct": "Vector2"
+                    "Object": "Vector2"
                   }
                 },
                 {
-                  "field_name": "stops",
+                  "name": "stops",
                   "ty": {
                     "Vec": {
-                      "Struct": "GradientPoint"
+                      "Object": "GradientPoint"
                     }
                   }
                 }
@@ -552,48 +616,51 @@
       }
     },
     {
-      "StructClass": {
+      "Struct": {
         "class_name": "Color",
+        "rust_struct_path": "lite_ui::Color",
         "fields": [
           {
-            "field_name": "r",
+            "name": "r",
             "ty": "Byte"
           },
           {
-            "field_name": "g",
+            "name": "g",
             "ty": "Byte"
           },
           {
-            "field_name": "b",
+            "name": "b",
             "ty": "Byte"
           },
           {
-            "field_name": "a",
+            "name": "a",
             "ty": "Byte"
           }
         ]
       }
     },
     {
-      "StructClass": {
+      "Struct": {
         "class_name": "GradientPoint",
+        "rust_struct_path": "lite_ui::GradientPoint",
         "fields": [
           {
-            "field_name": "stop",
+            "name": "stop",
             "ty": "F32"
           },
           {
-            "field_name": "color",
+            "name": "color",
             "ty": {
-              "Struct": "Color"
+              "Object": "Color"
             }
           }
         ]
       }
     },
     {
-      "EngineClass": {
+      "Engine": {
         "class_name": "Window",
+        "rust_struct_path": "lite_window::LiteWindow",
         "methods": [
           {
             "instance": false,
@@ -601,7 +668,10 @@
             "signature": {
               "params": [
                 {
-                  "Enum": "CursorGrabMode"
+                  "name": "mode",
+                  "ty": {
+                    "Object": "CursorGrabMode"
+                  }
                 }
               ]
             }
@@ -610,8 +680,9 @@
       }
     },
     {
-      "EnumClass": {
+      "Enum": {
         "class_name": "CursorGrabMode",
+        "rust_struct_path": "lite_window::LiteCursorGrabMode",
         "variants": [
           {
             "tag": "None"

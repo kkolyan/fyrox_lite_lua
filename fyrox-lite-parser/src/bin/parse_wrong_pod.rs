@@ -35,7 +35,7 @@ fn main() {
     };
 
     let mut errors = Vec::new();
-    extract_pod_struct(quote! {"Intersection"}, &struct_, &mut errors).unwrap();
+    extract_pod_struct("aaa", quote! {"Intersection"}, &struct_, &mut errors).unwrap();
     let error = errors.into_iter().reduce(|mut a, b| {
         a.combine(b);
         a

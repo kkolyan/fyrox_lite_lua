@@ -1,20 +1,14 @@
 use std::collections::HashMap;
 
-use fyrox_lite_model::{
-    ClassName, Constant, DataType, EngineClass, Method, Signature
-};
+use fyrox_lite_model::{ClassName, Constant, DataType, EngineClass, Method, NamedValue, RustQualifiedName, Signature};
 use proc_macro2::TokenStream;
 use quote::ToTokens;
-use syn::{
-    parse_quote_spanned, spanned::Spanned, Ident, TraitBoundModifier, TypeParamBound
-};
+use syn::{parse_quote_spanned, spanned::Spanned, Ident, TraitBoundModifier, TypeParamBound};
 
-use crate::{
-    extract_expression::extract_expression,
-    extract_ty::extract_ty,
-};
+use crate::{extract_expression::extract_expression, extract_ty::extract_ty};
 
 pub fn extract_engine_class_and_inject_assertions(
+    rust_path: &str,
     attr: TokenStream,
     item: &mut syn::ItemImpl,
     errors: &mut Vec<syn::Error>,
@@ -37,13 +31,10 @@ pub fn extract_engine_class_and_inject_assertions(
         }
     };
 
+    let mut constants: Vec<Constant> = Default::default();
+    let mut methods: Vec<Method> = Default::default();
+
     let class_name = attr.to_string();
-    let mut pod = EngineClass {
-        parent: None,
-        class_name: ClassName(class_name),
-        methods: Default::default(),
-        constants: Default::default(),
-    };
     'items: for it in item.items.iter_mut() {
         match it {
             syn::ImplItem::Fn(func) => {
@@ -95,18 +86,31 @@ pub fn extract_engine_class_and_inject_assertions(
                 }
                 let mut instance = false;
                 let mut params = Vec::new();
-                'params: for it in func.sig.inputs.iter() {
-                    let ty = match it {
+                'params: for args in func.sig.inputs.iter() {
+                    let arg = match args {
                         syn::FnArg::Receiver(_receiver) => {
                             instance = true;
                             continue 'params;
                         }
-                        syn::FnArg::Typed(pat_type) => pat_type.ty.as_ref(),
+                        syn::FnArg::Typed(pat_type) => pat_type,
                     };
+                    let ty = arg.ty.as_ref();
                     types.push(ty.clone());
                     match extract_ty(ty, Some(&generic_params)) {
                         Ok(it) => {
-                            params.push(it);
+                            params.push(NamedValue {
+                                name: match arg.pat.as_ref() {
+                                    syn::Pat::Ident(pat_ident) => pat_ident.ident.to_string(),
+                                    _ => {
+                                        errors.push(syn::Error::new_spanned(
+                                            arg,
+                                            "Fyrox Lite: identifier should be used as method arg name",
+                                        ));
+                                        continue 'items;
+                                    }
+                                },
+                                ty: it,
+                            });
                         }
                         Err(err) => {
                             errors.push(err);
@@ -114,7 +118,7 @@ pub fn extract_engine_class_and_inject_assertions(
                         }
                     }
                 }
-                pod.methods.push(Method {
+                methods.push(Method {
                     method_name: func.sig.ident.to_token_stream().to_string(),
                     instance,
                     signature: Signature {
@@ -137,10 +141,10 @@ pub fn extract_engine_class_and_inject_assertions(
                 let static_assertions = types
                     .into_iter()
                     .map::<syn::Stmt, _>(|ty| {
-						let span = ty.span();
+                        let span = ty.span();
                         parse_quote_spanned! {span =>
                             {
-								#[allow(unused_imports)]
+                                #[allow(unused_imports)]
                                 use crate::LiteDataType;
                                 <#ty>::compiles_if_type_is_allowed();
                             }
@@ -150,7 +154,7 @@ pub fn extract_engine_class_and_inject_assertions(
                 func.block.stmts.splice(0..0, static_assertions);
             }
             syn::ImplItem::Const(it) => {
-                pod.constants.push(Constant {
+                constants.push(Constant {
                     const_name: it.ident.to_string(),
                     ty: match extract_ty(&it.ty, None) {
                         Ok(it) => it,
@@ -176,5 +180,16 @@ pub fn extract_engine_class_and_inject_assertions(
             }
         }
     }
-    rust_name.map(|rust_name| (rust_name, pod))
+    rust_name.map(|rust_name| {
+        (
+            rust_name.clone(),
+            EngineClass {
+                parent: None,
+                class_name: ClassName(class_name),
+                methods,
+                constants,
+                rust_struct_path: RustQualifiedName(format!("{}::{}", rust_path, rust_name)),
+            },
+        )
+    })
 }

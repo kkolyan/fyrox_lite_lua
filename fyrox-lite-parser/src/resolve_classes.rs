@@ -7,38 +7,38 @@ use crate::RustSymbol;
 pub fn resolve_classes(domain: &mut Domain, aliases: &mut HashMap<String, RustSymbol>) {
     let mut classes: HashMap<RustSymbol, DataType> = Default::default();
 
-    for item in domain.items.iter() {
+    for item in domain.classes.iter() {
         match item {
-            fyrox_lite_model::DomainItem::EngineClass(class) => {
+            fyrox_lite_model::Class::Engine(class) => {
                 classes.insert(
                     aliases[&class.class_name.0].clone(),
-                    DataType::EngineObject(class.class_name.clone()),
+                    DataType::Object(class.class_name.clone()),
                 );
             }
-            fyrox_lite_model::DomainItem::StructClass(class) => {
+            fyrox_lite_model::Class::Struct(class) => {
                 classes.insert(
                     aliases[&class.class_name.0].clone(),
-                    DataType::Struct(class.class_name.clone()),
+                    DataType::Object(class.class_name.clone()),
                 );
             }
-            fyrox_lite_model::DomainItem::EnumClass(class) => {
+            fyrox_lite_model::Class::Enum(class) => {
                 classes.insert(
                     aliases[&class.class_name.0].clone(),
-                    DataType::Enum(class.class_name.clone()),
+                    DataType::Object(class.class_name.clone()),
                 );
             }
         }
     }
 
-    for item in domain.items.iter_mut() {
+    for item in domain.classes.iter_mut() {
         match item {
-            fyrox_lite_model::DomainItem::EngineClass(class) => {
+            fyrox_lite_model::Class::Engine(class) => {
                 resolve_classes_engine_class(class, &classes)
             }
-            fyrox_lite_model::DomainItem::StructClass(class) => {
+            fyrox_lite_model::Class::Struct(class) => {
                 resolve_classes_struct_class(class, &classes)
             }
-            fyrox_lite_model::DomainItem::EnumClass(class) => {
+            fyrox_lite_model::Class::Enum(class) => {
                 resolve_classes_enum_class(class, &classes)
             }
         }
@@ -99,7 +99,7 @@ fn resolve_classes_engine_class(
 ) {
     for method in class.methods.iter_mut() {
         for param in method.signature.params.iter_mut() {
-            *param = resolve_type(param, classes);
+            param.ty = resolve_type(&param.ty, classes);
         }
         if let Some(it) = method.signature.return_ty.as_mut() {
             *it = resolve_type(it, classes);

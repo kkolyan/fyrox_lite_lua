@@ -1,6 +1,6 @@
 
 [workspace]
-members = [ "editor", "executor", "fyrox-lite", "fyrox-lite-macro", "fyrox-lite-macro-lib", "fyrox-lite-math", "fyrox-lite-model", "fyrox-lite-parser", "fyrox-lua"]
+members = [ "editor", "executor", "fyrox-lite", "fyrox-lite-lua-generator", "fyrox-lite-macro", "fyrox-lite-macro-lib", "fyrox-lite-math", "fyrox-lite-model", "fyrox-lite-parser", "fyrox-lua"]
 resolver = "2"
 exclude = ["mlua"]
 
@@ -10,6 +10,20 @@ fyrox-core = {git = "https://github.com/FyroxEngine/Fyrox", default-features = f
 fyroxed_base = {git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f"}
 # fyrox = {path = "c:/dev/rust/Fyrox/fyrox", default-features = false}
 # fyroxed_base = {path = "c:/dev/rust/Fyrox/editor", default-features = false}
+serde = "1.0.210"
+serde_json = "1.0.128"
+quote = "1.0.37"
+proc-macro2 = "1.0.86"
+syn = {version = "2.0.77", features = ["full", "extra-traits"]}
+uuid = {version = "1.10.0", features = ["v4"]}
+fyrox-lite-model = {path = "fyrox-lite-model"}
+fyrox-lite-parser = {path = "fyrox-lite-parser"}
+extend = "1.2.0"
+convert_case = "0.6.0"
+to_vec = "0.1.0"
+fyrox-lite = {path = "fyrox-lite"}
+mlua = { version = "0.9.1", features = ["luau"] }
+# mlua = { path = "../mlua", features = ["luau"] }
 
 # Separate build profiles for hot reloading. These profiles ensures that build artifacts for
 # hot reloading will be placed into their own folders and does not interfere with standard (static)

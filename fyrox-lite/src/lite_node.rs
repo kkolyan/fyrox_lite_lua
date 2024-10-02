@@ -185,7 +185,7 @@ impl LiteNode {
         })
     }
 
-    pub fn find_script<T: UserScript>(&self, class_name: String) -> Option<T> {
+    pub fn find_script<T: UserScript>(&self, class_name: String, _stub: T::UserScriptGenericStub) -> Option<T> {
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
             for script in node.try_get_scripts_mut::<T::ProxyScript>() {

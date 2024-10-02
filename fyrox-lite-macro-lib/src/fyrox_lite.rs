@@ -1,11 +1,10 @@
-
-use fyrox_lite_parser::{extract_engine_class::extract_engine_class_and_inject_assertions, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct};
+use fyrox_lite_parser::{
+    extract_engine_class::extract_engine_class_and_inject_assertions,
+    extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct,
+};
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{
-    parse2,
-    spanned::Spanned,
-};
+use syn::{parse2, spanned::Spanned};
 
 use crate::generate_static_assertions;
 
@@ -16,7 +15,7 @@ pub fn fyrox_lite(attr: TokenStream, item: TokenStream) -> TokenStream {
                 let mut errors = Vec::new();
 
                 let mut types = Vec::new();
-                let ident = extract_pod_enum(attr, &item, &mut errors, &mut types)
+                let ident = extract_pod_enum("dontcare", attr, &item, &mut errors, &mut types)
                     .map(|(rust_class_name, _class)| rust_class_name);
 
                 let field_assertions = generate_static_assertions(types.iter());
@@ -41,11 +40,7 @@ pub fn fyrox_lite(attr: TokenStream, item: TokenStream) -> TokenStream {
             syn::Item::Struct(item) => {
                 let mut errors = Vec::new();
 
-                extract_pod_struct(
-                    attr,
-                    &item,
-                    &mut errors,
-                );
+                extract_pod_struct("dontcare", attr, &item, &mut errors);
 
                 let ident = &item.ident;
 
@@ -69,8 +64,13 @@ pub fn fyrox_lite(attr: TokenStream, item: TokenStream) -> TokenStream {
             syn::Item::Impl(mut item) => {
                 let mut errors = Vec::new();
 
-                let ident = extract_engine_class_and_inject_assertions(attr, &mut item, &mut errors)
-                    .map(|(rust_class_name, _class)| rust_class_name);
+                let ident = extract_engine_class_and_inject_assertions(
+                    "dontcare",
+                    attr,
+                    &mut item,
+                    &mut errors,
+                )
+                .map(|(rust_class_name, _class)| rust_class_name);
 
                 let errors = errors
                     .into_iter()

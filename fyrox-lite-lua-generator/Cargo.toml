@@ -1,0 +1,13 @@
+[package]
+name = "fyrox-lite-lua-generator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fyrox-lite-model = {workspace = true}
+serde = {workspace = true}
+serde_json = {workspace = true}
+extend = {workspace = true}
+convert_case = {workspace = true}
+to_vec = {workspace = true}
+fyrox-lite-parser = {workspace = true}

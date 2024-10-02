@@ -14,3 +14,4 @@ pub mod script_data;
 pub mod script;
 pub mod script_def;
 pub mod script_object;
+pub mod generated;

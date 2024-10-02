@@ -336,7 +336,7 @@ impl FyroxUserData for LiteNode {
 
 impl Traitor<LiteNode> {
     fn get_script(&self, class_name: &str) -> Option<TypedUserData<'static, ScriptObject>> {
-        self.find_script(class_name.to_string())
+        self.find_script(class_name.to_string(), ())
     }
 }
 

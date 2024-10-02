@@ -7,8 +7,7 @@ edition = "2021"
 fyrox-lite = {path = "../fyrox-lite"}
 fyrox-lite-math = {path = "../fyrox-lite-math"}
 fyrox = {workspace = true}
-mlua = { version = "0.9.1", features = ["luau"] }
-# mlua = { path = "../mlua", features = ["luau"] }
+mlua = {workspace = true}
 send_wrapper = "0.6.0"
 extend = "1.2.0"
 convert_case = "0.6.0"

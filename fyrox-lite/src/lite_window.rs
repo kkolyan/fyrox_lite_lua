@@ -1,9 +1,17 @@
+use std::fmt::Debug;
+
 use fyrox::{core::log::Log, window::CursorGrabMode};
 use fyrox_lite_macro::fyrox_lite;
 
 use crate::script_context::with_script_context;
 
 pub struct LiteWindow;
+
+impl Debug for LiteWindow {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Window")
+    }
+}
 
 #[fyrox_lite(Window)]
 impl LiteWindow {

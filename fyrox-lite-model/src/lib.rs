@@ -2,14 +2,32 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Default, PartialEq)]
 pub struct Domain {
-    pub items: Vec<DomainItem>,
+    pub classes: Vec<Class>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub enum DomainItem {
-    EngineClass(EngineClass),
-    StructClass(StructClass),
-    EnumClass(EnumClass),
+pub enum Class {
+    Engine(EngineClass),
+    Struct(StructClass),
+    Enum(EnumClass),
+}
+
+impl Class {
+    pub fn class_name(&self) -> &ClassName {
+        match self {
+            Class::Engine(it) => &it.class_name,
+            Class::Struct(it) => &it.class_name,
+            Class::Enum(it) => &it.class_name,
+        }
+    }
+
+    pub fn rust_name(&self) -> &RustQualifiedName {
+        match self {
+            Class::Engine(it) => &it.rust_struct_path,
+            Class::Struct(it) => &it.rust_struct_path,
+            Class::Enum(it) => &it.rust_struct_path,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -19,6 +37,8 @@ pub struct EngineClass {
     pub parent: Option<ClassName>,
 
     pub class_name: ClassName,
+
+    pub rust_struct_path: RustQualifiedName,
 
     #[serde(skip_serializing_if = "Vec::is_empty")]
     #[serde(default)]
@@ -37,8 +57,8 @@ pub struct Method {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct Field {
-    pub field_name: String,
+pub struct NamedValue {
+    pub name: String,
     pub ty: DataType,
 }
 
@@ -56,16 +76,24 @@ pub struct StructClass {
     pub parent: Option<ClassName>,
 
     pub class_name: ClassName,
+    
+    pub rust_struct_path: RustQualifiedName,
 
-    pub fields: Vec<Field>,
+    pub fields: Vec<NamedValue>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Hash)]
 pub struct ClassName(pub String);
 
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Hash)]
+pub struct RustQualifiedName(pub String);
+
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct EnumClass {
     pub class_name: ClassName,
+    
+    pub rust_struct_path: RustQualifiedName,
+
     pub variants: Vec<EnumVariant>,
 }
 
@@ -83,7 +111,7 @@ pub struct EnumVariant {
 pub enum EnumValue {
     Unit,
     Tuple { fields: Vec<DataType> },
-    Struct { fields: Vec<Field> },
+    Struct { fields: Vec<NamedValue> },
 }
 
 impl EnumValue {
@@ -100,7 +128,7 @@ impl EnumValue {
 pub struct Signature {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     #[serde(default)]
-    pub params: Vec<DataType>,
+    pub params: Vec<NamedValue>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
@@ -125,9 +153,7 @@ pub enum DataType {
     UserScriptMessage,
     /// stub argument to call UserScript-type parameterized methods
     UserScriptGenericStub,
-    Struct(ClassName),
-    Enum(ClassName),
-    EngineObject(ClassName),
+    Object(ClassName),
     Option(Box<DataType>),
     /// Error should be universal scripting language specific type, so it is not presented here
     Result {

@@ -1,6 +1,8 @@
-use std::marker::PhantomData;
+use std::{any::type_name, marker::PhantomData};
 
-use mlua::{AnyUserData, IntoLua};
+use mlua::{AnyUserData, FromLua, IntoLua, UserDataRef};
+
+use crate::lua_error;
 
 #[derive(Clone)]
 pub struct TypedUserData<'lua, T> {
@@ -28,5 +30,14 @@ impl<'lua, T: 'static> TypedUserData<'lua, T> {
 impl<'lua, T> IntoLua<'lua> for TypedUserData<'lua, T> {
     fn into_lua(self, lua: &'lua mlua::Lua) -> mlua::Result<mlua::Value<'lua>> {
         self.ud.into_lua(lua)
+    }
+}
+
+impl <'lua, T : 'static> FromLua<'lua> for TypedUserData<'lua, T> {
+    fn from_lua(value: mlua::Value<'lua>, _lua: &'lua mlua::Lua) -> mlua::Result<Self> {
+        match value {
+            mlua::Value::UserData(ud) => Ok(TypedUserData::new(ud)),
+            value => Err(lua_error!("cannot cast {:?} to {}", value, type_name::<T>())),
+        }
     }
 }
