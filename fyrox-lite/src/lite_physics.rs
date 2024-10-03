@@ -21,22 +21,22 @@ pub struct LitePhysics;
 #[fyrox_lite(Physics)]
 impl LitePhysics {
     /// Exclude from the query any collider attached to a fixed rigid-body and colliders with no rigid-body attached.
-    const EXCLUDE_FIXED: i32 = 1 << 1;
+    pub const EXCLUDE_FIXED: i32 = 1 << 1;
     /// Exclude from the query any collider attached to a kinematic rigid-body.
-    const EXCLUDE_KINEMATIC: i32 = 1 << 2;
+    pub const EXCLUDE_KINEMATIC: i32 = 1 << 2;
     /// Exclude from the query any collider attached to a dynamic rigid-body.
-    const EXCLUDE_DYNAMIC: i32 = 1 << 3;
+    pub const EXCLUDE_DYNAMIC: i32 = 1 << 3;
     /// Exclude from the query any collider that is a sensor.
-    const EXCLUDE_SENSORS: i32 = 1 << 4;
+    pub const EXCLUDE_SENSORS: i32 = 1 << 4;
     /// Exclude from the query any collider that is not a sensor.
-    const EXCLUDE_SOLIDS: i32 = 1 << 5;
+    pub const EXCLUDE_SOLIDS: i32 = 1 << 5;
     /// Excludes all colliders not attached to a dynamic rigid-body.
-    const ONLY_DYNAMIC: i32 = LitePhysics::EXCLUDE_FIXED | LitePhysics::EXCLUDE_KINEMATIC;
+    pub const ONLY_DYNAMIC: i32 = LitePhysics::EXCLUDE_FIXED | LitePhysics::EXCLUDE_KINEMATIC;
     /// Excludes all colliders not attached to a kinematic rigid-body.
-    const ONLY_KINEMATIC: i32 = LitePhysics::EXCLUDE_DYNAMIC | LitePhysics::EXCLUDE_FIXED;
+    pub const ONLY_KINEMATIC: i32 = LitePhysics::EXCLUDE_DYNAMIC | LitePhysics::EXCLUDE_FIXED;
     /// Exclude all colliders attached to a non-fixed rigid-body
     /// (this will not exclude colliders not attached to any rigid-body).
-    const ONLY_FIXED: i32 = LitePhysics::EXCLUDE_DYNAMIC | LitePhysics::EXCLUDE_KINEMATIC;
+    pub const ONLY_FIXED: i32 = LitePhysics::EXCLUDE_DYNAMIC | LitePhysics::EXCLUDE_KINEMATIC;
 
     pub fn cast_ray(opts: LiteRayCastOptions) -> Vec<LiteIntersection> {
         with_script_context(|ctx| {

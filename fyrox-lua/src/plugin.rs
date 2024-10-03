@@ -25,6 +25,7 @@ use fyrox::script::Script;
 use fyrox::script::ScriptContext;
 use fyrox::walkdir::DirEntry;
 use fyrox::walkdir::WalkDir;
+use fyrox_lite::lite_log::LiteLog;
 use fyrox_lite::lite_ui::Brush;
 use fyrox_lite::lite_ui::Color;
 use fyrox_lite::lite_window::LiteCursorGrabMode;
@@ -164,7 +165,7 @@ impl Plugin for LuaPlugin {
         LitePlugin::register_class(self.vm);
         LiteVector3::register_class(self.vm);
         LiteQuaternion::register_class(self.vm);
-        Log::register_class(self.vm);
+        LiteLog::register_class(self.vm);
         LitePhysics::register_class(self.vm);
         LiteRoutingStrategy::register_class(self.vm);
 

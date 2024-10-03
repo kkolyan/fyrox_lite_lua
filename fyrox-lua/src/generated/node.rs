@@ -92,9 +92,9 @@
 			
 				methods.add_method_mut(
 					"send_hierarchical",
-					|lua, this, (routing, payload): (TypedUserData<Traitor<lite_node::LiteRoutingStrategy>>, mlua::Value)| {
+					|lua, this, (routing, payload): (Traitor<lite_node::LiteRoutingStrategy>, mlua::Value)| {
 			
-						let routing = routing.borrow()?.inner().clone().into();
+						let routing = routing.inner().clone().into();
 				
 						let payload = Traitor::new(send_wrapper::SendWrapper::new(unsafe { std::mem::transmute::<_, mlua::Value<'static>>(payload) } ));
 				

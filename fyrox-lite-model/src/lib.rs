@@ -6,6 +6,12 @@ pub struct Domain {
 }
 
 impl Domain {
+    pub fn get_class(&self, name: &ClassName) -> Option<&Class> {
+        self.classes.iter().find(|it| it.class_name() == name)
+    }
+}
+
+impl Domain {
     pub fn merge_all(domains: impl IntoIterator<Item=Domain>) -> Self {
         let mut classes = Vec::new();
         for domain in domains {

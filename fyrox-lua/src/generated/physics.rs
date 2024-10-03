@@ -26,9 +26,9 @@
 	
 				methods.add_method_mut(
 					"cast_ray",
-					|lua, this, (opts): (TypedUserData<Traitor<lite_physics::LiteRayCastOptions>>)| {
+					|lua, this, (opts): (Traitor<lite_physics::LiteRayCastOptions>)| {
 			
-						let opts = opts.borrow()?.inner().clone().into();
+						let opts = opts.inner().clone().into();
 				
 						let ret = lite_physics::LitePhysics::cast_ray(opts);
                         let ret = lua.create_table_from(ret.into_iter().map(|it| Traitor::new(lite_physics::LiteIntersection::from(it))).enumerate());

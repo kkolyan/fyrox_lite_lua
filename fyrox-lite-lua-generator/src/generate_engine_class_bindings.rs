@@ -2,7 +2,7 @@ use core::fmt;
 
 use convert_case::{Case, Casing};
 use fyrox_lite_model::{DataType, Domain, EngineClass, Method, RustQualifiedName, StructClass};
-use std::{collections::HashMap, fmt::Write, ops::Deref};
+use std::{borrow::Cow, collections::HashMap, fmt::Write, ops::Deref};
 use to_vec::ToVec;
 
 use crate::{
@@ -108,7 +108,7 @@ fn generate_instance_fields(s: &mut String, class: &EngineClass, ctx: &Generatio
 
     generate_instance_getters(s, class, ctx);
 
-    generate_instance_setters(s, class, ctx);
+    generate_setters(s, class, ctx, true);
 
     render(
         s,
@@ -119,20 +119,25 @@ fn generate_instance_fields(s: &mut String, class: &EngineClass, ctx: &Generatio
     );
 }
 
-fn generate_instance_setters(s: &mut String, class: &EngineClass, ctx: &GenerationContext) {
+fn generate_setters(s: &mut String, class: &EngineClass, ctx: &GenerationContext, instance: bool) {
     let writable_props = class
         .methods
         .iter()
+        .filter(|it| it.instance == instance)
         .filter(|it| is_setter(it))
         .map(|method| (method.method_name.strip_prefix("set_").unwrap(), method))
         .to_vec();
 
     for (prop, setter) in writable_props {
+        let target = match instance {
+            true => Cow::Borrowed("this."),
+            false => Cow::Owned(format!("{}::", class.rust_struct_path.0)),
+        };
         render(
             s,
             r#"
 				fields.add_field_method_set("${field_name}", |lua, this, value: ${input_type}| {
-					this.set_${field_name}(${expression});
+					${target}set_${field_name}(${expression});
 					Ok(())
 				});
 		"#,
@@ -145,6 +150,13 @@ fn generate_instance_setters(s: &mut String, class: &EngineClass, ctx: &Generati
                 (
                     "expression",
                     &mlua_to_rust_expr("value", &setter.signature.params[0].ty, ctx),
+                ),
+                (
+                    "target",
+                    match instance {
+                        true => &"this.",
+                        false => &target,
+                    },
                 ),
             ],
         );
@@ -189,6 +201,15 @@ fn generate_class_fields(s: &mut String, class: &EngineClass, ctx: &GenerationCo
         [],
     );
 
+    generate_class_getters(s, class, ctx);
+    generate_setters(s, class, ctx, false);
+
+    *s += "
+			}
+	";
+}
+
+fn generate_class_getters(s: &mut String, class: &EngineClass, ctx: &GenerationContext) {
     for constant in class.constants.iter() {
         render(
             s,
@@ -233,8 +254,4 @@ fn generate_class_fields(s: &mut String, class: &EngineClass, ctx: &GenerationCo
             ],
         );
     }
-
-    *s += "
-			}
-	";
 }

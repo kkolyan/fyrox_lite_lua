@@ -26,9 +26,9 @@
 	
 				methods.add_method_mut(
 					"new",
-					|lua, this, (state): (TypedUserData<Traitor<lite_ui::TextBuilder>>)| {
+					|lua, this, (state): (Traitor<lite_ui::TextBuilder>)| {
 			
-						let state = state.borrow()?.inner().clone().into();
+						let state = state.inner().clone().into();
 				
 						let ret = lite_ui::LiteText::new(state);
                         let ret = Traitor::new(lite_ui::LiteText::from(ret));

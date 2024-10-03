@@ -8,9 +8,9 @@ use fyrox_lite_parser::generate_domain::generate_domain;
 fn main() {
     let mut fyrox: Domain = generate_domain("fyrox-lite/src");
     let math: Domain = generate_domain("fyrox-lite-math/src");
-    
+
     // math "overrides" classes in fyrox by name
-    fyrox.classes.retain_mut(|fyrox_class| !math.classes.iter().any(|it| it.class_name() == fyrox_class.class_name()));
+    fyrox.classes.retain_mut(|fyrox_class| math.get_class(fyrox_class.class_name()).is_none());
     
     let domain = Domain::merge_all([fyrox, math]);
     let mut context = GenerationContext {
@@ -18,15 +18,15 @@ fn main() {
         domain,
     };
 
-    context.internal_to_external.insert(
-        RustQualifiedName("lite_math::PodVector3".to_string()),
-        RustQualifiedName("vec::LiteVector3".to_string()),
-    );
+    // context.internal_to_external.insert(
+    //     RustQualifiedName("lite_math::PodVector3".to_string()),
+    //     RustQualifiedName("vec::LiteVector3".to_string()),
+    // );
 
-    context.internal_to_external.insert(
-        RustQualifiedName("lite_math::PodQuaternion".to_string()),
-        RustQualifiedName("quat::LiteQuaternion".to_string()),
-    );
+    // context.internal_to_external.insert(
+    //     RustQualifiedName("lite_math::PodQuaternion".to_string()),
+    //     RustQualifiedName("quat::LiteQuaternion".to_string()),
+    // );
 
     let mut code_base = SimpleRustCodeBase::default();
 
