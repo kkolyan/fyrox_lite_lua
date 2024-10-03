@@ -1,3 +1,4 @@
+pub mod generate_enum_class_bindings;
 pub mod generate_fields;
 pub mod generate_methods;
 pub mod expressions;

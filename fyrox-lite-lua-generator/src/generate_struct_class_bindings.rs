@@ -56,7 +56,7 @@ fn generate_into_lua(s: &mut String, class: &StructClass, ctx: &GenerationContex
             s,
             r#"
                     t.set("${field_name}", {
-                        let ${field_name} = self.${field_name};
+                        let ${field_name} = self.${field_name}.clone();
                         ${expression}
                     })?;
         "#,

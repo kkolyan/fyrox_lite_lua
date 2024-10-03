@@ -14,22 +14,22 @@
                     let t = lua.create_table()?;
     
                     t.set("r", {
-                        let r = self.r;
+                        let r = self.r.clone();
                         r
                     })?;
         
                     t.set("g", {
-                        let g = self.g;
+                        let g = self.g.clone();
                         g
                     })?;
         
                     t.set("b", {
-                        let b = self.b;
+                        let b = self.b.clone();
                         b
                     })?;
         
                     t.set("a", {
-                        let a = self.a;
+                        let a = self.a.clone();
                         a
                     })?;
         

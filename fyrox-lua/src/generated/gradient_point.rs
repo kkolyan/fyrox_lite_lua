@@ -14,12 +14,12 @@
                     let t = lua.create_table()?;
     
                     t.set("stop", {
-                        let stop = self.stop;
+                        let stop = self.stop.clone();
                         stop
                     })?;
         
                     t.set("color", {
-                        let color = self.color;
+                        let color = self.color.clone();
                         Traitor::new(lite_ui::Color::from(color))
                     })?;
         

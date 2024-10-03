@@ -14,12 +14,12 @@
                     let t = lua.create_table()?;
     
                     t.set("memberships", {
-                        let memberships = self.memberships;
+                        let memberships = self.memberships.clone();
                         memberships
                     })?;
         
                     t.set("filter", {
-                        let filter = self.filter;
+                        let filter = self.filter.clone();
                         filter
                     })?;
         

@@ -14,27 +14,27 @@
                     let t = lua.create_table()?;
     
                     t.set("collider", {
-                        let collider = self.collider;
+                        let collider = self.collider.clone();
                         Traitor::new(lite_node::LiteNode::from(collider))
                     })?;
         
                     t.set("normal", {
-                        let normal = self.normal;
+                        let normal = self.normal.clone();
                         Traitor::new(vec::LiteVector3::from(normal))
                     })?;
         
                     t.set("position", {
-                        let position = self.position;
+                        let position = self.position.clone();
                         Traitor::new(vec::LiteVector3::from(position))
                     })?;
         
                     t.set("feature", {
-                        let feature = self.feature;
+                        let feature = self.feature.clone();
                         Traitor::new(lite_physics::LiteFeatureId::from(feature))
                     })?;
         
                     t.set("toi", {
-                        let toi = self.toi;
+                        let toi = self.toi.clone();
                         toi
                     })?;
         

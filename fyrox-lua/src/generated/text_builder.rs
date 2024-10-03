@@ -14,12 +14,12 @@
                     let t = lua.create_table()?;
     
                     t.set("foregound", {
-                        let foregound = self.foregound;
+                        let foregound = self.foregound.clone();
                         if let Some(foregound) = foregound { Some(Traitor::new(lite_ui::Brush::from(foregound))) } else { None }
                     })?;
         
                     t.set("font_size", {
-                        let font_size = self.font_size;
+                        let font_size = self.font_size.clone();
                         if let Some(font_size) = font_size { Some(font_size) } else { None }
                     })?;
         

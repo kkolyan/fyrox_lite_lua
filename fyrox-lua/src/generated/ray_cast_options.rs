@@ -14,27 +14,27 @@
                     let t = lua.create_table()?;
     
                     t.set("ray_origin", {
-                        let ray_origin = self.ray_origin;
+                        let ray_origin = self.ray_origin.clone();
                         Traitor::new(vec::LiteVector3::from(ray_origin))
                     })?;
         
                     t.set("ray_direction", {
-                        let ray_direction = self.ray_direction;
+                        let ray_direction = self.ray_direction.clone();
                         Traitor::new(vec::LiteVector3::from(ray_direction))
                     })?;
         
                     t.set("max_len", {
-                        let max_len = self.max_len;
+                        let max_len = self.max_len.clone();
                         max_len
                     })?;
         
                     t.set("groups", {
-                        let groups = self.groups;
+                        let groups = self.groups.clone();
                         Traitor::new(lite_physics::LiteInteractionGroups::from(groups))
                     })?;
         
                     t.set("sort_results", {
-                        let sort_results = self.sort_results;
+                        let sort_results = self.sort_results.clone();
                         sort_results
                     })?;
         

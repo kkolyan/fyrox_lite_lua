@@ -14,12 +14,12 @@
                     let t = lua.create_table()?;
     
                     t.set("x", {
-                        let x = self.x;
+                        let x = self.x.clone();
                         x
                     })?;
         
                     t.set("y", {
-                        let y = self.y;
+                        let y = self.y.clone();
                         y
                     })?;
         

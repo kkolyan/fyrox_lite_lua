@@ -1,6 +1,5 @@
 use fyrox_lite_lua_generator::{
-    code_model::SimpleRustCodeBase, context::GenerationContext,
-    generate_engine_class_bindings::generate_engine_class_bindings, generate_struct_class_bindings::generate_struct_class_bindings,
+    code_model::SimpleRustCodeBase, context::GenerationContext, generate_engine_class_bindings::generate_engine_class_bindings, generate_enum_class_bindings::generate_enum_class_bindings, generate_struct_class_bindings::generate_struct_class_bindings
 };
 use fyrox_lite_model::{Class, Domain, RustQualifiedName};
 use fyrox_lite_parser::generate_domain::generate_domain;
@@ -13,7 +12,7 @@ fn main() {
     fyrox.classes.retain_mut(|fyrox_class| math.get_class(fyrox_class.class_name()).is_none());
     
     let domain = Domain::merge_all([fyrox, math]);
-    let mut context = GenerationContext {
+    let mut ctx = GenerationContext {
         internal_to_external: Default::default(),
         domain,
     };
@@ -30,15 +29,17 @@ fn main() {
 
     let mut code_base = SimpleRustCodeBase::default();
 
-    for item in context.domain.classes.iter() {
+    for item in ctx.domain.classes.iter() {
         match item {
             Class::Engine(it) => {
-                code_base.mods.push(generate_engine_class_bindings(it, &context));
+                code_base.mods.push(generate_engine_class_bindings(it, &ctx));
             }
             Class::Struct(it) => {
-                code_base.mods.push(generate_struct_class_bindings(it, &context));
+                code_base.mods.push(generate_struct_class_bindings(it, &ctx));
             }
-            Class::Enum(it) => {}
+            Class::Enum(it) => {
+                code_base.mods.push(generate_enum_class_bindings(it, &ctx));
+            }
         }
     }
 

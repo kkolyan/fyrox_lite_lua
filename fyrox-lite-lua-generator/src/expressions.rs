@@ -15,7 +15,11 @@ pub fn mlua_to_rust_expr(param: &str, ty: &DataType, ctx: &GenerationContext) ->
         DataType::F32 => param.to_string(),
         DataType::F64 => param.to_string(),
         DataType::String => format!("{}.to_str()?.to_string()", param),
-        DataType::Vec(_it) => todo!(),
+        DataType::Vec(item_ty) => format!(
+            "{}.into_iter().map(|it| {}).collect::<Vec<_>>()",
+            param,
+            mlua_to_rust_expr("it", item_ty.deref(), ctx)
+        ),
         DataType::UserScript => param.to_string(),
         DataType::UserScriptMessage => {
             // we use Lua interpreter as long as we use the process, so its lifetime is effectively static.
