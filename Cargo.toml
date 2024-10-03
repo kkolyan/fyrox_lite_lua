@@ -14,7 +14,7 @@ serde = "1.0.210"
 serde_json = "1.0.128"
 quote = "1.0.37"
 proc-macro2 = "1.0.86"
-syn = {version = "2.0.77", features = ["full", "extra-traits"]}
+syn = {version = "2.0.79", features = ["full", "extra-traits"]}
 uuid = {version = "1.10.0", features = ["v4"]}
 fyrox-lite-model = {path = "fyrox-lite-model"}
 fyrox-lite-parser = {path = "fyrox-lite-parser"}
@@ -25,6 +25,7 @@ to_vec = "0.1.0"
 fyrox-lite = {path = "fyrox-lite"}
 mlua = { version = "0.9.1", features = ["luau"] }
 # mlua = { path = "../mlua", features = ["luau"] }
+itertools = "0.13.0"
 
 # Separate build profiles for hot reloading. These profiles ensures that build artifacts for
 # hot reloading will be placed into their own folders and does not interfere with standard (static)

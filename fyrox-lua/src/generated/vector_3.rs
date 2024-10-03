@@ -13,78 +13,13 @@
 
 		impl FyroxUserData for vec::LiteVector3 {
 			const CLASS_NAME: &'static str = "Vector3";
+		
 			
 	    	fn add_instance_methods<'lua, M: mlua::UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
 				methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
 					Ok(format!("{:?}", this.inner()))
 				});
 		
-				methods.add_method_mut(
-					"get_x",
-					|lua, this, (): ()| {
-			
-						let ret = this.get_x();
-                        let ret = ret;
-						Ok(ret)
-					},
-				);
-			
-				methods.add_method_mut(
-					"get_y",
-					|lua, this, (): ()| {
-			
-						let ret = this.get_y();
-                        let ret = ret;
-						Ok(ret)
-					},
-				);
-			
-				methods.add_method_mut(
-					"get_z",
-					|lua, this, (): ()| {
-			
-						let ret = this.get_z();
-                        let ret = ret;
-						Ok(ret)
-					},
-				);
-			
-				methods.add_method_mut(
-					"set_x",
-					|lua, this, (value): (f32)| {
-			
-						let value = value;
-				
-						let ret = this.set_x(value);
-                        let ret = ret;
-						Ok(ret)
-					},
-				);
-			
-				methods.add_method_mut(
-					"set_y",
-					|lua, this, (value): (f32)| {
-			
-						let value = value;
-				
-						let ret = this.set_y(value);
-                        let ret = ret;
-						Ok(ret)
-					},
-				);
-			
-				methods.add_method_mut(
-					"set_z",
-					|lua, this, (value): (f32)| {
-			
-						let value = value;
-				
-						let ret = this.set_z(value);
-                        let ret = ret;
-						Ok(ret)
-					},
-				);
-			
 				methods.add_method_mut(
 					"mul",
 					|lua, this, (o): (f32)| {
@@ -156,36 +91,6 @@
 			fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(methods: &mut M) {
 	
 				methods.add_method_mut(
-					"x_axis",
-					|lua, this, (): ()| {
-			
-						let ret = vec::LiteVector3::x_axis();
-                        let ret = Traitor::new(vec::LiteVector3::from(ret));
-						Ok(ret)
-					},
-				);
-			
-				methods.add_method_mut(
-					"y_axis",
-					|lua, this, (): ()| {
-			
-						let ret = vec::LiteVector3::y_axis();
-                        let ret = Traitor::new(vec::LiteVector3::from(ret));
-						Ok(ret)
-					},
-				);
-			
-				methods.add_method_mut(
-					"z_axis",
-					|lua, this, (): ()| {
-			
-						let ret = vec::LiteVector3::z_axis();
-                        let ret = Traitor::new(vec::LiteVector3::from(ret));
-						Ok(ret)
-					},
-				);
-			
-				methods.add_method_mut(
 					"zero",
 					|lua, this, (): ()| {
 			
@@ -212,5 +117,59 @@
 				);
 			
 			}
+	
+			fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+	
+				fields.add_field_method_get("x", |lua, this| {
+					let value = this.get_x();
+					Ok(value)
+				});
+		
+				fields.add_field_method_get("y", |lua, this| {
+					let value = this.get_y();
+					Ok(value)
+				});
+		
+				fields.add_field_method_get("z", |lua, this| {
+					let value = this.get_z();
+					Ok(value)
+				});
+		
+				fields.add_field_method_set("x", |lua, this, value: f32| {
+					this.set_x(value);
+					Ok(())
+				});
+		
+				fields.add_field_method_set("y", |lua, this, value: f32| {
+					this.set_y(value);
+					Ok(())
+				});
+		
+				fields.add_field_method_set("z", |lua, this, value: f32| {
+					this.set_z(value);
+					Ok(())
+				});
+		
+			}
+	
+			fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
+					
+				fields.add_field_method_get("X", |lua, this| {
+					let value = vec::LiteVector3::get_X();
+					Ok(Traitor::new(vec::LiteVector3::from(value)))
+				});
+						
+				fields.add_field_method_get("Y", |lua, this| {
+					let value = vec::LiteVector3::get_Y();
+					Ok(Traitor::new(vec::LiteVector3::from(value)))
+				});
+						
+				fields.add_field_method_get("Z", |lua, this| {
+					let value = vec::LiteVector3::get_Z();
+					Ok(Traitor::new(vec::LiteVector3::from(value)))
+				});
+		
+			}
+	
 		}
 	

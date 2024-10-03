@@ -13,6 +13,7 @@
 
 		impl FyroxUserData for lite_node::LiteNode {
 			const CLASS_NAME: &'static str = "Node";
+		
 			
 	    	fn add_instance_methods<'lua, M: mlua::UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
 				methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
@@ -98,30 +99,6 @@
 						let payload = Traitor::new(send_wrapper::SendWrapper::new(unsafe { std::mem::transmute::<_, mlua::Value<'static>>(payload) } ));
 				
 						let ret = this.send_hierarchical::<TypedUserData<ScriptObject>>(routing, payload);
-                        let ret = ret;
-						Ok(ret)
-					},
-				);
-			
-				methods.add_method_mut(
-					"set_local_position",
-					|lua, this, (new_pos): (TypedUserData<Traitor<vec::LiteVector3>>)| {
-			
-						let new_pos = new_pos.borrow()?.inner().clone().into();
-				
-						let ret = this.set_local_position(new_pos);
-                        let ret = ret;
-						Ok(ret)
-					},
-				);
-			
-				methods.add_method_mut(
-					"set_local_rotation",
-					|lua, this, (value): (TypedUserData<Traitor<quat::LiteQuaternion>>)| {
-			
-						let value = value.borrow()?.inner().clone().into();
-				
-						let ret = this.set_local_rotation(value);
                         let ret = ret;
 						Ok(ret)
 					},
@@ -217,22 +194,34 @@
 					},
 				);
 			
-				methods.add_method_mut(
-					"set_tag",
-					|lua, this, (tag): (mlua::String)| {
-			
-						let tag = tag.to_str()?.to_string();
-				
-						let ret = this.set_tag(tag);
-                        let ret = ret;
-						Ok(ret)
-					},
-				);
-			
 			}
 	
 			fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(methods: &mut M) {
 	
 			}
+	
+			fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+	
+				fields.add_field_method_set("local_position", |lua, this, value: TypedUserData<Traitor<vec::LiteVector3>>| {
+					this.set_local_position(value.borrow()?.inner().clone().into());
+					Ok(())
+				});
+		
+				fields.add_field_method_set("local_rotation", |lua, this, value: TypedUserData<Traitor<quat::LiteQuaternion>>| {
+					this.set_local_rotation(value.borrow()?.inner().clone().into());
+					Ok(())
+				});
+		
+				fields.add_field_method_set("tag", |lua, this, value: mlua::String| {
+					this.set_tag(value.to_str()?.to_string());
+					Ok(())
+				});
+		
+			}
+	
+			fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
+	
+			}
+	
 		}
 	

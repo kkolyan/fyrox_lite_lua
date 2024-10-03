@@ -1,12 +1,12 @@
 use std::borrow::Cow;
 
-use fyrox_lite_model::{DataType, EngineClass};
+use fyrox_lite_model::{DataType, EngineClass, Method};
 use to_vec::ToVec;
 
 use crate::{
     context::GenerationContext,
     expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua},
-    templating::render
+    templating::render,
 };
 
 pub fn generate_methods(
@@ -15,7 +15,12 @@ pub fn generate_methods(
     ctx: &GenerationContext,
     instance: bool,
 ) {
-    for method in class.methods.iter().filter(|it| it.instance == instance) {
+    for method in class
+        .methods
+        .iter()
+        .filter(|it| is_regular(it))
+        .filter(|it| it.instance == instance)
+    {
         let params = method
             .signature
             .params
@@ -69,7 +74,7 @@ pub fn generate_methods(
         );
 
         for param in method.signature.params.iter() {
-            let expression = mlua_to_rust_expr(param, ctx);
+            let expression = mlua_to_rust_expr(&param.name, &param.ty, ctx);
             render(
                 s,
                 r#"
@@ -112,4 +117,16 @@ pub fn generate_methods(
             ],
         );
     }
+}
+
+pub(crate) fn is_setter(method: &Method) -> bool {
+    method.method_name.starts_with("set_") && method.signature.params.len() == 1
+}
+
+pub(crate) fn is_getter(method: &Method) -> bool {
+    method.method_name.starts_with("get_") && method.signature.params.is_empty()
+}
+
+pub(crate) fn is_regular(method: &Method) -> bool {
+    !is_setter(method) && !is_getter(method)
 }

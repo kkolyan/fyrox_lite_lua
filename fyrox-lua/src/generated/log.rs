@@ -13,6 +13,7 @@
 
 		impl FyroxUserData for lite_log::LiteLog {
 			const CLASS_NAME: &'static str = "Log";
+		
 			
 	    	fn add_instance_methods<'lua, M: mlua::UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
 				methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
@@ -60,5 +61,14 @@
 				);
 			
 			}
+	
+			fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+	
+			}
+	
+			fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
+	
+			}
+	
 		}
 	

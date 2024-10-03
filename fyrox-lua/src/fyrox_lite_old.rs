@@ -359,3 +359,123 @@ impl FyroxUserData for LitePrefab {
         );
     }
 }
+
+
+
+impl FyroxUserData for LiteVector3 {
+    const CLASS_NAME: &'static str = "Vector3";
+
+    #[rustfmt::skip]
+    fn add_instance_fields<'lua, F: UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+        fields.add_field_method_get("x", |lua, this| Ok(this.inner().clone().get_x()));
+        fields.add_field_method_get("y", |lua, this| Ok(this.inner().clone().get_y()));
+        fields.add_field_method_get("z", |lua, this| Ok(this.inner().clone().get_z()));
+
+        fields.add_field_method_set("x", |lua, this, value: f32| { this.inner_mut().set_x(value); Ok(()) });
+        fields.add_field_method_set("y", |lua, this, value: f32| { this.inner_mut().set_y(value); Ok(()) });
+        fields.add_field_method_set("z", |lua, this, value: f32| { this.inner_mut().set_z(value); Ok(()) });
+    }
+
+    fn add_instance_methods<'lua, M: UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
+        methods.add_function(
+            "mul",
+            |lua, (this, o): (UserDataRef<Traitor<LiteVector3>>, f32)| {
+                Ok(Traitor::new(this.mul(o)))
+            },
+        );
+
+        methods.add_function(
+            "add",
+            |lua,
+             (this, o): (
+                UserDataRef<Traitor<LiteVector3>>,
+                UserDataRef<Traitor<LiteVector3>>,
+            )| { Ok(Traitor::new(this.add(*o.inner()))) },
+        );
+        methods.add_function(
+            "sub",
+            |lua,
+             (this, o): (
+                UserDataRef<Traitor<LiteVector3>>,
+                UserDataRef<Traitor<LiteVector3>>,
+            )| { Ok(Traitor::new(this.sub(*o.inner()))) },
+        );
+        methods.add_function(
+            "normalize",
+            |lua, this: UserDataRef<Traitor<LiteVector3>>| Ok(Traitor::new(this.normalize())),
+        );
+        methods.add_function(
+            "magnitude",
+            |lua, this: UserDataRef<Traitor<LiteVector3>>| Ok(this.magnitude()),
+        );
+        methods.add_function_mut(
+            "normalize_inplace",
+            |lua, mut this: UserDataRefMut<Traitor<LiteVector3>>| {
+                this.normalize_inplace();
+                Ok(())
+            },
+        );
+    }
+
+    fn add_class_methods<'lua, M: UserDataMethods<'lua, UserDataClass<Self>>>(methods: &mut M) {
+        methods.add_method("new", |lua, cls, (x, y, z): (f32, f32, f32)| {
+            Ok(Traitor::new(LiteVector3::new(x, y, z)))
+        });
+    }
+
+    fn add_class_fields<'lua, F: UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
+        fields.add_field_function_get("X", |lua, this| Ok(Traitor::new(LiteVector3::get_X())));
+        fields.add_field_function_get("Y", |lua, this| Ok(Traitor::new(LiteVector3::get_Y())));
+        fields.add_field_function_get("Z", |lua, this| Ok(Traitor::new(LiteVector3::get_Z())));
+
+        fields.add_field_function_get("ZERO", |lua, this| Ok(Traitor::new(LiteVector3::zero())));
+    }
+}
+
+impl FyroxUserData for LiteQuaternion {
+    const CLASS_NAME: &'static str = "Quaternion";
+
+    fn add_instance_methods<'lua, M: UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
+        methods.add_function(
+            "mul",
+            |lua, (this, o): (UserDataRef<Traitor<LiteQuaternion>>, AnyUserData)| {
+                if let Ok(o) = o.borrow::<Traitor<LiteVector3>>() {
+                    return Ok(lua.create_userdata(Traitor::new(this.mul__LiteVector(*o.inner()))));
+                }
+                if let Ok(o) = o.borrow::<Traitor<LiteQuaternion>>() {
+                    return Ok(
+                        lua.create_userdata(Traitor::new(this.mul__LiteQuaternion(*o.inner())))
+                    );
+                }
+                Err(mlua::Error::runtime("invalid operand type"))
+            },
+        );
+    }
+
+    fn add_class_methods<'lua, M: UserDataMethods<'lua, UserDataClass<Self>>>(methods: &mut M) {
+        methods.add_method(
+            "face_towards",
+            |lua,
+             cls,
+             (dir, up): (
+                UserDataRef<Traitor<LiteVector3>>,
+                UserDataRef<Traitor<LiteVector3>>,
+            )| {
+                Ok(Traitor::new(LiteQuaternion::face_towards(
+                    *dir.inner(),
+                    *up.inner(),
+                )))
+            },
+        );
+        methods.add_method(
+            "from_axis_angle",
+            |lua, cls, (axis, angle): (UserDataRef<Traitor<LiteVector3>>, f32)| {
+                Ok(Traitor::new(LiteQuaternion::from_axis_angle(
+                    *axis.inner(),
+                    angle,
+                )))
+            },
+        );
+    }
+}
+

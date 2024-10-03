@@ -26,6 +26,7 @@ impl Display for LiteVector3 {
     }
 }
 
+#[allow(non_snake_case)]
 #[fyrox_lite(Vector3)]
 impl LiteVector3 {
     #[rustfmt::skip]    pub fn get_x(&self) -> f32 { self.0.x }
@@ -35,9 +36,9 @@ impl LiteVector3 {
     #[rustfmt::skip]    pub fn set_y(&mut self, value: f32) { self.0.y = value; }
     #[rustfmt::skip]    pub fn set_z(&mut self, value: f32) { self.0.z = value; }
 
-    #[rustfmt::skip]    pub fn x_axis() -> LiteVector3 { Vector3::x_axis().into_inner().into() }
-    #[rustfmt::skip]    pub fn y_axis() -> LiteVector3 { Vector3::y_axis().into_inner().into() }
-    #[rustfmt::skip]    pub fn z_axis() -> LiteVector3 { Vector3::z_axis().into_inner().into() }
+    #[rustfmt::skip]    pub fn get_X() -> LiteVector3 { Vector3::x_axis().into_inner().into() }
+    #[rustfmt::skip]    pub fn get_Y() -> LiteVector3 { Vector3::y_axis().into_inner().into() }
+    #[rustfmt::skip]    pub fn get_Z() -> LiteVector3 { Vector3::z_axis().into_inner().into() }
 
     pub fn zero() -> LiteVector3 {
         Vector3::zero().into()

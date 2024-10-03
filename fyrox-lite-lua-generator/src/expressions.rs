@@ -1,33 +1,33 @@
 use std::ops::Deref;
 
-use fyrox_lite_model::{named_value::NamedValue, DataType};
+use fyrox_lite_model::{ DataType};
 
 use crate::context::GenerationContext;
 
-pub fn mlua_to_rust_expr(param: &dyn NamedValue, ctx: &GenerationContext) -> String {
-    match param.ty() {
+pub fn mlua_to_rust_expr(param: &str, ty: &DataType, ctx: &GenerationContext) -> String {
+    match ty {
         DataType::UnresolvedClass(_) => panic!(),
-        DataType::Unit => param.name().to_string(),
-        DataType::Bool => param.name().to_string(),
-        DataType::Byte => param.name().to_string(),
-        DataType::I32 => param.name().to_string(),
-        DataType::I64 => param.name().to_string(),
-        DataType::F32 => param.name().to_string(),
-        DataType::F64 => param.name().to_string(),
-        DataType::String => format!("{}.to_str()?.to_string()", param.name()),
+        DataType::Unit => param.to_string(),
+        DataType::Bool => param.to_string(),
+        DataType::Byte => param.to_string(),
+        DataType::I32 => param.to_string(),
+        DataType::I64 => param.to_string(),
+        DataType::F32 => param.to_string(),
+        DataType::F64 => param.to_string(),
+        DataType::String => format!("{}.to_str()?.to_string()", param),
         DataType::Vec(_it) => todo!(),
-        DataType::UserScript => param.name().to_string(),
+        DataType::UserScript => param.to_string(),
         DataType::UserScriptMessage => {
             // we use Lua interpreter as long as we use the process, so its lifetime is effectively static.
-            format!("Traitor::new(send_wrapper::SendWrapper::new(unsafe {{ std::mem::transmute::<_, mlua::Value<'static>>({}) }} ))", param.name())
+            format!("Traitor::new(send_wrapper::SendWrapper::new(unsafe {{ std::mem::transmute::<_, mlua::Value<'static>>({}) }} ))", param)
         }
         DataType::UserScriptGenericStub => "Default::default()".to_string(),
-        DataType::Object(_it) => format!("{}.borrow()?.inner().clone().into()", param.name()),
+        DataType::Object(_it) => format!("{}.borrow()?.inner().clone().into()", param),
         DataType::Option(_it) => format!(
             "if let Some({}) = {} {{ Some({}) }} else {{ None }}",
-            param.name(),
-            param.name(),
-            mlua_to_rust_expr(param, ctx)
+            param,
+            param,
+            mlua_to_rust_expr(param, ty, ctx)
         ),
         DataType::Result { ok: _ } => todo!(),
     }

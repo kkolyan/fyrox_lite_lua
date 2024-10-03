@@ -11,3 +11,4 @@ extend = {workspace = true}
 convert_case = {workspace = true}
 to_vec = {workspace = true}
 fyrox-lite-parser = {workspace = true}
+itertools = {workspace = true}

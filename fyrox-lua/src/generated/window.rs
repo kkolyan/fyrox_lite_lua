@@ -13,6 +13,7 @@
 
 		impl FyroxUserData for lite_window::LiteWindow {
 			const CLASS_NAME: &'static str = "Window";
+		
 			
 	    	fn add_instance_methods<'lua, M: mlua::UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
 				methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
@@ -23,18 +24,20 @@
 	
 			fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(methods: &mut M) {
 	
-				methods.add_method_mut(
-					"set_cursor_grab",
-					|lua, this, (mode): (TypedUserData<Traitor<lite_window::LiteCursorGrabMode>>)| {
-			
-						let mode = mode.borrow()?.inner().clone().into();
-				
-						let ret = lite_window::LiteWindow::set_cursor_grab(mode);
-                        let ret = ret;
-						Ok(ret)
-					},
-				);
-			
 			}
+	
+			fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+	
+				fields.add_field_method_set("cursor_grab", |lua, this, value: TypedUserData<Traitor<lite_window::LiteCursorGrabMode>>| {
+					this.set_cursor_grab(value.borrow()?.inner().clone().into());
+					Ok(())
+				});
+		
+			}
+	
+			fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
+	
+			}
+	
 		}
 	

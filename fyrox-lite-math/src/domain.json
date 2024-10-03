@@ -159,7 +159,7 @@
           },
           {
             "instance": false,
-            "method_name": "x_axis",
+            "method_name": "get_X",
             "signature": {
               "return_ty": {
                 "Object": "Vector3"
@@ -168,7 +168,7 @@
           },
           {
             "instance": false,
-            "method_name": "y_axis",
+            "method_name": "get_Y",
             "signature": {
               "return_ty": {
                 "Object": "Vector3"
@@ -177,7 +177,7 @@
           },
           {
             "instance": false,
-            "method_name": "z_axis",
+            "method_name": "get_Z",
             "signature": {
               "return_ty": {
                 "Object": "Vector3"
