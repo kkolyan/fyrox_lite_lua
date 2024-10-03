@@ -27,7 +27,6 @@ pub fn mlua_to_rust_expr(param: &str, ty: &DataType, ctx: &GenerationContext) ->
         }
         DataType::UserScriptGenericStub => "Default::default()".to_string(),
         DataType::Object(class_name) => {
-
             let mut class = ctx.domain.get_class(class_name).unwrap();
             if let Some(ext) = ctx.internal_to_external.get(class.rust_name()) {
                 class = ctx.domain.get_class(ext).unwrap();
@@ -35,9 +34,9 @@ pub fn mlua_to_rust_expr(param: &str, ty: &DataType, ctx: &GenerationContext) ->
             match class {
                 Class::Engine(_it) => format!("{}.borrow()?.inner().clone().into()", param),
                 Class::Struct(_it) => format!("{}.inner().clone().into()", param),
-                Class::Enum(_it) => format!("{}.inner().clone().into()", param),
+                Class::Enum(_it) => format!("{}.borrow()?.inner().clone().into()", param),
             }
-        },
+        }
         DataType::Option(it) => format!(
             "if let Some({}) = {} {{ Some({}) }} else {{ None }}",
             param,
@@ -105,11 +104,9 @@ pub fn type_to_mlua(ty: &DataType, ctx: &GenerationContext) -> String {
                 class = ctx.domain.get_class(ext).unwrap();
             }
             match class {
-                Class::Engine(_it) => {
-                    format!("TypedUserData<Traitor<{}>>", class.rust_name().0)
-                }
+                Class::Engine(_it) => format!("TypedUserData<Traitor<{}>>", class.rust_name().0),
+                Class::Enum(_it) => format!("TypedUserData<Traitor<{}>>", class.rust_name().0),
                 Class::Struct(_it) => format!("Traitor<{}>", class.rust_name().0),
-                Class::Enum(_it) => format!("Traitor<{}>", class.rust_name().0),
             }
         }
         DataType::Option(it) => format!("Option<{}>", type_to_mlua(it.deref(), ctx)),

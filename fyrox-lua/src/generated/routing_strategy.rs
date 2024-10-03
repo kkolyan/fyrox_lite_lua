@@ -17,19 +17,17 @@
 		
 			fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(methods: &mut M) {
 	
-				methods.add_method_mut(
-					"Up",
-					|lua, this, mut args: mlua::MultiValue| {
-			
-					}
-				);
-		
-				methods.add_method_mut(
-					"Down",
-					|lua, this, mut args: mlua::MultiValue| {
-			
-					}
-				);
+			}
+	
+			fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
+					
+				fields.add_field_method_get("Up", |lua, this| {
+					Ok(Traitor::new(lite_node::LiteRoutingStrategy::Up))
+				});
+						
+				fields.add_field_method_get("Down", |lua, this| {
+					Ok(Traitor::new(lite_node::LiteRoutingStrategy::Down))
+				});
 		
 			}
 	

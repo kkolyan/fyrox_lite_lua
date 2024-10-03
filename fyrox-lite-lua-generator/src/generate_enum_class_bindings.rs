@@ -50,7 +50,7 @@ pub fn generate_enum_class_bindings(class: &EnumClass, ctx: &GenerationContext) 
     // 		for tuple the table again, with fields like "_1", "_2", "_3", for unit - `true` boolean value`.
 
     generate_class_methods(&mut s, class, ctx);
-    // generate_class_fields(&mut s, class, ctx);
+    generate_class_fields(&mut s, class, ctx);
     // generate_instance_methods(&mut s, class, ctx);
     // generate_instance_fields(&mut s, class, ctx);
 
@@ -64,6 +64,45 @@ pub fn generate_enum_class_bindings(class: &EnumClass, ctx: &GenerationContext) 
     }
 }
 
+fn generate_class_fields(s: &mut String, class: &EnumClass, ctx: &GenerationContext) {
+    render(
+        s,
+        r#"
+			fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
+	"#,
+        [],
+    );
+
+	unit_accessors(s, class, ctx);
+
+
+    *s += "
+			}
+	";
+}
+
+fn unit_accessors(s: &mut String, class: &EnumClass, ctx: &GenerationContext) {
+	for variant in class.variants.iter() {
+		let EnumValue::Unit = &variant.value else {
+			continue;
+		};
+		
+        render(
+            s,
+            r#"				
+				fields.add_field_method_get("${field_name}", |lua, this| {
+					Ok(Traitor::new(${rust_struct_path}::${variant_name}))
+				});
+		"#,
+            [
+                ("rust_struct_path", &class.rust_struct_path.0),
+                ("field_name", &variant.tag),
+                ("variant_name", &variant.tag),
+            ],
+        );
+	}
+}
+
 fn generate_class_methods(s: &mut String, class: &EnumClass, ctx: &GenerationContext) {
     render(
         s,
@@ -73,6 +112,9 @@ fn generate_class_methods(s: &mut String, class: &EnumClass, ctx: &GenerationCon
         [],
     );
     for variant in class.variants.iter() {
+		if let EnumValue::Unit = &variant.value {
+			continue;
+		}
         render(
             s,
             r#"

@@ -35,8 +35,8 @@
                     return Err(lua_error!("cannot extract TextBuilder from {:?}. expected table.", value));
                 };
     
-                let foregound = value.get::<_, Option<Traitor<lite_ui::Brush>>>("foregound")?;
-                let foregound = if let Some(foregound) = foregound { Some(foregound.inner().clone().into()) } else { None };
+                let foregound = value.get::<_, Option<TypedUserData<Traitor<lite_ui::Brush>>>>("foregound")?;
+                let foregound = if let Some(foregound) = foregound { Some(foregound.borrow()?.inner().clone().into()) } else { None };
         
                 let font_size = value.get::<_, Option<f32>>("font_size")?;
                 let font_size = if let Some(font_size) = font_size { Some(font_size) } else { None };

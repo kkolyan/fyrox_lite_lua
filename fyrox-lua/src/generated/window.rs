@@ -32,8 +32,8 @@
 	
 			fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
 	
-				fields.add_field_method_set("cursor_grab", |lua, this, value: Traitor<lite_window::LiteCursorGrabMode>| {
-					lite_window::LiteWindow::set_cursor_grab(value.inner().clone().into());
+				fields.add_field_method_set("cursor_grab", |lua, this, value: TypedUserData<Traitor<lite_window::LiteCursorGrabMode>>| {
+					lite_window::LiteWindow::set_cursor_grab(value.borrow()?.inner().clone().into());
 					Ok(())
 				});
 		

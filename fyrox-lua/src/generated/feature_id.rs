@@ -65,12 +65,13 @@
 					}
 				);
 		
-				methods.add_method_mut(
-					"Unknown",
-					|lua, this, mut args: mlua::MultiValue| {
-			
-					}
-				);
+			}
+	
+			fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
+					
+				fields.add_field_method_get("Unknown", |lua, this| {
+					Ok(Traitor::new(lite_physics::LiteFeatureId::Unknown))
+				});
 		
 			}
 	
