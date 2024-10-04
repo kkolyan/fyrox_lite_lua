@@ -6,12 +6,14 @@
 // }
 
 
+use std::fmt::Debug;
+
 use fyrox::script::{ScriptMessagePayload, ScriptTrait};
 
 
 pub trait UserScript : Sized + LiteDataType {
 	type ProxyScript: ScriptTrait;
-	type LangSpecificError;
+	type LangSpecificError: Clone + Debug;
 	type UserScriptMessage : ScriptMessagePayload + LiteDataType;
 	type UserScriptGenericStub: LiteDataType;
 
@@ -20,14 +22,14 @@ pub trait UserScript : Sized + LiteDataType {
 	fn into_proxy_script(self) -> Result<Self::ProxyScript, Self::LangSpecificError>;
 }
 
-/// implemented only by the types from `fyrox_lite_model::DataType` (mostly by proc macros)
-pub trait LiteDataType {
+/// implemented only by the types from `lite_model::DataType` (mostly by proc macros)
+pub trait LiteDataType : Clone + Debug {
 	fn compiles_if_type_is_allowed() {}
 }
 
 impl <T: LiteDataType> LiteDataType for Vec<T> {}
 impl <T: LiteDataType> LiteDataType for Option<T> {}
-impl <T: LiteDataType, E> LiteDataType for Result<T, E> {}
+impl <T: LiteDataType, E: Clone + Debug> LiteDataType for Result<T, E> {}
 
 impl LiteDataType for String {}
 impl LiteDataType for u8 {}

@@ -1,12 +1,13 @@
 use std::fmt::Debug;
 
-use fyrox_lite_macro::fyrox_lite;
+use lite_macro::lite_api;
 
 use crate::script_context::with_script_context;
 
+#[derive(Debug, Clone)]
 pub struct LiteScene;
 
-#[fyrox_lite(Scene)]
+#[lite_api(Scene)]
 impl LiteScene {
     pub fn load_async(scene_path: String) {
         with_script_context(|sc| {
@@ -15,11 +16,5 @@ impl LiteScene {
                 .expect("async scene loader not available")
                 .request(scene_path);
         })
-    }
-}
-
-impl Debug for LiteScene {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Scene")
     }
 }

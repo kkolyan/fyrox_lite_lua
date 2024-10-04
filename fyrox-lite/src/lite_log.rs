@@ -1,10 +1,10 @@
 use fyrox::core::log::Log;
-use fyrox_lite_macro::fyrox_lite;
+use lite_macro::lite_api;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LiteLog {}
 
-#[fyrox_lite(Log)]
+#[lite_api(Log)]
 impl LiteLog {
     pub fn info(msg: String) {
         Log::info(msg.as_str());

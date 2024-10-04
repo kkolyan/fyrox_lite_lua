@@ -3,7 +3,7 @@
     {
       "Engine": {
         "class_name": "Quaternion",
-        "rust_struct_path": "quat::LiteQuaternion",
+        "rust_struct_path": "fyrox_lite_math::lite_math::LiteQuaternion",
         "methods": [
           {
             "instance": false,
@@ -95,7 +95,7 @@
     {
       "Engine": {
         "class_name": "Vector3",
-        "rust_struct_path": "vec::LiteVector3",
+        "rust_struct_path": "fyrox_lite_math::lite_math::LiteVector3",
         "methods": [
           {
             "instance": true,

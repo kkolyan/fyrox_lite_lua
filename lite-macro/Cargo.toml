@@ -1,0 +1,10 @@
+[lib]
+proc-macro = true
+
+[package]
+name = "lite-macro"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lite-macro-lib = {path = "../lite-macro-lib"}

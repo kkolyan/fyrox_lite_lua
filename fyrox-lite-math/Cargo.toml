@@ -7,4 +7,4 @@ edition = "2021"
 [dependencies]
 fyrox-lite = {path = "../fyrox-lite"}
 fyrox-core = {workspace = true}
-fyrox-lite-macro = {workspace = true}
+lite-macro = {workspace = true}

@@ -1,19 +1,14 @@
 use std::fmt::Debug;
 
 use fyrox::{core::log::Log, window::CursorGrabMode};
-use fyrox_lite_macro::fyrox_lite;
+use lite_macro::lite_api;
 
 use crate::script_context::with_script_context;
 
+#[derive(Debug, Clone, Copy)]
 pub struct LiteWindow;
 
-impl Debug for LiteWindow {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Window")
-    }
-}
-
-#[fyrox_lite(Window)]
+#[lite_api(Window)]
 impl LiteWindow {
     pub fn set_cursor_grab(mode: LiteCursorGrabMode) {
         with_script_context(|ctx| {
@@ -33,8 +28,8 @@ impl LiteWindow {
     }
 }
 
-#[derive(Copy, PartialEq, Eq, Hash)]
-#[fyrox_lite(CursorGrabMode)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[lite_api(CursorGrabMode)]
 pub enum LiteCursorGrabMode {
     /// No grabbing of the cursor is performed.
     None,

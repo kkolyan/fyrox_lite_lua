@@ -3,14 +3,14 @@ use crate::spi::UserScript;
 use crate::wrapper_reflect;
 use std::fmt::Debug;
 
-extern crate fyrox_lite_macro;
+extern crate lite_macro;
 
 use fyrox::{
     core::{algebra::UnitQuaternion, pool::Handle, reflect::*, visitor::Visit},
     scene::node::Node,
     script::RoutingStrategy,
 };
-use fyrox_lite_macro::fyrox_lite;
+use lite_macro::lite_api;
 
 use crate::{lite_physics::LiteRigidBody, script_context::with_script_context};
 use fyrox::graph::BaseSceneGraph;
@@ -36,7 +36,7 @@ impl LiteNode {
     }
 }
 
-#[fyrox_lite(Node)]
+#[lite_api(Node)]
 impl LiteNode {
     pub fn as_rigid_body(&mut self) -> Option<LiteRigidBody> {
         with_script_context(|ctx| {
@@ -228,8 +228,8 @@ impl LiteNode {
     }
 }
 
-#[derive(Copy)]
-#[fyrox_lite(RoutingStrategy)]
+#[derive(Debug, Clone, Copy)]
+#[lite_api(RoutingStrategy)]
 pub enum LiteRoutingStrategy {
     /// An message will be passed to the specified root node and then to every node up in the hierarchy.
     Up,

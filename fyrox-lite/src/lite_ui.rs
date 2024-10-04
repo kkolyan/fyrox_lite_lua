@@ -8,7 +8,7 @@ use fyrox::{
         UiNode,
     },
 };
-use fyrox_lite_macro::{fyrox_lite};
+use lite_macro::{lite_api};
 
 use crate::{lite_math::PodVector2, script_context::with_script_context};
 
@@ -27,7 +27,7 @@ impl LiteUiNode {
     }
 }
 
-#[fyrox_lite(UiNode)]
+#[lite_api(UiNode)]
 impl LiteUiNode {
     
 }
@@ -49,7 +49,7 @@ impl From<Handle<UiNode>> for LiteText {
     }
 }
 
-#[fyrox_lite(Text)]
+#[lite_api(Text)]
 impl LiteText {
     pub fn set_text_async(&self, text: String) {
         with_script_context(|ctx| {
@@ -101,15 +101,16 @@ impl From<Brush> for brush::Brush {
     }
 }
 
-#[fyrox_lite(TextBuilder)]
+#[derive(Debug, Clone)]
+#[lite_api(TextBuilder)]
 pub struct TextBuilder {
     pub foregound: Option<Brush>,
     pub font_size: Option<f32>,
 }
 
 /// Brush defines a way to fill an arbitrary surface.
-#[derive(PartialEq)]
-#[fyrox_lite(Brush)]
+#[derive(Debug, Clone, PartialEq)]
+#[lite_api(Brush)]
 pub enum Brush {
     /// A brush, that fills a surface with a solid color.
     Solid(Color),
@@ -133,8 +134,8 @@ pub enum Brush {
     },
 }
 
-#[derive(Copy, PartialOrd, PartialEq, Eq)]
-#[fyrox_lite(Color)]
+#[derive(Debug, Clone, Copy, PartialOrd, PartialEq, Eq)]
+#[lite_api(Color)]
 pub struct Color {
     // Do not change order! OpenGL requires this order!
     pub r: u8,
@@ -143,8 +144,8 @@ pub struct Color {
     pub a: u8,
 }
 
-#[derive(PartialEq)]
-#[fyrox_lite(GradientPoint)]
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[lite_api(GradientPoint)]
 pub struct GradientPoint {
     /// A distance from an origin of the gradient.
     pub stop: f32,

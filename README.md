@@ -31,7 +31,7 @@ git clone https://github.com/kkolyan/fyrox_lite_lua
 cd my_game
 
 ## run game
-cargo run -p executor --manifest-path ../fyrox_lite_lua/Cargo.toml
+cargo run -p executor-lua --manifest-path ../fyrox_lite_lua/Cargo.toml
 
 ## run editor
 cargo run -p editor --manifest-path ../fyrox_lite_lua/Cargo.toml
@@ -40,3 +40,6 @@ cargo run -p editor --manifest-path ../fyrox_lite_lua/Cargo.toml
 ## Feedback
 Any feedback is extremely appreciated.
 Feel free to contact me in Discord `kkolyan_true` ([kkolyan_true](https://discord.com/users/333644000302989314)) or just [create issue](https://github.com/kkolyan/fyrox_lite_lua/issues/new).
+
+## Development
+[More information](dev.md)

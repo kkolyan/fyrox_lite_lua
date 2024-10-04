@@ -1,0 +1,14 @@
+
+[package]
+name = "editor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fyrox = { workspace = true }
+fyroxed_base = { workspace = true }
+fyrox-lua = { path = "../lua/fyrox-lua", optional = true}
+
+[features]
+default = ["fyrox-lua", "fyroxed_base/default"]
+dylib = ["fyroxed_base/dylib_engine"]

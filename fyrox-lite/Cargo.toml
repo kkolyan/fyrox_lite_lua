@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 fyrox = { workspace = true }
 extend = "1.2.0"
-fyrox-lite-macro = { path = "../fyrox-lite-macro" }
+lite-macro = { path = "../lite-macro" }
 
 [features]
 default = ["fyrox/fyrox-impl"]

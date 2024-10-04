@@ -1,3 +1,2 @@
-pub mod quat;
-pub mod vec;
+pub mod lite_math;
 use fyrox_lite::LiteDataType;

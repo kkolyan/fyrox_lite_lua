@@ -1,0 +1,10 @@
+[package]
+name = "tools"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lite-parser = {workspace = true}
+fyrox-lite-lua-generator = {workspace = true}
+lite-model = {workspace = true}
+itertools = {workspace = true}
