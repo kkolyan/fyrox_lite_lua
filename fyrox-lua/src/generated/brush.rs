@@ -90,5 +90,80 @@
 	
 			}
 	
+			
+	    	fn add_instance_methods<'lua, M: mlua::UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
+				methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
+					Ok(format!("{:?}", this.inner()))
+				});
+			}
+	
+			fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+	
+				fields.add_field_method_get("Solid", |lua, this| {
+		
+					let lite_ui::Brush::Solid(_1) = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+                    let t = lua.create_table()?;
+    
+					// Lua annotations is based on assumption that indexed table is homogenous array, so use string keys to allow heterogenous typing here.
+                    t.set("_1", {
+                        let _1 = _1.clone();
+                        Traitor::new(lite_ui::Color::from(_1))
+                    })?;
+        
+                    Ok(mlua::Value::Table(t))
+    
+				});
+		
+				fields.add_field_method_get("LinearGradient", |lua, this| {
+		
+					let lite_ui::Brush::LinearGradient { from, to, stops } = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+                    let t = lua.create_table()?;
+    
+                    t.set("from", {
+                        let from = from.clone();
+                        Traitor::new(lite_math::PodVector2::from(from))
+                    })?;
+        
+                    t.set("to", {
+                        let to = to.clone();
+                        Traitor::new(lite_math::PodVector2::from(to))
+                    })?;
+        
+                    t.set("stops", {
+                        let stops = stops.clone();
+                        lua.create_table_from(stops.into_iter().map(|it| Traitor::new(lite_ui::GradientPoint::from(it))).enumerate())?
+                    })?;
+        
+                    Ok(mlua::Value::Table(t))
+    
+				});
+		
+				fields.add_field_method_get("RadialGradient", |lua, this| {
+		
+					let lite_ui::Brush::RadialGradient { center, stops } = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+                    let t = lua.create_table()?;
+    
+                    t.set("center", {
+                        let center = center.clone();
+                        Traitor::new(lite_math::PodVector2::from(center))
+                    })?;
+        
+                    t.set("stops", {
+                        let stops = stops.clone();
+                        lua.create_table_from(stops.into_iter().map(|it| Traitor::new(lite_ui::GradientPoint::from(it))).enumerate())?
+                    })?;
+        
+                    Ok(mlua::Value::Table(t))
+    
+				});
+		
+			}
+	
 		}
 	

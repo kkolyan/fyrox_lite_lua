@@ -2,7 +2,8 @@ use core::fmt;
 
 use convert_case::{Case, Casing};
 use fyrox_lite_model::{
-    DataType, Domain, EngineClass, EnumClass, EnumValue, Field, Method, RustQualifiedName, StructClass
+    DataType, Domain, EngineClass, EnumClass, EnumValue, Field, Method, RustQualifiedName,
+    StructClass,
 };
 use std::{borrow::Cow, collections::HashMap, fmt::Write, ops::Deref};
 use to_vec::ToVec;
@@ -51,8 +52,8 @@ pub fn generate_enum_class_bindings(class: &EnumClass, ctx: &GenerationContext) 
 
     generate_class_methods(&mut s, class, ctx);
     generate_class_fields(&mut s, class, ctx);
-    // generate_instance_methods(&mut s, class, ctx);
-    // generate_instance_fields(&mut s, class, ctx);
+    generate_instance_methods(&mut s, class, ctx);
+    generate_instance_fields(&mut s, class, ctx);
 
     s += "
 		}
@@ -64,6 +65,189 @@ pub fn generate_enum_class_bindings(class: &EnumClass, ctx: &GenerationContext) 
     }
 }
 
+fn generate_instance_methods(s: &mut String, _class: &EnumClass, _ctx: &GenerationContext) {
+    render(
+        s,
+        r#"
+			
+	    	fn add_instance_methods<'lua, M: mlua::UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
+				methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
+					Ok(format!("{:?}", this.inner()))
+				});
+			}
+	"#,
+        [],
+    );
+}
+
+fn generate_instance_fields(s: &mut String, class: &EnumClass, ctx: &GenerationContext) {
+    render(
+        s,
+        r#"
+			fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+	"#,
+        [],
+    );
+
+    value_accessors(s, class, ctx);
+
+    render(
+        s,
+        r#"
+			}
+	"#,
+        [],
+    );
+}
+
+fn value_accessors(s: &mut String, class: &EnumClass, ctx: &GenerationContext) {
+    for variant in class.variants.iter() {
+        render(
+            s,
+            r#"
+				fields.add_field_method_get("${field_name}", |lua, this| {
+		"#,
+            [("field_name", &variant.tag)],
+        );
+
+        match &variant.value {
+            EnumValue::Unit => unit_to_value(s, class, &variant.tag, ctx),
+            EnumValue::Tuple { fields } => tuple_to_value(s, class, &variant.tag, fields, ctx),
+            EnumValue::Struct { fields } => struct_to_value(s, class, &variant.tag, fields, ctx),
+        }
+
+        render(
+            s,
+            r#"
+				});
+		"#,
+            [],
+        );
+    }
+}
+
+fn struct_to_value(
+    s: &mut String,
+    class: &EnumClass,
+    tag: &str,
+    fields: &[Field],
+    ctx: &GenerationContext,
+) {
+    let param_names = fields
+        .iter()
+        .map(|field| field.name.as_str())
+        .to_vec()
+        .join(", ");
+    render(
+        s,
+        r#"
+					let ${rust_struct_path}::${variant_name} { ${param_names} } = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+                    let t = lua.create_table()?;
+    "#,
+        [
+            ("rust_struct_path", &class.rust_struct_path.0),
+            ("variant_name", &tag),
+            ("param_names", &param_names),
+        ],
+    );
+
+    for field in fields.iter() {
+        let expression = rust_expr_to_mlua(ctx, &field.name, &field.ty);
+        render(
+            s,
+            r#"
+                    t.set("${field_name}", {
+                        let ${field_name} = ${field_name}.clone();
+                        ${expression}
+                    })?;
+        "#,
+            [("field_name", &field.name), ("expression", &expression)],
+        );
+    }
+
+    render(
+        s,
+        r#"
+                    Ok(mlua::Value::Table(t))
+    "#,
+        [],
+    );
+}
+
+fn tuple_to_value(
+    s: &mut String,
+    class: &EnumClass,
+    tag: &str,
+    fields: &[DataType],
+    ctx: &GenerationContext,
+) {
+    let param_names = fields
+        .iter()
+        .enumerate()
+        .map(|(i, _)| format!("_{}", i + 1))
+        .to_vec()
+        .join(", ");
+    render(
+        s,
+        r#"
+					let ${rust_struct_path}::${variant_name}(${param_names}) = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+                    let t = lua.create_table()?;
+    "#,
+        [
+            ("rust_struct_path", &class.rust_struct_path.0),
+            ("variant_name", &tag),
+            ("param_names", &param_names),
+        ],
+    );
+
+    for (i, ty) in fields.iter().enumerate() {
+        let var = format!("_{}", i + 1);
+        let expression = rust_expr_to_mlua(ctx, &var, ty);
+        render(
+            s,
+            r#"
+					// Lua annotations is based on assumption that indexed table is homogenous array, so use string keys to allow heterogenous typing here.
+                    t.set("${var}", {
+                        let ${var} = ${var}.clone();
+                        ${expression}
+                    })?;
+        "#,
+            [
+                ("var", &var),
+                ("expression", &expression),
+            ],
+        );
+    }
+
+    render(
+        s,
+        r#"
+                    Ok(mlua::Value::Table(t))
+    "#,
+        [],
+    );
+}
+
+fn unit_to_value(s: &mut String, class: &EnumClass, tag: &str, _ctx: &GenerationContext) {
+    render(
+        s,
+        r#"
+					let ${rust_struct_path}::${variant_name} = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+					Ok(mlua::Value::Boolean(true))
+    "#,
+        [
+            ("rust_struct_path", &class.rust_struct_path.0),
+            ("variant_name", &tag),
+        ],
+    );
+}
+
 fn generate_class_fields(s: &mut String, class: &EnumClass, ctx: &GenerationContext) {
     render(
         s,
@@ -73,8 +257,7 @@ fn generate_class_fields(s: &mut String, class: &EnumClass, ctx: &GenerationCont
         [],
     );
 
-	unit_accessors(s, class, ctx);
-
+    unit_accessors(s, class, ctx);
 
     *s += "
 			}
@@ -82,11 +265,11 @@ fn generate_class_fields(s: &mut String, class: &EnumClass, ctx: &GenerationCont
 }
 
 fn unit_accessors(s: &mut String, class: &EnumClass, ctx: &GenerationContext) {
-	for variant in class.variants.iter() {
-		let EnumValue::Unit = &variant.value else {
-			continue;
-		};
-		
+    for variant in class.variants.iter() {
+        let EnumValue::Unit = &variant.value else {
+            continue;
+        };
+
         render(
             s,
             r#"				
@@ -100,7 +283,7 @@ fn unit_accessors(s: &mut String, class: &EnumClass, ctx: &GenerationContext) {
                 ("variant_name", &variant.tag),
             ],
         );
-	}
+    }
 }
 
 fn generate_class_methods(s: &mut String, class: &EnumClass, ctx: &GenerationContext) {
@@ -112,9 +295,9 @@ fn generate_class_methods(s: &mut String, class: &EnumClass, ctx: &GenerationCon
         [],
     );
     for variant in class.variants.iter() {
-		if let EnumValue::Unit = &variant.value {
-			continue;
-		}
+        if let EnumValue::Unit = &variant.value {
+            continue;
+        }
         render(
             s,
             r#"
@@ -127,7 +310,9 @@ fn generate_class_methods(s: &mut String, class: &EnumClass, ctx: &GenerationCon
         match &variant.value {
             EnumValue::Unit => {}
             EnumValue::Tuple { fields } => tuple_construction(s, class, &variant.tag, fields, ctx),
-            EnumValue::Struct { fields } => struct_construction(s, class, &variant.tag, fields, ctx),
+            EnumValue::Struct { fields } => {
+                struct_construction(s, class, &variant.tag, fields, ctx)
+            }
         }
 
         *s += "
@@ -198,9 +383,9 @@ fn struct_construction(
     ctx: &GenerationContext,
 ) {
     let mut output_names = Vec::new();
-	render(
-		s,
-		r#"
+    render(
+        s,
+        r#"
 						if args.len() != 1 {
 							return Err(lua_error!("exactly one argument expected, but {} supplied", args.len()));
 						}
@@ -209,10 +394,11 @@ fn struct_construction(
 							return Err(lua_error!("${display_type_name}-typed table expected, but {:?} supplied", value));
 						};
 		"#,
-		[
-			("display_type_name", &format!("{}::{}", class.class_name.0, tag)),
-		],
-	);
+        [(
+            "display_type_name",
+            &format!("{}::{}", class.class_name.0, tag),
+        )],
+    );
     for field in fields.iter() {
         render(
             s,
@@ -222,7 +408,10 @@ fn struct_construction(
 			"#,
             [
                 ("field_name", &field.name),
-                ("expression", & mlua_to_rust_expr(&field.name, &field.ty, ctx)),
+                (
+                    "expression",
+                    &mlua_to_rust_expr(&field.name, &field.ty, ctx),
+                ),
                 ("field_type", &type_to_mlua(&field.ty, ctx)),
             ],
         );

@@ -31,5 +31,34 @@
 		
 			}
 	
+			
+	    	fn add_instance_methods<'lua, M: mlua::UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
+				methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
+					Ok(format!("{:?}", this.inner()))
+				});
+			}
+	
+			fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+	
+				fields.add_field_method_get("Up", |lua, this| {
+		
+					let lite_node::LiteRoutingStrategy::Up = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+					Ok(mlua::Value::Boolean(true))
+    
+				});
+		
+				fields.add_field_method_get("Down", |lua, this| {
+		
+					let lite_node::LiteRoutingStrategy::Down = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+					Ok(mlua::Value::Boolean(true))
+    
+				});
+		
+			}
+	
 		}
 	

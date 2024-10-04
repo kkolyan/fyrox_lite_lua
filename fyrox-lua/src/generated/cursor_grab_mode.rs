@@ -35,5 +35,43 @@
 		
 			}
 	
+			
+	    	fn add_instance_methods<'lua, M: mlua::UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
+				methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
+					Ok(format!("{:?}", this.inner()))
+				});
+			}
+	
+			fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+	
+				fields.add_field_method_get("None", |lua, this| {
+		
+					let lite_window::LiteCursorGrabMode::None = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+					Ok(mlua::Value::Boolean(true))
+    
+				});
+		
+				fields.add_field_method_get("Confined", |lua, this| {
+		
+					let lite_window::LiteCursorGrabMode::Confined = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+					Ok(mlua::Value::Boolean(true))
+    
+				});
+		
+				fields.add_field_method_get("Locked", |lua, this| {
+		
+					let lite_window::LiteCursorGrabMode::Locked = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+					Ok(mlua::Value::Boolean(true))
+    
+				});
+		
+			}
+	
 		}
 	

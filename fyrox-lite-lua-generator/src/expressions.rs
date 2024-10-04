@@ -59,7 +59,7 @@ pub fn rust_expr_to_mlua(ctx: &GenerationContext, param: &str, ty: &DataType) ->
         DataType::F64 => param.to_string(),
         DataType::String => param.to_string(),
         DataType::Vec(it) => format!(
-            "lua.create_table_from({}.into_iter().map(|it| {}).enumerate())",
+            "lua.create_table_from({}.into_iter().map(|it| {}).enumerate())?",
             param,
             rust_expr_to_mlua(ctx, "it", it.deref())
         ),

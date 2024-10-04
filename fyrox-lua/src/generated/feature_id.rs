@@ -75,5 +75,76 @@
 		
 			}
 	
+			
+	    	fn add_instance_methods<'lua, M: mlua::UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
+				methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
+					Ok(format!("{:?}", this.inner()))
+				});
+			}
+	
+			fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+	
+				fields.add_field_method_get("Vertex", |lua, this| {
+		
+					let lite_physics::LiteFeatureId::Vertex(_1) = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+                    let t = lua.create_table()?;
+    
+					// Lua annotations is based on assumption that indexed table is homogenous array, so use string keys to allow heterogenous typing here.
+                    t.set("_1", {
+                        let _1 = _1.clone();
+                        _1
+                    })?;
+        
+                    Ok(mlua::Value::Table(t))
+    
+				});
+		
+				fields.add_field_method_get("Edge", |lua, this| {
+		
+					let lite_physics::LiteFeatureId::Edge(_1) = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+                    let t = lua.create_table()?;
+    
+					// Lua annotations is based on assumption that indexed table is homogenous array, so use string keys to allow heterogenous typing here.
+                    t.set("_1", {
+                        let _1 = _1.clone();
+                        _1
+                    })?;
+        
+                    Ok(mlua::Value::Table(t))
+    
+				});
+		
+				fields.add_field_method_get("Face", |lua, this| {
+		
+					let lite_physics::LiteFeatureId::Face(_1) = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+                    let t = lua.create_table()?;
+    
+					// Lua annotations is based on assumption that indexed table is homogenous array, so use string keys to allow heterogenous typing here.
+                    t.set("_1", {
+                        let _1 = _1.clone();
+                        _1
+                    })?;
+        
+                    Ok(mlua::Value::Table(t))
+    
+				});
+		
+				fields.add_field_method_get("Unknown", |lua, this| {
+		
+					let lite_physics::LiteFeatureId::Unknown = this.inner() else {
+						return Ok(mlua::Value::Nil);
+					};
+					Ok(mlua::Value::Boolean(true))
+    
+				});
+		
+			}
+	
 		}
 	

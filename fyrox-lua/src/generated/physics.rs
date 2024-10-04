@@ -31,7 +31,7 @@
 						let opts = opts.inner().clone().into();
 				
 						let ret = lite_physics::LitePhysics::cast_ray(opts);
-                        let ret = lua.create_table_from(ret.into_iter().map(|it| Traitor::new(lite_physics::LiteIntersection::from(it))).enumerate());
+                        let ret = lua.create_table_from(ret.into_iter().map(|it| Traitor::new(lite_physics::LiteIntersection::from(it))).enumerate())?;
 						Ok(ret)
 					},
 				);
