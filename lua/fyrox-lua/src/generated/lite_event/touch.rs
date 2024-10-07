@@ -27,11 +27,6 @@ impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_event::Touch> {
         Ok(mlua::Value::Table({
             let t = lua.create_table()?;
 
-            t.set("device_id", {
-                let device_id = self.device_id.clone();
-                device_id
-            })?;
-
             t.set("phase", {
                 let phase = self.phase.clone();
                 Traitor::new(fyrox_lite::lite_event::TouchPhase::from(phase))
@@ -70,9 +65,6 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_event::Touch> {
             ));
         };
 
-        let device_id = value.get::<_, i64>("device_id")?;
-        let device_id = device_id;
-
         let phase =
             value.get::<_, TypedUserData<Traitor<fyrox_lite::lite_event::TouchPhase>>>("phase")?;
         let phase = phase.borrow()?.inner().clone().into();
@@ -92,7 +84,6 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_event::Touch> {
         let id = id;
 
         Ok(Traitor::new(fyrox_lite::lite_event::Touch {
-            device_id,
             phase,
             location,
             force,

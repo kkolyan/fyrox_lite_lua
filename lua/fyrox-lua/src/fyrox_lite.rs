@@ -1,39 +1,18 @@
-#![allow(unused_variables)]
-
-use std::{borrow::Borrow, mem};
+use std::mem;
 
 use crate::{
-    debug::VerboseLuaValue,
-    fyrox_lite_class::{FyroxUserData, Traitor, UserDataClass},
-    fyrox_utils::PluginsRefMut_Ext,
-    lua_error,
+    fyrox_lite_class::Traitor,
     script::LuaScript,
-    script_class::ScriptClass,
     script_object::ScriptObject,
     typed_userdata::TypedUserData,
 };
-use fyrox::core::{
-        algebra::{UnitQuaternion, Vector3},
-        log::Log,
-    };
 use fyrox_lite::{
-    lite_node::{LiteNode, LiteRoutingStrategy},
-    lite_physics::{LiteIntersection, LitePhysics, LiteRayCastOptions, LiteRigidBody},
-    lite_prefab::LitePrefab,
-    lite_scene::LiteScene,
-    lite_ui::{Brush, Color, LiteText, LiteUiNode},
-    lite_window::{LiteCursorGrabMode, LiteWindow},
-    script_context::with_script_context,
     spi::UserScript,
     LiteDataType,
 };
-use fyrox_lite_math::{lite_math::LiteQuaternion, lite_math::LiteVector3};
-use mlua::{
-    AnyUserData, IntoLua, Lua, MetaMethod, MultiValue, Table, UserDataFields, UserDataMethods, UserDataRef, UserDataRefMut, Value
-};
+use mlua::Value;
 use send_wrapper::SendWrapper;
 
-type UserScriptImpl<'a> = TypedUserData<'a, ScriptObject>;
 
 impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
     type ProxyScript = LuaScript;

@@ -1,9 +1,7 @@
-use std::{collections::HashMap, fs};
+use std::fs;
 
-use luagen_lib::{
-    code_model::{Mod, ModContent, SimpleRustCodeBase}, context::GenerationContext, generate_engine_class_bindings::generate_engine_class_bindings, generate_enum_class_bindings::generate_enum_class_bindings, generate_lua_bindings::generate_lua_bindings, generate_registry::generate_registry, generate_struct_class_bindings::generate_struct_class_bindings, templating::render
-};
-use lite_model::{Class, ClassName, Domain};
+use luagen_lib::generate_lua_bindings::generate_lua_bindings;
+use lite_model::Domain;
 use lite_parser::parse_domain_metadata::parse_domain_metadata;
 
 fn main() {

@@ -28,22 +28,6 @@ impl FyroxUserData for fyrox_lite::lite_event::Event {
     fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
         methods: &mut M,
     ) {
-        methods.add_method_mut(
-                    "NewEvents",
-                    |lua, this, mut args: mlua::MultiValue| {
-            
-                        let Some(_1) = args.pop_front() else {
-                            return Err(lua_error!("argument 1 (StartCause) missing"));
-                        };
-                        let _1 = <TypedUserData<Traitor<fyrox_lite::lite_event::StartCause>> as mlua::FromLua>::from_lua(_1, lua)?;
-                        let _1 = _1.borrow()?.inner().clone().into();
-            
-                        let value = fyrox_lite::lite_event::Event::NewEvents( _1 );
-                        Ok(Traitor::new(value))
-        
-                    }
-                );
-
         methods.add_method_mut("WindowEvent", |lua, this, mut args: mlua::MultiValue| {
             if args.len() != 1 {
                 return Err(lua_error!(
@@ -85,23 +69,16 @@ impl FyroxUserData for fyrox_lite::lite_event::Event {
                 ));
             };
 
-            let device_id = value.get::<_, i64>("device_id")?;
-            let device_id = device_id;
-
             let event = value
                 .get::<_, TypedUserData<Traitor<fyrox_lite::lite_event::DeviceEvent>>>("event")?;
             let event = event.borrow()?.inner().clone().into();
 
-            let value = fyrox_lite::lite_event::Event::DeviceEvent { device_id, event };
+            let value = fyrox_lite::lite_event::Event::DeviceEvent { event };
             Ok(Traitor::new(value))
         });
     }
 
     fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
-        fields.add_field_method_get("UserEvent", |lua, this| {
-            Ok(Traitor::new(fyrox_lite::lite_event::Event::UserEvent))
-        });
-
         fields.add_field_method_get("Suspended", |lua, this| {
             Ok(Traitor::new(fyrox_lite::lite_event::Event::Suspended))
         });
@@ -130,21 +107,6 @@ impl FyroxUserData for fyrox_lite::lite_event::Event {
     }
 
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
-        fields.add_field_method_get("NewEvents", |lua, this| {
-            let fyrox_lite::lite_event::Event::NewEvents(_1) = this.inner() else {
-                return Ok(mlua::Value::Nil);
-            };
-            let t = lua.create_table()?;
-
-            // Lua annotations is based on assumption that indexed table is homogenous array, so use string keys to allow heterogenous typing here.
-            t.set("_1", {
-                let _1 = _1.clone();
-                Traitor::new(fyrox_lite::lite_event::StartCause::from(_1))
-            })?;
-
-            Ok(mlua::Value::Table(t))
-        });
-
         fields.add_field_method_get("WindowEvent", |lua, this| {
             let fyrox_lite::lite_event::Event::WindowEvent { window_id, event } = this.inner()
             else {
@@ -166,16 +128,10 @@ impl FyroxUserData for fyrox_lite::lite_event::Event {
         });
 
         fields.add_field_method_get("DeviceEvent", |lua, this| {
-            let fyrox_lite::lite_event::Event::DeviceEvent { device_id, event } = this.inner()
-            else {
+            let fyrox_lite::lite_event::Event::DeviceEvent { event } = this.inner() else {
                 return Ok(mlua::Value::Nil);
             };
             let t = lua.create_table()?;
-
-            t.set("device_id", {
-                let device_id = device_id.clone();
-                device_id
-            })?;
 
             t.set("event", {
                 let event = event.clone();
@@ -183,13 +139,6 @@ impl FyroxUserData for fyrox_lite::lite_event::Event {
             })?;
 
             Ok(mlua::Value::Table(t))
-        });
-
-        fields.add_field_method_get("UserEvent", |lua, this| {
-            let fyrox_lite::lite_event::Event::UserEvent = this.inner() else {
-                return Ok(mlua::Value::Nil);
-            };
-            Ok(mlua::Value::Boolean(true))
         });
 
         fields.add_field_method_get("Suspended", |lua, this| {

@@ -70,7 +70,7 @@ pub fn extract_pod_enum(
         EnumClass {
             class_name: ClassName(class_name),
             variants,
-            rust_struct_path: RustQualifiedName(format!("{}::{}", rust_path, item.ident.to_string())),
+            rust_struct_path: RustQualifiedName(format!("{}::{}", rust_path, item.ident)),
         },
     ))
 }

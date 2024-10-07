@@ -1,8 +1,7 @@
-use core::fmt;
 
 use convert_case::{Case, Casing};
-use lite_model::{DataType, Domain, EngineClass, Method, RustQualifiedName, StructClass};
-use std::{borrow::Cow, collections::HashMap, fmt::Write, ops::Deref};
+use lite_model::EngineClass;
+use std::borrow::Cow;
 use to_vec::ToVec;
 
 use crate::{

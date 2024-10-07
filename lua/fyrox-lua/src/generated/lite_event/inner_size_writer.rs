@@ -31,7 +31,7 @@ impl FyroxUserData for fyrox_lite::lite_event::InnerSizeWriter {
 
         methods.add_method_mut(
             "request_inner_size",
-            |lua, this, (new_inner_size): (Traitor<fyrox_lite::lite_math::PodVector2>)| {
+            |lua, this, (new_inner_size): (Traitor<fyrox_lite::lite_math::PodVector2i>)| {
                 let new_inner_size = new_inner_size.inner().clone().into();
 
                 let ret = this.request_inner_size(new_inner_size);

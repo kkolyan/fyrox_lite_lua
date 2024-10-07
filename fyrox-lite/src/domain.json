@@ -6,16 +6,6 @@
         "rust_struct_path": "fyrox_lite::lite_event::Event",
         "variants": [
           {
-            "tag": "NewEvents",
-            "value": {
-              "fields": [
-                {
-                  "Object": "StartCause"
-                }
-              ]
-            }
-          },
-          {
             "tag": "WindowEvent",
             "value": {
               "fields": [
@@ -37,10 +27,6 @@
             "value": {
               "fields": [
                 {
-                  "name": "device_id",
-                  "ty": "I64"
-                },
-                {
                   "name": "event",
                   "ty": {
                     "Object": "DeviceEvent"
@@ -48,9 +34,6 @@
                 }
               ]
             }
-          },
-          {
-            "tag": "UserEvent"
           },
           {
             "tag": "Suspended"
@@ -76,36 +59,10 @@
         "rust_struct_path": "fyrox_lite::lite_event::StartCause",
         "variants": [
           {
-            "tag": "ResumeTimeReached",
-            "value": {
-              "fields": [
-                {
-                  "name": "start",
-                  "ty": "I64"
-                },
-                {
-                  "name": "requested_resume",
-                  "ty": "I64"
-                }
-              ]
-            }
+            "tag": "ResumeTimeReached"
           },
           {
-            "tag": "WaitCancelled",
-            "value": {
-              "fields": [
-                {
-                  "name": "start",
-                  "ty": "I64"
-                },
-                {
-                  "name": "requested_resume",
-                  "ty": {
-                    "Option": "I64"
-                  }
-                }
-              ]
-            }
+            "tag": "WaitCancelled"
           },
           {
             "tag": "Poll"
@@ -129,7 +86,7 @@
             "value": {
               "fields": [
                 {
-                  "Object": "Vector2"
+                  "Object": "Vector2i"
                 }
               ]
             }
@@ -139,7 +96,7 @@
             "value": {
               "fields": [
                 {
-                  "Object": "Vector2"
+                  "Object": "Vector2i"
                 }
               ]
             }
@@ -182,10 +139,6 @@
             "value": {
               "fields": [
                 {
-                  "name": "device_id",
-                  "ty": "I64"
-                },
-                {
                   "name": "event",
                   "ty": {
                     "Object": "KeyEvent"
@@ -209,48 +162,24 @@
             "value": {
               "fields": [
                 {
-                  "name": "device_id",
-                  "ty": "I64"
-                },
-                {
                   "name": "position",
                   "ty": {
-                    "Object": "Vector2"
+                    "Object": "Vector2i"
                   }
                 }
               ]
             }
           },
           {
-            "tag": "CursorEntered",
-            "value": {
-              "fields": [
-                {
-                  "name": "device_id",
-                  "ty": "I64"
-                }
-              ]
-            }
+            "tag": "CursorEntered"
           },
           {
-            "tag": "CursorLeft",
-            "value": {
-              "fields": [
-                {
-                  "name": "device_id",
-                  "ty": "I64"
-                }
-              ]
-            }
+            "tag": "CursorLeft"
           },
           {
             "tag": "MouseWheel",
             "value": {
               "fields": [
-                {
-                  "name": "device_id",
-                  "ty": "I64"
-                },
                 {
                   "name": "delta",
                   "ty": {
@@ -271,10 +200,6 @@
             "value": {
               "fields": [
                 {
-                  "name": "device_id",
-                  "ty": "I64"
-                },
-                {
                   "name": "state",
                   "ty": {
                     "Object": "ElementState"
@@ -294,10 +219,6 @@
             "value": {
               "fields": [
                 {
-                  "name": "device_id",
-                  "ty": "I64"
-                },
-                {
                   "name": "delta",
                   "ty": "F64"
                 },
@@ -311,24 +232,12 @@
             }
           },
           {
-            "tag": "SmartMagnify",
-            "value": {
-              "fields": [
-                {
-                  "name": "device_id",
-                  "ty": "I64"
-                }
-              ]
-            }
+            "tag": "SmartMagnify"
           },
           {
             "tag": "TouchpadRotate",
             "value": {
               "fields": [
-                {
-                  "name": "device_id",
-                  "ty": "I64"
-                },
                 {
                   "name": "delta",
                   "ty": "F32"
@@ -347,10 +256,6 @@
             "value": {
               "fields": [
                 {
-                  "name": "device_id",
-                  "ty": "I64"
-                },
-                {
                   "name": "pressure",
                   "ty": "F32"
                 },
@@ -365,10 +270,6 @@
             "tag": "AxisMotion",
             "value": {
               "fields": [
-                {
-                  "name": "device_id",
-                  "ty": "I64"
-                },
                 {
                   "name": "axis",
                   "ty": "I32"
@@ -1199,18 +1100,6 @@
             }
           },
           {
-            "name": "text",
-            "ty": {
-              "Option": "String"
-            }
-          },
-          {
-            "name": "location",
-            "ty": {
-              "Object": "KeyLocation"
-            }
-          },
-          {
             "name": "state",
             "ty": {
               "Object": "ElementState"
@@ -1268,10 +1157,6 @@
         "class_name": "Touch",
         "rust_struct_path": "fyrox_lite::lite_event::Touch",
         "fields": [
-          {
-            "name": "device_id",
-            "ty": "I64"
-          },
           {
             "name": "phase",
             "ty": {
@@ -1390,8 +1275,9 @@
             "tag": "LineDelta",
             "value": {
               "fields": [
-                "F32",
-                "F32"
+                {
+                  "Object": "Vector2"
+                }
               ]
             }
           },
@@ -1421,7 +1307,7 @@
                 {
                   "name": "new_inner_size",
                   "ty": {
-                    "Object": "Vector2"
+                    "Object": "Vector2i"
                   },
                   "variadic": false
                 }
@@ -1511,6 +1397,22 @@
           {
             "name": "y",
             "ty": "F32"
+          }
+        ]
+      }
+    },
+    {
+      "Struct": {
+        "class_name": "Vector2i",
+        "rust_struct_path": "fyrox_lite::lite_math::PodVector2i",
+        "fields": [
+          {
+            "name": "x",
+            "ty": "I64"
+          },
+          {
+            "name": "y",
+            "ty": "I64"
           }
         ]
       }

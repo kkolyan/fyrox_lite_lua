@@ -32,20 +32,6 @@ impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_event::KeyEvent> {
                 Traitor::new(fyrox_lite::lite_event::PhysicalKey::from(physical_key))
             })?;
 
-            t.set("text", {
-                let text = self.text.clone();
-                if let Some(text) = text {
-                    Some(text)
-                } else {
-                    None
-                }
-            })?;
-
-            t.set("location", {
-                let location = self.location.clone();
-                Traitor::new(fyrox_lite::lite_event::KeyLocation::from(location))
-            })?;
-
             t.set("state", {
                 let state = self.state.clone();
                 Traitor::new(fyrox_lite::lite_event::ElementState::from(state))
@@ -76,17 +62,6 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_event::KeyEvent> {
             )?;
         let physical_key = physical_key.borrow()?.inner().clone().into();
 
-        let text = value.get::<_, Option<mlua::String>>("text")?;
-        let text = if let Some(text) = text {
-            Some(text.to_str()?.to_string())
-        } else {
-            None
-        };
-
-        let location = value
-            .get::<_, TypedUserData<Traitor<fyrox_lite::lite_event::KeyLocation>>>("location")?;
-        let location = location.borrow()?.inner().clone().into();
-
         let state = value
             .get::<_, TypedUserData<Traitor<fyrox_lite::lite_event::ElementState>>>("state")?;
         let state = state.borrow()?.inner().clone().into();
@@ -96,8 +71,6 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_event::KeyEvent> {
 
         Ok(Traitor::new(fyrox_lite::lite_event::KeyEvent {
             physical_key,
-            text,
-            location,
             state,
             repeat,
         }))

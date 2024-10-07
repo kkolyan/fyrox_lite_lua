@@ -30,18 +30,13 @@ impl FyroxUserData for fyrox_lite::lite_event::MouseScrollDelta {
     ) {
         methods.add_method_mut("LineDelta", |lua, this, mut args: mlua::MultiValue| {
             let Some(_1) = args.pop_front() else {
-                return Err(lua_error!("argument 1 (f32) missing"));
+                return Err(lua_error!("argument 1 (Vector2) missing"));
             };
-            let _1 = <f32 as mlua::FromLua>::from_lua(_1, lua)?;
-            let _1 = _1;
+            let _1 =
+                <Traitor<fyrox_lite::lite_math::PodVector2> as mlua::FromLua>::from_lua(_1, lua)?;
+            let _1 = _1.inner().clone().into();
 
-            let Some(_2) = args.pop_front() else {
-                return Err(lua_error!("argument 2 (f32) missing"));
-            };
-            let _2 = <f32 as mlua::FromLua>::from_lua(_2, lua)?;
-            let _2 = _2;
-
-            let value = fyrox_lite::lite_event::MouseScrollDelta::LineDelta(_1, _2);
+            let value = fyrox_lite::lite_event::MouseScrollDelta::LineDelta(_1);
             Ok(Traitor::new(value))
         });
 
@@ -68,7 +63,7 @@ impl FyroxUserData for fyrox_lite::lite_event::MouseScrollDelta {
 
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
         fields.add_field_method_get("LineDelta", |lua, this| {
-            let fyrox_lite::lite_event::MouseScrollDelta::LineDelta(_1, _2) = this.inner() else {
+            let fyrox_lite::lite_event::MouseScrollDelta::LineDelta(_1) = this.inner() else {
                 return Ok(mlua::Value::Nil);
             };
             let t = lua.create_table()?;
@@ -76,13 +71,7 @@ impl FyroxUserData for fyrox_lite::lite_event::MouseScrollDelta {
             // Lua annotations is based on assumption that indexed table is homogenous array, so use string keys to allow heterogenous typing here.
             t.set("_1", {
                 let _1 = _1.clone();
-                _1
-            })?;
-
-            // Lua annotations is based on assumption that indexed table is homogenous array, so use string keys to allow heterogenous typing here.
-            t.set("_2", {
-                let _2 = _2.clone();
-                _2
+                Traitor::new(fyrox_lite::lite_math::PodVector2::from(_1))
             })?;
 
             Ok(mlua::Value::Table(t))

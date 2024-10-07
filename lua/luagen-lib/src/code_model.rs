@@ -1,4 +1,4 @@
-use std::{fs, io, process::{self, Stdio}};
+use std::{fs, process::{self, Stdio}};
 
 #[derive(Default)]
 pub struct SimpleRustCodeBase {

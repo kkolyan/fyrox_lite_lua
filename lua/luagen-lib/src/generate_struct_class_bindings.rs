@@ -1,8 +1,6 @@
-use core::fmt;
 
 use convert_case::{Case, Casing};
-use lite_model::{DataType, Domain, EngineClass, RustQualifiedName, StructClass};
-use std::{collections::HashMap, fmt::Write, ops::Deref};
+use lite_model::StructClass;
 use to_vec::ToVec;
 
 use crate::{

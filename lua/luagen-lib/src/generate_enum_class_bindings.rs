@@ -1,15 +1,12 @@
-use core::fmt;
 
 use convert_case::{Case, Casing};
 use lite_model::{
-    DataType, Domain, EngineClass, EnumClass, EnumValue, Field, Method, RustQualifiedName,
-    StructClass,
+    DataType, EnumClass, EnumValue, Field,
 };
-use std::{borrow::Cow, collections::HashMap, fmt::Write, ops::Deref};
 use to_vec::ToVec;
 
 use crate::{
-    code_model::{Mod, ModContent}, context::GenerationContext, expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, generate_methods::{generate_methods, is_getter, is_setter}, supress_lint::SUPRESSIONS, templating::render
+    code_model::{Mod, ModContent}, context::GenerationContext, expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, supress_lint::SUPRESSIONS, templating::render
 };
 
 pub fn generate_enum_class_bindings(class: &EnumClass, ctx: &GenerationContext) -> Mod {

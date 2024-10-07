@@ -1,5 +1,5 @@
 pub mod display;
-use std::{fmt::Display};
+use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
 

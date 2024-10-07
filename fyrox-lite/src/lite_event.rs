@@ -32,25 +32,17 @@
 //!
 //! [`EventLoop::run(...)`]: crate::event_loop::EventLoop::run
 //! [`ControlFlow::WaitUntil`]: crate::event_loop::ControlFlow::WaitUntil
-use std::path::PathBuf;
-use std::sync::{Mutex, Weak};
-#[cfg(not(wasm_platform))]
-use std::time::Instant as StdInstant;
+use std::{
+    sync::{Mutex, Weak},
+    time::{Instant, SystemTime},
+};
 
 use lite_macro::lite_api;
-#[cfg(wasm_platform)]
-use web_time::Instant as StdInstant;
 
-use crate::lite_math::PodVector2;
-use crate::spi::UserScript;
+use crate::lite_math::{PodVector2, PodVector2i};
 #[cfg(doc)]
 use crate::window::Window;
-use fyrox::{
-    dpi::{PhysicalPosition, PhysicalSize},
-    event_loop::AsyncRequestSerial,
-    keyboard::{self, ModifiersKeyState, ModifiersState},
-    window::{ActivationToken, Theme, WindowId},
-};
+use fyrox::dpi::{PhysicalPosition, PhysicalSize};
 
 // type Instant = i64;
 
@@ -60,28 +52,11 @@ use fyrox::{
 #[derive(Debug, Clone, PartialEq)]
 #[lite_api]
 pub enum Event {
-    /// Emitted when new events arrive from the OS to be processed.
-    ///
-    /// This event type is useful as a place to put code that should be done before you start
-    /// processing events, such as updating frame timing information for benchmarking or checking
-    /// the [`StartCause`] to see if a timer set by
-    /// [`ControlFlow::WaitUntil`](crate::event_loop::ControlFlow::WaitUntil) has elapsed.
-    NewEvents(StartCause),
-
     /// Emitted when the OS sends an event to a winit window.
-    WindowEvent {
-        window_id: i64,
-        event: WindowEvent,
-    },
+    WindowEvent { window_id: i64, event: WindowEvent },
 
     /// Emitted when the OS sends an event to a device.
-    DeviceEvent {
-        device_id: i64,
-        event: DeviceEvent,
-    },
-
-    /// Emitted when an event is sent from [`EventLoopProxy::send_event`](crate::event_loop::EventLoopProxy::send_event)
-    UserEvent,
+    DeviceEvent { event: DeviceEvent },
 
     /// Emitted when the application has been suspended.
     ///
@@ -265,17 +240,11 @@ pub enum StartCause {
     /// guaranteed to be equal to or after the requested resume time.
     ///
     /// [`ControlFlow::WaitUntil`]: crate::event_loop::ControlFlow::WaitUntil
-    ResumeTimeReached {
-        start: i64,
-        requested_resume: i64,
-    },
+    ResumeTimeReached,
 
     /// Sent if the OS has new events to send to the window, after a wait was requested. Contains
     /// the moment the wait was requested and the resume time, if requested.
-    WaitCancelled {
-        start: i64,
-        requested_resume: Option<i64>,
-    },
+    WaitCancelled,
 
     /// Sent if the event loop is being resumed after the loop's control flow was set to
     /// [`ControlFlow::Poll`].
@@ -293,24 +262,21 @@ pub enum StartCause {
 pub enum WindowEvent {
     /// The activation token was delivered back and now could be used.
     ///
-    #[cfg_attr(
-        not(any(x11_platform, wayland_platfrom)),
-        allow(rustdoc::broken_intra_doc_links)
-    )]
+    #[allow(rustdoc::broken_intra_doc_links)]
     /// Delivered in response to [`request_activation_token`].
     ///
     /// [`request_activation_token`]: crate::platform::startup_notify::WindowExtStartupNotify::request_activation_token
     ActivationTokenDone,
 
     /// The size of the window has changed. Contains the client area's new dimensions.
-    Resized(PodVector2),
+    Resized(PodVector2i),
 
     /// The position of the window has changed. Contains the window's new position.
     ///
     /// ## Platform-specific
     ///
     /// - **iOS / Android / Web / Wayland:** Unsupported.
-    Moved(PodVector2),
+    Moved(PodVector2i),
 
     /// The window has been requested to close.
     CloseRequested,
@@ -348,7 +314,6 @@ pub enum WindowEvent {
     ///   numpad keys act as if NumLock wasn't active. When this is used, the OS sends fake key
     ///   events which are not marked as `is_synthetic`.
     KeyboardInput {
-        device_id: i64,
         event: KeyEvent,
 
         /// If `true`, the event was generated synthetically by winit
@@ -385,12 +350,10 @@ pub enum WindowEvent {
     /// [`padding`]: https://developer.mozilla.org/en-US/docs/Web/CSS/padding
     /// [`transform`]: https://developer.mozilla.org/en-US/docs/Web/CSS/transform
     CursorMoved {
-        device_id: i64,
-
         /// (x,y) coords in pixels relative to the top-left corner of the window. Because the range of this data is
         /// limited by the display area and it may have been transformed by the OS to implement effects such as cursor
         /// acceleration, it should not be used to implement non-cursor-like interactions such as 3D camera control.
-        position: PodVector2,
+        position: PodVector2i,
     },
 
     /// The cursor has entered the window.
@@ -402,7 +365,7 @@ pub enum WindowEvent {
     /// [`border`]: https://developer.mozilla.org/en-US/docs/Web/CSS/border
     /// [`padding`]: https://developer.mozilla.org/en-US/docs/Web/CSS/padding
     /// [`transform`]: https://developer.mozilla.org/en-US/docs/Web/CSS/transform
-    CursorEntered { device_id: i64 },
+    CursorEntered,
 
     /// The cursor has left the window.
     ///
@@ -413,18 +376,16 @@ pub enum WindowEvent {
     /// [`border`]: https://developer.mozilla.org/en-US/docs/Web/CSS/border
     /// [`padding`]: https://developer.mozilla.org/en-US/docs/Web/CSS/padding
     /// [`transform`]: https://developer.mozilla.org/en-US/docs/Web/CSS/transform
-    CursorLeft { device_id: i64 },
+    CursorLeft,
 
     /// A mouse wheel movement or touchpad scroll occurred.
     MouseWheel {
-        device_id: i64,
         delta: MouseScrollDelta,
         phase: TouchPhase,
     },
 
     /// An mouse button press has been received.
     MouseInput {
-        device_id: i64,
         state: ElementState,
         button: MouseButton,
     },
@@ -437,11 +398,7 @@ pub enum WindowEvent {
     /// ## Platform-specific
     ///
     /// - Only available on **macOS**.
-    TouchpadMagnify {
-        device_id: i64,
-        delta: f64,
-        phase: TouchPhase,
-    },
+    TouchpadMagnify { delta: f64, phase: TouchPhase },
 
     /// Smart magnification event.
     ///
@@ -460,7 +417,7 @@ pub enum WindowEvent {
     /// ## Platform-specific
     ///
     /// - Only available on **macOS 10.8** and later.
-    SmartMagnify { device_id: i64 },
+    SmartMagnify,
 
     /// Touchpad rotation event with two-finger rotation gesture.
     ///
@@ -470,29 +427,17 @@ pub enum WindowEvent {
     /// ## Platform-specific
     ///
     /// - Only available on **macOS**.
-    TouchpadRotate {
-        device_id: i64,
-        delta: f32,
-        phase: TouchPhase,
-    },
+    TouchpadRotate { delta: f32, phase: TouchPhase },
 
     /// Touchpad pressure event.
     ///
     /// At the moment, only supported on Apple forcetouch-capable macbooks.
     /// The parameters are: pressure level (value between 0 and 1 representing how hard the touchpad
     /// is being pressed) and stage (integer representing the click level).
-    TouchpadPressure {
-        device_id: i64,
-        pressure: f32,
-        stage: i64,
-    },
+    TouchpadPressure { pressure: f32, stage: i64 },
 
     /// Motion on some analog axis. May report data redundant to other, more specific events.
-    AxisMotion {
-        device_id: i64,
-        axis: i32,
-        value: f64,
-    },
+    AxisMotion { axis: i32, value: f64 },
 
     /// Touch event has been received
     ///
@@ -1172,42 +1117,6 @@ pub struct KeyEvent {
     /// you somehow see this in the wild, we'd like to know :)
     pub physical_key: PhysicalKey,
 
-    /// Contains the text produced by this keypress.
-    ///
-    /// In most cases this is identical to the content
-    /// of the `Character` variant of `logical_key`.
-    /// However, on Windows when a dead key was pressed earlier
-    /// but cannot be combined with the character from this
-    /// keypress, the produced text will consist of two characters:
-    /// the dead-key-character followed by the character resulting
-    /// from this keypress.
-    ///
-    /// An additional difference from `logical_key` is that
-    /// this field stores the text representation of any key
-    /// that has such a representation. For example when
-    /// `logical_key` is `Key::Named(NamedKey::Enter)`, this field is `Some("\r")`.
-    ///
-    /// This is `None` if the current keypress cannot
-    /// be interpreted as text.
-    ///
-    /// See also: `text_with_all_modifiers()`
-    pub text: Option<String>,
-
-    /// Contains the location of this key on the keyboard.
-    ///
-    /// Certain keys on the keyboard may appear in more than once place. For example, the "Shift" key
-    /// appears on the left side of the QWERTY keyboard as well as the right side. However, both keys
-    /// have the same symbolic value. Another example of this phenomenon is the "1" key, which appears
-    /// both above the "Q" key and as the "Keypad 1" key.
-    ///
-    /// This field allows the user to differentiate between keys like this that have the same symbolic
-    /// value but different locations on the keyboard.
-    ///
-    /// See the [`KeyLocation`] type for more details.
-    ///
-    /// [`KeyLocation`]: crate::keyboard::KeyLocation
-    pub location: KeyLocation,
-
     /// Whether the key is being pressed or released.
     ///
     /// See the [`ElementState`] type for more details.
@@ -1337,7 +1246,6 @@ pub enum TouchPhase {
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[lite_api]
 pub struct Touch {
-    pub device_id: i64,
     pub phase: TouchPhase,
     pub location: PodVector2,
     /// Describes how hard the screen was pressed. May be `None` if the platform
@@ -1428,7 +1336,7 @@ pub enum MouseScrollDelta {
     ///
     /// Positive values indicate that the content that is being scrolled should move
     /// right and down (revealing more content left and up).
-    LineDelta(f32, f32),
+    LineDelta(PodVector2),
 
     /// Amount in pixels to scroll in the horizontal and
     /// vertical direction.
@@ -1450,35 +1358,462 @@ pub enum MouseScrollDelta {
 /// [`WindowEvent`].
 #[derive(Debug, Clone)]
 pub struct InnerSizeWriter {
-    pub(crate) new_inner_size: Weak<Mutex<PhysicalSize<u32>>>,
+    pub(crate) target: fyrox::event::InnerSizeWriter,
 }
 
 #[lite_api(InnerSizeWriter)]
 impl InnerSizeWriter {
     /// Try to request inner size which will be set synchroniously on the window.
-    pub fn request_inner_size(
-        &mut self,
-        new_inner_size: PodVector2,
-    ) -> bool {
-        if let Some(inner) = self.new_inner_size.upgrade() {
-            *inner.lock().unwrap() = PhysicalSize::new(new_inner_size.x as u32, new_inner_size.y as u32);
-            true
-        } else {
-            false
-        }
+    pub fn request_inner_size(&mut self, new_inner_size: PodVector2i) -> bool {
+        self.target
+            .request_inner_size(PhysicalSize::new(
+                new_inner_size.x as u32,
+                new_inner_size.y as u32,
+            ))
+            .is_ok()
     }
-}
-impl InnerSizeWriter {
-    #[cfg(not(orbital_platform))]
-    pub(crate) fn new(new_inner_size: Weak<Mutex<PhysicalSize<u32>>>) -> Self {
-        Self { new_inner_size }
-    }
-
 }
 
 impl PartialEq for InnerSizeWriter {
     fn eq(&self, other: &Self) -> bool {
-        self.new_inner_size.as_ptr() == other.new_inner_size.as_ptr()
+        self.target == other.target
     }
 }
 
+#[allow(unused_variables)]
+pub fn to_lite<T>(event: fyrox::event::Event<T>) -> Option<Event> {
+    Some(match event {
+        fyrox::event::Event::NewEvents(it) => return None,
+        fyrox::event::Event::WindowEvent { window_id, event } => Event::WindowEvent {
+            window_id: u64::from(window_id) as i64,
+            event: windo_event_to_lite(event)?,
+        },
+        fyrox::event::Event::DeviceEvent { device_id, event } => Event::DeviceEvent {
+            event: match event {
+                fyrox::event::DeviceEvent::Added => DeviceEvent::Added,
+                fyrox::event::DeviceEvent::Removed => DeviceEvent::Removed,
+                fyrox::event::DeviceEvent::MouseMotion { delta: (x, y) } => {
+                    DeviceEvent::MouseMotion {
+                        delta: PodVector2 {
+                            x: x as f32,
+                            y: y as f32,
+                        },
+                    }
+                }
+                fyrox::event::DeviceEvent::MouseWheel { delta } => DeviceEvent::MouseWheel {
+                    delta: delta.into(),
+                },
+                fyrox::event::DeviceEvent::Motion { axis, value } => DeviceEvent::Motion {
+                    axis: axis as i32,
+                    value,
+                },
+                fyrox::event::DeviceEvent::Button { button, state } => DeviceEvent::Button {
+                    button: button as i32,
+                    state: state.into(),
+                },
+                fyrox::event::DeviceEvent::Key(it) => DeviceEvent::Key(RawKeyEvent {
+                    physical_key: physical_key_to_lite(it.physical_key)?,
+                    state: it.state.into(),
+                }),
+            },
+        },
+        fyrox::event::Event::UserEvent(_) => return None,
+        fyrox::event::Event::Suspended => Event::Suspended,
+        fyrox::event::Event::Resumed => Event::Resumed,
+        fyrox::event::Event::AboutToWait => Event::AboutToWait,
+        fyrox::event::Event::LoopExiting => Event::LoopExiting,
+        fyrox::event::Event::MemoryWarning => Event::MemoryWarning,
+    })
+}
+
+#[allow(unused_variables)]
+pub fn windo_event_to_lite(event: fyrox::event::WindowEvent) -> Option<WindowEvent> {
+    Some(match event {
+        fyrox::event::WindowEvent::ActivationTokenDone { serial, token } => {
+            WindowEvent::ActivationTokenDone
+        }
+        fyrox::event::WindowEvent::Resized(PhysicalSize { width, height }) => {
+            WindowEvent::Resized(PodVector2i {
+                x: width as i64,
+                y: height as i64,
+            })
+        }
+        fyrox::event::WindowEvent::Moved(PhysicalPosition { x, y }) => {
+            WindowEvent::Moved(PodVector2i {
+                x: x as i64,
+                y: y as i64,
+            })
+        }
+        fyrox::event::WindowEvent::CloseRequested => WindowEvent::CloseRequested,
+        fyrox::event::WindowEvent::Destroyed => WindowEvent::Destroyed,
+        fyrox::event::WindowEvent::DroppedFile(path_buf) => {
+            WindowEvent::DroppedFile(path_buf.to_string_lossy().to_string())
+        }
+        fyrox::event::WindowEvent::HoveredFile(path_buf) => {
+            WindowEvent::HoveredFile(path_buf.to_string_lossy().to_string())
+        }
+        fyrox::event::WindowEvent::HoveredFileCancelled => WindowEvent::HoveredFileCancelled,
+        fyrox::event::WindowEvent::Focused(v) => WindowEvent::Focused(v),
+        fyrox::event::WindowEvent::KeyboardInput {
+            device_id,
+            event,
+            is_synthetic,
+        } => WindowEvent::KeyboardInput {
+            event: KeyEvent {
+                physical_key: physical_key_to_lite(event.physical_key)?,
+                state: event.state.into(),
+                repeat: event.repeat,
+            },
+            is_synthetic,
+        },
+        fyrox::event::WindowEvent::ModifiersChanged(modifiers) => WindowEvent::ModifiersChanged,
+        fyrox::event::WindowEvent::Ime(ime) => WindowEvent::Ime,
+        fyrox::event::WindowEvent::CursorMoved {
+            device_id,
+            position,
+        } => WindowEvent::CursorMoved {
+            position: PodVector2i {
+                x: position.x as i64,
+                y: position.y as i64,
+            },
+        },
+        fyrox::event::WindowEvent::CursorEntered { device_id } => WindowEvent::CursorEntered,
+        fyrox::event::WindowEvent::CursorLeft { device_id } => WindowEvent::CursorLeft,
+        fyrox::event::WindowEvent::MouseWheel {
+            device_id,
+            delta,
+            phase,
+        } => WindowEvent::MouseWheel {
+            delta: delta.into(),
+            phase: phase.into(),
+        },
+        fyrox::event::WindowEvent::MouseInput {
+            device_id,
+            state,
+            button,
+        } => WindowEvent::MouseInput {
+            state: state.into(),
+            button: match button {
+                fyrox::event::MouseButton::Left => MouseButton::Left,
+                fyrox::event::MouseButton::Right => MouseButton::Right,
+                fyrox::event::MouseButton::Middle => MouseButton::Middle,
+                fyrox::event::MouseButton::Back => MouseButton::Back,
+                fyrox::event::MouseButton::Forward => MouseButton::Forward,
+                fyrox::event::MouseButton::Other(it) => MouseButton::Other(it as i32),
+            },
+        },
+        fyrox::event::WindowEvent::TouchpadMagnify {
+            device_id,
+            delta,
+            phase,
+        } => WindowEvent::TouchpadMagnify {
+            delta,
+            phase: phase.into(),
+        },
+        fyrox::event::WindowEvent::SmartMagnify { device_id } => WindowEvent::SmartMagnify,
+        fyrox::event::WindowEvent::TouchpadRotate {
+            device_id,
+            delta,
+            phase,
+        } => WindowEvent::TouchpadRotate {
+            delta,
+            phase: phase.into(),
+        },
+        fyrox::event::WindowEvent::TouchpadPressure {
+            device_id,
+            pressure,
+            stage,
+        } => WindowEvent::TouchpadPressure { pressure, stage },
+        fyrox::event::WindowEvent::AxisMotion {
+            device_id,
+            axis,
+            value,
+        } => WindowEvent::AxisMotion {
+            axis: axis as i32,
+            value,
+        },
+        fyrox::event::WindowEvent::Touch(fyrox::event::Touch {
+            device_id,
+            phase,
+            location: PhysicalPosition { x, y },
+            force,
+            id,
+        }) => WindowEvent::Touch(Touch {
+            phase: phase.into(),
+            location: PodVector2 {
+                x: x as f32,
+                y: y as f32,
+            },
+            force: force.map(|it| match it {
+                fyrox::event::Force::Calibrated {
+                    force,
+                    max_possible_force,
+                    altitude_angle,
+                } => Force::Calibrated {
+                    force,
+                    max_possible_force,
+                    altitude_angle,
+                },
+                fyrox::event::Force::Normalized(it) => Force::Normalized(it),
+            }),
+            id: id as i64,
+        }),
+        fyrox::event::WindowEvent::ScaleFactorChanged {
+            scale_factor,
+            inner_size_writer,
+        } => WindowEvent::ScaleFactorChanged {
+            scale_factor,
+            inner_size_writer: InnerSizeWriter {
+                target: inner_size_writer,
+            },
+        },
+        fyrox::event::WindowEvent::ThemeChanged(theme) => WindowEvent::ThemeChanged,
+        fyrox::event::WindowEvent::Occluded(it) => WindowEvent::Occluded(it),
+        fyrox::event::WindowEvent::RedrawRequested => WindowEvent::RedrawRequested,
+    })
+}
+
+impl From<fyrox::event::MouseScrollDelta> for MouseScrollDelta {
+    fn from(value: fyrox::event::MouseScrollDelta) -> Self {
+        match value {
+            fyrox::event::MouseScrollDelta::LineDelta(x, y) => {
+                MouseScrollDelta::LineDelta(PodVector2 { x, y })
+            }
+            fyrox::event::MouseScrollDelta::PixelDelta(PhysicalPosition { x, y }) => {
+                MouseScrollDelta::PixelDelta(PodVector2 {
+                    x: x as f32,
+                    y: y as f32,
+                })
+            }
+        }
+    }
+}
+
+impl From<fyrox::event::ElementState> for ElementState {
+    fn from(value: fyrox::event::ElementState) -> Self {
+        match value {
+            fyrox::event::ElementState::Pressed => ElementState::Pressed,
+            fyrox::event::ElementState::Released => ElementState::Released,
+        }
+    }
+}
+
+impl From<fyrox::event::TouchPhase> for TouchPhase {
+    fn from(value: fyrox::event::TouchPhase) -> Self {
+        match value {
+            fyrox::event::TouchPhase::Started => TouchPhase::Started,
+            fyrox::event::TouchPhase::Moved => TouchPhase::Moved,
+            fyrox::event::TouchPhase::Ended => TouchPhase::Ended,
+            fyrox::event::TouchPhase::Cancelled => TouchPhase::Cancelled,
+        }
+    }
+}
+
+fn physical_key_to_lite(it: fyrox::keyboard::PhysicalKey) -> Option<PhysicalKey> {
+    Some(match it {
+        fyrox::keyboard::PhysicalKey::Code(it) => PhysicalKey::Code(match it {
+            fyrox::keyboard::KeyCode::Backquote => KeyCode::Backquote,
+            fyrox::keyboard::KeyCode::Backslash => KeyCode::Backslash,
+            fyrox::keyboard::KeyCode::BracketLeft => KeyCode::BracketLeft,
+            fyrox::keyboard::KeyCode::BracketRight => KeyCode::BracketRight,
+            fyrox::keyboard::KeyCode::Comma => KeyCode::Comma,
+            fyrox::keyboard::KeyCode::Digit0 => KeyCode::Digit0,
+            fyrox::keyboard::KeyCode::Digit1 => KeyCode::Digit1,
+            fyrox::keyboard::KeyCode::Digit2 => KeyCode::Digit2,
+            fyrox::keyboard::KeyCode::Digit3 => KeyCode::Digit3,
+            fyrox::keyboard::KeyCode::Digit4 => KeyCode::Digit4,
+            fyrox::keyboard::KeyCode::Digit5 => KeyCode::Digit5,
+            fyrox::keyboard::KeyCode::Digit6 => KeyCode::Digit6,
+            fyrox::keyboard::KeyCode::Digit7 => KeyCode::Digit7,
+            fyrox::keyboard::KeyCode::Digit8 => KeyCode::Digit8,
+            fyrox::keyboard::KeyCode::Digit9 => KeyCode::Digit9,
+            fyrox::keyboard::KeyCode::Equal => KeyCode::Equal,
+            fyrox::keyboard::KeyCode::IntlBackslash => KeyCode::IntlBackslash,
+            fyrox::keyboard::KeyCode::IntlRo => KeyCode::IntlRo,
+            fyrox::keyboard::KeyCode::IntlYen => KeyCode::IntlYen,
+            fyrox::keyboard::KeyCode::KeyA => KeyCode::KeyA,
+            fyrox::keyboard::KeyCode::KeyB => KeyCode::KeyB,
+            fyrox::keyboard::KeyCode::KeyC => KeyCode::KeyC,
+            fyrox::keyboard::KeyCode::KeyD => KeyCode::KeyD,
+            fyrox::keyboard::KeyCode::KeyE => KeyCode::KeyE,
+            fyrox::keyboard::KeyCode::KeyF => KeyCode::KeyF,
+            fyrox::keyboard::KeyCode::KeyG => KeyCode::KeyG,
+            fyrox::keyboard::KeyCode::KeyH => KeyCode::KeyH,
+            fyrox::keyboard::KeyCode::KeyI => KeyCode::KeyI,
+            fyrox::keyboard::KeyCode::KeyJ => KeyCode::KeyJ,
+            fyrox::keyboard::KeyCode::KeyK => KeyCode::KeyK,
+            fyrox::keyboard::KeyCode::KeyL => KeyCode::KeyL,
+            fyrox::keyboard::KeyCode::KeyM => KeyCode::KeyM,
+            fyrox::keyboard::KeyCode::KeyN => KeyCode::KeyN,
+            fyrox::keyboard::KeyCode::KeyO => KeyCode::KeyO,
+            fyrox::keyboard::KeyCode::KeyP => KeyCode::KeyP,
+            fyrox::keyboard::KeyCode::KeyQ => KeyCode::KeyQ,
+            fyrox::keyboard::KeyCode::KeyR => KeyCode::KeyR,
+            fyrox::keyboard::KeyCode::KeyS => KeyCode::KeyS,
+            fyrox::keyboard::KeyCode::KeyT => KeyCode::KeyT,
+            fyrox::keyboard::KeyCode::KeyU => KeyCode::KeyU,
+            fyrox::keyboard::KeyCode::KeyV => KeyCode::KeyV,
+            fyrox::keyboard::KeyCode::KeyW => KeyCode::KeyW,
+            fyrox::keyboard::KeyCode::KeyX => KeyCode::KeyX,
+            fyrox::keyboard::KeyCode::KeyY => KeyCode::KeyY,
+            fyrox::keyboard::KeyCode::KeyZ => KeyCode::KeyZ,
+            fyrox::keyboard::KeyCode::Minus => KeyCode::Minus,
+            fyrox::keyboard::KeyCode::Period => KeyCode::Period,
+            fyrox::keyboard::KeyCode::Quote => KeyCode::Quote,
+            fyrox::keyboard::KeyCode::Semicolon => KeyCode::Semicolon,
+            fyrox::keyboard::KeyCode::Slash => KeyCode::Slash,
+            fyrox::keyboard::KeyCode::AltLeft => KeyCode::AltLeft,
+            fyrox::keyboard::KeyCode::AltRight => KeyCode::AltRight,
+            fyrox::keyboard::KeyCode::Backspace => KeyCode::Backspace,
+            fyrox::keyboard::KeyCode::CapsLock => KeyCode::CapsLock,
+            fyrox::keyboard::KeyCode::ContextMenu => KeyCode::ContextMenu,
+            fyrox::keyboard::KeyCode::ControlLeft => KeyCode::ControlLeft,
+            fyrox::keyboard::KeyCode::ControlRight => KeyCode::ControlRight,
+            fyrox::keyboard::KeyCode::Enter => KeyCode::Enter,
+            fyrox::keyboard::KeyCode::SuperLeft => KeyCode::SuperLeft,
+            fyrox::keyboard::KeyCode::SuperRight => KeyCode::SuperRight,
+            fyrox::keyboard::KeyCode::ShiftLeft => KeyCode::ShiftLeft,
+            fyrox::keyboard::KeyCode::ShiftRight => KeyCode::ShiftRight,
+            fyrox::keyboard::KeyCode::Space => KeyCode::Space,
+            fyrox::keyboard::KeyCode::Tab => KeyCode::Tab,
+            fyrox::keyboard::KeyCode::Convert => KeyCode::Convert,
+            fyrox::keyboard::KeyCode::KanaMode => KeyCode::KanaMode,
+            fyrox::keyboard::KeyCode::Lang1 => KeyCode::Lang1,
+            fyrox::keyboard::KeyCode::Lang2 => KeyCode::Lang2,
+            fyrox::keyboard::KeyCode::Lang3 => KeyCode::Lang3,
+            fyrox::keyboard::KeyCode::Lang4 => KeyCode::Lang4,
+            fyrox::keyboard::KeyCode::Lang5 => KeyCode::Lang5,
+            fyrox::keyboard::KeyCode::NonConvert => KeyCode::NonConvert,
+            fyrox::keyboard::KeyCode::Delete => KeyCode::Delete,
+            fyrox::keyboard::KeyCode::End => KeyCode::End,
+            fyrox::keyboard::KeyCode::Help => KeyCode::Help,
+            fyrox::keyboard::KeyCode::Home => KeyCode::Home,
+            fyrox::keyboard::KeyCode::Insert => KeyCode::Insert,
+            fyrox::keyboard::KeyCode::PageDown => KeyCode::PageDown,
+            fyrox::keyboard::KeyCode::PageUp => KeyCode::PageUp,
+            fyrox::keyboard::KeyCode::ArrowDown => KeyCode::ArrowDown,
+            fyrox::keyboard::KeyCode::ArrowLeft => KeyCode::ArrowLeft,
+            fyrox::keyboard::KeyCode::ArrowRight => KeyCode::ArrowRight,
+            fyrox::keyboard::KeyCode::ArrowUp => KeyCode::ArrowUp,
+            fyrox::keyboard::KeyCode::NumLock => KeyCode::NumLock,
+            fyrox::keyboard::KeyCode::Numpad0 => KeyCode::Numpad0,
+            fyrox::keyboard::KeyCode::Numpad1 => KeyCode::Numpad1,
+            fyrox::keyboard::KeyCode::Numpad2 => KeyCode::Numpad2,
+            fyrox::keyboard::KeyCode::Numpad3 => KeyCode::Numpad3,
+            fyrox::keyboard::KeyCode::Numpad4 => KeyCode::Numpad4,
+            fyrox::keyboard::KeyCode::Numpad5 => KeyCode::Numpad5,
+            fyrox::keyboard::KeyCode::Numpad6 => KeyCode::Numpad6,
+            fyrox::keyboard::KeyCode::Numpad7 => KeyCode::Numpad7,
+            fyrox::keyboard::KeyCode::Numpad8 => KeyCode::Numpad8,
+            fyrox::keyboard::KeyCode::Numpad9 => KeyCode::Numpad9,
+            fyrox::keyboard::KeyCode::NumpadAdd => KeyCode::NumpadAdd,
+            fyrox::keyboard::KeyCode::NumpadBackspace => KeyCode::NumpadBackspace,
+            fyrox::keyboard::KeyCode::NumpadClear => KeyCode::NumpadClear,
+            fyrox::keyboard::KeyCode::NumpadClearEntry => KeyCode::NumpadClearEntry,
+            fyrox::keyboard::KeyCode::NumpadComma => KeyCode::NumpadComma,
+            fyrox::keyboard::KeyCode::NumpadDecimal => KeyCode::NumpadDecimal,
+            fyrox::keyboard::KeyCode::NumpadDivide => KeyCode::NumpadDivide,
+            fyrox::keyboard::KeyCode::NumpadEnter => KeyCode::NumpadEnter,
+            fyrox::keyboard::KeyCode::NumpadEqual => KeyCode::NumpadEqual,
+            fyrox::keyboard::KeyCode::NumpadHash => KeyCode::NumpadHash,
+            fyrox::keyboard::KeyCode::NumpadMemoryAdd => KeyCode::NumpadMemoryAdd,
+            fyrox::keyboard::KeyCode::NumpadMemoryClear => KeyCode::NumpadMemoryClear,
+            fyrox::keyboard::KeyCode::NumpadMemoryRecall => KeyCode::NumpadMemoryRecall,
+            fyrox::keyboard::KeyCode::NumpadMemoryStore => KeyCode::NumpadMemoryStore,
+            fyrox::keyboard::KeyCode::NumpadMemorySubtract => KeyCode::NumpadMemorySubtract,
+            fyrox::keyboard::KeyCode::NumpadMultiply => KeyCode::NumpadMultiply,
+            fyrox::keyboard::KeyCode::NumpadParenLeft => KeyCode::NumpadParenLeft,
+            fyrox::keyboard::KeyCode::NumpadParenRight => KeyCode::NumpadParenRight,
+            fyrox::keyboard::KeyCode::NumpadStar => KeyCode::NumpadStar,
+            fyrox::keyboard::KeyCode::NumpadSubtract => KeyCode::NumpadSubtract,
+            fyrox::keyboard::KeyCode::Escape => KeyCode::Escape,
+            fyrox::keyboard::KeyCode::Fn => KeyCode::Fn,
+            fyrox::keyboard::KeyCode::FnLock => KeyCode::FnLock,
+            fyrox::keyboard::KeyCode::PrintScreen => KeyCode::PrintScreen,
+            fyrox::keyboard::KeyCode::ScrollLock => KeyCode::ScrollLock,
+            fyrox::keyboard::KeyCode::Pause => KeyCode::Pause,
+            fyrox::keyboard::KeyCode::BrowserBack => KeyCode::BrowserBack,
+            fyrox::keyboard::KeyCode::BrowserFavorites => KeyCode::BrowserFavorites,
+            fyrox::keyboard::KeyCode::BrowserForward => KeyCode::BrowserForward,
+            fyrox::keyboard::KeyCode::BrowserHome => KeyCode::BrowserHome,
+            fyrox::keyboard::KeyCode::BrowserRefresh => KeyCode::BrowserRefresh,
+            fyrox::keyboard::KeyCode::BrowserSearch => KeyCode::BrowserSearch,
+            fyrox::keyboard::KeyCode::BrowserStop => KeyCode::BrowserStop,
+            fyrox::keyboard::KeyCode::Eject => KeyCode::Eject,
+            fyrox::keyboard::KeyCode::LaunchApp1 => KeyCode::LaunchApp1,
+            fyrox::keyboard::KeyCode::LaunchApp2 => KeyCode::LaunchApp2,
+            fyrox::keyboard::KeyCode::LaunchMail => KeyCode::LaunchMail,
+            fyrox::keyboard::KeyCode::MediaPlayPause => KeyCode::MediaPlayPause,
+            fyrox::keyboard::KeyCode::MediaSelect => KeyCode::MediaSelect,
+            fyrox::keyboard::KeyCode::MediaStop => KeyCode::MediaStop,
+            fyrox::keyboard::KeyCode::MediaTrackNext => KeyCode::MediaTrackNext,
+            fyrox::keyboard::KeyCode::MediaTrackPrevious => KeyCode::MediaTrackPrevious,
+            fyrox::keyboard::KeyCode::Power => KeyCode::Power,
+            fyrox::keyboard::KeyCode::Sleep => KeyCode::Sleep,
+            fyrox::keyboard::KeyCode::AudioVolumeDown => KeyCode::AudioVolumeDown,
+            fyrox::keyboard::KeyCode::AudioVolumeMute => KeyCode::AudioVolumeMute,
+            fyrox::keyboard::KeyCode::AudioVolumeUp => KeyCode::AudioVolumeUp,
+            fyrox::keyboard::KeyCode::WakeUp => KeyCode::WakeUp,
+            fyrox::keyboard::KeyCode::Meta => KeyCode::Meta,
+            fyrox::keyboard::KeyCode::Hyper => KeyCode::Hyper,
+            fyrox::keyboard::KeyCode::Turbo => KeyCode::Turbo,
+            fyrox::keyboard::KeyCode::Abort => KeyCode::Abort,
+            fyrox::keyboard::KeyCode::Resume => KeyCode::Resume,
+            fyrox::keyboard::KeyCode::Suspend => KeyCode::Suspend,
+            fyrox::keyboard::KeyCode::Again => KeyCode::Again,
+            fyrox::keyboard::KeyCode::Copy => KeyCode::Copy,
+            fyrox::keyboard::KeyCode::Cut => KeyCode::Cut,
+            fyrox::keyboard::KeyCode::Find => KeyCode::Find,
+            fyrox::keyboard::KeyCode::Open => KeyCode::Open,
+            fyrox::keyboard::KeyCode::Paste => KeyCode::Paste,
+            fyrox::keyboard::KeyCode::Props => KeyCode::Props,
+            fyrox::keyboard::KeyCode::Select => KeyCode::Select,
+            fyrox::keyboard::KeyCode::Undo => KeyCode::Undo,
+            fyrox::keyboard::KeyCode::Hiragana => KeyCode::Hiragana,
+            fyrox::keyboard::KeyCode::Katakana => KeyCode::Katakana,
+            fyrox::keyboard::KeyCode::F1 => KeyCode::F1,
+            fyrox::keyboard::KeyCode::F2 => KeyCode::F2,
+            fyrox::keyboard::KeyCode::F3 => KeyCode::F3,
+            fyrox::keyboard::KeyCode::F4 => KeyCode::F4,
+            fyrox::keyboard::KeyCode::F5 => KeyCode::F5,
+            fyrox::keyboard::KeyCode::F6 => KeyCode::F6,
+            fyrox::keyboard::KeyCode::F7 => KeyCode::F7,
+            fyrox::keyboard::KeyCode::F8 => KeyCode::F8,
+            fyrox::keyboard::KeyCode::F9 => KeyCode::F9,
+            fyrox::keyboard::KeyCode::F10 => KeyCode::F10,
+            fyrox::keyboard::KeyCode::F11 => KeyCode::F11,
+            fyrox::keyboard::KeyCode::F12 => KeyCode::F12,
+            fyrox::keyboard::KeyCode::F13 => KeyCode::F13,
+            fyrox::keyboard::KeyCode::F14 => KeyCode::F14,
+            fyrox::keyboard::KeyCode::F15 => KeyCode::F15,
+            fyrox::keyboard::KeyCode::F16 => KeyCode::F16,
+            fyrox::keyboard::KeyCode::F17 => KeyCode::F17,
+            fyrox::keyboard::KeyCode::F18 => KeyCode::F18,
+            fyrox::keyboard::KeyCode::F19 => KeyCode::F19,
+            fyrox::keyboard::KeyCode::F20 => KeyCode::F20,
+            fyrox::keyboard::KeyCode::F21 => KeyCode::F21,
+            fyrox::keyboard::KeyCode::F22 => KeyCode::F22,
+            fyrox::keyboard::KeyCode::F23 => KeyCode::F23,
+            fyrox::keyboard::KeyCode::F24 => KeyCode::F24,
+            fyrox::keyboard::KeyCode::F25 => KeyCode::F25,
+            fyrox::keyboard::KeyCode::F26 => KeyCode::F26,
+            fyrox::keyboard::KeyCode::F27 => KeyCode::F27,
+            fyrox::keyboard::KeyCode::F28 => KeyCode::F28,
+            fyrox::keyboard::KeyCode::F29 => KeyCode::F29,
+            fyrox::keyboard::KeyCode::F30 => KeyCode::F30,
+            fyrox::keyboard::KeyCode::F31 => KeyCode::F31,
+            fyrox::keyboard::KeyCode::F32 => KeyCode::F32,
+            fyrox::keyboard::KeyCode::F33 => KeyCode::F33,
+            fyrox::keyboard::KeyCode::F34 => KeyCode::F34,
+            fyrox::keyboard::KeyCode::F35 => KeyCode::F35,
+            _ => return None,
+        }),
+        fyrox::keyboard::PhysicalKey::Unidentified(it) => PhysicalKey::Unidentified(match it {
+            fyrox::keyboard::NativeKeyCode::Unidentified => NativeKeyCode::Unidentified,
+            fyrox::keyboard::NativeKeyCode::Android(it) => NativeKeyCode::Android(it as i32),
+            fyrox::keyboard::NativeKeyCode::MacOS(it) => NativeKeyCode::MacOS(it as i32),
+            fyrox::keyboard::NativeKeyCode::Windows(it) => NativeKeyCode::Windows(it as i32),
+            fyrox::keyboard::NativeKeyCode::Xkb(it) => NativeKeyCode::Xkb(it as i32),
+        }),
+    })
+}

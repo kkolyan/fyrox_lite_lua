@@ -1,6 +1,6 @@
 use std::{any::type_name, fmt::Debug, marker::PhantomData};
 
-use mlua::{AnyUserData, FromLua, IntoLua, UserDataRef};
+use mlua::{AnyUserData, FromLua, IntoLua};
 
 use crate::lua_error;
 

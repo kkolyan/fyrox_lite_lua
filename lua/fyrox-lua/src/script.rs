@@ -21,6 +21,7 @@ use fyrox::scene::node::Node;
 use fyrox::script::BaseScript;
 use fyrox::script::ScriptContext;
 use fyrox::script::ScriptTrait;
+use fyrox_lite::lite_event::to_lite;
 use fyrox_lite::script_context::without_script_context;
 use fyrox_lite::script_context::UnsafeAsUnifiedContext;
 use mlua::IntoLuaMulti;
@@ -74,14 +75,16 @@ impl ScriptTrait for LuaScript {
     }
 
     fn on_os_event(&mut self, event: &fyrox::event::Event<()>, ctx: &mut ScriptContext) {
-        uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
-        invoke_callback(
-            &mut self.data,
-            ctx.plugins.lua().vm,
-            ctx,
-            "on_os_event",
-            |_lua| Ok(Traitor::new(event.clone())),
-        );
+        if let Some(event) = to_lite(event.clone()) {
+            uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+            invoke_callback(
+                &mut self.data,
+                ctx.plugins.lua().vm,
+                ctx,
+                "on_os_event",
+                |_lua| Ok(Traitor::new(event.clone())),
+            );
+        }
     }
 
     fn on_update(&mut self, ctx: &mut ScriptContext) {
