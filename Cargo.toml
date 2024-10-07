@@ -25,11 +25,12 @@ lite-model = { path = "lite-model" }
 lite-parser = { path = "lite-parser" }
 lite-macro = { path = "lite-macro" }
 
-fyrox = { git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f" }
-fyrox-core = { git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f" }
-fyroxed_base = { git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f" }
-# fyrox = {path = "c:/dev/rust/Fyrox/fyrox", default-features = false}
-# fyroxed_base = {path = "c:/dev/rust/Fyrox/editor", default-features = false}
+# fyrox = { git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f" }
+# fyrox-core = { git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f" }
+# fyroxed_base = { git = "https://github.com/FyroxEngine/Fyrox", default-features = false, rev = "b0768290d37453bb589705a8d678ecb29afc346f" }
+fyrox = {path = "engine/fyrox", default-features = false}
+fyrox-core = {path = "engine/fyrox-core", default-features = false}
+fyroxed_base = {path = "engine/editor", default-features = false}
 
 serde = "1.0.210"
 serde_json = "1.0.128"

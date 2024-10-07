@@ -32,8 +32,11 @@ impl FyroxUserData for fyrox_lite::lite_ui::Brush {
             let Some(_1) = args.pop_front() else {
                 return Err(lua_error!("argument 1 (Color) missing"));
             };
-            let _1 = <Traitor<fyrox_lite::lite_ui::Color> as mlua::FromLua>::from_lua(_1, lua)?;
-            let _1 = _1.inner().clone().into();
+            let _1 =
+                <TypedUserData<Traitor<fyrox_lite::lite_ui::Color>> as mlua::FromLua>::from_lua(
+                    _1, lua,
+                )?;
+            let _1 = _1.borrow()?.inner().clone().into();
 
             let value = fyrox_lite::lite_ui::Brush::Solid(_1);
             Ok(Traitor::new(value))

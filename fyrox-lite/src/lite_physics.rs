@@ -183,7 +183,7 @@ pub struct LiteRayCastOptions {
     pub max_len: f32,
 
     /// Groups to check.
-    pub groups: LiteInteractionGroups,
+    pub groups: Option<LiteInteractionGroups>,
 
     /// Whether to sort intersections from closest to farthest.
     pub sort_results: bool,
@@ -212,10 +212,12 @@ impl From<LiteRayCastOptions> for RayCastOptions {
             ray_origin: Point3::from(Vector3::from(ray_origin)),
             ray_direction: ray_direction.into(),
             max_len,
-            groups: InteractionGroups {
-                memberships: BitMask(groups.memberships as u32),
-                filter: BitMask(groups.filter as u32),
-            },
+            groups: groups
+                .map(|groups| InteractionGroups {
+                    memberships: BitMask(groups.memberships as u32),
+                    filter: BitMask(groups.filter as u32),
+                })
+                .unwrap_or_default(),
             sort_results,
         }
     }

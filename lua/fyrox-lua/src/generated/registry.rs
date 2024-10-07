@@ -42,6 +42,8 @@ pub fn register_classes(lua: &mlua::Lua) {
 
     fyrox_lite::lite_physics::LiteRigidBody::register_class(lua);
 
+    fyrox_lite::lite_plugin::LitePlugin::register_class(lua);
+
     fyrox_lite::lite_prefab::LitePrefab::register_class(lua);
 
     fyrox_lite::lite_scene::LiteScene::register_class(lua);
@@ -51,6 +53,8 @@ pub fn register_classes(lua: &mlua::Lua) {
     fyrox_lite::lite_ui::LiteText::register_class(lua);
 
     fyrox_lite::lite_ui::Brush::register_class(lua);
+
+    fyrox_lite::lite_ui::Color::register_class(lua);
 
     fyrox_lite::lite_window::LiteWindow::register_class(lua);
 

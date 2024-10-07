@@ -100,7 +100,6 @@ fn is_false(value: &bool) -> bool {
 pub struct Constant {
     pub const_name: String,
     pub ty: DataType,
-    pub value: ConstantValue,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -192,23 +191,6 @@ pub enum DataType {
     /// Error should be universal scripting language specific type, so it is not presented here
     Result {
         ok: Box<DataType>,
-    },
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub enum ConstantValue {
-    Bool(bool),
-    Integer(i32),
-    Float(f32),
-    String(String),
-    Reference {
-        owner: ClassName,
-        constant_name: String,
-    },
-    BinaryOp {
-        op: BinaryOp,
-        left: Box<ConstantValue>,
-        right: Box<ConstantValue>,
     },
 }
 

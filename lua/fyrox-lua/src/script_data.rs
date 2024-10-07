@@ -1,5 +1,6 @@
 use convert_case::Case;
 use convert_case::Casing;
+use fyrox::core::log::Log;
 use fyrox::core::visitor::Visit;
 use fyrox::core::visitor::VisitResult;
 use fyrox::core::visitor::Visitor;
@@ -75,7 +76,7 @@ impl Visit for ScriptData {
             let def = it.def.clone();
             for (i, field) in def.metadata.fields.iter().enumerate() {
                 let field_name = &field.name.to_case(Case::UpperCamel);
-                match &mut it.values[i] {
+                let result = match &mut it.values[i] {
                     ScriptFieldValue::Number(it) => it.visit(field_name, &mut guard),
                     ScriptFieldValue::String(it) => it.visit(field_name, &mut guard),
                     ScriptFieldValue::Bool(it) => it.visit(field_name, &mut guard),
@@ -85,7 +86,10 @@ impl Visit for ScriptData {
                     ScriptFieldValue::Vector3(it) => it.visit(field_name, &mut guard),
                     ScriptFieldValue::Quaternion(it) => it.visit(field_name, &mut guard),
                     ScriptFieldValue::RawLuaValue(_it) => Ok(()),
-                }?;
+                };
+                if let Err(err) = &result {
+                    Log::warn(format!("skipping deserialization of field `{}::{}` due to error: {}", it.def.metadata.class, field_name, err).as_str());
+                }
             }
             Ok(())
         })

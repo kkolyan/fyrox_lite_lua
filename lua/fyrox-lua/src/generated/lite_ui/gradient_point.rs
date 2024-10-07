@@ -54,8 +54,8 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_ui::GradientPoint> {
         let stop = value.get::<_, f32>("stop")?;
         let stop = stop;
 
-        let color = value.get::<_, Traitor<fyrox_lite::lite_ui::Color>>("color")?;
-        let color = color.inner().clone().into();
+        let color = value.get::<_, TypedUserData<Traitor<fyrox_lite::lite_ui::Color>>>("color")?;
+        let color = color.borrow()?.inner().clone().into();
 
         Ok(Traitor::new(fyrox_lite::lite_ui::GradientPoint {
             stop,

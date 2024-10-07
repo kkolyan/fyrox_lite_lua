@@ -1459,7 +1459,7 @@
           },
           {
             "instance": true,
-            "method_name": "name",
+            "method_name": "get_name",
             "signature": {
               "return_ty": {
                 "Option": "String"
@@ -1468,7 +1468,7 @@
           },
           {
             "instance": true,
-            "method_name": "is_alive",
+            "method_name": "get_alive",
             "signature": {
               "return_ty": "Bool"
             }
@@ -1480,7 +1480,7 @@
           },
           {
             "instance": true,
-            "method_name": "global_position",
+            "method_name": "get_global_position",
             "signature": {
               "return_ty": {
                 "Object": "Vector3"
@@ -1489,7 +1489,7 @@
           },
           {
             "instance": true,
-            "method_name": "local_position",
+            "method_name": "get_local_position",
             "signature": {
               "return_ty": {
                 "Object": "Vector3"
@@ -1498,7 +1498,7 @@
           },
           {
             "instance": true,
-            "method_name": "local_rotation",
+            "method_name": "get_local_rotation",
             "signature": {
               "return_ty": {
                 "Object": "Quaternion"
@@ -1570,7 +1570,7 @@
           },
           {
             "instance": true,
-            "method_name": "try_get_collider",
+            "method_name": "find_collider_in_children",
             "signature": {
               "return_ty": {
                 "Option": {
@@ -1581,14 +1581,14 @@
           },
           {
             "instance": true,
-            "method_name": "is_valid",
+            "method_name": "get_valid",
             "signature": {
               "return_ty": "Bool"
             }
           },
           {
             "instance": true,
-            "method_name": "parent",
+            "method_name": "get_parent",
             "signature": {
               "return_ty": {
                 "Object": "Node"
@@ -1636,7 +1636,7 @@
           },
           {
             "instance": true,
-            "method_name": "global_rotation",
+            "method_name": "get_global_rotation",
             "signature": {
               "return_ty": {
                 "Object": "Quaternion"
@@ -1668,6 +1668,13 @@
                   "variadic": false
                 }
               ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "get_tag",
+            "signature": {
+              "return_ty": "String"
             }
           }
         ]
@@ -1716,141 +1723,35 @@
         "constants": [
           {
             "const_name": "EXCLUDE_FIXED",
-            "ty": "I32",
-            "value": {
-              "BinaryOp": {
-                "op": "Shl",
-                "left": {
-                  "Integer": 1
-                },
-                "right": {
-                  "Integer": 1
-                }
-              }
-            }
+            "ty": "I32"
           },
           {
             "const_name": "EXCLUDE_KINEMATIC",
-            "ty": "I32",
-            "value": {
-              "BinaryOp": {
-                "op": "Shl",
-                "left": {
-                  "Integer": 1
-                },
-                "right": {
-                  "Integer": 2
-                }
-              }
-            }
+            "ty": "I32"
           },
           {
             "const_name": "EXCLUDE_DYNAMIC",
-            "ty": "I32",
-            "value": {
-              "BinaryOp": {
-                "op": "Shl",
-                "left": {
-                  "Integer": 1
-                },
-                "right": {
-                  "Integer": 3
-                }
-              }
-            }
+            "ty": "I32"
           },
           {
             "const_name": "EXCLUDE_SENSORS",
-            "ty": "I32",
-            "value": {
-              "BinaryOp": {
-                "op": "Shl",
-                "left": {
-                  "Integer": 1
-                },
-                "right": {
-                  "Integer": 4
-                }
-              }
-            }
+            "ty": "I32"
           },
           {
             "const_name": "EXCLUDE_SOLIDS",
-            "ty": "I32",
-            "value": {
-              "BinaryOp": {
-                "op": "Shl",
-                "left": {
-                  "Integer": 1
-                },
-                "right": {
-                  "Integer": 5
-                }
-              }
-            }
+            "ty": "I32"
           },
           {
             "const_name": "ONLY_DYNAMIC",
-            "ty": "I32",
-            "value": {
-              "BinaryOp": {
-                "op": "BitOr",
-                "left": {
-                  "Reference": {
-                    "owner": "LitePhysics",
-                    "constant_name": "EXCLUDE_FIXED"
-                  }
-                },
-                "right": {
-                  "Reference": {
-                    "owner": "LitePhysics",
-                    "constant_name": "EXCLUDE_KINEMATIC"
-                  }
-                }
-              }
-            }
+            "ty": "I32"
           },
           {
             "const_name": "ONLY_KINEMATIC",
-            "ty": "I32",
-            "value": {
-              "BinaryOp": {
-                "op": "BitOr",
-                "left": {
-                  "Reference": {
-                    "owner": "LitePhysics",
-                    "constant_name": "EXCLUDE_DYNAMIC"
-                  }
-                },
-                "right": {
-                  "Reference": {
-                    "owner": "LitePhysics",
-                    "constant_name": "EXCLUDE_FIXED"
-                  }
-                }
-              }
-            }
+            "ty": "I32"
           },
           {
             "const_name": "ONLY_FIXED",
-            "ty": "I32",
-            "value": {
-              "BinaryOp": {
-                "op": "BitOr",
-                "left": {
-                  "Reference": {
-                    "owner": "LitePhysics",
-                    "constant_name": "EXCLUDE_DYNAMIC"
-                  }
-                },
-                "right": {
-                  "Reference": {
-                    "owner": "LitePhysics",
-                    "constant_name": "EXCLUDE_KINEMATIC"
-                  }
-                }
-              }
-            }
+            "ty": "I32"
           }
         ]
       }
@@ -1950,7 +1851,9 @@
           {
             "name": "groups",
             "ty": {
-              "Object": "InteractionGroups"
+              "Option": {
+                "Object": "InteractionGroups"
+              }
             }
           },
           {
@@ -1994,6 +1897,37 @@
                   "variadic": false
                 }
               ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "Engine": {
+        "class_name": "Plugin",
+        "rust_struct_path": "fyrox_lite::lite_plugin::LitePlugin",
+        "methods": [
+          {
+            "instance": false,
+            "method_name": "get",
+            "signature": {
+              "params": [
+                {
+                  "name": "class_name",
+                  "ty": "String",
+                  "variadic": false
+                },
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub",
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Result": {
+                  "ok": "UserScript"
+                }
+              }
             }
           }
         ]
@@ -2187,25 +2121,849 @@
       }
     },
     {
-      "Struct": {
+      "Engine": {
         "class_name": "Color",
         "rust_struct_path": "fyrox_lite::lite_ui::Color",
-        "fields": [
+        "constants": [
           {
-            "name": "r",
-            "ty": "Byte"
+            "const_name": "WHITE",
+            "ty": {
+              "Object": "Color"
+            }
           },
           {
-            "name": "g",
-            "ty": "Byte"
+            "const_name": "BLACK",
+            "ty": {
+              "Object": "Color"
+            }
           },
           {
-            "name": "b",
-            "ty": "Byte"
+            "const_name": "RED",
+            "ty": {
+              "Object": "Color"
+            }
           },
           {
-            "name": "a",
-            "ty": "Byte"
+            "const_name": "GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "TRANSPARENT",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MAROON",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_RED",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "BROWN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "FIREBRICK",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "CRIMSON",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "TOMATO",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "CORAL",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "INDIAN_RED",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_CORAL",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_SALMON",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "SALMON",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_SALMON",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "ORANGE_RED",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_ORANGE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "ORANGE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "GOLD",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_GOLDEN_ROD",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "GOLDEN_ROD",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "PALE_GOLDEN_ROD",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_KHAKI",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "KHAKI",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "OLIVE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "YELLOW",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "YELLOW_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_OLIVE_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "OLIVE_DRAB",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LAWN_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "CHARTREUSE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "GREEN_YELLOW",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "FOREST_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIME",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIME_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "PALE_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_SEA_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MEDIUM_SPRING_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "SPRING_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "SEA_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MEDIUM_AQUA_MARINE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MEDIUM_SEA_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_SEA_GREEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_SLATE_GRAY",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "TEAL",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_CYAN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "AQUA",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "CYAN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_CYAN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_TURQUOISE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "TURQUOISE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MEDIUM_TURQUOISE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "PALE_TURQUOISE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "AQUA_MARINE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "POWDER_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "CADET_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "STEEL_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "CORN_FLOWER_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DEEP_SKY_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DODGER_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "SKY_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_SKY_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MIDNIGHT_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "NAVY",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MEDIUM_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "ROYAL_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "BLUE_VIOLET",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "INDIGO",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_SLATE_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "SLATE_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MEDIUM_SLATE_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MEDIUM_PURPLE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_MAGENTA",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_VIOLET",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_ORCHID",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MEDIUM_ORCHID",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "PURPLE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "THISTLE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "PLUM",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "VIOLET",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MAGENTA",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "ORCHID",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MEDIUM_VIOLET_RED",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "PALE_VIOLET_RED",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DEEP_PINK",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "HOT_PINK",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_PINK",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "PINK",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "ANTIQUE_WHITE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "BEIGE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "BISQUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "BLANCHED_ALMOND",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "WHEAT",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "CORN_SILK",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LEMON_CHIFFON",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_GOLDEN_ROD_YELLOW",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_YELLOW",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "SADDLE_BROWN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "SIENNA",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "CHOCOLATE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "PERU",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "SANDY_BROWN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "BURLY_WOOD",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "TAN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "ROSY_BROWN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MOCCASIN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "NAVAJO_WHITE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "PEACH_PUFF",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MISTY_ROSE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LAVENDER_BLUSH",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LINEN",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "OLD_LACE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "PAPAYA_WHIP",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "SEA_SHELL",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "MINT_CREAM",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "SLATE_GRAY",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_SLATE_GRAY",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_STEEL_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LAVENDER",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "FLORAL_WHITE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "ALICE_BLUE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "GHOST_WHITE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "HONEYDEW",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "IVORY",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "AZURE",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "SNOW",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DIM_GRAY",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "GRAY",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "DARK_GRAY",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "SILVER",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "LIGHT_GRAY",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "GAINSBORO",
+            "ty": {
+              "Object": "Color"
+            }
+          },
+          {
+            "const_name": "WHITE_SMOKE",
+            "ty": {
+              "Object": "Color"
+            }
           }
         ]
       }

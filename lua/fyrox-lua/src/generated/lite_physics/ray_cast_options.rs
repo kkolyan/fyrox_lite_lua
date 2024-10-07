@@ -44,9 +44,13 @@ impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteRayCast
 
             t.set("groups", {
                 let groups = self.groups.clone();
-                Traitor::new(fyrox_lite::lite_physics::LiteInteractionGroups::from(
-                    groups,
-                ))
+                if let Some(groups) = groups {
+                    Some(Traitor::new(
+                        fyrox_lite::lite_physics::LiteInteractionGroups::from(groups),
+                    ))
+                } else {
+                    None
+                }
             })?;
 
             t.set("sort_results", {
@@ -83,9 +87,13 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteRayCast
         let max_len = value.get::<_, f32>("max_len")?;
         let max_len = max_len;
 
-        let groups =
-            value.get::<_, Traitor<fyrox_lite::lite_physics::LiteInteractionGroups>>("groups")?;
-        let groups = groups.inner().clone().into();
+        let groups = value
+            .get::<_, Option<Traitor<fyrox_lite::lite_physics::LiteInteractionGroups>>>("groups")?;
+        let groups = if let Some(groups) = groups {
+            Some(groups.inner().clone().into())
+        } else {
+            None
+        };
 
         let sort_results = value.get::<_, bool>("sort_results")?;
         let sort_results = sort_results;

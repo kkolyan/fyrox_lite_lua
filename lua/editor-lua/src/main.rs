@@ -1,9 +1,12 @@
 //! Editor with your game connected to it as a plugin.
+use fyrox::core::log::Log;
+use fyrox::core::log::MessageKind;
 use fyroxed_base::fyrox::event_loop::EventLoop;
 use fyroxed_base::Editor;
 use fyroxed_base::StartupData;
 
 fn main() {
+    Log::set_verbosity(MessageKind::Warning);
     let event_loop = EventLoop::new().unwrap();
     let mut editor = Editor::new(Some(StartupData {
         working_directory: Default::default(),

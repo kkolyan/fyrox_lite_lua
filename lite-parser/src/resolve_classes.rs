@@ -105,4 +105,7 @@ fn resolve_classes_engine_class(
             *it = resolve_type(it, classes);
         }
     }
+    for c in class.constants.iter_mut() {
+        c.ty = resolve_type(&c.ty, classes);
+    }
 }

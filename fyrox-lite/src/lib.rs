@@ -1,3 +1,4 @@
+pub mod lite_plugin;
 pub mod lite_event;
 pub mod lite_log;
 pub mod lite_math;

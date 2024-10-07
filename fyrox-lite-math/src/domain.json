@@ -55,7 +55,7 @@
           },
           {
             "instance": true,
-            "method_name": "mul__LiteVector",
+            "method_name": "mul_vec",
             "signature": {
               "params": [
                 {
@@ -73,7 +73,7 @@
           },
           {
             "instance": true,
-            "method_name": "mul__LiteQuaternion",
+            "method_name": "mul_quat",
             "signature": {
               "params": [
                 {
@@ -186,7 +186,7 @@
           },
           {
             "instance": false,
-            "method_name": "zero",
+            "method_name": "get_ZERO",
             "signature": {
               "return_ty": {
                 "Object": "Vector3"

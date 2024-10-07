@@ -41,39 +41,9 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
             Ok(ret)
         });
 
-        methods.add_method_mut("name", |lua, this, (): ()| {
-            let ret = this.name();
-            let ret = if let Some(ret) = ret { Some(ret) } else { None };
-            Ok(ret)
-        });
-
-        methods.add_method_mut("is_alive", |lua, this, (): ()| {
-            let ret = this.is_alive();
-            let ret = ret;
-            Ok(ret)
-        });
-
         methods.add_method_mut("destroy", |lua, this, (): ()| {
             let ret = this.destroy();
             let ret = ret;
-            Ok(ret)
-        });
-
-        methods.add_method_mut("global_position", |lua, this, (): ()| {
-            let ret = this.global_position();
-            let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(ret));
-            Ok(ret)
-        });
-
-        methods.add_method_mut("local_position", |lua, this, (): ()| {
-            let ret = this.local_position();
-            let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(ret));
-            Ok(ret)
-        });
-
-        methods.add_method_mut("local_rotation", |lua, this, (): ()| {
-            let ret = this.local_rotation();
-            let ret = Traitor::new(fyrox_lite_math::lite_math::LiteQuaternion::from(ret));
             Ok(ret)
         });
 
@@ -105,25 +75,13 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
             Ok(ret)
         });
 
-        methods.add_method_mut("try_get_collider", |lua, this, (): ()| {
-            let ret = this.try_get_collider();
+        methods.add_method_mut("find_collider_in_children", |lua, this, (): ()| {
+            let ret = this.find_collider_in_children();
             let ret = if let Some(ret) = ret {
                 Some(Traitor::new(fyrox_lite::lite_node::LiteNode::from(ret)))
             } else {
                 None
             };
-            Ok(ret)
-        });
-
-        methods.add_method_mut("is_valid", |lua, this, (): ()| {
-            let ret = this.is_valid();
-            let ret = ret;
-            Ok(ret)
-        });
-
-        methods.add_method_mut("parent", |lua, this, (): ()| {
-            let ret = this.parent();
-            let ret = Traitor::new(fyrox_lite::lite_node::LiteNode::from(ret));
             Ok(ret)
         });
 
@@ -148,12 +106,6 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
             Ok(ret)
         });
 
-        methods.add_method_mut("global_rotation", |lua, this, (): ()| {
-            let ret = this.global_rotation();
-            let ret = Traitor::new(fyrox_lite_math::lite_math::LiteQuaternion::from(ret));
-            Ok(ret)
-        });
-
         methods.add_method_mut("tag_is", |lua, this, (tag): (mlua::String)| {
             let tag = tag.to_str()?.to_string();
 
@@ -169,6 +121,63 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
     }
 
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+        fields.add_field_method_get("name", |lua, this| {
+            let value = this.get_name();
+            Ok(if let Some(value) = value {
+                Some(value)
+            } else {
+                None
+            })
+        });
+
+        fields.add_field_method_get("alive", |lua, this| {
+            let value = this.get_alive();
+            Ok(value)
+        });
+
+        fields.add_field_method_get("global_position", |lua, this| {
+            let value = this.get_global_position();
+            Ok(Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(
+                value,
+            )))
+        });
+
+        fields.add_field_method_get("local_position", |lua, this| {
+            let value = this.get_local_position();
+            Ok(Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(
+                value,
+            )))
+        });
+
+        fields.add_field_method_get("local_rotation", |lua, this| {
+            let value = this.get_local_rotation();
+            Ok(Traitor::new(
+                fyrox_lite_math::lite_math::LiteQuaternion::from(value),
+            ))
+        });
+
+        fields.add_field_method_get("valid", |lua, this| {
+            let value = this.get_valid();
+            Ok(value)
+        });
+
+        fields.add_field_method_get("parent", |lua, this| {
+            let value = this.get_parent();
+            Ok(Traitor::new(fyrox_lite::lite_node::LiteNode::from(value)))
+        });
+
+        fields.add_field_method_get("global_rotation", |lua, this| {
+            let value = this.get_global_rotation();
+            Ok(Traitor::new(
+                fyrox_lite_math::lite_math::LiteQuaternion::from(value),
+            ))
+        });
+
+        fields.add_field_method_get("tag", |lua, this| {
+            let value = this.get_tag();
+            Ok(value)
+        });
+
         fields.add_field_method_set(
             "local_position",
             |lua, this, value: TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector3>>| {

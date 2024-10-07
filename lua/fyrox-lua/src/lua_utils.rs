@@ -18,6 +18,7 @@ use std::process::exit;
 #[macro_export]
 macro_rules! lua_error {
     ($($arg:tt)*) => {{
+        // panic!($($arg)*);
         mlua::Error::runtime(format!($($arg)*))
     }}
 }

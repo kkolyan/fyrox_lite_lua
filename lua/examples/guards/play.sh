@@ -1,0 +1,1 @@
+cargo run -p executor-lua --manifest-path ../../../Cargo.toml

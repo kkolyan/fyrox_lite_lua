@@ -50,7 +50,7 @@ impl LiteNode {
         })
     }
 
-    pub fn name(&self) -> Option<String> {
+    pub fn get_name(&self) -> Option<String> {
         with_script_context(|ctx| {
             ctx.scene
                 .as_ref()
@@ -61,7 +61,7 @@ impl LiteNode {
         })
     }
 
-    pub fn is_alive(&self) -> bool {
+    pub fn get_alive(&self) -> bool {
         with_script_context(|ctx| {
             ctx.scene
                 .as_ref()
@@ -82,7 +82,7 @@ impl LiteNode {
         });
     }
 
-    pub fn global_position(&self) -> PodVector3 {
+    pub fn get_global_position(&self) -> PodVector3 {
         with_script_context(|ctx| {
             ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
                 .global_position()
@@ -90,7 +90,7 @@ impl LiteNode {
         })
     }
 
-    pub fn local_position(&self) -> PodVector3 {
+    pub fn get_local_position(&self) -> PodVector3 {
         with_script_context(|ctx| {
             ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
                 .local_transform()
@@ -101,7 +101,7 @@ impl LiteNode {
         })
     }
 
-    pub fn local_rotation(&self) -> PodQuaternion {
+    pub fn get_local_rotation(&self) -> PodQuaternion {
         with_script_context(|ctx| {
             ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
                 .local_transform()
@@ -154,7 +154,7 @@ impl LiteNode {
         });
     }
 
-    pub fn try_get_collider(&self) -> Option<LiteNode> {
+    pub fn find_collider_in_children(&self) -> Option<LiteNode> {
         with_script_context(|ctx| {
             ctx.scene.as_ref().expect("scene unavailable").graph[self.handle]
                 .children()
@@ -165,11 +165,11 @@ impl LiteNode {
         })
     }
 
-    pub fn is_valid(&self) -> bool {
+    pub fn get_valid(&self) -> bool {
         self.handle.is_some()
     }
 
-    pub fn parent(&self) -> LiteNode {
+    pub fn get_parent(&self) -> LiteNode {
         with_script_context(|ctx| {
             LiteNode::new(
                 ctx.scene.as_mut().expect("scene unavailable").graph[self.handle].parent(),
@@ -197,7 +197,7 @@ impl LiteNode {
         })
     }
 
-    pub fn global_rotation(&self) -> PodQuaternion {
+    pub fn get_global_rotation(&self) -> PodQuaternion {
         with_script_context(|ctx| {
             let camera_global_transform = ctx.scene.as_mut().expect("scene unavailable").graph
                 [self.handle]
@@ -225,6 +225,13 @@ impl LiteNode {
             ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
                 .set_tag(tag.to_string());
         });
+    }
+
+    pub fn get_tag(&self) -> String {
+        with_script_context(|ctx| {
+            ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
+                .tag().to_string()
+        })
     }
 }
 

@@ -22,7 +22,7 @@ fn main() {
         });
     }
 
-    Log::set_verbosity(MessageKind::Warning);
+    Log::set_verbosity(MessageKind::Error);
     let mut window_attributes = WindowAttributes::default();
     window_attributes.inner_size = Some(LogicalSize::new(1280.0, 720.0).into());
     let mut executor = Executor::from_params(

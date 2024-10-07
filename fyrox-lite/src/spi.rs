@@ -12,6 +12,7 @@ use fyrox::script::{ScriptMessagePayload, ScriptTrait};
 
 
 pub trait UserScript : Sized + LiteDataType {
+	type Plugin: fyrox::plugin::Plugin;
 	type ProxyScript: ScriptTrait;
 	type LangSpecificError: Clone + Debug;
 	type UserScriptMessage : ScriptMessagePayload + LiteDataType;
@@ -20,6 +21,8 @@ pub trait UserScript : Sized + LiteDataType {
 	fn extract_from(proxy: &Self::ProxyScript, class_name: &str) -> Option<Self>;
 
 	fn into_proxy_script(self) -> Result<Self::ProxyScript, Self::LangSpecificError>;
+
+	fn find_plugin_script(class_name: &str) -> Result<Self, Self::LangSpecificError>;
 }
 
 /// implemented only by the types from `lite_model::DataType` (mostly by proc macros)

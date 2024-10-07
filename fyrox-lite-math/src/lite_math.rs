@@ -26,12 +26,12 @@ impl LiteQuaternion {
     }
 
     #[allow(non_snake_case)]
-    pub fn mul__LiteVector(&self, o: LiteVector3) -> LiteVector3 {
+    pub fn mul_vec(&self, o: LiteVector3) -> LiteVector3 {
         LiteVector3(self.0.mul(&o.0))
     }
 
     #[allow(non_snake_case)]
-    pub fn mul__LiteQuaternion(&self, rot_delta: LiteQuaternion) -> LiteQuaternion {
+    pub fn mul_quat(&self, rot_delta: LiteQuaternion) -> LiteQuaternion {
         LiteQuaternion(self.0.mul(&rot_delta.0))
     }
 }
@@ -96,7 +96,7 @@ impl LiteVector3 {
     #[rustfmt::skip]    pub fn get_Y() -> LiteVector3 { Vector3::y_axis().into_inner().into() }
     #[rustfmt::skip]    pub fn get_Z() -> LiteVector3 { Vector3::z_axis().into_inner().into() }
 
-    pub fn zero() -> LiteVector3 {
+    pub fn get_ZERO() -> LiteVector3 {
         Vector3::zero().into()
     }
     pub fn new(x: f32, y: f32, z: f32) -> LiteVector3 {

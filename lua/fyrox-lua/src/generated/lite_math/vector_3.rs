@@ -81,12 +81,6 @@ impl FyroxUserData for fyrox_lite_math::lite_math::LiteVector3 {
     fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
         methods: &mut M,
     ) {
-        methods.add_method_mut("zero", |lua, this, (): ()| {
-            let ret = fyrox_lite_math::lite_math::LiteVector3::zero();
-            let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(ret));
-            Ok(ret)
-        });
-
         methods.add_method_mut("new", |lua, this, (x, y, z): (f32, f32, f32)| {
             let x = x;
 
@@ -149,6 +143,13 @@ impl FyroxUserData for fyrox_lite_math::lite_math::LiteVector3 {
 
         fields.add_field_method_get("Z", |lua, this| {
             let value = fyrox_lite_math::lite_math::LiteVector3::get_Z();
+            Ok(Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(
+                value,
+            )))
+        });
+
+        fields.add_field_method_get("ZERO", |lua, this| {
+            let value = fyrox_lite_math::lite_math::LiteVector3::get_ZERO();
             Ok(Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(
                 value,
             )))

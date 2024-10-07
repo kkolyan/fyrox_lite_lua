@@ -30,23 +30,23 @@ impl FyroxUserData for fyrox_lite_math::lite_math::LiteQuaternion {
         });
 
         methods.add_method_mut(
-            "mul__LiteVector",
+            "mul_vec",
             |lua, this, (o): (TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector3>>)| {
                 let o = o.borrow()?.inner().clone().into();
 
-                let ret = this.mul__LiteVector(o);
+                let ret = this.mul_vec(o);
                 let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(ret));
                 Ok(ret)
             },
         );
 
         methods.add_method_mut(
-                    "mul__LiteQuaternion",
+                    "mul_quat",
                     |lua, this, (rot_delta): (TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteQuaternion>>)| {
             
                         let rot_delta = rot_delta.borrow()?.inner().clone().into();
                 
-                        let ret = this.mul__LiteQuaternion(rot_delta);
+                        let ret = this.mul_quat(rot_delta);
                         let ret = Traitor::new(fyrox_lite_math::lite_math::LiteQuaternion::from(ret));
                         Ok(ret)
                     },

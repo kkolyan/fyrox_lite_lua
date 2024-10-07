@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
 use lite_model::{
-    ClassName, Constant, DataType, EngineClass, Method, Param, RustQualifiedName, Signature
+    ClassName, Constant, DataType, EngineClass, Method, Param, RustQualifiedName, Signature,
 };
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::{parse_quote_spanned, spanned::Spanned, Ident, TraitBoundModifier, TypeParamBound};
 
-use crate::{extract_expression::extract_expression, extract_ty::extract_ty};
+use crate::extract_ty::extract_ty;
 
 pub fn extract_engine_class_and_inject_assertions(
     rust_path: &str,
@@ -101,20 +101,23 @@ pub fn extract_engine_class_and_inject_assertions(
                     match extract_ty(ty, Some(&generic_params)) {
                         Ok(it) => {
                             // handle #[variadic]
-                            let variadic_index = arg.attrs.iter_mut().enumerate()
-                            .find(|(_i, it)| {
-                                it.path()
-                                    .get_ident()
-                                    .map(|it| it == "variadic")
-                                    .unwrap_or_default()
-                            })
-                            .map(|(i, _)| i);
+                            let variadic_index = arg
+                                .attrs
+                                .iter_mut()
+                                .enumerate()
+                                .find(|(_i, it)| {
+                                    it.path()
+                                        .get_ident()
+                                        .map(|it| it == "variadic")
+                                        .unwrap_or_default()
+                                })
+                                .map(|(i, _)| i);
                             let variadic = match variadic_index {
                                 Some(index) => {
                                     arg.attrs.remove(index);
                                     true
                                 }
-                                None => false
+                                None => false,
                             };
                             if variadic && i != arg_count - 1 {
                                 errors.push(syn::Error::new_spanned(
@@ -189,13 +192,6 @@ pub fn extract_engine_class_and_inject_assertions(
                             continue 'items;
                         }
                     },
-                    value: match extract_expression(&it.expr) {
-                        Ok(it) => it,
-                        Err(err) => {
-                            errors.push(err);
-                            continue 'items;
-                        }
-                    },
                 });
             }
             _ => {
@@ -207,7 +203,9 @@ pub fn extract_engine_class_and_inject_assertions(
         }
     }
     rust_name.map(|rust_name| {
-        let class_name = attr.map(|it| it.to_string()).unwrap_or_else(|| rust_name.to_string());
+        let class_name = attr
+            .map(|it| it.to_string())
+            .unwrap_or_else(|| rust_name.to_string());
         (
             rust_name.clone(),
             EngineClass {
