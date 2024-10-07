@@ -7,7 +7,7 @@ edition = "2021"
 [dependencies]
 fyrox = { workspace = true }
 fyroxed_base = { workspace = true }
-fyrox-lua = { path = "../lua/fyrox-lua", optional = true}
+fyrox-lua = { workspace = true, optional = true}
 
 [features]
 default = ["fyrox-lua", "fyroxed_base/default"]

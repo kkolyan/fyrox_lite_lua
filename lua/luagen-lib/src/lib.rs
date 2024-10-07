@@ -1,3 +1,5 @@
+pub mod generate_lua_bindings;
+pub mod generate_registry;
 pub mod supress_lint;
 pub mod generate_enum_class_bindings;
 pub mod generate_fields;

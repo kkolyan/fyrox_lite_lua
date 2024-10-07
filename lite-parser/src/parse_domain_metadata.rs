@@ -4,7 +4,7 @@ use lite_model::Domain;
 
 use crate::{load_path::load_path, resolve_classes::resolve_classes};
 
-pub fn generate_domain(crate_name: &str) -> Domain {
+pub fn parse_domain_metadata(crate_name: &str) -> Domain {
     let dir = format!("{}/src", crate_name);
     println!("generating domain from crate {}", dir);
     let mut domain = Domain::default();

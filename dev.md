@@ -18,7 +18,7 @@ Proc macros to help validate and parse **Lite API**.
 ### [lite-parser](lite-parser)
 Parses **Lite API**s and generates a metadata expressed with data structures from [lite-model](lite-model).
 
-### [fyrox-lite-lua-generator](fyrox-lite-lua-generator)
+### [luagen-lib](luagen-lib)
 Generates the Lua language bindings to **Lite API** from the metadata expressed with [lite-model](lite-model). Writes to the subdirectory of [fyrox-lua](fyrox-lua).
 
 ### [lite-model](lite-model)

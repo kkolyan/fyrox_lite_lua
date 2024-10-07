@@ -5,6 +5,6 @@ edition = "2021"
 
 [dependencies]
 lite-parser = {workspace = true}
-fyrox-lite-lua-generator = {workspace = true}
+luagen-lib = {workspace = true}
 lite-model = {workspace = true}
 itertools = {workspace = true}

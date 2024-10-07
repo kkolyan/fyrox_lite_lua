@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-fyrox-lite = {path = "../fyrox-lite"}
-fyrox-lite-math = {path = "../fyrox-lite-math"}
+fyrox-lite = {workspace = true}
+fyrox-lite-math = {workspace = true}
 fyrox = {workspace = true}
 mlua = {workspace = true}
 send_wrapper = "0.6.0"

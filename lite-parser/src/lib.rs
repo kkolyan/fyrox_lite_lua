@@ -1,4 +1,4 @@
-pub mod generate_domain;
+pub mod parse_domain_metadata;
 pub mod resolve_classes;
 pub mod load_path;
 pub mod extract_pod_enum;

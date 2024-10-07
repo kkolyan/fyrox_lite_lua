@@ -1255,19 +1255,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fyrox-lite-lua-generator"
-version = "0.1.0"
-dependencies = [
- "convert_case",
- "extend",
- "itertools 0.13.0",
- "lite-model",
- "serde",
- "serde_json",
- "to_vec",
-]
-
-[[package]]
 name = "fyrox-lite-math"
 version = "0.1.0"
 dependencies = [
@@ -1989,6 +1976,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0fae87c125b03c1d2c0150c90365d7d6bcc53fb73a9acaef207d2d065860f062"
 dependencies = [
  "imgref",
+]
+
+[[package]]
+name = "luagen-lib"
+version = "0.1.0"
+dependencies = [
+ "convert_case",
+ "extend",
+ "itertools 0.13.0",
+ "lite-model",
+ "serde",
+ "serde_json",
+ "to_vec",
 ]
 
 [[package]]
@@ -3517,10 +3517,10 @@ dependencies = [
 name = "tools"
 version = "0.1.0"
 dependencies = [
- "fyrox-lite-lua-generator",
  "itertools 0.13.0",
  "lite-model",
  "lite-parser",
+ "luagen-lib",
 ]
 
 [[package]]

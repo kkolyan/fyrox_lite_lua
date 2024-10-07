@@ -144,7 +144,7 @@ impl Plugin for LuaPlugin {
             )
             .unwrap();
 
-        register_classes(&self.vm);
+        register_classes(self.vm);
 
         for entry in WalkDir::new("scripts").into_iter().flatten() {
             load_script(
