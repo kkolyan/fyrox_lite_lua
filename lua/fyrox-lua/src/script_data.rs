@@ -8,8 +8,8 @@ use send_wrapper::SendWrapper;
 use std::fmt::Debug;
 use std::fmt::Formatter;
 
-use crate::plugin::LuaPlugin;
-use crate::script::ScriptFieldValue;
+use crate::fyrox_plugin::LuaPlugin;
+use crate::fyrox_script::ScriptFieldValue;
 use crate::script_object::ScriptObject;
 use crate::typed_userdata::TypedUserData;
 

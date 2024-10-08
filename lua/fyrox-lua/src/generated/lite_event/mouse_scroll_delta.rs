@@ -16,7 +16,7 @@ use fyrox_lite_math::*;
 use mlua;
 
 use crate::{
-    fyrox_lite_class::{FyroxUserData, Traitor, UserDataClass},
+    user_data_plus::{FyroxUserData, Traitor, UserDataClass},
     lua_error,
     script_object::ScriptObject,
     typed_userdata::TypedUserData,

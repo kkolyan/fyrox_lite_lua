@@ -1,8 +1,8 @@
 use std::mem;
 
 use crate::{
-    fyrox_lite_class::Traitor, fyrox_utils::PluginsRefMut_Ext, lua_error, plugin::LuaPlugin,
-    script::LuaScript, script_class::ScriptClass, script_object::ScriptObject,
+    user_data_plus::Traitor, fyrox_plugin::PluginsRefMut_Ext, lua_error, fyrox_plugin::LuaPlugin,
+    fyrox_script::LuaScript, script_class::ScriptClass, script_object::ScriptObject,
     typed_userdata::TypedUserData,
 };
 use fyrox_lite::{script_context::with_script_context, spi::UserScript, LiteDataType};

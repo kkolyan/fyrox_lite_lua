@@ -1,6 +1,6 @@
 use super::script_data::ScriptData;
-use crate::fyrox_lite_class::Traitor;
-use crate::fyrox_utils::PluginsRefMut_Ext;
+use crate::user_data_plus::Traitor;
+use crate::fyrox_plugin::PluginsRefMut_Ext;
 use crate::reflect_base;
 use crate::script_class::ScriptClass;
 use crate::script_def::ScriptKind;

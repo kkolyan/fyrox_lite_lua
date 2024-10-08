@@ -22,11 +22,11 @@ use mlua::{MetaMethod, String, UserData, UserDataRef, Value};
 use send_wrapper::SendWrapper;
 
 use crate::{
-    debug::VerboseLuaValue, fyrox_lite_class::{FyroxUserData, Traitor}, lua_error, lua_utils::{OptionX, ValueX}, reflect_base, script_class::ScriptClass
+    debug::VerboseLuaValue, user_data_plus::{FyroxUserData, Traitor}, lua_error, lua_utils::{OptionX, ValueX}, reflect_base, script_class::ScriptClass
 };
 
 use super::{
-    script::ScriptFieldValue,
+    fyrox_script::ScriptFieldValue,
     script_def::{ScriptDefinition, ScriptFieldValueType},
 };
 

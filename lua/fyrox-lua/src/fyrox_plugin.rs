@@ -2,8 +2,8 @@ use crate::debug::override_print;
 use crate::debug::var_dump;
 use crate::generated::registry::register_classes;
 use crate::lua_utils::log_error;
-use crate::script::invoke_callback;
-use crate::script::LuaScript;
+use crate::fyrox_script::invoke_callback;
+use crate::fyrox_script::LuaScript;
 use crate::script_class::ScriptClass;
 use crate::script_data::ScriptData;
 use crate::script_def::ScriptDefinition;
@@ -20,6 +20,7 @@ use fyrox::plugin::Plugin;
 use fyrox::plugin::PluginContext;
 use fyrox::plugin::PluginRegistrationContext;
 use fyrox::script::constructor::ScriptConstructor;
+use fyrox::script::PluginsRefMut;
 use fyrox::script::Script;
 use fyrox::script::ScriptContext;
 use fyrox::walkdir::DirEntry;
@@ -321,5 +322,16 @@ impl Reflect for PluginScriptList {
         Self: Sized,
     {
         env!("CARGO_PKG_NAME")
+    }
+}
+
+#[extend::ext]
+pub impl PluginsRefMut<'_> {
+    fn lua(&self) -> &LuaPlugin {
+        self.get::<LuaPlugin>()
+    }
+
+    fn lua_mut(&mut self) -> &mut LuaPlugin {
+        self.get_mut::<LuaPlugin>()
     }
 }
