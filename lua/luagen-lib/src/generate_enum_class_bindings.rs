@@ -6,7 +6,7 @@ use lite_model::{
 use to_vec::ToVec;
 
 use crate::{
-    code_model::{Mod, ModContent}, context::GenerationContext, eq::{self, generate_eq}, expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, supress_lint::SUPRESSIONS, templating::render
+    code_model::{Mod, ModContent}, context::GenerationContext, eq::generate_eq, expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, supress_lint::SUPRESSIONS, templating::render
 };
 
 pub fn generate_enum_class_bindings(class: &EnumClass, ctx: &GenerationContext) -> Mod {
@@ -260,7 +260,7 @@ fn generate_class_fields(s: &mut String, class: &EnumClass, ctx: &GenerationCont
     ";
 }
 
-fn unit_accessors(s: &mut String, class: &EnumClass, ctx: &GenerationContext) {
+fn unit_accessors(s: &mut String, class: &EnumClass, _ctx: &GenerationContext) {
     for variant in class.variants.iter() {
         let EnumValue::Unit = &variant.value else {
             continue;

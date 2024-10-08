@@ -45,7 +45,7 @@ impl Mod {
 }
 
 fn write_mods(dir: &str, children: &[Mod])  {
-    let _ = fs::create_dir_all(&dir);
+    let _ = fs::create_dir_all(dir);
 
     let lib_rs = children
         .iter()

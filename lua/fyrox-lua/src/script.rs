@@ -1,12 +1,9 @@
 use super::script_data::ScriptData;
 use crate::fyrox_lite_class::Traitor;
 use crate::fyrox_utils::PluginsRefMut_Ext;
-use crate::plugin::LuaPlugin;
 use crate::reflect_base;
 use crate::script_class::ScriptClass;
 use crate::script_def::ScriptKind;
-use crate::script_object::ScriptObject;
-use crate::typed_userdata::TypedUserData;
 use fyrox::asset::Resource;
 use fyrox::core::algebra::UnitQuaternion;
 use fyrox::core::algebra::Vector3;

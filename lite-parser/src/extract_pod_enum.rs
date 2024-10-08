@@ -6,7 +6,7 @@ use crate::{extract_ty::extract_ty, lite_api_attr::LiteApiAttr};
 
 pub fn extract_pod_enum(
     rust_path: &str,
-    (attr, attr_span): (LiteApiAttr, Span),
+    (attr, _attr_span): (LiteApiAttr, Span),
     item: &syn::ItemEnum,
     errors: &mut Vec<syn::Error>,
     types: &mut Vec<syn::Type>,

@@ -1,5 +1,5 @@
 use lite_model::*;
-use proc_macro2::{Span, TokenStream};
+use proc_macro2::Span;
 use quote::ToTokens;
 use syn::Ident;
 

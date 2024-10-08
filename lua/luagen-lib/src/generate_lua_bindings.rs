@@ -40,7 +40,7 @@ pub fn generate_lua_bindings(domain: Domain) -> SimpleRustCodeBase {
     for (package, class_names) in by_package {
         let mut mods = Vec::new();
         for class_name in class_names.iter() {
-            let class = ctx.domain.get_class(&class_name).unwrap();
+            let class = ctx.domain.get_class(class_name).unwrap();
             match class {
                 Class::Engine(it) => {
                     mods.push(generate_engine_class_bindings(it, &ctx));

@@ -32,10 +32,6 @@
 //!
 //! [`EventLoop::run(...)`]: crate::event_loop::EventLoop::run
 //! [`ControlFlow::WaitUntil`]: crate::event_loop::ControlFlow::WaitUntil
-use std::{
-    sync::{Mutex, Weak},
-    time::{Instant, SystemTime},
-};
 
 use lite_macro::lite_api;
 

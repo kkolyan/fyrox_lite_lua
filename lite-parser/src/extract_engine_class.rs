@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use lite_model::{
     ClassName, Constant, DataType, EngineClass, Method, Param, RustQualifiedName, Signature,
 };
-use proc_macro2::{Span, TokenStream};
+use proc_macro2::Span;
 use quote::ToTokens;
 use syn::{parse_quote_spanned, spanned::Spanned, Ident, TraitBoundModifier, TypeParamBound};
 
@@ -11,7 +11,7 @@ use crate::{extract_ty::extract_ty, lite_api_attr::LiteApiAttr};
 
 pub fn extract_engine_class_and_inject_assertions(
     rust_path: &str,
-    (attr, attr_span): (LiteApiAttr, Span),
+    (attr, _attr_span): (LiteApiAttr, Span),
     item: &mut syn::ItemImpl,
     errors: &mut Vec<syn::Error>,
 ) -> Option<(Ident, EngineClass)> {
