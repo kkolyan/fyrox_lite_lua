@@ -3,7 +3,7 @@ Rudimental Game made with Fyrox Engine and https://github.com/kkolyan/fyrox_lite
 
 Lua port of https://github.com/kkolyan/fyrox_guards
 
-Explored Fyrox APIs ([annotations available](https://github.com/kkolyan/fyrox_lite_lua/blob/main/fyrox-lite.lua)):
+Explored Fyrox APIs:
 * Node graph.
 * RigidBody (3D)
 * Ray Casting

@@ -41,13 +41,14 @@ Lite API is a Rust library that provides a scripting-language-friendly facade ov
 
 This library is supposed to be updated frequently when it's necessary to expose some part of Fyrox API to scripting language. Package [fyrox-lite](fyrox-lite) is the place where most of changes to be done. 
 
-Exposed API should comply with the rules.
-
-Lite API allows following types
+Exposed API should comply with the rules. Following types allowed:
 * primitives (limited set of them, for the sake of simplicity)
-* data types - `#[fyrox_lite]`-annotated structures. they have copy-on-asign semantic. It's supposed that on the scripting language side they are represented in its native data structures. That's not allowed to expose Rust methods of this structures, because it doesn't make sense - all necessary methods should be provided by the language specific implementation.
-* engine types - defined by annotating plain (non-trait) `impl`s with `this same #[fyrox_lite]` attribute. Script code can invoke methods (using `ffi` or analogs), but internal structure of this types is completely hidden. Script code can instantiate an engine type only if there is exposed method for this. Handles are clonable and clone operation only clones the handle, not the underlying object. If underlying object has limited lifecycle, then it should provide the methods to deal with it.
-* script implementation types. that's a family of traits, expected to be implemented by every language provider. they are not intended to be changed frequently. The central type is [UserScript](lua/fyrox-lua/src/user_script_impl.rs).
+* `data types` - `#[fyrox_lite]`-annotated structures or enums. they have copy-on-asign semantic. It's supposed that on the scripting language side they are represented in its native data structures. That's not allowed to expose Rust methods of this structures - all necessary methods should be provided by the language specific implementation.
+* `engine types` - defined by annotating non-trait `impl`s with `this same #[fyrox_lite]` attribute. Script code can invoke methods (using `ffi` or analogs), but internal structure of this types is completely hidden. Script code can instantiate an engine type only if there is exposed method for this. Handles are clonable and clone operation only clones the handle, not the underlying object. If underlying object has limited lifecycle, then it should provide the methods to deal with it.
+* predefined abstract types. that's a family of traits, expected to be implemented by every language provider. they are not intended to be changed frequently. The central type is [UserScript](lua/fyrox-lua/src/user_script_impl.rs).
+* Vec, Option, Result
+
+Note that Vector3 and Quaternion for Lua are of an `engine type`, but for some languages (C# for instance) they probably would be a `data type`, because language-native implementation of vector arithmetics could be more efficient than `ffi` to `nalgebra`. That's why nalgebra-backed types are in [fyrox-lite-math](fyrox-lite-math) and [fyrox-lite](fyrox-lite) exposes methods with shallow math structs instead of nalgebra-backed ones.
 
 `#[fyrox_lite]` attrubute is not just a marker - it provides almost complete realtime enforcement of this rules.
 
@@ -58,9 +59,9 @@ There is a [metadata model](lite-model/src/lib.rs) that serves as contract betwe
 There is no limitation on this. But it's supposed that in consumes the result of Lite API parsing and produces a Rust code with Fyrox `Plugin` implementation that loads scripts metadata, allowing to attach them in inspector, and provides a runtime for a target scripting language.
 
 ### Lua Implementation
-* [fyrox-lua](lua/fyrox-lua) - the runtime library, provides [LuaPlugin](lua/fyrox-lua/src/fyrox_plugin.rs) and [LuaScript](lua/fyrox-lua/src/fyrox_script.rs). `mlua` crate used to embed Lua. LuaU interpreter is choosen (mlua allow to switch them easily) just because it was easiest to compile on Windows.
-* [editor-lua](lua/editor-lua/src/main.rs) / [executor-lua](lua/executor-lua/src/main.rs) - desktop instantiations of previously mentioned `LuaPlugin`.
-* [luagen-lib](lua/luagen-lib) - dynamic part. It uses Lite API metadata to generate both [Lua bindings](lua/fyrox-lua/src/generated) and [Lua annotations](lua/annotations/fyrox-lite.lua) (for autocomplete in VSCode). Currently, it's not integrated in build yet and invoked with `cargo run --bin luagen` ([code](tools/src/bin/luagen.rs)).
+* `lua/fyrox-lua` - the runtime library, provides [LuaPlugin](lua/fyrox-lua/src/fyrox_plugin.rs) and [LuaScript](lua/fyrox-lua/src/fyrox_script.rs). `mlua` crate used to embed Lua. LuaU interpreter is choosen (mlua allow to switch them easily) just because it was easiest to compile on Windows.
+* `lua/editor-lua` / `lua/executor-lua` - desktop instantiations of previously mentioned `LuaPlugin`.
+* `lua/luagen-lib` - dynamic part. It uses Lite API metadata to generate both [Lua bindings](lua/fyrox-lua/src/generated) and [Lua annotations](lua/annotations/fyrox-lite.lua) (for autocomplete in VSCode). Currently, it's not integrated in build yet and invoked with `cargo run --bin luagen` ([code](tools/src/bin/luagen.rs)).
 
 ## Feedback
 Any feedback is extremely appreciated.
