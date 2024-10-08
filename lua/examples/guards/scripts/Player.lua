@@ -61,8 +61,8 @@ end
 function Player:on_init()
     Window.cursor_grab = CursorGrabMode.Confined;
 
-    self.collider = self.node:find_collider_in_children()
-    end
+    self.collider = not_nil(self.node:find_collider_in_children(), "player collider missing")
+end
 
 function Player:on_start()
     self.node:subscribe_to()

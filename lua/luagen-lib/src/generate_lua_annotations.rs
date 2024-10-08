@@ -1,10 +1,12 @@
-use std::collections::{HashMap, HashSet};
-
-use lite_model::{Class, DataType, Domain, EngineClass, EnumClass, EnumValue, EnumVariant, Method, StructClass};
-use to_vec::ToVec;
+use lite_model::{Class, Domain};
 
 use crate::{
-    annotations::{engine_class::generate_engine, enum_class::{generate_enum}, fields::fields, methods::methods, struct_class::generate_struct}, bindings::generate_methods::{is_getter, is_setter}, code_model::{HierarchicalCodeBase, ModContent, Module}, templating::strExt, writelnu
+    annotations::{
+        engine_class::generate_engine, enum_class::generate_enum, struct_class::generate_struct,
+    },
+    code_model::{HierarchicalCodeBase, ModContent, Module},
+    templating::strExt,
+    writelnu,
 };
 
 pub fn generate_lua_annotations(domain: &Domain) -> HierarchicalCodeBase {
@@ -25,14 +27,23 @@ pub fn generate_lua_annotations(domain: &Domain) -> HierarchicalCodeBase {
 		".deindent().as_str();
     for class in domain.classes.iter() {
         writelnu!(s, "");
-        writelnu!(s, "-----------------------------------------------------------");
+        writelnu!(
+            s,
+            "-----------------------------------------------------------"
+        );
         writelnu!(s, "------ {}", class.rust_name());
-        writelnu!(s, "-----------------------------------------------------------");
+        writelnu!(
+            s,
+            "-----------------------------------------------------------"
+        );
+        writelnu!(s, "do");
         match class {
             Class::Engine(class) => generate_engine(&mut s, class),
             Class::Struct(class) => generate_struct(&mut s, class),
             Class::Enum(class) => generate_enum(&mut s, class),
         }
+        writelnu!(s, "");
+        writelnu!(s, "end");
     }
     HierarchicalCodeBase {
         mods: vec![Module {

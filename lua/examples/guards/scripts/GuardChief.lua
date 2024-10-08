@@ -26,7 +26,7 @@ function GuardChief:on_update(ctx)
                     orientation
                 )
                 guard:find_script("Guard"):init(i)
-                Log:info(string.format("guard spawned at %s", position))
+                Log:info(string.format("guard spawned at %s", tostring(position)))
             else
                 Log:err("cannot spawn guards: no beacons found")
             end

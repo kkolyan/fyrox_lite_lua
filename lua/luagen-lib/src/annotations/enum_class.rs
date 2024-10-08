@@ -1,13 +1,12 @@
 use core::panic;
-use std::collections::{HashMap, HashSet};
 
 use lite_model::{
-    Class, DataType, Domain, EngineClass, EnumClass, EnumValue, EnumVariant, Method, StructClass,
+    EnumClass, EnumValue,
 };
 use to_vec::ToVec;
 
 use crate::{
-    annotations::type_to_lua::type_rust_to_lua, bindings::generate_methods::{is_getter, is_setter}, code_model::{HierarchicalCodeBase, ModContent, Module}, templating::strExt, writelnu
+    annotations::type_to_lua::type_rust_to_lua, writelnu
 };
 
 pub fn generate_enum(s: &mut String, class: &EnumClass) {

@@ -1,8 +1,6 @@
 pub mod engine_class;
 pub mod struct_class;
 pub mod type_to_lua;
-pub mod fields;
-pub mod methods;
 pub mod enum_class;
 
 #[macro_export]

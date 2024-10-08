@@ -15,6 +15,7 @@ function script_class() end
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::Event
 -----------------------------------------------------------
+do
 
 ---@class Event_static
 
@@ -61,9 +62,12 @@ Event = {}
 ---@field MemoryWarning boolean
 Event_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::StartCause
 -----------------------------------------------------------
+do
 
 ---@class StartCause_static
 
@@ -87,9 +91,12 @@ StartCause = {}
 ---@field Init boolean
 StartCause_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::WindowEvent
 -----------------------------------------------------------
+do
 
 ---@class WindowEvent_static
 
@@ -293,9 +300,12 @@ WindowEvent = {}
 ---@field RedrawRequested boolean
 WindowEvent_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::DeviceEvent
 -----------------------------------------------------------
+do
 
 ---@class DeviceEvent_static
 
@@ -358,18 +368,24 @@ DeviceEvent = {}
 ---@field Key DeviceEvent_Key
 DeviceEvent_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::RawKeyEvent
 -----------------------------------------------------------
+do
 
 ---@class RawKeyEvent
 ---@field physical_key PhysicalKey
 ---@field state ElementState
 RawKeyEvent_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::PhysicalKey
 -----------------------------------------------------------
+do
 
 ---@class PhysicalKey_static
 
@@ -395,9 +411,12 @@ PhysicalKey = {}
 ---@field Unidentified PhysicalKey_Unidentified
 PhysicalKey_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::KeyCode
 -----------------------------------------------------------
+do
 
 ---@class KeyCode_static
 
@@ -1181,9 +1200,12 @@ KeyCode = {}
 ---@field F35 boolean
 KeyCode_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::NativeKeyCode
 -----------------------------------------------------------
+do
 
 ---@class NativeKeyCode_static
 
@@ -1231,9 +1253,12 @@ NativeKeyCode = {}
 ---@field Xkb NativeKeyCode_Xkb
 NativeKeyCode_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::KeyEvent
 -----------------------------------------------------------
+do
 
 ---@class KeyEvent
 ---@field physical_key PhysicalKey
@@ -1241,9 +1266,12 @@ NativeKeyCode_instance = {}
 ---@field repeat boolean
 KeyEvent_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::KeyLocation
 -----------------------------------------------------------
+do
 
 ---@class KeyLocation_static
 
@@ -1267,9 +1295,12 @@ KeyLocation = {}
 ---@field Numpad boolean
 KeyLocation_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::TouchPhase
 -----------------------------------------------------------
+do
 
 ---@class TouchPhase_static
 
@@ -1293,9 +1324,12 @@ TouchPhase = {}
 ---@field Cancelled boolean
 TouchPhase_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::Touch
 -----------------------------------------------------------
+do
 
 ---@class Touch
 ---@field phase TouchPhase
@@ -1304,9 +1338,12 @@ TouchPhase_instance = {}
 ---@field id integer
 Touch_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::Force
 -----------------------------------------------------------
+do
 
 ---@class Force_static
 
@@ -1334,9 +1371,12 @@ Force = {}
 ---@field Normalized Force_Normalized
 Force_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::ElementState
 -----------------------------------------------------------
+do
 
 ---@class ElementState_static
 
@@ -1352,9 +1392,12 @@ ElementState = {}
 ---@field Released boolean
 ElementState_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::MouseButton
 -----------------------------------------------------------
+do
 
 ---@class MouseButton_static
 
@@ -1391,9 +1434,12 @@ MouseButton = {}
 ---@field Other MouseButton_Other
 MouseButton_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::MouseScrollDelta
 -----------------------------------------------------------
+do
 
 ---@class MouseScrollDelta_static
 
@@ -1419,9 +1465,12 @@ MouseScrollDelta = {}
 ---@field PixelDelta MouseScrollDelta_PixelDelta
 MouseScrollDelta_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_event::InnerSizeWriter
 -----------------------------------------------------------
+do
 
 ---@class InnerSizeWriter_static
 InnerSizeWriter = {}
@@ -1433,9 +1482,12 @@ InnerSizeWriter_instance = {}
 ---@return boolean
 function InnerSizeWriter_instance:request_inner_size(new_inner_size) end
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_log::LiteLog
 -----------------------------------------------------------
+do
 
 ---@class Log_static
 Log = {}
@@ -1452,27 +1504,36 @@ function Log:warn(msg) end
 ---@param msg string
 function Log:err(msg) end
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_math::PodVector2
 -----------------------------------------------------------
+do
 
 ---@class Vector2
 ---@field x number
 ---@field y number
 Vector2_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_math::PodVector2i
 -----------------------------------------------------------
+do
 
 ---@class Vector2i
 ---@field x integer
 ---@field y integer
 Vector2i_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_node::LiteNode
 -----------------------------------------------------------
+do
 
 ---@class Node_static
 Node = {}
@@ -1498,12 +1559,6 @@ function Node_instance:destroy() end
 ---@param payload any
 function Node_instance:send_hierarchical(routing, payload) end
 
----@param new_pos Vector3
-function Node_instance:set_local_position(new_pos) end
-
----@param value Quaternion
-function Node_instance:set_local_rotation(value) end
-
 function Node_instance:subscribe_to() end
 
 ---@return Node?
@@ -1523,12 +1578,12 @@ function Node_instance:find_script(class_name) end
 ---@return boolean
 function Node_instance:tag_is(tag) end
 
----@param tag string
-function Node_instance:set_tag(tag) end
+end
 
 -----------------------------------------------------------
 ------ fyrox_lite::lite_node::LiteRoutingStrategy
 -----------------------------------------------------------
+do
 
 ---@class RoutingStrategy_static
 
@@ -1544,9 +1599,12 @@ RoutingStrategy = {}
 ---@field Down boolean
 RoutingStrategy_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_physics::LitePhysics
 -----------------------------------------------------------
+do
 
 ---@class Physics_static
 ---@field EXCLUDE_FIXED integer
@@ -1566,9 +1624,12 @@ Physics_instance = {}
 ---@return Intersection[]
 function Physics:cast_ray(opts) end
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_physics::LiteIntersection
 -----------------------------------------------------------
+do
 
 ---@class Intersection
 ---@field collider Node
@@ -1578,9 +1639,12 @@ function Physics:cast_ray(opts) end
 ---@field toi number
 Intersection_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_physics::LiteFeatureId
 -----------------------------------------------------------
+do
 
 ---@class FeatureId_static
 
@@ -1619,9 +1683,12 @@ FeatureId = {}
 ---@field Unknown boolean
 FeatureId_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_physics::LiteRayCastOptions
 -----------------------------------------------------------
+do
 
 ---@class RayCastOptions
 ---@field ray_origin Vector3
@@ -1631,18 +1698,24 @@ FeatureId_instance = {}
 ---@field sort_results boolean
 RayCastOptions_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_physics::LiteInteractionGroups
 -----------------------------------------------------------
+do
 
 ---@class InteractionGroups
 ---@field memberships integer
 ---@field filter integer
 InteractionGroups_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_physics::LiteRigidBody
 -----------------------------------------------------------
+do
 
 ---@class RigidBody_static
 RigidBody = {}
@@ -1653,9 +1726,12 @@ RigidBody_instance = {}
 ---@param force Vector3
 function RigidBody_instance:apply_force(force) end
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_plugin::LitePlugin
 -----------------------------------------------------------
+do
 
 ---@class Plugin_static
 Plugin = {}
@@ -1668,9 +1744,12 @@ Plugin_instance = {}
 ---@return T
 function Plugin:get(class_name) end
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_prefab::LitePrefab
 -----------------------------------------------------------
+do
 
 ---@class Prefab_static
 Prefab = {}
@@ -1683,9 +1762,12 @@ Prefab_instance = {}
 ---@return Node
 function Prefab_instance:instantiate_at(position, orientation) end
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_scene::LiteScene
 -----------------------------------------------------------
+do
 
 ---@class Scene_static
 Scene = {}
@@ -1696,9 +1778,12 @@ Scene_instance = {}
 ---@param scene_path string
 function Scene:load_async(scene_path) end
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_ui::LiteUiNode
 -----------------------------------------------------------
+do
 
 ---@class UiNode_static
 UiNode = {}
@@ -1706,9 +1791,12 @@ UiNode = {}
 ---@class UiNode
 UiNode_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_ui::LiteText
 -----------------------------------------------------------
+do
 
 ---@class Text_static
 Text = {}
@@ -1721,21 +1809,24 @@ Text_instance = {}
 ---@return Text
 function Text:new(state) end
 
----@param text string
-function Text_instance:set_text_async(text) end
+end
 
 -----------------------------------------------------------
 ------ fyrox_lite::lite_ui::TextBuilder
 -----------------------------------------------------------
+do
 
 ---@class TextBuilder
 ---@field foregound Brush?
 ---@field font_size number?
 TextBuilder_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_ui::Brush
 -----------------------------------------------------------
+do
 
 ---@class Brush_static
 
@@ -1773,9 +1864,12 @@ Brush = {}
 ---@field RadialGradient Brush_RadialGradient
 Brush_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_ui::Color
 -----------------------------------------------------------
+do
 
 ---@class Color_static
 ---@field WHITE Color
@@ -1923,18 +2017,24 @@ Color = {}
 ---@class Color
 Color_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_ui::GradientPoint
 -----------------------------------------------------------
+do
 
 ---@class GradientPoint
 ---@field stop number
 ---@field color Color
 GradientPoint_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite::lite_window::LiteWindow
 -----------------------------------------------------------
+do
 
 ---@class Window_static
 ---@field cursor_grab CursorGrabMode
@@ -1943,12 +2043,12 @@ Window = {}
 ---@class Window
 Window_instance = {}
 
----@param mode CursorGrabMode
-function Window:set_cursor_grab(mode) end
+end
 
 -----------------------------------------------------------
 ------ fyrox_lite::lite_window::LiteCursorGrabMode
 -----------------------------------------------------------
+do
 
 ---@class CursorGrabMode_static
 
@@ -1968,9 +2068,12 @@ CursorGrabMode = {}
 ---@field Locked boolean
 CursorGrabMode_instance = {}
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite_math::lite_math::LiteQuaternion
 -----------------------------------------------------------
+do
 
 ---@class Quaternion_static
 Quaternion = {}
@@ -1996,9 +2099,12 @@ function Quaternion_instance:mul_vec(o) end
 ---@return Quaternion
 function Quaternion_instance:mul_quat(rot_delta) end
 
+end
+
 -----------------------------------------------------------
 ------ fyrox_lite_math::lite_math::LiteVector3
 -----------------------------------------------------------
+do
 
 ---@class Vector3_static
 ---@field X Vector3
@@ -2019,15 +2125,6 @@ Vector3_instance = {}
 ---@return Vector3
 function Vector3:new(x, y, z) end
 
----@param value number
-function Vector3_instance:set_x(value) end
-
----@param value number
-function Vector3_instance:set_y(value) end
-
----@param value number
-function Vector3_instance:set_z(value) end
-
 ---@param o number
 ---@return Vector3
 function Vector3_instance:mul(o) end
@@ -2047,3 +2144,5 @@ function Vector3_instance:sub(o) end
 function Vector3_instance:magnitude() end
 
 function Vector3_instance:normalize_inplace() end
+
+end

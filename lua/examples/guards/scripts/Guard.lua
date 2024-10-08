@@ -96,7 +96,7 @@ end
 
 
 function Guard:on_init()
-    self.collider = self.node:find_collider_in_children()
+    self.collider = not_nil(self.node:find_collider_in_children(), "guard collider missing")
     if not self.collider then
         Log:err("Collider not found under Guard node")
     end

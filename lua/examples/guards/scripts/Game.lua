@@ -31,3 +31,16 @@ end
 function Game:inc_wounds()
 	self.wounds = self.wounds + 1
 end
+
+
+---@generic T
+---@param o T?
+---@param msg string
+---@return T
+function not_nil(o, msg)
+    if o then
+        return o
+    else
+        error(msg)
+    end
+end
