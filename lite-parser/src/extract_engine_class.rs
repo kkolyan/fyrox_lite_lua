@@ -96,10 +96,31 @@ pub fn extract_engine_class_and_inject_assertions(
                         }
                         syn::FnArg::Typed(pat_type) => pat_type,
                     };
+                    let is_class_name = if arg
+                        .attrs
+                        .iter()
+                        .any(|it| it.meta.path().is_ident("class_name"))
+                    {
+                        arg.attrs
+                            .retain(|it| !it.meta.path().is_ident("class_name"));
+                        true
+                    } else {
+                        false
+                    };
                     let ty = arg.ty.as_ref();
                     types.push(ty.clone());
                     match extract_ty(ty, Some(&generic_params)) {
-                        Ok(it) => {
+                        Ok(mut it) => {
+                            if is_class_name {
+                                if !matches!(it, DataType::String) {
+                                    errors.push(syn::Error::new_spanned(
+                                        fn_arg,
+                                        "Fyrox Lite: only String parameter could be a class name",
+                                    ));
+                                    continue 'items;
+                                }
+                                it = DataType::ClassName;
+                            }
                             // handle #[variadic]
                             let variadic_index = arg
                                 .attrs
@@ -203,9 +224,7 @@ pub fn extract_engine_class_and_inject_assertions(
         }
     }
     rust_name.map(|rust_name| {
-        let class_name = attr
-            .class
-            .unwrap_or_else(|| rust_name.to_string());
+        let class_name = attr.class.unwrap_or_else(|| rust_name.to_string());
         (
             rust_name.clone(),
             EngineClass {

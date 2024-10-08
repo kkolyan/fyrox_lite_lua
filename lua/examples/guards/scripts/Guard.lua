@@ -17,6 +17,10 @@ Guard = script_class()
 
 FRACTION_GUARDS = 1
 
+function Guard:init(id)
+    self.id = id
+end
+
 ---@return boolean
 function Guard:try_attack_player()
     local player_pos = Plugin:get("Game").player.global_position

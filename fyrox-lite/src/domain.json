@@ -1602,7 +1602,7 @@
               "params": [
                 {
                   "name": "class_name",
-                  "ty": "String",
+                  "ty": "ClassName",
                   "variadic": false
                 },
                 {
@@ -1625,7 +1625,7 @@
               "params": [
                 {
                   "name": "class_name",
-                  "ty": "String",
+                  "ty": "ClassName",
                   "variadic": false
                 },
                 {
@@ -1926,7 +1926,7 @@
               "params": [
                 {
                   "name": "class_name",
-                  "ty": "String",
+                  "ty": "ClassName",
                   "variadic": false
                 },
                 {

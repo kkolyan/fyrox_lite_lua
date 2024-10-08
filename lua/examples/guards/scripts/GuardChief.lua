@@ -15,20 +15,20 @@ function GuardChief:on_update(ctx)
     if not self.initialized then
         self.initialized = true;
         for i = 1, self.initial_count do
-            local beacons = Plugin:get("Game").beacons;
+            local beacons = Plugin:get("Game").beacons
             if #beacons > 0 then
-                local position = beacons[math.random(#beacons)];
+                local position = beacons[math.random(#beacons)]
 
-                local orientation = Quaternion:from_axis_angle(Vector3.Y, math.random() * 2 * math.pi);
+                local orientation = Quaternion:from_axis_angle(Vector3.Y, math.random() * 2 * math.pi)
 
                 local guard = self.gaurd_prefab:instantiate_at(
                     position,
                     orientation
                 )
-                guard:find_script("Guard").id = i
-                Log:info("guard spawned at %s", position);
+                guard:find_script("Guard"):init(i)
+                Log:info(string.format("guard spawned at %s", position))
             else
-                Log:err("cannot spawn guards: no beacons found");
+                Log:err("cannot spawn guards: no beacons found")
             end
         end
     end

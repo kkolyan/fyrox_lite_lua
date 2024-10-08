@@ -32,15 +32,18 @@ impl FyroxUserData for fyrox_lite::lite_event::PhysicalKey {
                     "Code",
                     |lua, this, mut args: mlua::MultiValue| {
             
+
                         let Some(_1) = args.pop_front() else {
                             return Err(lua_error!("argument 1 (KeyCode) missing"));
                         };
                         let _1 = <TypedUserData<Traitor<fyrox_lite::lite_event::KeyCode>> as mlua::FromLua>::from_lua(_1, lua)?;
                         let _1 = _1.borrow()?.inner().clone().into();
             
+
                         let value = fyrox_lite::lite_event::PhysicalKey::Code( _1 );
                         Ok(Traitor::new(value))
         
+
                     }
                 );
 
@@ -48,15 +51,18 @@ impl FyroxUserData for fyrox_lite::lite_event::PhysicalKey {
                     "Unidentified",
                     |lua, this, mut args: mlua::MultiValue| {
             
+
                         let Some(_1) = args.pop_front() else {
                             return Err(lua_error!("argument 1 (NativeKeyCode) missing"));
                         };
                         let _1 = <TypedUserData<Traitor<fyrox_lite::lite_event::NativeKeyCode>> as mlua::FromLua>::from_lua(_1, lua)?;
                         let _1 = _1.borrow()?.inner().clone().into();
             
+
                         let value = fyrox_lite::lite_event::PhysicalKey::Unidentified( _1 );
                         Ok(Traitor::new(value))
         
+
                     }
                 );
     }

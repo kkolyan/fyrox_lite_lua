@@ -15,6 +15,7 @@ pub fn mlua_to_rust_expr(param: &str, ty: &DataType, ctx: &GenerationContext) ->
         DataType::F32 => param.to_string(),
         DataType::F64 => param.to_string(),
         DataType::String => format!("{}.to_str()?.to_string()", param),
+        DataType::ClassName => format!("{}.to_str()?.to_string()", param),
         DataType::Vec(item_ty) => format!(
             "{}.into_iter().map(|it| {}).collect::<Vec<_>>()",
             param,
@@ -58,6 +59,7 @@ pub fn rust_expr_to_mlua(ctx: &GenerationContext, param: &str, ty: &DataType) ->
         DataType::F32 => param.to_string(),
         DataType::F64 => param.to_string(),
         DataType::String => param.to_string(),
+        DataType::ClassName => param.to_string(),
         DataType::Vec(it) => format!(
             "lua.create_table_from({}.into_iter().map(|it| {}).enumerate().map(|(i, v)| (i + 1, v)))?",
             param,
@@ -99,6 +101,7 @@ pub fn type_to_mlua(ty: &DataType, ctx: &GenerationContext) -> String {
         DataType::F32 => "f32".to_owned(),
         DataType::F64 => "f64".to_owned(),
         DataType::String => "mlua::String".to_owned(),
+        DataType::ClassName => "mlua::String".to_owned(),
         DataType::Vec(it) => format!("Vec<{}>", type_to_mlua(it.deref(), ctx)),
         DataType::UserScript => "TypedUserData<ScriptObject>".to_string(),
         DataType::UserScriptMessage => "mlua::Value".to_string(),

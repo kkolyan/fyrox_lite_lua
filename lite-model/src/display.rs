@@ -14,6 +14,7 @@ impl Display for DataType {
             DataType::F32 => write!(f, "f32"),
             DataType::F64 => write!(f, "f64"),
             DataType::String => write!(f, "String"),
+            DataType::ClassName => write!(f, "ClassName"),
             DataType::Vec(it) => write!(f, "Vec<{}>", it.deref()),
             DataType::UserScript => write!(f, "UserScript"),
             DataType::UserScriptMessage => write!(f, "UserScriptMessage"),

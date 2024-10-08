@@ -124,7 +124,7 @@ pub(crate) fn is_setter(method: &Method) -> bool {
 }
 
 pub(crate) fn is_getter(method: &Method) -> bool {
-    method.method_name.starts_with("get_") && method.signature.params.is_empty()
+    method.method_name.starts_with("get_") && method.signature.params.is_empty() && method.signature.return_ty.is_some()
 }
 
 pub(crate) fn is_regular(method: &Method) -> bool {

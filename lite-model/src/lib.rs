@@ -182,7 +182,7 @@ pub struct Signature {
     pub return_ty: Option<DataType>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DataType {
     UnresolvedClass(String),
     Unit,
@@ -193,6 +193,7 @@ pub enum DataType {
     F32,
     F64,
     String,
+    ClassName,
     Vec(Box<DataType>),
     /// trait in Lite, manual implementation on language binding side
     UserScript,

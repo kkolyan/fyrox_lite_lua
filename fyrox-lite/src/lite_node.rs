@@ -177,7 +177,7 @@ impl LiteNode {
         })
     }
 
-    pub fn add_script<T: UserScript>(&self, class_name: String, _stub: T::UserScriptGenericStub) -> Result<T, T::LangSpecificError> {
+    pub fn add_script<T: UserScript>(&self, #[class_name] class_name: String, _stub: T::UserScriptGenericStub) -> Result<T, T::LangSpecificError> {
         if self.find_script::<T>(class_name.clone(), _stub)?.is_some() {
             return Err(T::create_error(format!("node {:?} already contains script of class {}", self, &class_name).as_str()))
         }
@@ -192,7 +192,7 @@ impl LiteNode {
         Ok(script.expect("WTF: it was just added"))
     }
 
-    pub fn find_script<T: UserScript>(&self, class_name: String, _stub: T::UserScriptGenericStub) -> Result<Option<T>, T::LangSpecificError> {
+    pub fn find_script<T: UserScript>(&self, #[class_name] class_name: String, _stub: T::UserScriptGenericStub) -> Result<Option<T>, T::LangSpecificError> {
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
             for script in node.try_get_scripts_mut::<T::ProxyScript>() {

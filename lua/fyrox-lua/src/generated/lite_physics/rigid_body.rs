@@ -33,8 +33,10 @@ impl FyroxUserData for fyrox_lite::lite_physics::LiteRigidBody {
                     "apply_force",
                     |lua, this, (force): (TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector3>>)| {
             
+
                         let force = force.borrow()?.inner().clone().into();
                 
+
                         let ret = this.apply_force(force);
                         let ret = ret;
                         Ok(ret)
