@@ -1,4 +1,2 @@
 newline_style = "Unix"
 edition = "2018"
-unstable_features = false
-error_on_unformatted = false

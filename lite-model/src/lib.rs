@@ -209,28 +209,6 @@ pub enum DataType {
     },
 }
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
-pub enum BinaryOp {
-    Add,
-    Sub,
-    Mul,
-    Div,
-    Rem,
-    And,
-    Or,
-    BitXor,
-    BitAnd,
-    BitOr,
-    Shl,
-    Shr,
-    Eq,
-    Lt,
-    Le,
-    Ne,
-    Ge,
-    Gt,
-}
-
 impl Display for RustQualifiedName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)

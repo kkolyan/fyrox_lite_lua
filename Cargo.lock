@@ -1120,7 +1120,6 @@ dependencies = [
 [[package]]
 name = "fyrox"
 version = "0.34.1"
-source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
 dependencies = [
  "fyrox-dylib",
  "fyrox-impl",
@@ -1129,7 +1128,6 @@ dependencies = [
 [[package]]
 name = "fyrox-animation"
 version = "0.2.0"
-source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
 dependencies = [
  "fxhash",
  "fyrox-core",
@@ -1141,7 +1139,6 @@ dependencies = [
 [[package]]
 name = "fyrox-core"
 version = "0.28.1"
-source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
 dependencies = [
  "android-activity",
  "arrayvec",
@@ -1173,11 +1170,12 @@ dependencies = [
 [[package]]
 name = "fyrox-core-derive"
 version = "0.23.0"
-source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
 dependencies = [
  "convert_case",
  "darling",
+ "futures",
  "fxhash",
+ "fyrox-core",
  "proc-macro2",
  "quote",
  "syn 1.0.109",
@@ -1186,7 +1184,6 @@ dependencies = [
 [[package]]
 name = "fyrox-dylib"
 version = "0.1.0"
-source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
 dependencies = [
  "fyrox-impl",
 ]
@@ -1194,7 +1191,6 @@ dependencies = [
 [[package]]
 name = "fyrox-graph"
 version = "0.1.0"
-source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
 dependencies = [
  "fxhash",
  "fyrox-core",
@@ -1204,7 +1200,6 @@ dependencies = [
 [[package]]
 name = "fyrox-impl"
 version = "0.34.1"
-source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
 dependencies = [
  "base64 0.22.1",
  "bitflags 2.5.0",
@@ -1220,6 +1215,7 @@ dependencies = [
  "fyrox-sound",
  "fyrox-ui",
  "glow",
+ "gltf",
  "glutin",
  "glutin-winit",
  "half",
@@ -1292,7 +1288,6 @@ dependencies = [
 [[package]]
 name = "fyrox-math"
 version = "0.2.0"
-source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
 dependencies = [
  "arrayvec",
  "nalgebra",
@@ -1304,7 +1299,6 @@ dependencies = [
 [[package]]
 name = "fyrox-resource"
 version = "0.12.0"
-source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
 dependencies = [
  "fxhash",
  "fyrox-core",
@@ -1317,7 +1311,6 @@ dependencies = [
 [[package]]
 name = "fyrox-sound"
 version = "0.35.0"
-source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
 dependencies = [
  "fyrox-core",
  "fyrox-resource",
@@ -1334,7 +1327,6 @@ dependencies = [
 [[package]]
 name = "fyrox-ui"
 version = "0.25.1"
-source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
 dependencies = [
  "copypasta",
  "fontdue",
@@ -1354,7 +1346,6 @@ dependencies = [
 [[package]]
 name = "fyroxed_base"
 version = "0.21.1"
-source = "git+https://github.com/FyroxEngine/Fyrox?rev=b0768290d37453bb589705a8d678ecb29afc346f#b0768290d37453bb589705a8d678ecb29afc346f"
 dependencies = [
  "cargo_metadata",
  "fyrox",
@@ -1431,6 +1422,42 @@ dependencies = [
  "slotmap",
  "wasm-bindgen",
  "web-sys",
+]
+
+[[package]]
+name = "gltf"
+version = "1.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3ce1918195723ce6ac74e80542c5a96a40c2b26162c1957a5cd70799b8cacf7"
+dependencies = [
+ "byteorder",
+ "gltf-json",
+ "lazy_static",
+ "serde_json",
+]
+
+[[package]]
+name = "gltf-derive"
+version = "1.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "14070e711538afba5d6c807edb74bcb84e5dbb9211a3bf5dea0dfab5b24f4c51"
+dependencies = [
+ "inflections",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.79",
+]
+
+[[package]]
+name = "gltf-json"
+version = "1.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e6176f9d60a7eab0a877e8e96548605dedbde9190a7ae1e80bbcc1c9af03ab14"
+dependencies = [
+ "gltf-derive",
+ "serde",
+ "serde_derive",
+ "serde_json",
 ]
 
 [[package]]
@@ -1645,6 +1672,12 @@ checksum = "1cdb29978cc5797bd8dcc8e5bf7de604891df2a8dc576973d71a281e916db2ff"
 dependencies = [
  "adler32",
 ]
+
+[[package]]
+name = "inflections"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a257582fdcde896fd96463bf2d40eefea0580021c0712a0e2b028b60b47a837a"
 
 [[package]]
 name = "inotify"

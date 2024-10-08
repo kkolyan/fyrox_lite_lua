@@ -12,9 +12,8 @@ Explored Fyrox APIs ([annotations available](https://github.com/kkolyan/fyrox_li
 # How to run a game
 ```sh
 git clone https://github.com/kkolyan/fyrox_lite_lua
-git clone https://github.com/kkolyan/fyrox_guards_lua
-cd fyrox_guards_lua
-cargo run -p executor --manifest-path ../fyrox_lite_lua/Cargo.toml
+cd lua/examples/guards
+./play.sh
 ```
 
 # How to play
@@ -22,10 +21,11 @@ Use WASD and mouse to shoot enemies and optionally avoid their attacks.
 
 # How to edit scenes
 ```sh
-cargo run -p editor --manifest-path ../fyrox_lite_lua/Cargo.toml
+./edit.sh
 ```
 
 # How to edit scripts
-Feel free to use any text editor to edit existing files under [scripts](scripts) directory. If you use VSCode, don't forget to download [annotations](https://github.com/kkolyan/fyrox_lite_lua/blob/main/fyrox-lite.lua) for code insight.
+Use any text editor to edit existing files under [scripts](scripts) directory. If you use VSCode, make sure that the [annotations](lua/annotations/fyrox-lite.lua) are in the scope of the VSCode project, because it will provide some code insight (autocompletion, type checking, Fyrox Lite API reference). Though, it's optional and doesn't impact code execution.
 
+# Screenshots
 ![gameplay.png](gameplay.png)
