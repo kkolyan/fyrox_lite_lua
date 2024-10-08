@@ -25,17 +25,14 @@ fn main() {
 
     println!("generating bindings");
 
-    let bindings = generate_lua_bindings(&domain);
     let annotations = generate_lua_annotations(&domain);
-
-    write_bindings(bindings);
     write_annotations(annotations);
 }
 
 fn write_annotations(annotations: HierarchicalCodeBase) {
     let target_path = "lua/annotations";
     println!("clearing {}", target_path);
-    fs::remove_dir_all(target_path).unwrap();
+    fs::remove_dir_all(target_path);
     println!("writing bindings to {}", target_path);
     annotations.write_lua(target_path);
 }
@@ -43,7 +40,7 @@ fn write_annotations(annotations: HierarchicalCodeBase) {
 fn write_bindings(bindings: HierarchicalCodeBase) {
     let target_path = "lua/fyrox-lua/src/generated";
     println!("clearing {}", target_path);
-    fs::remove_dir_all(target_path).unwrap();
+    fs::remove_dir_all(target_path);
     println!("writing bindings to {}", target_path);
     bindings.write_rust(target_path);
 }

@@ -1,9 +1,9 @@
 use lite_model::Class;
 
-use crate::{code_model::{Mod, ModContent}, context::GenerationContext, templating::render};
+use crate::{code_model::{Module, ModContent}, context::GenerationContext, templating::render};
 
 
-pub fn generate_registry(ctx: &GenerationContext) -> Mod {
+pub fn generate_registry(ctx: &GenerationContext) -> Module {
     let mut s = String::new();
     render(
         &mut s,
@@ -32,7 +32,7 @@ pub fn generate_registry(ctx: &GenerationContext) -> Mod {
     s += r#"
         }
     "#;
-    Mod {
+    Module {
         name: "registry".into(),
         content: ModContent::Code(s),
     }

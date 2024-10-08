@@ -2,11 +2,12 @@ use std::collections::HashMap;
 
 use lite_model::{Class, ClassName, Domain};
 
-use crate::{code_model::{Mod, ModContent, SimpleRustCodeBase}, context::GenerationContext, generate_engine_class_bindings::generate_engine_class_bindings, generate_enum_class_bindings::generate_enum_class_bindings, generate_registry::generate_registry, generate_struct_class_bindings::generate_struct_class_bindings};
+use crate::{code_model::{Module, ModContent, HierarchicalCodeBase}, context::GenerationContext, };
+use crate::bindings::{generate_engine_class_bindings::generate_engine_class_bindings, generate_enum_class_bindings::generate_enum_class_bindings, generate_registry::generate_registry, generate_struct_class_bindings::generate_struct_class_bindings};
 
 
 
-pub fn generate_lua_bindings(domain: Domain) -> SimpleRustCodeBase {
+pub fn generate_lua_bindings(domain: &Domain) -> HierarchicalCodeBase {
     let ctx = GenerationContext {
         internal_to_external: Default::default(),
         domain,
@@ -23,9 +24,9 @@ pub fn generate_lua_bindings(domain: Domain) -> SimpleRustCodeBase {
     //     RustQualifiedName("quat::LiteQuaternion".to_string()),
     // );
 
-    let mut code_base = SimpleRustCodeBase::default();
+    let mut bindings = HierarchicalCodeBase::default();
 
-    code_base.mods.push(generate_registry(&ctx));
+    bindings.mods.push(generate_registry(&ctx));
 
     let mut by_package: HashMap<&str, Vec<ClassName>> = Default::default();
     for class in ctx.domain.classes.iter() {
@@ -53,10 +54,10 @@ pub fn generate_lua_bindings(domain: Domain) -> SimpleRustCodeBase {
                 }
             }
         }
-        code_base.mods.push(Mod {
+        bindings.mods.push(Module {
             name: package.to_string(),
             content: ModContent::Children(mods),
         });
     }
-    code_base
+    bindings
 }

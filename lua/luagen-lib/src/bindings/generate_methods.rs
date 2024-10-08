@@ -5,9 +5,9 @@ use to_vec::ToVec;
 
 use crate::{
     context::GenerationContext,
-    expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua},
     templating::render,
 };
+use super::expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua};
 
 pub fn generate_methods(
     s: &mut String,

@@ -24,7 +24,8 @@ pub fn render<const N: usize>(target: &mut dyn Write, template: &str, vars: [(&s
 	for (name, value) in vars {
 		let placeholder = &format!("${{{}}}",name);
 		assert!(template.contains(placeholder), "missing placeholder for {}", name);
-		s = s.replace(placeholder, format!("{}", value).as_str());
+		s = s.replace(placeholder, format!("{}", value).trim_end());
 	}
+	s += "\n";
 	target.write_str(s.as_str()).unwrap();
 }

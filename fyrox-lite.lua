@@ -1,222 +1,222 @@
--- This document follows this specification: https://luals.github.io/wiki/annotations
+-- -- This document follows this specification: https://luals.github.io/wiki/annotations
 
----@diagnostic disable: missing-return, lowercase-global
+-- ---@diagnostic disable: missing-return, lowercase-global
 
--- That file is just annotations for VSCode, are not part of source code and will be provided by bindings
+-- -- That file is just annotations for VSCode, are not part of source code and will be provided by bindings
 
----@class Script
-Script = {}
+-- ---@class Script
+-- Script = {}
 
 
----@type Node
-Script.node = {}
+-- ---@type Node
+-- Script.node = {}
 
----@class Plugin
-Plugin = {}
+-- ---@class Plugin
+-- Plugin = {}
 
----@generic T
----@param class `T`
----@return T
-function Plugin:get(class) end
+-- ---@generic T
+-- ---@param class `T`
+-- ---@return T
+-- function Plugin:get(class) end
 
-function Plugin:update() end
+-- function Plugin:update() end
 
----@class Vector3
----@field x number
----@field y number
----@field z number
-Vector3 = {}
+-- ---@class Vector3
+-- ---@field x number
+-- ---@field y number
+-- ---@field z number
+-- Vector3 = {}
 
----@type Vector3
-Vector3.X = nil
+-- ---@type Vector3
+-- Vector3.X = nil
 
----@type Vector3
-Vector3.Y = nil
+-- ---@type Vector3
+-- Vector3.Y = nil
 
----@type Vector3
-Vector3.Z = nil
+-- ---@type Vector3
+-- Vector3.Z = nil
 
 
----@return Vector3
-function Vector3:normalize() end
+-- ---@return Vector3
+-- function Vector3:normalize() end
 
----@param f number
----@return Vector3
-function Vector3:mul(f) end
+-- ---@param f number
+-- ---@return Vector3
+-- function Vector3:mul(f) end
 
----@param x number
----@param y number
----@param z number
----@return Vector3
-function Vector3:new(x, y, z) end
+-- ---@param x number
+-- ---@param y number
+-- ---@param z number
+-- ---@return Vector3
+-- function Vector3:new(x, y, z) end
 
----@return number
-function Vector3:magnitude() end
+-- ---@return number
+-- function Vector3:magnitude() end
 
----@param other Vector3
----@return Vector3
-function Vector3:add(other) end
+-- ---@param other Vector3
+-- ---@return Vector3
+-- function Vector3:add(other) end
 
----@param other Vector3
----@return Vector3
-function Vector3:sub(other) end
+-- ---@param other Vector3
+-- ---@return Vector3
+-- function Vector3:sub(other) end
 
----@class Quaternion
-Quaternion = {}
+-- ---@class Quaternion
+-- Quaternion = {}
 
----@param direction Vector3
----@param up Vector3
----@return Quaternion
-function Quaternion:face_towards(direction, up) end
+-- ---@param direction Vector3
+-- ---@param up Vector3
+-- ---@return Quaternion
+-- function Quaternion:face_towards(direction, up) end
 
----@param axis Vector3
----@param angle number
----@return Quaternion
-function Quaternion:from_axis_angle(axis, angle) end
+-- ---@param axis Vector3
+-- ---@param angle number
+-- ---@return Quaternion
+-- function Quaternion:from_axis_angle(axis, angle) end
 
----@class Node
-Node = {}
+-- ---@class Node
+-- Node = {}
 
----@generic T
----@param class `T`
----@initial_state T
----@return T
-function Node:add_script(class) end
+-- ---@generic T
+-- ---@param class `T`
+-- ---@initial_state T
+-- ---@return T
+-- function Node:add_script(class) end
 
----@return Vector3
-function Node:global_position() end
+-- ---@return Vector3
+-- function Node:global_position() end
 
----@return Vector3
-function Node:local_position() end
+-- ---@return Vector3
+-- function Node:local_position() end
 
----@param v Vector3
-function Node:set_local_position(v) end
+-- ---@param v Vector3
+-- function Node:set_local_position(v) end
 
-function Node:destroy() end
+-- function Node:destroy() end
 
-function Node:subscribe_to() end
+-- function Node:subscribe_to() end
 
----@return RigidBody
-function Node:as_rigid_body() end
+-- ---@return RigidBody
+-- function Node:as_rigid_body() end
 
----@return Node
-function Node:find_collider_in_children() end
+-- ---@return Node
+-- function Node:find_collider_in_children() end
 
----@param routing RoutingStrategy
----@param message any
-function Node:send_hierarchical(routing, message) end
+-- ---@param routing RoutingStrategy
+-- ---@param message any
+-- function Node:send_hierarchical(routing, message) end
 
----@class RigidBody
-RigidBody = {}
+-- ---@class RigidBody
+-- RigidBody = {}
 
----@param force Vector3
-function RigidBody:apply_force(force) end
+-- ---@param force Vector3
+-- function RigidBody:apply_force(force) end
 
----@class Prefab
-Prefab = {}
+-- ---@class Prefab
+-- Prefab = {}
 
----@param position Vector3
----@param orientation Quaternion
----@return Node
-function Prefab:instantiate_at(position, orientation) end
+-- ---@param position Vector3
+-- ---@param orientation Quaternion
+-- ---@return Node
+-- function Prefab:instantiate_at(position, orientation) end
 
-function script_class() end
+-- function script_class() end
 
----@class UiNode
-UiNode = {}
+-- ---@class UiNode
+-- UiNode = {}
 
 
----@class Brush
-Brush = {}
+-- ---@class Brush
+-- Brush = {}
 
----@param color Color
-function Brush:solid(color) end
+-- ---@param color Color
+-- function Brush:solid(color) end
 
----@class Color
-Color = {}
+-- ---@class Color
+-- Color = {}
 
----@type Color
-Color.BLACK = nil
+-- ---@type Color
+-- Color.BLACK = nil
 
 
----@class Widget : UiNode
----@field foreground Brush?
-Widget = {}
+-- ---@class Widget : UiNode
+-- ---@field foreground Brush?
+-- Widget = {}
 
----@class Text : Widget
----@field font_size number
-Text = {}
+-- ---@class Text : Widget
+-- ---@field font_size number
+-- Text = {}
 
----@static
----@param state Text
----@return Text
-function Text:new(state) end
+-- ---@static
+-- ---@param state Text
+-- ---@return Text
+-- function Text:new(state) end
 
----@param text string
-function Text:set_text_async(text) end
+-- ---@param text string
+-- function Text:set_text_async(text) end
 
----@class Scene
-Scene = {}
+-- ---@class Scene
+-- Scene = {}
 
----@param scene_path string
-function Scene:load_async(scene_path) end
+-- ---@param scene_path string
+-- function Scene:load_async(scene_path) end
 
----@class CursorGrabMode
-CursorGrabMode = {}
+-- ---@class CursorGrabMode
+-- CursorGrabMode = {}
 
----@type CursorGrabMode
-CursorGrabMode.None = {}
+-- ---@type CursorGrabMode
+-- CursorGrabMode.None = {}
 
----@type CursorGrabMode
-CursorGrabMode.Locked = {}
+-- ---@type CursorGrabMode
+-- CursorGrabMode.Locked = {}
 
----@type CursorGrabMode
-CursorGrabMode.Confined = {}
+-- ---@type CursorGrabMode
+-- CursorGrabMode.Confined = {}
 
 
----@class Window
-Window = {}
+-- ---@class Window
+-- Window = {}
 
----@param mode CursorGrabMode
-function Window:set_cursor_grab(mode) end
+-- ---@param mode CursorGrabMode
+-- function Window:set_cursor_grab(mode) end
 
----@class Physics
-Physics = {}
+-- ---@class Physics
+-- Physics = {}
 
----@param opts RayCastOptions
----@param results Intersection[]
-function Physics:cast_ray(opts, results) end
+-- ---@param opts RayCastOptions
+-- ---@param results Intersection[]
+-- function Physics:cast_ray(opts, results) end
 
----@class RayCastOptions
----@field ray_origin Vector3
----@field ray_direction Vector3
----@field max_len number
----@field sort_results boolean
-RayCastOptions = {}
+-- ---@class RayCastOptions
+-- ---@field ray_origin Vector3
+-- ---@field ray_direction Vector3
+-- ---@field max_len number
+-- ---@field sort_results boolean
+-- RayCastOptions = {}
 
----@class Intersection
----@field collider Node
-Intersection = {}
+-- ---@class Intersection
+-- ---@field collider Node
+-- Intersection = {}
 
 
----@param o any
-function var_dump(o) end
+-- ---@param o any
+-- function var_dump(o) end
 
----@class RoutingStrategy
-RoutingStrategy = {}
+-- ---@class RoutingStrategy
+-- RoutingStrategy = {}
 
----@type RoutingStrategy
-RoutingStrategy.Up = {}
+-- ---@type RoutingStrategy
+-- RoutingStrategy.Up = {}
 
----@type RoutingStrategy
-RoutingStrategy.Down = {}
+-- ---@type RoutingStrategy
+-- RoutingStrategy.Down = {}
 
 
----@class Log
-Log = {}
+-- ---@class Log
+-- Log = {}
 
----@param message string
-function Log:err(message, ...) end
+-- ---@param message string
+-- function Log:err(message, ...) end
 
----@param message string
-function Log:info(message, ...) end
+-- ---@param message string
+-- function Log:info(message, ...) end

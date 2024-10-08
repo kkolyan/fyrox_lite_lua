@@ -4,10 +4,11 @@ use lite_model::StructClass;
 use to_vec::ToVec;
 
 use crate::{
-    code_model::{Mod, ModContent}, context::GenerationContext, expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, supress_lint::SUPRESSIONS, templating::render
+    code_model::{Module, ModContent}, context::GenerationContext, templating::render
 };
+use super::{expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, supress_lint::SUPRESSIONS};
 
-pub fn generate_struct_class_bindings(class: &StructClass, ctx: &GenerationContext) -> Mod {
+pub fn generate_struct_class_bindings(class: &StructClass, ctx: &GenerationContext) -> Module {
     let mut s: String = Default::default();
     s.push_str(SUPRESSIONS);
     render(
@@ -28,7 +29,7 @@ pub fn generate_struct_class_bindings(class: &StructClass, ctx: &GenerationConte
     generate_into_lua(&mut s, class, ctx);
     generate_from_lua(&mut s, class, ctx);
 
-    Mod {
+    Module {
         name: class.class_name.0.to_case(Case::Snake),
         content: ModContent::Code(s),
     }

@@ -5,10 +5,11 @@ use std::borrow::Cow;
 use to_vec::ToVec;
 
 use crate::{
-    code_model::{Mod, ModContent}, context::GenerationContext, eq::generate_eq, expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, generate_methods::{generate_methods, is_getter, is_setter}, supress_lint::SUPRESSIONS, templating::render
+    code_model::{Module, ModContent}, context::GenerationContext, templating::render
 };
+use super::{eq::generate_eq, expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, generate_methods::{generate_methods, is_getter, is_setter}, supress_lint::SUPRESSIONS};
 
-pub fn generate_engine_class_bindings(class: &EngineClass, ctx: &GenerationContext) -> Mod {
+pub fn generate_engine_class_bindings(class: &EngineClass, ctx: &GenerationContext) -> Module {
     let mut s: String = Default::default();
     s.push_str(SUPRESSIONS);
 
@@ -44,7 +45,7 @@ pub fn generate_engine_class_bindings(class: &EngineClass, ctx: &GenerationConte
         }
     ";
 
-    Mod {
+    Module {
         name: class.class_name.0.to_case(Case::Snake),
         content: ModContent::Code(s),
     }
