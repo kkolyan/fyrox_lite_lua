@@ -1,5 +1,18 @@
-## About
-Full Scripting languages support for Fyrox Engine. "Full" mean that one can make games with Fyrox without seeing a single Rust line of code. The same as Godot, Unity or UE allow to make games with GDSript, C# or Blueprints.
+- [Overview](#overview)
+- [For users (who make Games)](#for-users-who-make-games)
+	- [Vision](#vision)
+	- [Current state](#current-state)
+	- [How to use Fyrox Lite Lua from code currently](#how-to-use-fyrox-lite-lua-from-code-currently)
+	- [Example](#example)
+- [For contributors](#for-contributors)
+	- [Lite API](#lite-api)
+	- [Contract](#contract)
+	- [Language Implementations](#language-implementations)
+	- [Lua Implementation](#lua-implementation)
+- [Feedback](#feedback)
+
+## Overview
+Full Scripting languages support for [Fyrox Engine](https://github.com/FyroxEngine/Fyrox). "Full" means that one can make games with Fyrox without seeing a single Rust line of code. The same as Godot, Unity or UE allow to make games with GDSript, C# or Blueprints.
 
 Project ambition is to make Fyrox a "polyglot", so there is an abstraction over the languages, called Lite API, and a number of implementations for different languages. 
 
@@ -36,7 +49,7 @@ Feel free to chek out a [demo game](lua/examples/guards) that written in Lua to 
 
 ## For contributors
 
-## Lite API
+### Lite API
 Lite API is a Rust library that provides a scripting-language-friendly facade over the Fyrox API. It doesn't bound to a specific language, but it's design assumes that scripting language has GC and some kind of OOP.
 
 This library is supposed to be updated frequently when it's necessary to expose some part of Fyrox API to scripting language. Package [fyrox-lite](fyrox-lite) is the place where most of changes to be done. 
@@ -52,11 +65,11 @@ Note that Vector3 and Quaternion for Lua are of an `engine type`, but for some l
 
 `#[fyrox_lite]` attrubute is not just a marker - it provides almost complete realtime enforcement of this rules.
 
-## Contract
+### Contract
 There is a [metadata model](lite-model/src/lib.rs) that serves as contract between `Lite API` and `Language Implementation`s. There is the [parser](lite-parser) that is responsible to collect metadata using this same `#[lite_api]` attribute.
 
-## Language Implementations
-There is no limitation on this. But it's supposed that in consumes the result of Lite API parsing and produces a Rust code with Fyrox `Plugin` implementation that loads scripts metadata, allowing to attach them in inspector, and provides a runtime for a target scripting language.
+### Language Implementations
+There is no limitation on this. But it's supposed that in consumes the result of Lite API parsing and produces a Rust code with Fyrox `Plugin` implementation that loads scripts metadata, allowing attaching them in inspector, and provides a runtime for a target scripting language.
 
 ### Lua Implementation
 * `lua/fyrox-lua` - the runtime library, provides [LuaPlugin](lua/fyrox-lua/src/fyrox_plugin.rs) and [LuaScript](lua/fyrox-lua/src/fyrox_script.rs). `mlua` crate used to embed Lua. LuaU interpreter is choosen (mlua allow to switch them easily) just because it was easiest to compile on Windows.
