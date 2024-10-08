@@ -3,7 +3,7 @@
 -- More about Lua annotations format: https://luals.github.io/wiki/annotations
 -- This file is auto-generated, do not edit it manually.
 
----@diagnostic disable: missing-return, lowercase-global
+---@diagnostic disable: missing-return, lowercase-global, missing-fields
 
 ---@class Script
 ---@field node Node
@@ -12,18 +12,45 @@ Script = {}
 -- Used to 
 function script_class() end
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::Event
+-----------------------------------------------------------
+
 ---@class Event_static
+
+---@class Event_WindowEvent
+---@field window_id integer
+---@field event WindowEvent
+Event_WindowEvent = {}
+
+---@param state Event_WindowEvent
+---@return Event
+function Event:WindowEvent(state) end
+
+---@class Event_DeviceEvent
+---@field event DeviceEvent
+Event_DeviceEvent = {}
+
+---@param state Event_DeviceEvent
+---@return Event
+function Event:DeviceEvent(state) end
+
+---@type Event
+Event.Suspended = {}
+
+---@type Event
+Event.Resumed = {}
+
+---@type Event
+Event.AboutToWait = {}
+
+---@type Event
+Event.LoopExiting = {}
+
+---@type Event
+Event.MemoryWarning = {}
 Event = {}
 
----@class Event
-Event_instance = {}
----@class Event_static
----@field Suspended Event
----@field Resumed Event
----@field AboutToWait Event
----@field LoopExiting Event
----@field MemoryWarning Event
-Event = {}
 ---@class Event
 ---@field WindowEvent Event_WindowEvent
 ---@field DeviceEvent Event_DeviceEvent
@@ -34,30 +61,25 @@ Event = {}
 ---@field MemoryWarning boolean
 Event_instance = {}
 
----@class Event_WindowEvent
-Event_WindowEvent = {}
-
----@param state Event_WindowEvent
----@return Event
-function Event:WindowEvent(state) end
----@class Event_DeviceEvent
-Event_DeviceEvent = {}
-
----@param state Event_DeviceEvent
----@return Event
-function Event:DeviceEvent(state) end
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::StartCause
+-----------------------------------------------------------
 
 ---@class StartCause_static
+
+---@type StartCause
+StartCause.ResumeTimeReached = {}
+
+---@type StartCause
+StartCause.WaitCancelled = {}
+
+---@type StartCause
+StartCause.Poll = {}
+
+---@type StartCause
+StartCause.Init = {}
 StartCause = {}
 
----@class StartCause
-StartCause_instance = {}
----@class StartCause_static
----@field ResumeTimeReached StartCause
----@field WaitCancelled StartCause
----@field Poll StartCause
----@field Init StartCause
-StartCause = {}
 ---@class StartCause
 ---@field ResumeTimeReached boolean
 ---@field WaitCancelled boolean
@@ -65,25 +87,182 @@ StartCause = {}
 ---@field Init boolean
 StartCause_instance = {}
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::WindowEvent
+-----------------------------------------------------------
 
 ---@class WindowEvent_static
+
+---@type WindowEvent
+WindowEvent.ActivationTokenDone = {}
+
+---@class WindowEvent_Resized
+---@field _1 Vector2i
+WindowEvent_Resized = {}
+
+---@param _1 Vector2i
+---@return WindowEvent
+function WindowEvent:Resized(_1) end
+
+---@class WindowEvent_Moved
+---@field _1 Vector2i
+WindowEvent_Moved = {}
+
+---@param _1 Vector2i
+---@return WindowEvent
+function WindowEvent:Moved(_1) end
+
+---@type WindowEvent
+WindowEvent.CloseRequested = {}
+
+---@type WindowEvent
+WindowEvent.Destroyed = {}
+
+---@class WindowEvent_DroppedFile
+---@field _1 string
+WindowEvent_DroppedFile = {}
+
+---@param _1 string
+---@return WindowEvent
+function WindowEvent:DroppedFile(_1) end
+
+---@class WindowEvent_HoveredFile
+---@field _1 string
+WindowEvent_HoveredFile = {}
+
+---@param _1 string
+---@return WindowEvent
+function WindowEvent:HoveredFile(_1) end
+
+---@type WindowEvent
+WindowEvent.HoveredFileCancelled = {}
+
+---@class WindowEvent_Focused
+---@field _1 boolean
+WindowEvent_Focused = {}
+
+---@param _1 boolean
+---@return WindowEvent
+function WindowEvent:Focused(_1) end
+
+---@class WindowEvent_KeyboardInput
+---@field event KeyEvent
+---@field is_synthetic boolean
+WindowEvent_KeyboardInput = {}
+
+---@param state WindowEvent_KeyboardInput
+---@return WindowEvent
+function WindowEvent:KeyboardInput(state) end
+
+---@type WindowEvent
+WindowEvent.ModifiersChanged = {}
+
+---@type WindowEvent
+WindowEvent.Ime = {}
+
+---@class WindowEvent_CursorMoved
+---@field position Vector2i
+WindowEvent_CursorMoved = {}
+
+---@param state WindowEvent_CursorMoved
+---@return WindowEvent
+function WindowEvent:CursorMoved(state) end
+
+---@type WindowEvent
+WindowEvent.CursorEntered = {}
+
+---@type WindowEvent
+WindowEvent.CursorLeft = {}
+
+---@class WindowEvent_MouseWheel
+---@field delta MouseScrollDelta
+---@field phase TouchPhase
+WindowEvent_MouseWheel = {}
+
+---@param state WindowEvent_MouseWheel
+---@return WindowEvent
+function WindowEvent:MouseWheel(state) end
+
+---@class WindowEvent_MouseInput
+---@field state ElementState
+---@field button MouseButton
+WindowEvent_MouseInput = {}
+
+---@param state WindowEvent_MouseInput
+---@return WindowEvent
+function WindowEvent:MouseInput(state) end
+
+---@class WindowEvent_TouchpadMagnify
+---@field delta number
+---@field phase TouchPhase
+WindowEvent_TouchpadMagnify = {}
+
+---@param state WindowEvent_TouchpadMagnify
+---@return WindowEvent
+function WindowEvent:TouchpadMagnify(state) end
+
+---@type WindowEvent
+WindowEvent.SmartMagnify = {}
+
+---@class WindowEvent_TouchpadRotate
+---@field delta number
+---@field phase TouchPhase
+WindowEvent_TouchpadRotate = {}
+
+---@param state WindowEvent_TouchpadRotate
+---@return WindowEvent
+function WindowEvent:TouchpadRotate(state) end
+
+---@class WindowEvent_TouchpadPressure
+---@field pressure number
+---@field stage integer
+WindowEvent_TouchpadPressure = {}
+
+---@param state WindowEvent_TouchpadPressure
+---@return WindowEvent
+function WindowEvent:TouchpadPressure(state) end
+
+---@class WindowEvent_AxisMotion
+---@field axis integer
+---@field value number
+WindowEvent_AxisMotion = {}
+
+---@param state WindowEvent_AxisMotion
+---@return WindowEvent
+function WindowEvent:AxisMotion(state) end
+
+---@class WindowEvent_Touch
+---@field _1 Touch
+WindowEvent_Touch = {}
+
+---@param _1 Touch
+---@return WindowEvent
+function WindowEvent:Touch(_1) end
+
+---@class WindowEvent_ScaleFactorChanged
+---@field scale_factor number
+---@field inner_size_writer InnerSizeWriter
+WindowEvent_ScaleFactorChanged = {}
+
+---@param state WindowEvent_ScaleFactorChanged
+---@return WindowEvent
+function WindowEvent:ScaleFactorChanged(state) end
+
+---@type WindowEvent
+WindowEvent.ThemeChanged = {}
+
+---@class WindowEvent_Occluded
+---@field _1 boolean
+WindowEvent_Occluded = {}
+
+---@param _1 boolean
+---@return WindowEvent
+function WindowEvent:Occluded(_1) end
+
+---@type WindowEvent
+WindowEvent.RedrawRequested = {}
 WindowEvent = {}
 
----@class WindowEvent
-WindowEvent_instance = {}
----@class WindowEvent_static
----@field ActivationTokenDone WindowEvent
----@field CloseRequested WindowEvent
----@field Destroyed WindowEvent
----@field HoveredFileCancelled WindowEvent
----@field ModifiersChanged WindowEvent
----@field Ime WindowEvent
----@field CursorEntered WindowEvent
----@field CursorLeft WindowEvent
----@field SmartMagnify WindowEvent
----@field ThemeChanged WindowEvent
----@field RedrawRequested WindowEvent
-WindowEvent = {}
 ---@class WindowEvent
 ---@field ActivationTokenDone boolean
 ---@field Resized WindowEvent_Resized
@@ -114,112 +293,61 @@ WindowEvent = {}
 ---@field RedrawRequested boolean
 WindowEvent_instance = {}
 
----@class WindowEvent_Resized
-WindowEvent_Resized = {}
-
----@param state WindowEvent_Resized
----@return WindowEvent
-function WindowEvent:Resized(state) end
----@class WindowEvent_Moved
-WindowEvent_Moved = {}
-
----@param state WindowEvent_Moved
----@return WindowEvent
-function WindowEvent:Moved(state) end
----@class WindowEvent_DroppedFile
-WindowEvent_DroppedFile = {}
-
----@param state WindowEvent_DroppedFile
----@return WindowEvent
-function WindowEvent:DroppedFile(state) end
----@class WindowEvent_HoveredFile
-WindowEvent_HoveredFile = {}
-
----@param state WindowEvent_HoveredFile
----@return WindowEvent
-function WindowEvent:HoveredFile(state) end
----@class WindowEvent_Focused
-WindowEvent_Focused = {}
-
----@param state WindowEvent_Focused
----@return WindowEvent
-function WindowEvent:Focused(state) end
----@class WindowEvent_KeyboardInput
-WindowEvent_KeyboardInput = {}
-
----@param state WindowEvent_KeyboardInput
----@return WindowEvent
-function WindowEvent:KeyboardInput(state) end
----@class WindowEvent_CursorMoved
-WindowEvent_CursorMoved = {}
-
----@param state WindowEvent_CursorMoved
----@return WindowEvent
-function WindowEvent:CursorMoved(state) end
----@class WindowEvent_MouseWheel
-WindowEvent_MouseWheel = {}
-
----@param state WindowEvent_MouseWheel
----@return WindowEvent
-function WindowEvent:MouseWheel(state) end
----@class WindowEvent_MouseInput
-WindowEvent_MouseInput = {}
-
----@param state WindowEvent_MouseInput
----@return WindowEvent
-function WindowEvent:MouseInput(state) end
----@class WindowEvent_TouchpadMagnify
-WindowEvent_TouchpadMagnify = {}
-
----@param state WindowEvent_TouchpadMagnify
----@return WindowEvent
-function WindowEvent:TouchpadMagnify(state) end
----@class WindowEvent_TouchpadRotate
-WindowEvent_TouchpadRotate = {}
-
----@param state WindowEvent_TouchpadRotate
----@return WindowEvent
-function WindowEvent:TouchpadRotate(state) end
----@class WindowEvent_TouchpadPressure
-WindowEvent_TouchpadPressure = {}
-
----@param state WindowEvent_TouchpadPressure
----@return WindowEvent
-function WindowEvent:TouchpadPressure(state) end
----@class WindowEvent_AxisMotion
-WindowEvent_AxisMotion = {}
-
----@param state WindowEvent_AxisMotion
----@return WindowEvent
-function WindowEvent:AxisMotion(state) end
----@class WindowEvent_Touch
-WindowEvent_Touch = {}
-
----@param state WindowEvent_Touch
----@return WindowEvent
-function WindowEvent:Touch(state) end
----@class WindowEvent_ScaleFactorChanged
-WindowEvent_ScaleFactorChanged = {}
-
----@param state WindowEvent_ScaleFactorChanged
----@return WindowEvent
-function WindowEvent:ScaleFactorChanged(state) end
----@class WindowEvent_Occluded
-WindowEvent_Occluded = {}
-
----@param state WindowEvent_Occluded
----@return WindowEvent
-function WindowEvent:Occluded(state) end
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::DeviceEvent
+-----------------------------------------------------------
 
 ---@class DeviceEvent_static
+
+---@type DeviceEvent
+DeviceEvent.Added = {}
+
+---@type DeviceEvent
+DeviceEvent.Removed = {}
+
+---@class DeviceEvent_MouseMotion
+---@field delta Vector2
+DeviceEvent_MouseMotion = {}
+
+---@param state DeviceEvent_MouseMotion
+---@return DeviceEvent
+function DeviceEvent:MouseMotion(state) end
+
+---@class DeviceEvent_MouseWheel
+---@field delta MouseScrollDelta
+DeviceEvent_MouseWheel = {}
+
+---@param state DeviceEvent_MouseWheel
+---@return DeviceEvent
+function DeviceEvent:MouseWheel(state) end
+
+---@class DeviceEvent_Motion
+---@field axis integer
+---@field value number
+DeviceEvent_Motion = {}
+
+---@param state DeviceEvent_Motion
+---@return DeviceEvent
+function DeviceEvent:Motion(state) end
+
+---@class DeviceEvent_Button
+---@field button integer
+---@field state ElementState
+DeviceEvent_Button = {}
+
+---@param state DeviceEvent_Button
+---@return DeviceEvent
+function DeviceEvent:Button(state) end
+
+---@class DeviceEvent_Key
+---@field _1 RawKeyEvent
+DeviceEvent_Key = {}
+
+---@param _1 RawKeyEvent
+---@return DeviceEvent
+function DeviceEvent:Key(_1) end
 DeviceEvent = {}
 
----@class DeviceEvent
-DeviceEvent_instance = {}
----@class DeviceEvent_static
----@field Added DeviceEvent
----@field Removed DeviceEvent
-DeviceEvent = {}
 ---@class DeviceEvent
 ---@field Added boolean
 ---@field Removed boolean
@@ -230,271 +358,632 @@ DeviceEvent = {}
 ---@field Key DeviceEvent_Key
 DeviceEvent_instance = {}
 
----@class DeviceEvent_MouseMotion
-DeviceEvent_MouseMotion = {}
-
----@param state DeviceEvent_MouseMotion
----@return DeviceEvent
-function DeviceEvent:MouseMotion(state) end
----@class DeviceEvent_MouseWheel
-DeviceEvent_MouseWheel = {}
-
----@param state DeviceEvent_MouseWheel
----@return DeviceEvent
-function DeviceEvent:MouseWheel(state) end
----@class DeviceEvent_Motion
-DeviceEvent_Motion = {}
-
----@param state DeviceEvent_Motion
----@return DeviceEvent
-function DeviceEvent:Motion(state) end
----@class DeviceEvent_Button
-DeviceEvent_Button = {}
-
----@param state DeviceEvent_Button
----@return DeviceEvent
-function DeviceEvent:Button(state) end
----@class DeviceEvent_Key
-DeviceEvent_Key = {}
-
----@param state DeviceEvent_Key
----@return DeviceEvent
-function DeviceEvent:Key(state) end
-
----@class RawKeyEvent_static
-RawKeyEvent = {}
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::RawKeyEvent
+-----------------------------------------------------------
 
 ---@class RawKeyEvent
 ---@field physical_key PhysicalKey
 ---@field state ElementState
 RawKeyEvent_instance = {}
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::PhysicalKey
+-----------------------------------------------------------
+
 ---@class PhysicalKey_static
+
+---@class PhysicalKey_Code
+---@field _1 KeyCode
+PhysicalKey_Code = {}
+
+---@param _1 KeyCode
+---@return PhysicalKey
+function PhysicalKey:Code(_1) end
+
+---@class PhysicalKey_Unidentified
+---@field _1 NativeKeyCode
+PhysicalKey_Unidentified = {}
+
+---@param _1 NativeKeyCode
+---@return PhysicalKey
+function PhysicalKey:Unidentified(_1) end
 PhysicalKey = {}
 
----@class PhysicalKey
-PhysicalKey_instance = {}
----@class PhysicalKey_static
-PhysicalKey = {}
 ---@class PhysicalKey
 ---@field Code PhysicalKey_Code
 ---@field Unidentified PhysicalKey_Unidentified
 PhysicalKey_instance = {}
 
----@class PhysicalKey_Code
-PhysicalKey_Code = {}
-
----@param state PhysicalKey_Code
----@return PhysicalKey
-function PhysicalKey:Code(state) end
----@class PhysicalKey_Unidentified
-PhysicalKey_Unidentified = {}
-
----@param state PhysicalKey_Unidentified
----@return PhysicalKey
-function PhysicalKey:Unidentified(state) end
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::KeyCode
+-----------------------------------------------------------
 
 ---@class KeyCode_static
+
+---@type KeyCode
+KeyCode.Backquote = {}
+
+---@type KeyCode
+KeyCode.Backslash = {}
+
+---@type KeyCode
+KeyCode.BracketLeft = {}
+
+---@type KeyCode
+KeyCode.BracketRight = {}
+
+---@type KeyCode
+KeyCode.Comma = {}
+
+---@type KeyCode
+KeyCode.Digit0 = {}
+
+---@type KeyCode
+KeyCode.Digit1 = {}
+
+---@type KeyCode
+KeyCode.Digit2 = {}
+
+---@type KeyCode
+KeyCode.Digit3 = {}
+
+---@type KeyCode
+KeyCode.Digit4 = {}
+
+---@type KeyCode
+KeyCode.Digit5 = {}
+
+---@type KeyCode
+KeyCode.Digit6 = {}
+
+---@type KeyCode
+KeyCode.Digit7 = {}
+
+---@type KeyCode
+KeyCode.Digit8 = {}
+
+---@type KeyCode
+KeyCode.Digit9 = {}
+
+---@type KeyCode
+KeyCode.Equal = {}
+
+---@type KeyCode
+KeyCode.IntlBackslash = {}
+
+---@type KeyCode
+KeyCode.IntlRo = {}
+
+---@type KeyCode
+KeyCode.IntlYen = {}
+
+---@type KeyCode
+KeyCode.KeyA = {}
+
+---@type KeyCode
+KeyCode.KeyB = {}
+
+---@type KeyCode
+KeyCode.KeyC = {}
+
+---@type KeyCode
+KeyCode.KeyD = {}
+
+---@type KeyCode
+KeyCode.KeyE = {}
+
+---@type KeyCode
+KeyCode.KeyF = {}
+
+---@type KeyCode
+KeyCode.KeyG = {}
+
+---@type KeyCode
+KeyCode.KeyH = {}
+
+---@type KeyCode
+KeyCode.KeyI = {}
+
+---@type KeyCode
+KeyCode.KeyJ = {}
+
+---@type KeyCode
+KeyCode.KeyK = {}
+
+---@type KeyCode
+KeyCode.KeyL = {}
+
+---@type KeyCode
+KeyCode.KeyM = {}
+
+---@type KeyCode
+KeyCode.KeyN = {}
+
+---@type KeyCode
+KeyCode.KeyO = {}
+
+---@type KeyCode
+KeyCode.KeyP = {}
+
+---@type KeyCode
+KeyCode.KeyQ = {}
+
+---@type KeyCode
+KeyCode.KeyR = {}
+
+---@type KeyCode
+KeyCode.KeyS = {}
+
+---@type KeyCode
+KeyCode.KeyT = {}
+
+---@type KeyCode
+KeyCode.KeyU = {}
+
+---@type KeyCode
+KeyCode.KeyV = {}
+
+---@type KeyCode
+KeyCode.KeyW = {}
+
+---@type KeyCode
+KeyCode.KeyX = {}
+
+---@type KeyCode
+KeyCode.KeyY = {}
+
+---@type KeyCode
+KeyCode.KeyZ = {}
+
+---@type KeyCode
+KeyCode.Minus = {}
+
+---@type KeyCode
+KeyCode.Period = {}
+
+---@type KeyCode
+KeyCode.Quote = {}
+
+---@type KeyCode
+KeyCode.Semicolon = {}
+
+---@type KeyCode
+KeyCode.Slash = {}
+
+---@type KeyCode
+KeyCode.AltLeft = {}
+
+---@type KeyCode
+KeyCode.AltRight = {}
+
+---@type KeyCode
+KeyCode.Backspace = {}
+
+---@type KeyCode
+KeyCode.CapsLock = {}
+
+---@type KeyCode
+KeyCode.ContextMenu = {}
+
+---@type KeyCode
+KeyCode.ControlLeft = {}
+
+---@type KeyCode
+KeyCode.ControlRight = {}
+
+---@type KeyCode
+KeyCode.Enter = {}
+
+---@type KeyCode
+KeyCode.SuperLeft = {}
+
+---@type KeyCode
+KeyCode.SuperRight = {}
+
+---@type KeyCode
+KeyCode.ShiftLeft = {}
+
+---@type KeyCode
+KeyCode.ShiftRight = {}
+
+---@type KeyCode
+KeyCode.Space = {}
+
+---@type KeyCode
+KeyCode.Tab = {}
+
+---@type KeyCode
+KeyCode.Convert = {}
+
+---@type KeyCode
+KeyCode.KanaMode = {}
+
+---@type KeyCode
+KeyCode.Lang1 = {}
+
+---@type KeyCode
+KeyCode.Lang2 = {}
+
+---@type KeyCode
+KeyCode.Lang3 = {}
+
+---@type KeyCode
+KeyCode.Lang4 = {}
+
+---@type KeyCode
+KeyCode.Lang5 = {}
+
+---@type KeyCode
+KeyCode.NonConvert = {}
+
+---@type KeyCode
+KeyCode.Delete = {}
+
+---@type KeyCode
+KeyCode.End = {}
+
+---@type KeyCode
+KeyCode.Help = {}
+
+---@type KeyCode
+KeyCode.Home = {}
+
+---@type KeyCode
+KeyCode.Insert = {}
+
+---@type KeyCode
+KeyCode.PageDown = {}
+
+---@type KeyCode
+KeyCode.PageUp = {}
+
+---@type KeyCode
+KeyCode.ArrowDown = {}
+
+---@type KeyCode
+KeyCode.ArrowLeft = {}
+
+---@type KeyCode
+KeyCode.ArrowRight = {}
+
+---@type KeyCode
+KeyCode.ArrowUp = {}
+
+---@type KeyCode
+KeyCode.NumLock = {}
+
+---@type KeyCode
+KeyCode.Numpad0 = {}
+
+---@type KeyCode
+KeyCode.Numpad1 = {}
+
+---@type KeyCode
+KeyCode.Numpad2 = {}
+
+---@type KeyCode
+KeyCode.Numpad3 = {}
+
+---@type KeyCode
+KeyCode.Numpad4 = {}
+
+---@type KeyCode
+KeyCode.Numpad5 = {}
+
+---@type KeyCode
+KeyCode.Numpad6 = {}
+
+---@type KeyCode
+KeyCode.Numpad7 = {}
+
+---@type KeyCode
+KeyCode.Numpad8 = {}
+
+---@type KeyCode
+KeyCode.Numpad9 = {}
+
+---@type KeyCode
+KeyCode.NumpadAdd = {}
+
+---@type KeyCode
+KeyCode.NumpadBackspace = {}
+
+---@type KeyCode
+KeyCode.NumpadClear = {}
+
+---@type KeyCode
+KeyCode.NumpadClearEntry = {}
+
+---@type KeyCode
+KeyCode.NumpadComma = {}
+
+---@type KeyCode
+KeyCode.NumpadDecimal = {}
+
+---@type KeyCode
+KeyCode.NumpadDivide = {}
+
+---@type KeyCode
+KeyCode.NumpadEnter = {}
+
+---@type KeyCode
+KeyCode.NumpadEqual = {}
+
+---@type KeyCode
+KeyCode.NumpadHash = {}
+
+---@type KeyCode
+KeyCode.NumpadMemoryAdd = {}
+
+---@type KeyCode
+KeyCode.NumpadMemoryClear = {}
+
+---@type KeyCode
+KeyCode.NumpadMemoryRecall = {}
+
+---@type KeyCode
+KeyCode.NumpadMemoryStore = {}
+
+---@type KeyCode
+KeyCode.NumpadMemorySubtract = {}
+
+---@type KeyCode
+KeyCode.NumpadMultiply = {}
+
+---@type KeyCode
+KeyCode.NumpadParenLeft = {}
+
+---@type KeyCode
+KeyCode.NumpadParenRight = {}
+
+---@type KeyCode
+KeyCode.NumpadStar = {}
+
+---@type KeyCode
+KeyCode.NumpadSubtract = {}
+
+---@type KeyCode
+KeyCode.Escape = {}
+
+---@type KeyCode
+KeyCode.Fn = {}
+
+---@type KeyCode
+KeyCode.FnLock = {}
+
+---@type KeyCode
+KeyCode.PrintScreen = {}
+
+---@type KeyCode
+KeyCode.ScrollLock = {}
+
+---@type KeyCode
+KeyCode.Pause = {}
+
+---@type KeyCode
+KeyCode.BrowserBack = {}
+
+---@type KeyCode
+KeyCode.BrowserFavorites = {}
+
+---@type KeyCode
+KeyCode.BrowserForward = {}
+
+---@type KeyCode
+KeyCode.BrowserHome = {}
+
+---@type KeyCode
+KeyCode.BrowserRefresh = {}
+
+---@type KeyCode
+KeyCode.BrowserSearch = {}
+
+---@type KeyCode
+KeyCode.BrowserStop = {}
+
+---@type KeyCode
+KeyCode.Eject = {}
+
+---@type KeyCode
+KeyCode.LaunchApp1 = {}
+
+---@type KeyCode
+KeyCode.LaunchApp2 = {}
+
+---@type KeyCode
+KeyCode.LaunchMail = {}
+
+---@type KeyCode
+KeyCode.MediaPlayPause = {}
+
+---@type KeyCode
+KeyCode.MediaSelect = {}
+
+---@type KeyCode
+KeyCode.MediaStop = {}
+
+---@type KeyCode
+KeyCode.MediaTrackNext = {}
+
+---@type KeyCode
+KeyCode.MediaTrackPrevious = {}
+
+---@type KeyCode
+KeyCode.Power = {}
+
+---@type KeyCode
+KeyCode.Sleep = {}
+
+---@type KeyCode
+KeyCode.AudioVolumeDown = {}
+
+---@type KeyCode
+KeyCode.AudioVolumeMute = {}
+
+---@type KeyCode
+KeyCode.AudioVolumeUp = {}
+
+---@type KeyCode
+KeyCode.WakeUp = {}
+
+---@type KeyCode
+KeyCode.Meta = {}
+
+---@type KeyCode
+KeyCode.Hyper = {}
+
+---@type KeyCode
+KeyCode.Turbo = {}
+
+---@type KeyCode
+KeyCode.Abort = {}
+
+---@type KeyCode
+KeyCode.Resume = {}
+
+---@type KeyCode
+KeyCode.Suspend = {}
+
+---@type KeyCode
+KeyCode.Again = {}
+
+---@type KeyCode
+KeyCode.Copy = {}
+
+---@type KeyCode
+KeyCode.Cut = {}
+
+---@type KeyCode
+KeyCode.Find = {}
+
+---@type KeyCode
+KeyCode.Open = {}
+
+---@type KeyCode
+KeyCode.Paste = {}
+
+---@type KeyCode
+KeyCode.Props = {}
+
+---@type KeyCode
+KeyCode.Select = {}
+
+---@type KeyCode
+KeyCode.Undo = {}
+
+---@type KeyCode
+KeyCode.Hiragana = {}
+
+---@type KeyCode
+KeyCode.Katakana = {}
+
+---@type KeyCode
+KeyCode.F1 = {}
+
+---@type KeyCode
+KeyCode.F2 = {}
+
+---@type KeyCode
+KeyCode.F3 = {}
+
+---@type KeyCode
+KeyCode.F4 = {}
+
+---@type KeyCode
+KeyCode.F5 = {}
+
+---@type KeyCode
+KeyCode.F6 = {}
+
+---@type KeyCode
+KeyCode.F7 = {}
+
+---@type KeyCode
+KeyCode.F8 = {}
+
+---@type KeyCode
+KeyCode.F9 = {}
+
+---@type KeyCode
+KeyCode.F10 = {}
+
+---@type KeyCode
+KeyCode.F11 = {}
+
+---@type KeyCode
+KeyCode.F12 = {}
+
+---@type KeyCode
+KeyCode.F13 = {}
+
+---@type KeyCode
+KeyCode.F14 = {}
+
+---@type KeyCode
+KeyCode.F15 = {}
+
+---@type KeyCode
+KeyCode.F16 = {}
+
+---@type KeyCode
+KeyCode.F17 = {}
+
+---@type KeyCode
+KeyCode.F18 = {}
+
+---@type KeyCode
+KeyCode.F19 = {}
+
+---@type KeyCode
+KeyCode.F20 = {}
+
+---@type KeyCode
+KeyCode.F21 = {}
+
+---@type KeyCode
+KeyCode.F22 = {}
+
+---@type KeyCode
+KeyCode.F23 = {}
+
+---@type KeyCode
+KeyCode.F24 = {}
+
+---@type KeyCode
+KeyCode.F25 = {}
+
+---@type KeyCode
+KeyCode.F26 = {}
+
+---@type KeyCode
+KeyCode.F27 = {}
+
+---@type KeyCode
+KeyCode.F28 = {}
+
+---@type KeyCode
+KeyCode.F29 = {}
+
+---@type KeyCode
+KeyCode.F30 = {}
+
+---@type KeyCode
+KeyCode.F31 = {}
+
+---@type KeyCode
+KeyCode.F32 = {}
+
+---@type KeyCode
+KeyCode.F33 = {}
+
+---@type KeyCode
+KeyCode.F34 = {}
+
+---@type KeyCode
+KeyCode.F35 = {}
 KeyCode = {}
 
----@class KeyCode
-KeyCode_instance = {}
----@class KeyCode_static
----@field Backquote KeyCode
----@field Backslash KeyCode
----@field BracketLeft KeyCode
----@field BracketRight KeyCode
----@field Comma KeyCode
----@field Digit0 KeyCode
----@field Digit1 KeyCode
----@field Digit2 KeyCode
----@field Digit3 KeyCode
----@field Digit4 KeyCode
----@field Digit5 KeyCode
----@field Digit6 KeyCode
----@field Digit7 KeyCode
----@field Digit8 KeyCode
----@field Digit9 KeyCode
----@field Equal KeyCode
----@field IntlBackslash KeyCode
----@field IntlRo KeyCode
----@field IntlYen KeyCode
----@field KeyA KeyCode
----@field KeyB KeyCode
----@field KeyC KeyCode
----@field KeyD KeyCode
----@field KeyE KeyCode
----@field KeyF KeyCode
----@field KeyG KeyCode
----@field KeyH KeyCode
----@field KeyI KeyCode
----@field KeyJ KeyCode
----@field KeyK KeyCode
----@field KeyL KeyCode
----@field KeyM KeyCode
----@field KeyN KeyCode
----@field KeyO KeyCode
----@field KeyP KeyCode
----@field KeyQ KeyCode
----@field KeyR KeyCode
----@field KeyS KeyCode
----@field KeyT KeyCode
----@field KeyU KeyCode
----@field KeyV KeyCode
----@field KeyW KeyCode
----@field KeyX KeyCode
----@field KeyY KeyCode
----@field KeyZ KeyCode
----@field Minus KeyCode
----@field Period KeyCode
----@field Quote KeyCode
----@field Semicolon KeyCode
----@field Slash KeyCode
----@field AltLeft KeyCode
----@field AltRight KeyCode
----@field Backspace KeyCode
----@field CapsLock KeyCode
----@field ContextMenu KeyCode
----@field ControlLeft KeyCode
----@field ControlRight KeyCode
----@field Enter KeyCode
----@field SuperLeft KeyCode
----@field SuperRight KeyCode
----@field ShiftLeft KeyCode
----@field ShiftRight KeyCode
----@field Space KeyCode
----@field Tab KeyCode
----@field Convert KeyCode
----@field KanaMode KeyCode
----@field Lang1 KeyCode
----@field Lang2 KeyCode
----@field Lang3 KeyCode
----@field Lang4 KeyCode
----@field Lang5 KeyCode
----@field NonConvert KeyCode
----@field Delete KeyCode
----@field End KeyCode
----@field Help KeyCode
----@field Home KeyCode
----@field Insert KeyCode
----@field PageDown KeyCode
----@field PageUp KeyCode
----@field ArrowDown KeyCode
----@field ArrowLeft KeyCode
----@field ArrowRight KeyCode
----@field ArrowUp KeyCode
----@field NumLock KeyCode
----@field Numpad0 KeyCode
----@field Numpad1 KeyCode
----@field Numpad2 KeyCode
----@field Numpad3 KeyCode
----@field Numpad4 KeyCode
----@field Numpad5 KeyCode
----@field Numpad6 KeyCode
----@field Numpad7 KeyCode
----@field Numpad8 KeyCode
----@field Numpad9 KeyCode
----@field NumpadAdd KeyCode
----@field NumpadBackspace KeyCode
----@field NumpadClear KeyCode
----@field NumpadClearEntry KeyCode
----@field NumpadComma KeyCode
----@field NumpadDecimal KeyCode
----@field NumpadDivide KeyCode
----@field NumpadEnter KeyCode
----@field NumpadEqual KeyCode
----@field NumpadHash KeyCode
----@field NumpadMemoryAdd KeyCode
----@field NumpadMemoryClear KeyCode
----@field NumpadMemoryRecall KeyCode
----@field NumpadMemoryStore KeyCode
----@field NumpadMemorySubtract KeyCode
----@field NumpadMultiply KeyCode
----@field NumpadParenLeft KeyCode
----@field NumpadParenRight KeyCode
----@field NumpadStar KeyCode
----@field NumpadSubtract KeyCode
----@field Escape KeyCode
----@field Fn KeyCode
----@field FnLock KeyCode
----@field PrintScreen KeyCode
----@field ScrollLock KeyCode
----@field Pause KeyCode
----@field BrowserBack KeyCode
----@field BrowserFavorites KeyCode
----@field BrowserForward KeyCode
----@field BrowserHome KeyCode
----@field BrowserRefresh KeyCode
----@field BrowserSearch KeyCode
----@field BrowserStop KeyCode
----@field Eject KeyCode
----@field LaunchApp1 KeyCode
----@field LaunchApp2 KeyCode
----@field LaunchMail KeyCode
----@field MediaPlayPause KeyCode
----@field MediaSelect KeyCode
----@field MediaStop KeyCode
----@field MediaTrackNext KeyCode
----@field MediaTrackPrevious KeyCode
----@field Power KeyCode
----@field Sleep KeyCode
----@field AudioVolumeDown KeyCode
----@field AudioVolumeMute KeyCode
----@field AudioVolumeUp KeyCode
----@field WakeUp KeyCode
----@field Meta KeyCode
----@field Hyper KeyCode
----@field Turbo KeyCode
----@field Abort KeyCode
----@field Resume KeyCode
----@field Suspend KeyCode
----@field Again KeyCode
----@field Copy KeyCode
----@field Cut KeyCode
----@field Find KeyCode
----@field Open KeyCode
----@field Paste KeyCode
----@field Props KeyCode
----@field Select KeyCode
----@field Undo KeyCode
----@field Hiragana KeyCode
----@field Katakana KeyCode
----@field F1 KeyCode
----@field F2 KeyCode
----@field F3 KeyCode
----@field F4 KeyCode
----@field F5 KeyCode
----@field F6 KeyCode
----@field F7 KeyCode
----@field F8 KeyCode
----@field F9 KeyCode
----@field F10 KeyCode
----@field F11 KeyCode
----@field F12 KeyCode
----@field F13 KeyCode
----@field F14 KeyCode
----@field F15 KeyCode
----@field F16 KeyCode
----@field F17 KeyCode
----@field F18 KeyCode
----@field F19 KeyCode
----@field F20 KeyCode
----@field F21 KeyCode
----@field F22 KeyCode
----@field F23 KeyCode
----@field F24 KeyCode
----@field F25 KeyCode
----@field F26 KeyCode
----@field F27 KeyCode
----@field F28 KeyCode
----@field F29 KeyCode
----@field F30 KeyCode
----@field F31 KeyCode
----@field F32 KeyCode
----@field F33 KeyCode
----@field F34 KeyCode
----@field F35 KeyCode
-KeyCode = {}
 ---@class KeyCode
 ---@field Backquote boolean
 ---@field Backslash boolean
@@ -692,15 +1181,48 @@ KeyCode = {}
 ---@field F35 boolean
 KeyCode_instance = {}
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::NativeKeyCode
+-----------------------------------------------------------
 
 ---@class NativeKeyCode_static
+
+---@type NativeKeyCode
+NativeKeyCode.Unidentified = {}
+
+---@class NativeKeyCode_Android
+---@field _1 integer
+NativeKeyCode_Android = {}
+
+---@param _1 integer
+---@return NativeKeyCode
+function NativeKeyCode:Android(_1) end
+
+---@class NativeKeyCode_MacOS
+---@field _1 integer
+NativeKeyCode_MacOS = {}
+
+---@param _1 integer
+---@return NativeKeyCode
+function NativeKeyCode:MacOS(_1) end
+
+---@class NativeKeyCode_Windows
+---@field _1 integer
+NativeKeyCode_Windows = {}
+
+---@param _1 integer
+---@return NativeKeyCode
+function NativeKeyCode:Windows(_1) end
+
+---@class NativeKeyCode_Xkb
+---@field _1 integer
+NativeKeyCode_Xkb = {}
+
+---@param _1 integer
+---@return NativeKeyCode
+function NativeKeyCode:Xkb(_1) end
 NativeKeyCode = {}
 
----@class NativeKeyCode
-NativeKeyCode_instance = {}
----@class NativeKeyCode_static
----@field Unidentified NativeKeyCode
-NativeKeyCode = {}
 ---@class NativeKeyCode
 ---@field Unidentified boolean
 ---@field Android NativeKeyCode_Android
@@ -709,33 +1231,9 @@ NativeKeyCode = {}
 ---@field Xkb NativeKeyCode_Xkb
 NativeKeyCode_instance = {}
 
----@class NativeKeyCode_Android
-NativeKeyCode_Android = {}
-
----@param state NativeKeyCode_Android
----@return NativeKeyCode
-function NativeKeyCode:Android(state) end
----@class NativeKeyCode_MacOS
-NativeKeyCode_MacOS = {}
-
----@param state NativeKeyCode_MacOS
----@return NativeKeyCode
-function NativeKeyCode:MacOS(state) end
----@class NativeKeyCode_Windows
-NativeKeyCode_Windows = {}
-
----@param state NativeKeyCode_Windows
----@return NativeKeyCode
-function NativeKeyCode:Windows(state) end
----@class NativeKeyCode_Xkb
-NativeKeyCode_Xkb = {}
-
----@param state NativeKeyCode_Xkb
----@return NativeKeyCode
-function NativeKeyCode:Xkb(state) end
-
----@class KeyEvent_static
-KeyEvent = {}
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::KeyEvent
+-----------------------------------------------------------
 
 ---@class KeyEvent
 ---@field physical_key PhysicalKey
@@ -743,17 +1241,25 @@ KeyEvent = {}
 ---@field repeat boolean
 KeyEvent_instance = {}
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::KeyLocation
+-----------------------------------------------------------
+
 ---@class KeyLocation_static
+
+---@type KeyLocation
+KeyLocation.Standard = {}
+
+---@type KeyLocation
+KeyLocation.Left = {}
+
+---@type KeyLocation
+KeyLocation.Right = {}
+
+---@type KeyLocation
+KeyLocation.Numpad = {}
 KeyLocation = {}
 
----@class KeyLocation
-KeyLocation_instance = {}
----@class KeyLocation_static
----@field Standard KeyLocation
----@field Left KeyLocation
----@field Right KeyLocation
----@field Numpad KeyLocation
-KeyLocation = {}
 ---@class KeyLocation
 ---@field Standard boolean
 ---@field Left boolean
@@ -761,18 +1267,25 @@ KeyLocation = {}
 ---@field Numpad boolean
 KeyLocation_instance = {}
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::TouchPhase
+-----------------------------------------------------------
 
 ---@class TouchPhase_static
+
+---@type TouchPhase
+TouchPhase.Started = {}
+
+---@type TouchPhase
+TouchPhase.Moved = {}
+
+---@type TouchPhase
+TouchPhase.Ended = {}
+
+---@type TouchPhase
+TouchPhase.Cancelled = {}
 TouchPhase = {}
 
----@class TouchPhase
-TouchPhase_instance = {}
----@class TouchPhase_static
----@field Started TouchPhase
----@field Moved TouchPhase
----@field Ended TouchPhase
----@field Cancelled TouchPhase
-TouchPhase = {}
 ---@class TouchPhase
 ---@field Started boolean
 ---@field Moved boolean
@@ -780,9 +1293,9 @@ TouchPhase = {}
 ---@field Cancelled boolean
 TouchPhase_instance = {}
 
-
----@class Touch_static
-Touch = {}
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::Touch
+-----------------------------------------------------------
 
 ---@class Touch
 ---@field phase TouchPhase
@@ -791,58 +1304,84 @@ Touch = {}
 ---@field id integer
 Touch_instance = {}
 
----@class Force_static
-Force = {}
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::Force
+-----------------------------------------------------------
 
----@class Force
-Force_instance = {}
 ---@class Force_static
-Force = {}
----@class Force
----@field Calibrated Force_Calibrated
----@field Normalized Force_Normalized
-Force_instance = {}
 
 ---@class Force_Calibrated
+---@field force number
+---@field max_possible_force number
+---@field altitude_angle number?
 Force_Calibrated = {}
 
 ---@param state Force_Calibrated
 ---@return Force
 function Force:Calibrated(state) end
+
 ---@class Force_Normalized
+---@field _1 number
 Force_Normalized = {}
 
----@param state Force_Normalized
+---@param _1 number
 ---@return Force
-function Force:Normalized(state) end
+function Force:Normalized(_1) end
+Force = {}
+
+---@class Force
+---@field Calibrated Force_Calibrated
+---@field Normalized Force_Normalized
+Force_instance = {}
+
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::ElementState
+-----------------------------------------------------------
 
 ---@class ElementState_static
+
+---@type ElementState
+ElementState.Pressed = {}
+
+---@type ElementState
+ElementState.Released = {}
 ElementState = {}
 
----@class ElementState
-ElementState_instance = {}
----@class ElementState_static
----@field Pressed ElementState
----@field Released ElementState
-ElementState = {}
 ---@class ElementState
 ---@field Pressed boolean
 ---@field Released boolean
 ElementState_instance = {}
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::MouseButton
+-----------------------------------------------------------
 
 ---@class MouseButton_static
+
+---@type MouseButton
+MouseButton.Left = {}
+
+---@type MouseButton
+MouseButton.Right = {}
+
+---@type MouseButton
+MouseButton.Middle = {}
+
+---@type MouseButton
+MouseButton.Back = {}
+
+---@type MouseButton
+MouseButton.Forward = {}
+
+---@class MouseButton_Other
+---@field _1 integer
+MouseButton_Other = {}
+
+---@param _1 integer
+---@return MouseButton
+function MouseButton:Other(_1) end
 MouseButton = {}
 
----@class MouseButton
-MouseButton_instance = {}
----@class MouseButton_static
----@field Left MouseButton
----@field Right MouseButton
----@field Middle MouseButton
----@field Back MouseButton
----@field Forward MouseButton
-MouseButton = {}
 ---@class MouseButton
 ---@field Left boolean
 ---@field Right boolean
@@ -852,37 +1391,37 @@ MouseButton = {}
 ---@field Other MouseButton_Other
 MouseButton_instance = {}
 
----@class MouseButton_Other
-MouseButton_Other = {}
-
----@param state MouseButton_Other
----@return MouseButton
-function MouseButton:Other(state) end
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::MouseScrollDelta
+-----------------------------------------------------------
 
 ---@class MouseScrollDelta_static
+
+---@class MouseScrollDelta_LineDelta
+---@field _1 Vector2
+MouseScrollDelta_LineDelta = {}
+
+---@param _1 Vector2
+---@return MouseScrollDelta
+function MouseScrollDelta:LineDelta(_1) end
+
+---@class MouseScrollDelta_PixelDelta
+---@field _1 Vector2
+MouseScrollDelta_PixelDelta = {}
+
+---@param _1 Vector2
+---@return MouseScrollDelta
+function MouseScrollDelta:PixelDelta(_1) end
 MouseScrollDelta = {}
 
----@class MouseScrollDelta
-MouseScrollDelta_instance = {}
----@class MouseScrollDelta_static
-MouseScrollDelta = {}
 ---@class MouseScrollDelta
 ---@field LineDelta MouseScrollDelta_LineDelta
 ---@field PixelDelta MouseScrollDelta_PixelDelta
 MouseScrollDelta_instance = {}
 
----@class MouseScrollDelta_LineDelta
-MouseScrollDelta_LineDelta = {}
-
----@param state MouseScrollDelta_LineDelta
----@return MouseScrollDelta
-function MouseScrollDelta:LineDelta(state) end
----@class MouseScrollDelta_PixelDelta
-MouseScrollDelta_PixelDelta = {}
-
----@param state MouseScrollDelta_PixelDelta
----@return MouseScrollDelta
-function MouseScrollDelta:PixelDelta(state) end
+-----------------------------------------------------------
+------ fyrox_lite::lite_event::InnerSizeWriter
+-----------------------------------------------------------
 
 ---@class InnerSizeWriter_static
 InnerSizeWriter = {}
@@ -893,6 +1432,10 @@ InnerSizeWriter_instance = {}
 ---@param new_inner_size Vector2i
 ---@return boolean
 function InnerSizeWriter_instance:request_inner_size(new_inner_size) end
+
+-----------------------------------------------------------
+------ fyrox_lite::lite_log::LiteLog
+-----------------------------------------------------------
 
 ---@class Log_static
 Log = {}
@@ -909,21 +1452,27 @@ function Log:warn(msg) end
 ---@param msg string
 function Log:err(msg) end
 
----@class Vector2_static
-Vector2 = {}
+-----------------------------------------------------------
+------ fyrox_lite::lite_math::PodVector2
+-----------------------------------------------------------
 
 ---@class Vector2
 ---@field x number
 ---@field y number
 Vector2_instance = {}
 
----@class Vector2i_static
-Vector2i = {}
+-----------------------------------------------------------
+------ fyrox_lite::lite_math::PodVector2i
+-----------------------------------------------------------
 
 ---@class Vector2i
 ---@field x integer
 ---@field y integer
 Vector2i_instance = {}
+
+-----------------------------------------------------------
+------ fyrox_lite::lite_node::LiteNode
+-----------------------------------------------------------
 
 ---@class Node_static
 Node = {}
@@ -977,20 +1526,27 @@ function Node_instance:tag_is(tag) end
 ---@param tag string
 function Node_instance:set_tag(tag) end
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_node::LiteRoutingStrategy
+-----------------------------------------------------------
+
 ---@class RoutingStrategy_static
+
+---@type RoutingStrategy
+RoutingStrategy.Up = {}
+
+---@type RoutingStrategy
+RoutingStrategy.Down = {}
 RoutingStrategy = {}
 
----@class RoutingStrategy
-RoutingStrategy_instance = {}
----@class RoutingStrategy_static
----@field Up RoutingStrategy
----@field Down RoutingStrategy
-RoutingStrategy = {}
 ---@class RoutingStrategy
 ---@field Up boolean
 ---@field Down boolean
 RoutingStrategy_instance = {}
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_physics::LitePhysics
+-----------------------------------------------------------
 
 ---@class Physics_static
 ---@field EXCLUDE_FIXED integer
@@ -1010,8 +1566,9 @@ Physics_instance = {}
 ---@return Intersection[]
 function Physics:cast_ray(opts) end
 
----@class Intersection_static
-Intersection = {}
+-----------------------------------------------------------
+------ fyrox_lite::lite_physics::LiteIntersection
+-----------------------------------------------------------
 
 ---@class Intersection
 ---@field collider Node
@@ -1021,14 +1578,40 @@ Intersection = {}
 ---@field toi number
 Intersection_instance = {}
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_physics::LiteFeatureId
+-----------------------------------------------------------
+
 ---@class FeatureId_static
+
+---@class FeatureId_Vertex
+---@field _1 integer
+FeatureId_Vertex = {}
+
+---@param _1 integer
+---@return FeatureId
+function FeatureId:Vertex(_1) end
+
+---@class FeatureId_Edge
+---@field _1 integer
+FeatureId_Edge = {}
+
+---@param _1 integer
+---@return FeatureId
+function FeatureId:Edge(_1) end
+
+---@class FeatureId_Face
+---@field _1 integer
+FeatureId_Face = {}
+
+---@param _1 integer
+---@return FeatureId
+function FeatureId:Face(_1) end
+
+---@type FeatureId
+FeatureId.Unknown = {}
 FeatureId = {}
 
----@class FeatureId
-FeatureId_instance = {}
----@class FeatureId_static
----@field Unknown FeatureId
-FeatureId = {}
 ---@class FeatureId
 ---@field Vertex FeatureId_Vertex
 ---@field Edge FeatureId_Edge
@@ -1036,27 +1619,9 @@ FeatureId = {}
 ---@field Unknown boolean
 FeatureId_instance = {}
 
----@class FeatureId_Vertex
-FeatureId_Vertex = {}
-
----@param state FeatureId_Vertex
----@return FeatureId
-function FeatureId:Vertex(state) end
----@class FeatureId_Edge
-FeatureId_Edge = {}
-
----@param state FeatureId_Edge
----@return FeatureId
-function FeatureId:Edge(state) end
----@class FeatureId_Face
-FeatureId_Face = {}
-
----@param state FeatureId_Face
----@return FeatureId
-function FeatureId:Face(state) end
-
----@class RayCastOptions_static
-RayCastOptions = {}
+-----------------------------------------------------------
+------ fyrox_lite::lite_physics::LiteRayCastOptions
+-----------------------------------------------------------
 
 ---@class RayCastOptions
 ---@field ray_origin Vector3
@@ -1066,13 +1631,18 @@ RayCastOptions = {}
 ---@field sort_results boolean
 RayCastOptions_instance = {}
 
----@class InteractionGroups_static
-InteractionGroups = {}
+-----------------------------------------------------------
+------ fyrox_lite::lite_physics::LiteInteractionGroups
+-----------------------------------------------------------
 
 ---@class InteractionGroups
 ---@field memberships integer
 ---@field filter integer
 InteractionGroups_instance = {}
+
+-----------------------------------------------------------
+------ fyrox_lite::lite_physics::LiteRigidBody
+-----------------------------------------------------------
 
 ---@class RigidBody_static
 RigidBody = {}
@@ -1082,6 +1652,10 @@ RigidBody_instance = {}
 
 ---@param force Vector3
 function RigidBody_instance:apply_force(force) end
+
+-----------------------------------------------------------
+------ fyrox_lite::lite_plugin::LitePlugin
+-----------------------------------------------------------
 
 ---@class Plugin_static
 Plugin = {}
@@ -1094,6 +1668,10 @@ Plugin_instance = {}
 ---@return T
 function Plugin:get(class_name) end
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_prefab::LitePrefab
+-----------------------------------------------------------
+
 ---@class Prefab_static
 Prefab = {}
 
@@ -1105,6 +1683,10 @@ Prefab_instance = {}
 ---@return Node
 function Prefab_instance:instantiate_at(position, orientation) end
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_scene::LiteScene
+-----------------------------------------------------------
+
 ---@class Scene_static
 Scene = {}
 
@@ -1114,11 +1696,19 @@ Scene_instance = {}
 ---@param scene_path string
 function Scene:load_async(scene_path) end
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_ui::LiteUiNode
+-----------------------------------------------------------
+
 ---@class UiNode_static
 UiNode = {}
 
 ---@class UiNode
 UiNode_instance = {}
+
+-----------------------------------------------------------
+------ fyrox_lite::lite_ui::LiteText
+-----------------------------------------------------------
 
 ---@class Text_static
 Text = {}
@@ -1134,45 +1724,58 @@ function Text:new(state) end
 ---@param text string
 function Text_instance:set_text_async(text) end
 
----@class TextBuilder_static
-TextBuilder = {}
+-----------------------------------------------------------
+------ fyrox_lite::lite_ui::TextBuilder
+-----------------------------------------------------------
 
 ---@class TextBuilder
 ---@field foregound Brush?
 ---@field font_size number?
 TextBuilder_instance = {}
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_ui::Brush
+-----------------------------------------------------------
+
 ---@class Brush_static
+
+---@class Brush_Solid
+---@field _1 Color
+Brush_Solid = {}
+
+---@param _1 Color
+---@return Brush
+function Brush:Solid(_1) end
+
+---@class Brush_LinearGradient
+---@field from Vector2
+---@field to Vector2
+---@field stops GradientPoint[]
+Brush_LinearGradient = {}
+
+---@param state Brush_LinearGradient
+---@return Brush
+function Brush:LinearGradient(state) end
+
+---@class Brush_RadialGradient
+---@field center Vector2
+---@field stops GradientPoint[]
+Brush_RadialGradient = {}
+
+---@param state Brush_RadialGradient
+---@return Brush
+function Brush:RadialGradient(state) end
 Brush = {}
 
----@class Brush
-Brush_instance = {}
----@class Brush_static
-Brush = {}
 ---@class Brush
 ---@field Solid Brush_Solid
 ---@field LinearGradient Brush_LinearGradient
 ---@field RadialGradient Brush_RadialGradient
 Brush_instance = {}
 
----@class Brush_Solid
-Brush_Solid = {}
-
----@param state Brush_Solid
----@return Brush
-function Brush:Solid(state) end
----@class Brush_LinearGradient
-Brush_LinearGradient = {}
-
----@param state Brush_LinearGradient
----@return Brush
-function Brush:LinearGradient(state) end
----@class Brush_RadialGradient
-Brush_RadialGradient = {}
-
----@param state Brush_RadialGradient
----@return Brush
-function Brush:RadialGradient(state) end
+-----------------------------------------------------------
+------ fyrox_lite::lite_ui::Color
+-----------------------------------------------------------
 
 ---@class Color_static
 ---@field WHITE Color
@@ -1320,13 +1923,18 @@ Color = {}
 ---@class Color
 Color_instance = {}
 
----@class GradientPoint_static
-GradientPoint = {}
+-----------------------------------------------------------
+------ fyrox_lite::lite_ui::GradientPoint
+-----------------------------------------------------------
 
 ---@class GradientPoint
 ---@field stop number
 ---@field color Color
 GradientPoint_instance = {}
+
+-----------------------------------------------------------
+------ fyrox_lite::lite_window::LiteWindow
+-----------------------------------------------------------
 
 ---@class Window_static
 ---@field cursor_grab CursorGrabMode
@@ -1338,22 +1946,31 @@ Window_instance = {}
 ---@param mode CursorGrabMode
 function Window:set_cursor_grab(mode) end
 
+-----------------------------------------------------------
+------ fyrox_lite::lite_window::LiteCursorGrabMode
+-----------------------------------------------------------
+
 ---@class CursorGrabMode_static
+
+---@type CursorGrabMode
+CursorGrabMode.None = {}
+
+---@type CursorGrabMode
+CursorGrabMode.Confined = {}
+
+---@type CursorGrabMode
+CursorGrabMode.Locked = {}
 CursorGrabMode = {}
 
----@class CursorGrabMode
-CursorGrabMode_instance = {}
----@class CursorGrabMode_static
----@field None CursorGrabMode
----@field Confined CursorGrabMode
----@field Locked CursorGrabMode
-CursorGrabMode = {}
 ---@class CursorGrabMode
 ---@field None boolean
 ---@field Confined boolean
 ---@field Locked boolean
 CursorGrabMode_instance = {}
 
+-----------------------------------------------------------
+------ fyrox_lite_math::lite_math::LiteQuaternion
+-----------------------------------------------------------
 
 ---@class Quaternion_static
 Quaternion = {}
@@ -1378,6 +1995,10 @@ function Quaternion_instance:mul_vec(o) end
 ---@param rot_delta Quaternion
 ---@return Quaternion
 function Quaternion_instance:mul_quat(rot_delta) end
+
+-----------------------------------------------------------
+------ fyrox_lite_math::lite_math::LiteVector3
+-----------------------------------------------------------
 
 ---@class Vector3_static
 ---@field X Vector3

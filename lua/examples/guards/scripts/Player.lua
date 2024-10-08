@@ -115,6 +115,7 @@ function Player:on_update(dt)
     self.node:as_rigid_body():apply_force(force);
 end
 
+---@param event Event
 function Player:on_os_event(event)
     if event.WindowEvent then
         local event = event.WindowEvent.event
