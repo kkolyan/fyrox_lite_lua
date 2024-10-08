@@ -36,7 +36,7 @@ impl LiteNode {
     }
 }
 
-#[lite_api(Node)]
+#[lite_api(class=Node, eq)]
 impl LiteNode {
     pub fn as_rigid_body(&mut self) -> Option<LiteRigidBody> {
         with_script_context(|ctx| {
@@ -177,23 +177,34 @@ impl LiteNode {
         })
     }
 
-    pub fn add_script<T: UserScript>(&self, state: T) -> Result<(), T::LangSpecificError> {
+    pub fn add_script<T: UserScript>(&self, class_name: String, _stub: T::UserScriptGenericStub) -> Result<T, T::LangSpecificError> {
+        if self.find_script::<T>(class_name.clone(), _stub)?.is_some() {
+            return Err(T::create_error(format!("node {:?} already contains script of class {}", self, &class_name).as_str()))
+        }
+        let script = T::new_instance(&class_name)?;
+        let proxy = T::into_proxy_script(script)?;
+        
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
-            node.add_script(state.into_proxy_script()?);
-            Ok(())
-        })
+            node.add_script(proxy);
+        });
+        let script = self.find_script(class_name, _stub)?;
+        Ok(script.expect("WTF: it was just added"))
     }
 
-    pub fn find_script<T: UserScript>(&self, class_name: String, _stub: T::UserScriptGenericStub) -> Option<T> {
+    pub fn find_script<T: UserScript>(&self, class_name: String, _stub: T::UserScriptGenericStub) -> Result<Option<T>, T::LangSpecificError> {
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
             for script in node.try_get_scripts_mut::<T::ProxyScript>() {
-                if let Some(r) = T::extract_from(script, &class_name) {
-                    return Some(r);
+                let Some(plugin) = &mut ctx.plugins else {
+                    return Err(T::create_error("plugins access not allowed from Plugin scripts"));
+                };
+                let plugin = plugin.of_type_mut::<T::Plugin>().expect("WTF: Lua plugin unavailable");
+                if let Some(r) = T::extract_from(script, &class_name, plugin) {
+                    return Ok(Some(r));
                 }
             }
-            None
+            Ok(None)
         })
     }
 
@@ -236,7 +247,7 @@ impl LiteNode {
 }
 
 #[derive(Debug, Clone, Copy)]
-#[lite_api(RoutingStrategy)]
+#[lite_api(class=RoutingStrategy)]
 pub enum LiteRoutingStrategy {
     /// An message will be passed to the specified root node and then to every node up in the hierarchy.
     Up,

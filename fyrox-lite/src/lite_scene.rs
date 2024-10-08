@@ -7,7 +7,7 @@ use crate::script_context::with_script_context;
 #[derive(Debug, Clone)]
 pub struct LiteScene;
 
-#[lite_api(Scene)]
+#[lite_api(class=Scene)]
 impl LiteScene {
     pub fn load_async(scene_path: String) {
         with_script_context(|sc| {

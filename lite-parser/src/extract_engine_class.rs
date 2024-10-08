@@ -3,15 +3,15 @@ use std::collections::HashMap;
 use lite_model::{
     ClassName, Constant, DataType, EngineClass, Method, Param, RustQualifiedName, Signature,
 };
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 use quote::ToTokens;
 use syn::{parse_quote_spanned, spanned::Spanned, Ident, TraitBoundModifier, TypeParamBound};
 
-use crate::extract_ty::extract_ty;
+use crate::{extract_ty::extract_ty, lite_api_attr::LiteApiAttr};
 
 pub fn extract_engine_class_and_inject_assertions(
     rust_path: &str,
-    attr: Option<TokenStream>,
+    (attr, attr_span): (LiteApiAttr, Span),
     item: &mut syn::ItemImpl,
     errors: &mut Vec<syn::Error>,
 ) -> Option<(Ident, EngineClass)> {
@@ -204,7 +204,7 @@ pub fn extract_engine_class_and_inject_assertions(
     }
     rust_name.map(|rust_name| {
         let class_name = attr
-            .map(|it| it.to_string())
+            .class
             .unwrap_or_else(|| rust_name.to_string());
         (
             rust_name.clone(),
@@ -214,6 +214,7 @@ pub fn extract_engine_class_and_inject_assertions(
                 methods,
                 constants,
                 rust_struct_path: RustQualifiedName(format!("{}::{}", rust_path, rust_name)),
+                features: attr.features,
             },
         )
     })

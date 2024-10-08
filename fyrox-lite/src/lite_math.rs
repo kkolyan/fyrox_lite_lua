@@ -1,21 +1,21 @@
 use fyrox::core::algebra::{Quaternion, UnitQuaternion, Vector2, Vector3};
 use lite_macro::lite_api;
 
-#[lite_api(Vector3)]
+#[lite_api(class=Vector3)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PodVector3 {
     pub x: f32,
     pub y: f32,
     pub z: f32,
 }
-#[lite_api(Vector2)]
+#[lite_api(class=Vector2)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PodVector2 {
     pub x: f32,
     pub y: f32,
 }
 
-#[lite_api(Vector2i)]
+#[lite_api(class=Vector2i)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PodVector2i {
     pub x: i64,
@@ -53,7 +53,7 @@ impl From<PodVector2> for Vector2<f32> {
     }
 }
 
-#[lite_api(Quaternion)]
+#[lite_api(class=Quaternion)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PodQuaternion {
     pub x: f32,

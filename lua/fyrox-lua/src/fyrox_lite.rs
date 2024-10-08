@@ -1,11 +1,12 @@
 use std::mem;
 
 use crate::{
-    fyrox_lite_class::Traitor, lua_error, plugin::LuaPlugin, script::LuaScript,
-    script_object::ScriptObject, typed_userdata::TypedUserData,
+    fyrox_lite_class::Traitor, fyrox_utils::PluginsRefMut_Ext, lua_error, plugin::LuaPlugin,
+    script::LuaScript, script_class::ScriptClass, script_object::ScriptObject,
+    typed_userdata::TypedUserData,
 };
 use fyrox_lite::{script_context::with_script_context, spi::UserScript, LiteDataType};
-use mlua::Value;
+use mlua::{UserDataRef, Value};
 use send_wrapper::SendWrapper;
 
 impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
@@ -19,8 +20,13 @@ impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
 
     type UserScriptGenericStub = ();
 
-    fn extract_from(proxy: &Self::ProxyScript, class_name: &str) -> Option<Self> {
+    fn extract_from(
+        proxy: &mut Self::ProxyScript,
+        class_name: &str,
+        plugin: &mut Self::Plugin,
+    ) -> Option<Self> {
         if proxy.name == class_name {
+            proxy.data.ensure_unpacked(plugin);
             let script_data = proxy.data.inner_unpacked();
             return Some(script_data.expect("expected to be unpacked here"));
         }
@@ -49,6 +55,30 @@ impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
                 }
             }
             Err(lua_error!("plugin script not found: {}", class_name))
+        })
+    }
+
+    fn create_error(msg: &str) -> Self::LangSpecificError {
+        mlua::Error::runtime(msg)
+    }
+
+    fn new_instance(class_name: &str) -> Result<Self, Self::LangSpecificError> {
+        with_script_context(|ctx| {
+            let Some(plugins) = ctx.plugins.as_mut() else {
+                return Err(lua_error!("cannot create scripts programmatically from Plugin scripts. to be implemented in future."));
+            };
+            let lua = plugins.lua_mut().vm;
+            let class = lua
+                .globals()
+                .get::<_, Option<UserDataRef<ScriptClass>>>(class_name)?;
+            let Some(class) = class else {
+                return Err(lua_error!("class not found: {}", class_name));
+            };
+            let Some(def) = &class.def else {
+                return Err(lua_error!("invalid class: {}", class_name));
+            };
+            let obj = lua.create_userdata(ScriptObject::new(def))?;
+            Ok(TypedUserData::<ScriptObject>::new(obj))
         })
     }
 }

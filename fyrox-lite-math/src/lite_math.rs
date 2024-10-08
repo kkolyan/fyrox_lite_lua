@@ -13,7 +13,7 @@ use std::ops::Mul;
 #[derive(Clone, Copy)]
 pub struct LiteQuaternion(UnitQuaternion<f32>);
 
-#[lite_api(Quaternion)]
+#[lite_api(class=Quaternion)]
 impl LiteQuaternion {
     pub fn face_towards(dir: LiteVector3, up: LiteVector3) -> LiteQuaternion {
         LiteQuaternion(UnitQuaternion::face_towards(&dir.into(), &up.into()))
@@ -83,7 +83,7 @@ impl Display for LiteVector3 {
 }
 
 #[allow(non_snake_case)]
-#[lite_api(Vector3)]
+#[lite_api(class=Vector3)]
 impl LiteVector3 {
     #[rustfmt::skip]    pub fn get_x(&self) -> f32 { self.0.x }
     #[rustfmt::skip]    pub fn get_y(&self) -> f32 { self.0.y }

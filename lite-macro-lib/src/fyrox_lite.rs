@@ -1,6 +1,7 @@
 use lite_parser::{
     extract_engine_class::extract_engine_class_and_inject_assertions,
     extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct,
+    lite_api_attr::LiteApiAttr,
 };
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -9,19 +10,19 @@ use syn::{parse2, spanned::Spanned};
 use crate::generate_static_assertions;
 
 pub fn lite_api(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let span = attr.span();
     let mut errors = Vec::new();
-    let attr = if attr.is_empty() {
-        None
-    } else {
-        Some(attr)
+    let attr = match LiteApiAttr::from_attr_args(attr) {
+        Ok(it) => it,
+        Err(err) => return err.to_compile_error(),
     };
     match parse2::<syn::Item>(item) {
         Ok(it) => match it {
             syn::Item::Enum(item) => {
-
                 let mut types = Vec::new();
-                let ident = extract_pod_enum("dontcare", attr, &item, &mut errors, &mut types)
-                    .map(|(rust_class_name, _class)| rust_class_name);
+                let ident =
+                    extract_pod_enum("dontcare", (attr, span), &item, &mut errors, &mut types)
+                        .map(|(rust_class_name, _class)| rust_class_name);
 
                 let field_assertions = generate_static_assertions(types.iter());
 
@@ -43,8 +44,7 @@ pub fn lite_api(attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
             }
             syn::Item::Struct(item) => {
-
-                extract_pod_struct("dontcare", attr, &item, &mut errors);
+                extract_pod_struct("dontcare", (attr, span), &item, &mut errors);
 
                 let ident = &item.ident;
 
@@ -66,10 +66,9 @@ pub fn lite_api(attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
             }
             syn::Item::Impl(mut item) => {
-
                 let ident = extract_engine_class_and_inject_assertions(
                     "dontcare",
-                    attr,
+                    (attr, span),
                     &mut item,
                     &mut errors,
                 )
@@ -93,7 +92,7 @@ pub fn lite_api(attr: TokenStream, item: TokenStream) -> TokenStream {
             }
             it => {
                 let error = syn::Error::new(
-                    attr.span(),
+                    span,
                     "fyrox_lite allowed only for impl, struct or enum declarations",
                 )
                 .into_compile_error();

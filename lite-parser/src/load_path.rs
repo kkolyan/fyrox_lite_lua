@@ -1,14 +1,18 @@
 use std::{collections::HashMap, fs, path::Path, str::FromStr};
 
 use crate::{
-    extract_engine_class::extract_engine_class_and_inject_assertions,
-    extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, RustSymbol,
+    extract_engine_class::extract_engine_class_and_inject_assertions, extract_pod_enum::extract_pod_enum, extract_pod_struct::extract_pod_struct, lite_api_attr::LiteApiAttr, RustSymbol
 };
 use lite_model::{Class, Domain};
-use proc_macro2::TokenStream;
-use syn::parse2;
+use proc_macro2::{Span, TokenStream};
+use syn::{parse2, spanned::Spanned};
 
-pub fn load_path(crate_name: &str, path: &Path, domain: &mut Domain, aliases: &mut HashMap<String, RustSymbol>) {
+pub fn load_path(
+    crate_name: &str,
+    path: &Path,
+    domain: &mut Domain,
+    aliases: &mut HashMap<String, RustSymbol>,
+) {
     let text = fs::read_to_string(path).unwrap();
     let file = parse2::<syn::File>(TokenStream::from_str(&text).unwrap()).unwrap();
 
@@ -75,10 +79,7 @@ pub fn load_path(crate_name: &str, path: &Path, domain: &mut Domain, aliases: &m
     }
 }
 
-fn extract_attr(
-    attrs: &[syn::Attribute],
-    attr_name: &str
-) -> Option<Option<TokenStream>> {
+fn extract_attr(attrs: &[syn::Attribute], attr_name: &str) -> Option<(LiteApiAttr, Span)> {
     let attr = attrs.iter().find(|it| {
         it.path()
             .get_ident()
@@ -86,9 +87,16 @@ fn extract_attr(
             .unwrap_or_default()
     });
     let attr = attr?;
-    match &attr.meta {
-        syn::Meta::Path(_it) => Some(None),
-        syn::Meta::List(it) =>  Some(Some(it.tokens.clone())),
-        syn::Meta::NameValue(_it) => panic!("usage: #[lite_api] or #[lite_api(MyClass)]"),
-    }
+    Some((
+        match &attr.meta {
+            syn::Meta::Path(_it) => Default::default(),
+            syn::Meta::List(it) => {
+                LiteApiAttr::from_attr_args(it.tokens.clone()).unwrap()
+            }
+            syn::Meta::NameValue(_it) => {
+                panic!("usage: #[lite_api] or #[lite_api({})]", LiteApiAttr::OPTIONS_HINT);
+            }
+        },
+        attr.span()
+    ))
 }

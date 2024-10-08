@@ -44,7 +44,8 @@ impl FyroxUserData for fyrox_lite::lite_physics::LitePhysics {
                         .map(|it| {
                             Traitor::new(fyrox_lite::lite_physics::LiteIntersection::from(it))
                         })
-                        .enumerate(),
+                        .enumerate()
+                        .map(|(i, v)| (i + 1, v)),
                 )?;
                 Ok(ret)
             },

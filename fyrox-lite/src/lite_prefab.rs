@@ -36,7 +36,7 @@ impl LitePrefab {
     }
 }
 
-#[lite_api(Prefab)]
+#[lite_api(class=Prefab)]
 impl LitePrefab {
     pub fn instantiate_at(&self, position: PodVector3, orientation: PodQuaternion) -> LiteNode {
         with_script_context(|ctx| {

@@ -5,7 +5,7 @@ use crate::spi::UserScript;
 #[derive(Debug, Clone)]
 pub struct LitePlugin;
 
-#[lite_api(Plugin)]
+#[lite_api(class=Plugin)]
 impl LitePlugin {
 	/// find a plugin script by name
 	pub fn get<T: UserScript>(class_name: String, _stub: T::UserScriptGenericStub) -> Result<T, T::LangSpecificError> {

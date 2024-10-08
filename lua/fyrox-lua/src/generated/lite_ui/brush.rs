@@ -151,7 +151,8 @@ impl FyroxUserData for fyrox_lite::lite_ui::Brush {
                     stops
                         .into_iter()
                         .map(|it| Traitor::new(fyrox_lite::lite_ui::GradientPoint::from(it)))
-                        .enumerate(),
+                        .enumerate()
+                        .map(|(i, v)| (i + 1, v)),
                 )?
             })?;
 
@@ -175,7 +176,8 @@ impl FyroxUserData for fyrox_lite::lite_ui::Brush {
                     stops
                         .into_iter()
                         .map(|it| Traitor::new(fyrox_lite::lite_ui::GradientPoint::from(it)))
-                        .enumerate(),
+                        .enumerate()
+                        .map(|(i, v)| (i + 1, v)),
                 )?
             })?;
 

@@ -66,6 +66,16 @@ pub struct EngineClass {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     #[serde(default)]
     pub constants: Vec<Constant>,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default)]
+    pub features: Vec<Feature>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Feature {
+    Eq
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -128,6 +138,10 @@ pub struct EnumClass {
     pub rust_struct_path: RustQualifiedName,
 
     pub variants: Vec<EnumVariant>,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default)]
+    pub features: Vec<Feature>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]

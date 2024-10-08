@@ -42,7 +42,7 @@ pub struct LuaScript {
 
 impl ScriptTrait for LuaScript {
     fn on_init(&mut self, ctx: &mut ScriptContext) {
-        uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+        self.data.ensure_unpacked(ctx.plugins.lua_mut());
         invoke_callback(
             &mut self.data,
             ctx.plugins.lua().vm,
@@ -53,7 +53,7 @@ impl ScriptTrait for LuaScript {
     }
 
     fn on_start(&mut self, ctx: &mut ScriptContext) {
-        uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+        self.data.ensure_unpacked(ctx.plugins.lua_mut());
         invoke_callback(
             &mut self.data,
             ctx.plugins.lua().vm,
@@ -64,7 +64,7 @@ impl ScriptTrait for LuaScript {
     }
 
     fn on_deinit(&mut self, ctx: &mut fyrox::script::ScriptDeinitContext) {
-        uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+        self.data.ensure_unpacked(ctx.plugins.lua_mut());
         invoke_callback(
             &mut self.data,
             ctx.plugins.lua().vm,
@@ -76,7 +76,7 @@ impl ScriptTrait for LuaScript {
 
     fn on_os_event(&mut self, event: &fyrox::event::Event<()>, ctx: &mut ScriptContext) {
         if let Some(event) = to_lite(event.clone()) {
-            uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+            self.data.ensure_unpacked(ctx.plugins.lua_mut());
             invoke_callback(
                 &mut self.data,
                 ctx.plugins.lua().vm,
@@ -88,7 +88,7 @@ impl ScriptTrait for LuaScript {
     }
 
     fn on_update(&mut self, ctx: &mut ScriptContext) {
-        uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+        self.data.ensure_unpacked(ctx.plugins.lua_mut());
         let dt = ctx.dt;
         invoke_callback(
             &mut self.data,
@@ -104,8 +104,8 @@ impl ScriptTrait for LuaScript {
         message: &mut dyn fyrox::script::ScriptMessagePayload,
         ctx: &mut fyrox::script::ScriptMessageContext,
     ) {
-        if let Some(lua_message) = message.downcast_ref::<SendWrapper<Value>>() {
-            uppack_script_if_necessary(ctx.plugins.lua_mut(), &mut self.data);
+        if let Some(lua_message) = message.downcast_ref::<Traitor<SendWrapper<Value>>>() {
+            self.data.ensure_unpacked(ctx.plugins.lua_mut());
             invoke_callback(
                 &mut self.data,
                 ctx.plugins.lua().vm,
@@ -115,35 +115,6 @@ impl ScriptTrait for LuaScript {
             );
         } else {
             panic!("non-lua messages not supported by lua scripts")
-        }
-    }
-}
-
-fn uppack_script_if_necessary(plugin: &mut LuaPlugin, data: &mut ScriptData) {
-    if plugin.failed {
-        // don't spam logs, though, plugin is completely broken at this point
-        return;
-    }
-    if data.is_packed() {
-        // script was just loaded from the scene file or safe game. unpack it!
-        *data = match data {
-            ScriptData::Packed(it) => {
-                let so = plugin
-                    .vm
-                    .create_userdata(it.clone())
-                    .map(TypedUserData::<ScriptObject>::new)
-                    .map(SendWrapper::new)
-                    .map(ScriptData::Unpacked);
-                match so {
-                    Ok(it) => it,
-                    Err(err) => {
-                        Log::err(format!("failed to unpack LuaScript: {:?}", err));
-                        plugin.failed = true;
-                        return;
-                    }
-                }
-            }
-            ScriptData::Unpacked(_) => panic!("WTF?"),
         }
     }
 }

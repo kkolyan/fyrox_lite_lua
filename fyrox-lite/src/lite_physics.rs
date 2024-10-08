@@ -18,7 +18,7 @@ use crate::{lite_math::PodVector3, lite_node::LiteNode, script_context::with_scr
 #[derive(Debug, Clone)]
 pub struct LitePhysics;
 
-#[lite_api(Physics)]
+#[lite_api(class=Physics)]
 impl LitePhysics {
     /// Exclude from the query any collider attached to a fixed rigid-body and colliders with no rigid-body attached.
     pub const EXCLUDE_FIXED: i32 = 1 << 1;
@@ -130,7 +130,7 @@ pub trait LiteQueryResultsStorage {
 
 /// A ray intersection result.
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[lite_api(Intersection)]
+#[lite_api(class=Intersection)]
 pub struct LiteIntersection {
     /// A handle of the collider with which intersection was detected.
     pub collider: LiteNode,
@@ -158,7 +158,7 @@ pub struct LiteIntersection {
 
 /// Shape-dependent identifier.
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
-#[lite_api(FeatureId)]
+#[lite_api(class=FeatureId)]
 pub enum LiteFeatureId {
     /// Shape-dependent identifier of a vertex.
     Vertex(i32),
@@ -171,7 +171,7 @@ pub enum LiteFeatureId {
 }
 
 #[derive(Debug, Clone, Copy)]
-#[lite_api(RayCastOptions)]
+#[lite_api(class=RayCastOptions)]
 pub struct LiteRayCastOptions {
     /// A ray origin.
     pub ray_origin: PodVector3,
@@ -190,7 +190,7 @@ pub struct LiteRayCastOptions {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-#[lite_api(InteractionGroups)]
+#[lite_api(class=InteractionGroups)]
 pub struct LiteInteractionGroups {
     /// Groups memberships.
     pub memberships: i32,
@@ -228,7 +228,7 @@ pub struct LiteRigidBody {
     pub handle: Handle<Node>,
 }
 
-#[lite_api(RigidBody)]
+#[lite_api(class=RigidBody)]
 impl LiteRigidBody {
     pub fn apply_force(&mut self, force: PodVector3) {
         with_script_context(|ctx| {

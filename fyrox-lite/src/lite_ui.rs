@@ -21,7 +21,7 @@ impl LiteUiNode {
     }
 }
 
-#[lite_api(UiNode)]
+#[lite_api(class=UiNode)]
 impl LiteUiNode {}
 
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
@@ -41,7 +41,7 @@ impl From<Handle<UiNode>> for LiteText {
     }
 }
 
-#[lite_api(Text)]
+#[lite_api(class=Text)]
 impl LiteText {
     pub fn set_text_async(&self, text: String) {
         with_script_context(|ctx| {
@@ -94,7 +94,7 @@ impl From<Brush> for brush::Brush {
 }
 
 #[derive(Debug, Clone)]
-#[lite_api(TextBuilder)]
+#[lite_api(class=TextBuilder)]
 pub struct TextBuilder {
     pub foregound: Option<Brush>,
     pub font_size: Option<f32>,
@@ -102,7 +102,7 @@ pub struct TextBuilder {
 
 /// Brush defines a way to fill an arbitrary surface.
 #[derive(Debug, Clone, PartialEq)]
-#[lite_api(Brush)]
+#[lite_api(class=Brush)]
 pub enum Brush {
     /// A brush, that fills a surface with a solid color.
     Solid(Color),
@@ -289,7 +289,7 @@ const fn color_to_lite(value: fyrox::core::color::Color) -> Color {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-#[lite_api(GradientPoint)]
+#[lite_api(class=GradientPoint)]
 pub struct GradientPoint {
     /// A distance from an origin of the gradient.
     pub stop: f32,

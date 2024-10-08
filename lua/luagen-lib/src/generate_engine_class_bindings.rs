@@ -5,12 +5,7 @@ use std::borrow::Cow;
 use to_vec::ToVec;
 
 use crate::{
-    code_model::{Mod, ModContent},
-    context::GenerationContext,
-    expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua},
-    generate_methods::{generate_methods, is_getter, is_setter},
-    supress_lint::SUPRESSIONS,
-    templating::render,
+    code_model::{Mod, ModContent}, context::GenerationContext, eq::generate_eq, expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, generate_methods::{generate_methods, is_getter, is_setter}, supress_lint::SUPRESSIONS, templating::render
 };
 
 pub fn generate_engine_class_bindings(class: &EngineClass, ctx: &GenerationContext) -> Mod {
@@ -86,6 +81,7 @@ fn generate_instance_methods(s: &mut String, class: &EngineClass, ctx: &Generati
         "#,
         [],
     );
+    generate_eq(s, &class.features);
     generate_methods(s, class, ctx, true);
 
     render(

@@ -7,17 +7,6 @@ use syn::{
     Ident,
 };
 use uuid::Uuid;
-// use quote::quote;
-
-
-pub fn fyrox_lite_user_class(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let error = syn::Error::new_spanned(_attr, "Fyrox Lite: fyrox_lite_user_class is not implemented yet").into_compile_error();
-    quote! {
-        #error
-        #item
-    }
-}
-
 
 fn generate_static_assertions<'a>(items: impl Iterator<Item = &'a syn::Type>) -> TokenStream {
     items

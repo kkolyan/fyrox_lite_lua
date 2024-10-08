@@ -6,7 +6,7 @@ use lite_model::{
 use to_vec::ToVec;
 
 use crate::{
-    code_model::{Mod, ModContent}, context::GenerationContext, expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, supress_lint::SUPRESSIONS, templating::render
+    code_model::{Mod, ModContent}, context::GenerationContext, eq::{self, generate_eq}, expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, supress_lint::SUPRESSIONS, templating::render
 };
 
 pub fn generate_enum_class_bindings(class: &EnumClass, ctx: &GenerationContext) -> Mod {
@@ -58,7 +58,7 @@ pub fn generate_enum_class_bindings(class: &EnumClass, ctx: &GenerationContext) 
     }
 }
 
-fn generate_instance_methods(s: &mut String, _class: &EnumClass, _ctx: &GenerationContext) {
+fn generate_instance_methods(s: &mut String, class: &EnumClass, _ctx: &GenerationContext) {
     render(
         s,
         r#"
@@ -67,10 +67,13 @@ fn generate_instance_methods(s: &mut String, _class: &EnumClass, _ctx: &Generati
                 methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
                     Ok(format!("{:?}", this.inner()))
                 });
-            }
     "#,
         [],
     );
+    generate_eq(s, &class.features);
+    *s += "
+            }
+    "
 }
 
 fn generate_instance_fields(s: &mut String, class: &EnumClass, ctx: &GenerationContext) {

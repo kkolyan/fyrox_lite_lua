@@ -41,7 +41,10 @@ impl FyroxUserData for fyrox_lite::lite_plugin::LitePlugin {
             let ret = fyrox_lite::lite_plugin::LitePlugin::get::<TypedUserData<ScriptObject>>(
                 class_name, _stub,
             );
-            let ret = ret?;
+            let ret = match ret {
+                Ok(ret) => ret,
+                Err(err) => return Err(err),
+            };
             Ok(ret)
         });
     }

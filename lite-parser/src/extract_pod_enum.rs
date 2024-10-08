@@ -1,12 +1,12 @@
 use lite_model::{ClassName, EnumClass, EnumValue, EnumVariant, Field, RustQualifiedName};
-use proc_macro2::TokenStream;
+use proc_macro2::Span;
 use syn::Ident;
 
-use crate::extract_ty::extract_ty;
+use crate::{extract_ty::extract_ty, lite_api_attr::LiteApiAttr};
 
 pub fn extract_pod_enum(
     rust_path: &str,
-    attr: Option<TokenStream>,
+    (attr, attr_span): (LiteApiAttr, Span),
     item: &syn::ItemEnum,
     errors: &mut Vec<syn::Error>,
     types: &mut Vec<syn::Type>,
@@ -64,13 +64,14 @@ pub fn extract_pod_enum(
             }
         }
     }
-    let class_name = attr.map(|it| it.to_string()).unwrap_or_else(|| item.ident.to_string());
+    let class_name = attr.class.unwrap_or_else(|| item.ident.to_string());
     Some((
         item.ident.clone(),
         EnumClass {
             class_name: ClassName(class_name),
             variants,
             rust_struct_path: RustQualifiedName(format!("{}::{}", rust_path, item.ident)),
+            features: attr.features,
         },
     ))
 }

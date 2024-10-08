@@ -12,7 +12,7 @@
 ---@field attack_range number
 ---@field beacon_reached_distance number
 ---@field move_power number
----@field private guard_id number
+---@field private id number
 Guard = script_class()
 
 
@@ -21,10 +21,6 @@ function Guard:try_attack_player()
     local player_pos = Plugin:get("Game").player.global_position
     local self_pos = self.node.global_position
     local sight_vector = player_pos:sub(self_pos)
-    print(string.format(
-        "[%s] try attack player. player_pos: %s, self_pos: %s",
-        self.id, tostring(player_pos), tostring(self_pos)
-    ))
 
     if self:can_see_player(player_pos, sight_vector) then
         Bullet:spawn(
@@ -55,16 +51,15 @@ function Guard:can_see_player(player_pos, sight_vector)
         max_len = sight_vector:magnitude(),
         sort_results = true
     }
-    local results = {}
-    Physics:cast_ray(opts, results)
+    local results = Physics:cast_ray(opts)
     for i, hit in ipairs(results) do
         local node = hit.collider
         if node ~= self.collider then
-            while node:is_alive() do
-                if node:get_script("Player") then
+            while node.alive do
+                if node:find_script("Player") then
                     return true
                 end
-                node = node:parent()
+                node = node.parent
             end
             return false
         end
@@ -78,7 +73,6 @@ function Guard:move_to_waypoint(dt)
         self.current_waypoint = nil;
         self.waypoint_sec = 0.0;
 
-        -- println!("guard {:?end switched waypoint", ctx.handle);
     end
     if self.current_waypoint == nil then
         local beacons = Plugin:get("Game").beacons;

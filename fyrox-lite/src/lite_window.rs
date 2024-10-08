@@ -8,7 +8,7 @@ use crate::script_context::with_script_context;
 #[derive(Debug, Clone, Copy)]
 pub struct LiteWindow;
 
-#[lite_api(Window)]
+#[lite_api(class=Window)]
 impl LiteWindow {
     pub fn set_cursor_grab(mode: LiteCursorGrabMode) {
         with_script_context(|ctx| {
@@ -29,7 +29,7 @@ impl LiteWindow {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[lite_api(CursorGrabMode)]
+#[lite_api(class=CursorGrabMode)]
 pub enum LiteCursorGrabMode {
     /// No grabbing of the cursor is performed.
     None,

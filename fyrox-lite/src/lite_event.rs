@@ -1361,7 +1361,7 @@ pub struct InnerSizeWriter {
     pub(crate) target: fyrox::event::InnerSizeWriter,
 }
 
-#[lite_api(InnerSizeWriter)]
+#[lite_api(class=InnerSizeWriter)]
 impl InnerSizeWriter {
     /// Try to request inner size which will be set synchroniously on the window.
     pub fn request_inner_size(&mut self, new_inner_size: PodVector2i) -> bool {

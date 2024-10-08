@@ -8,6 +8,7 @@ use send_wrapper::SendWrapper;
 use std::fmt::Debug;
 use std::fmt::Formatter;
 
+use crate::plugin::LuaPlugin;
 use crate::script::ScriptFieldValue;
 use crate::script_object::ScriptObject;
 use crate::typed_userdata::TypedUserData;
@@ -47,6 +48,35 @@ impl ScriptData {
         match self {
             ScriptData::Packed(_it) => None,
             ScriptData::Unpacked(it) => Some(TypedUserData::clone(it)),
+        }
+    }
+
+    pub fn ensure_unpacked(&mut self, plugin: &mut LuaPlugin) {
+        if plugin.failed {
+            // don't spam logs, though, plugin is completely broken at this point
+            return;
+        }
+        if self.is_packed() {
+            // script was just loaded from the scene file or safe game. unpack it!
+            *self = match self {
+                ScriptData::Packed(it) => {
+                    let so = plugin
+                        .vm
+                        .create_userdata(it.clone())
+                        .map(TypedUserData::<ScriptObject>::new)
+                        .map(SendWrapper::new)
+                        .map(ScriptData::Unpacked);
+                    match so {
+                        Ok(it) => it,
+                        Err(err) => {
+                            Log::err(format!("failed to unpack LuaScript: {:?}", err));
+                            plugin.failed = true;
+                            return;
+                        }
+                    }
+                }
+                ScriptData::Unpacked(_) => panic!("WTF?"),
+            }
         }
     }
 }

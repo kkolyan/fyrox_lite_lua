@@ -1,13 +1,13 @@
 use lite_model::*;
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 use quote::ToTokens;
 use syn::Ident;
 
-use crate::extract_ty::extract_ty;
+use crate::{extract_ty::extract_ty, lite_api_attr::LiteApiAttr};
 
 pub fn extract_pod_struct(
     rust_path: &str,
-    attr: Option<TokenStream>,
+    (attr, attr_span): (LiteApiAttr, Span),
     item: &syn::ItemStruct,
     errors: &mut Vec<syn::Error>,
 ) -> Option<(Ident, StructClass)> {
@@ -25,7 +25,14 @@ pub fn extract_pod_struct(
             },
         });
     }
-    let class_name = attr.map(|it| it.to_string()).unwrap_or_else(|| rust_name.to_string());
+    let class_name = attr.class.unwrap_or_else(|| rust_name.to_string());
+    for feature in attr.features {
+        match feature {
+            Feature::Eq => {
+                errors.push(syn::Error::new( attr_span, "`eq` option not allowed for struct classes"));
+            },
+        }
+    }
     Some((
         rust_name.clone(),
         StructClass {

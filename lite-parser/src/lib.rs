@@ -1,3 +1,4 @@
+pub mod lite_api_attr;
 pub mod parse_domain_metadata;
 pub mod resolve_classes;
 pub mod load_path;

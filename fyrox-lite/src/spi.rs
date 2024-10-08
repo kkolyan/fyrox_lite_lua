@@ -16,13 +16,17 @@ pub trait UserScript : Sized + LiteDataType {
 	type ProxyScript: ScriptTrait;
 	type LangSpecificError: Clone + Debug;
 	type UserScriptMessage : ScriptMessagePayload + LiteDataType;
-	type UserScriptGenericStub: LiteDataType;
+	type UserScriptGenericStub: LiteDataType + Copy;
 
-	fn extract_from(proxy: &Self::ProxyScript, class_name: &str) -> Option<Self>;
+	fn extract_from(proxy: &mut Self::ProxyScript, class_name: &str, ctx: &mut Self::Plugin) -> Option<Self>;
 
 	fn into_proxy_script(self) -> Result<Self::ProxyScript, Self::LangSpecificError>;
 
+	fn new_instance(class: &str) -> Result<Self, Self::LangSpecificError>;
+
 	fn find_plugin_script(class_name: &str) -> Result<Self, Self::LangSpecificError>;
+
+	fn create_error(msg: &str) -> Self::LangSpecificError;
 }
 
 /// implemented only by the types from `lite_model::DataType` (mostly by proc macros)

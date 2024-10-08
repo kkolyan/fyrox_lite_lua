@@ -3,7 +3,7 @@ use quote::quote;
 
 fn main() {
 	let attr = quote! {
-		#[lite_api(Intersection)]
+		#[lite_api(class=Intersection)]
 	};
 	let item = quote! {
 		/// A ray intersection result.

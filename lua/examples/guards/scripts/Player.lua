@@ -116,9 +116,9 @@ end
 
 function Player:on_os_event(event)
     if event.WindowEvent then
-        local event = event.WindowEvent
+        local event = event.WindowEvent.event
         if event.KeyboardInput then
-            local event = event.KeyboardInput
+            local event = event.KeyboardInput.event
             local value = event.state.Pressed
             if event.physical_key.Code then
                 local code = event.physical_key.Code._1
@@ -144,12 +144,11 @@ function Player:on_os_event(event)
         end
     end
     if event.DeviceEvent then
-        local event = event.DeviceEvent
+        local event = event.DeviceEvent.event
         if event.MouseMotion then
             local event = event.MouseMotion
-            local x, y = table.unpack(event.delta)
-            self:turn(-x);
-            self:aim(y);
+            self:turn(-event.delta.x);
+            self:aim(event.delta.y);
         end
     end
 end

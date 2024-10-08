@@ -20,9 +20,9 @@ BulletSeed = nil
 function Bullet:spawn(seed)
     local orientation = Quaternion:face_towards(seed.direction, Vector3.Y);
     local bullet = seed.prefab:instantiate_at(seed.origin, orientation);
-    local script = bullet:add_script("Bullet")
+    local script = bullet:find_script("Bullet")
     script.velocity = seed.direction:normalize():mul(seed.initial_velocity)
-    script.remaining_sec = seed.range / seed.initial_velocity
+    script.remaining_sec = 1--seed.range / seed.initial_velocity
     script.author_collider = seed.author_collider
 end
 
@@ -42,8 +42,7 @@ function Bullet:on_update(dt)
         sort_results = true
     }
     ---@type Intersection[]
-    local results = {}
-    Physics:cast_ray(opts, results)
+    local results = Physics:cast_ray(opts)
 
     for i, hit in ipairs(results) do
         if hit.collider ~= self.author_collider then

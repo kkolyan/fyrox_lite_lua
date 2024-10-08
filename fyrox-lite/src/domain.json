@@ -1601,14 +1601,19 @@
             "signature": {
               "params": [
                 {
-                  "name": "state",
-                  "ty": "UserScript",
+                  "name": "class_name",
+                  "ty": "String",
+                  "variadic": false
+                },
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub",
                   "variadic": false
                 }
               ],
               "return_ty": {
                 "Result": {
-                  "ok": "Unit"
+                  "ok": "UserScript"
                 }
               }
             }
@@ -1630,7 +1635,11 @@
                 }
               ],
               "return_ty": {
-                "Option": "UserScript"
+                "Result": {
+                  "ok": {
+                    "Option": "UserScript"
+                  }
+                }
               }
             }
           },
@@ -1677,6 +1686,9 @@
               "return_ty": "String"
             }
           }
+        ],
+        "features": [
+          "Eq"
         ]
       }
     },
