@@ -15,6 +15,7 @@
 ---@field private id number
 Guard = script_class()
 
+FRACTION_GUARDS = 1
 
 ---@return boolean
 function Guard:try_attack_player()
@@ -31,6 +32,7 @@ function Guard:try_attack_player()
                 initial_velocity = self.initial_bullet_velocity,
                 author_collider = self.collider,
                 range = self.attack_range,
+                fraction = FRACTION_GUARDS,
             }
         )
         self.reloading_sec = self.reload_delay_sec
@@ -111,9 +113,7 @@ function Guard:on_update(dt)
 end
 
 function Guard:on_message(message)
-    print("on_message", message)
-    local bullet = message == Bullet.HitMessage
-    if bullet then
+    if message.type == Bullet.HitMessage and message.fraction ~= FRACTION_GUARDS then
         self.node:destroy()
         Plugin:get("Game"):inc_frags()
         print("guard killed!")

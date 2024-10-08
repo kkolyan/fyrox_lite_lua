@@ -19,6 +19,7 @@ local left = false
 local right = false
 local fire = false
 
+FRACTION_PLAYER = 0
 
 ---@param x number
 function Player:turn(x)
@@ -50,7 +51,8 @@ function Player:fire()
             direction = bullet_orientation:mul_vec(Vector3.Z),
             initial_velocity = self.initial_bullet_velocity,
             author_collider = self.collider,
-            range = self.shooting_range
+            range = self.shooting_range,
+            fraction = FRACTION_PLAYER,
         }
     );
 end
@@ -67,8 +69,7 @@ function Player:on_start()
 end
 
 function Player:on_message(message)
-    local _bullet = message == Bullet.HitMessage
-    if _bullet ~= nil then
+    if message.type == Bullet.HitMessage and message.fraction ~= FRACTION_PLAYER then
         Plugin:get("Game"):inc_wounds()
         print("player wounded!")
     end

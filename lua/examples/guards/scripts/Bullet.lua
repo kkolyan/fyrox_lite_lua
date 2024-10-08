@@ -3,6 +3,7 @@
 ---@field velocity Vector3
 ---@field remaining_sec number
 ---@field author_collider Node
+---@field fraction number
 Bullet = script_class()
 
 Bullet.HitMessage = "BulletHit"
@@ -14,6 +15,7 @@ Bullet.HitMessage = "BulletHit"
 ---@field initial_velocity number
 ---@field author_collider Node
 ---@field range number
+---@field fraction number
 BulletSeed = nil
 
 ---@param seed BulletSeed
@@ -22,8 +24,9 @@ function Bullet:spawn(seed)
     local bullet = seed.prefab:instantiate_at(seed.origin, orientation);
     local script = bullet:find_script("Bullet")
     script.velocity = seed.direction:normalize():mul(seed.initial_velocity)
-    script.remaining_sec = 1--seed.range / seed.initial_velocity
+    script.remaining_sec = 1 --seed.range / seed.initial_velocity
     script.author_collider = seed.author_collider
+    script.fraction = seed.fraction
 end
 
 function Bullet:on_update(dt)
@@ -46,7 +49,7 @@ function Bullet:on_update(dt)
 
     for i, hit in ipairs(results) do
         if hit.collider ~= self.author_collider then
-            hit.collider:send_hierarchical(RoutingStrategy.Up, Bullet.HitMessage)
+            hit.collider:send_hierarchical(RoutingStrategy.Up, { type = Bullet.HitMessage, fraction = self.fraction })
             self.node:destroy()
             return;
         end
