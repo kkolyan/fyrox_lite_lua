@@ -4,7 +4,7 @@
 	- [Vision](#vision)
 	- [Current state](#current-state)
 	- [How to use it now](#how-to-use-it-now)
-	- [How to write scripts now](#how-to-write-scripts-now)
+	- [How to write scripts in Lua](#how-to-write-scripts-in-lua)
 - [For contributors](#for-contributors)
 	- [Lite API](#lite-api)
 	- [Contract](#contract)
@@ -49,15 +49,14 @@ Project is in deep pre-alpha. There is no downloadable pre-built version for now
 3. Run editor: `cargo run --release -p editor-lua --manifest-path $FYROX_LITE_HOME/Cargo.toml`.
 4. Run game without editor: `cargo run --release -p executor-lua --manifest-path $FYROX_LITE_HOME/Cargo.toml`.
 
-### How to write scripts now
+### How to write scripts in Lua
 The best available documentation for now is the [demo game](lua/examples/guards).
 
 There are two kind of scripts:
 1. Node scripts (for instance [Bullet.lua](lua/examples/guards/scripts/Bullet.lua)), that in general replicates [Fyrox Scripts](https://fyrox-book.github.io/scripting/script.html). They can be attached to nodes in scene editor and configured via inspector.
 2. Global scripts (for instance [Game.lua](lua/examples/guards/scripts/Game.lua)). These scripts purpose to load scene initially and share global state between node scripts. It is somewhat close to [Fyrox Plugin](https://fyrox-book.github.io/scripting/plugin.html), but without technical things like scripts registration.
 
-There is [Lua Annotation](lua/annotations/fyrox-lite.lua) file, that can serve as Lite API reference of some sort.
-
+The Lite API reference is presented with [Lua Annotations](lua/annotations). Also, these annotations can be used for autocompletion and type-checking (VSCode do it automatically if annotation files are in scope of project). Note that even though annotations are Lua files, they are not supposed to be executed, so do not place them in `scripts` directory.
 
 ## For contributors
 
@@ -86,7 +85,7 @@ There is no specific rules for this, but it's supposed that language implementat
 ### Lua Implementation
 * `lua/fyrox-lua` - the runtime library, provides [LuaPlugin](lua/fyrox-lua/src/fyrox_plugin.rs) and [LuaScript](lua/fyrox-lua/src/fyrox_script.rs). [mlua](https://github.com/mlua-rs/mlua) crate used to embed Lua. LuaU interpreter is choosen (mlua allow to switch them easily) just because it was easiest to compile on Windows, but there is no dependency on specific interpreter features.
 * `lua/editor-lua` / `lua/executor-lua` - desktop instantiations of previously mentioned `LuaPlugin`.
-* `lua/luagen-lib` - dynamic part. It uses Lite API metadata to generate both [Lua bindings](lua/fyrox-lua/src/generated) and [Lua annotations](lua/annotations/fyrox-lite.lua) (for code insights in VSCode). Currently, `luagen-lib` is not integrated with build and invoked with `cargo run --bin luagen` ([code](tools/src/bin/luagen.rs)).
+* `lua/luagen-lib` - dynamic part. It uses Lite API metadata to generate both [Lua bindings](lua/fyrox-lua/src/generated) and [Lua annotations](lua/annotations). Currently, `luagen-lib` is not integrated with build and invoked with `cargo run --bin luagen` ([code](tools/src/bin/luagen.rs)).
 
 ## Feedback
 Any feedback is extremely appreciated.

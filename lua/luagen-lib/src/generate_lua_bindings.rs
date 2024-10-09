@@ -1,6 +1,4 @@
-use std::collections::HashMap;
-
-use lite_model::{Class, ClassName, Domain};
+use lite_model::{Class, Domain};
 
 use crate::{by_package::classes_by_package, code_model::{HierarchicalCodeBase, ModContent, Module}, context::GenerationContext };
 use crate::bindings::{generate_engine_class_bindings::generate_engine_class_bindings, generate_enum_class_bindings::generate_enum_class_bindings, generate_registry::generate_registry, generate_struct_class_bindings::generate_struct_class_bindings};
@@ -12,17 +10,6 @@ pub fn generate_lua_bindings(domain: &Domain) -> HierarchicalCodeBase {
         internal_to_external: Default::default(),
         domain,
     };
-
-
-    // context.internal_to_external.insert(
-    //     RustQualifiedName("lite_math::PodVector3".to_string()),
-    //     RustQualifiedName("vec::LiteVector3".to_string()),
-    // );
-
-    // context.internal_to_external.insert(
-    //     RustQualifiedName("lite_math::PodQuaternion".to_string()),
-    //     RustQualifiedName("quat::LiteQuaternion".to_string()),
-    // );
 
     let mut bindings = HierarchicalCodeBase::default();
 

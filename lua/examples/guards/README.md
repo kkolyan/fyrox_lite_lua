@@ -25,7 +25,7 @@ Use WASD and mouse to shoot enemies and optionally avoid their attacks.
 ```
 
 # How to edit scripts
-Use any text editor to edit existing files under [scripts](scripts) directory. If you use VSCode, make sure that the [annotations](lua/annotations/fyrox-lite.lua) are in the scope of the VSCode project, because it will provide some code insight (autocompletion, type checking, Fyrox Lite API reference). Though, it's optional and doesn't impact code execution.
+Use any text editor to edit existing files under [scripts](scripts) directory. If you use VSCode, make sure that the [annotations](lua/annotations) are in the scope of the VSCode project, because it will provide some code insight (autocompletion, type checking, Fyrox Lite API reference). Though, it's optional and doesn't impact code execution.
 
 # Screenshots
 ![gameplay.png](gameplay.png)
