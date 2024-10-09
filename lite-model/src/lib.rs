@@ -1,27 +1,11 @@
-pub mod display;
-use std::fmt::Display;
+pub mod impls;
 
 use serde::{Deserialize, Serialize};
+use impls::is_false;
 
 #[derive(Serialize, Deserialize, Debug, Default, PartialEq)]
 pub struct Domain {
     pub classes: Vec<Class>,
-}
-
-impl Domain {
-    pub fn get_class(&self, name: &ClassName) -> Option<&Class> {
-        self.classes.iter().find(|it| it.class_name() == name)
-    }
-}
-
-impl Domain {
-    pub fn merge_all(domains: impl IntoIterator<Item=Domain>) -> Self {
-        let mut classes = Vec::new();
-        for domain in domains {
-            classes.extend(domain.classes);
-        }
-        Self {classes}
-    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -29,24 +13,6 @@ pub enum Class {
     Engine(EngineClass),
     Struct(StructClass),
     Enum(EnumClass),
-}
-
-impl Class {
-    pub fn class_name(&self) -> &ClassName {
-        match self {
-            Class::Engine(it) => &it.class_name,
-            Class::Struct(it) => &it.class_name,
-            Class::Enum(it) => &it.class_name,
-        }
-    }
-
-    pub fn rust_name(&self) -> &RustQualifiedName {
-        match self {
-            Class::Engine(it) => &it.rust_struct_path,
-            Class::Struct(it) => &it.rust_struct_path,
-            Class::Enum(it) => &it.rust_struct_path,
-        }
-    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -100,10 +66,6 @@ pub struct Param {
 
     #[serde(skip_serializing_if = "is_false")]
     pub variadic: bool,
-}
-
-fn is_false(value: &bool) -> bool {
-    *value
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -161,16 +123,6 @@ pub enum EnumValue {
     Struct { fields: Vec<Field> },
 }
 
-impl EnumValue {
-    fn is_unit(&self) -> bool {
-        matches!(self, EnumValue::Unit)
-    }
-
-    fn unit() -> EnumValue {
-        EnumValue::Unit
-    }
-}
-
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Signature {
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -207,15 +159,4 @@ pub enum DataType {
     Result {
         ok: Box<DataType>,
     },
-}
-
-impl Display for RustQualifiedName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-impl Display for ClassName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
 }
