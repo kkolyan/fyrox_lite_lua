@@ -1,4 +1,5 @@
 - [Overview](#overview)
+- [Demo](#demo)
 - [For users (who make Games)](#for-users-who-make-games)
 	- [Vision](#vision)
 	- [Current state](#current-state)
@@ -17,6 +18,7 @@ Project ambition is to make Fyrox a "polyglot", so there is an abstraction over 
 
 For a proof of concept phase `Lua` was chosen, but there is a plan to adopt some popular statically typed language. `C#` and `Kotlin` are main candidates. `$Lang` alias is used further in text instead of refering to a particular language.
 
+## Demo
 There is a [demo game](lua/examples/guards) that written in Lua to demonstrate the currently Lua-exposed subset of Fyrox API.
 
 ## For users (who make Games)
@@ -36,7 +38,7 @@ Project is in deep pre-alpha. There is no downloadable pre-built version for now
 1. There is no existing pre-built toolkit yet, so editor and executor should be run from the source code (which is pretty easy actually - see instruction below). The Fyrox Packager doesn't exist at all for now.
 2. There is only `Lua` language support currently.
 3. There are a lot of temporary limitations, decribed in [known_issues.md](known_issues.md).
-4. Subset of exposed Fyrox API is pretty limited: input, messages, working with scene graph, basic physics, raycasting, basic UI Text. Though, that's already enough for gameplay prototyping.
+4. Subset of exposed Fyrox API is pretty limited: input, messages, working with scene graph, prefab instantiation, basic physics, basic UI Text. Though, that's already enough for gameplay prototyping.
 
 ### How to use it now
 1. install Rust (https://www.rust-lang.org/tools/install)
