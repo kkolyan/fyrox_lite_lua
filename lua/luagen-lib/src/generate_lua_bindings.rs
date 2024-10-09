@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use lite_model::{Class, ClassName, Domain};
 
-use crate::{code_model::{Module, ModContent, HierarchicalCodeBase}, context::GenerationContext, };
+use crate::{by_package::classes_by_package, code_model::{HierarchicalCodeBase, ModContent, Module}, context::GenerationContext };
 use crate::bindings::{generate_engine_class_bindings::generate_engine_class_bindings, generate_enum_class_bindings::generate_enum_class_bindings, generate_registry::generate_registry, generate_struct_class_bindings::generate_struct_class_bindings};
 
 
@@ -28,15 +28,7 @@ pub fn generate_lua_bindings(domain: &Domain) -> HierarchicalCodeBase {
 
     bindings.mods.push(generate_registry(&ctx));
 
-    let mut by_package: HashMap<&str, Vec<ClassName>> = Default::default();
-    for class in ctx.domain.classes.iter() {
-        let rust_name_without_crate = class.rust_name().0.split_once("::").unwrap().1;
-        let package = rust_name_without_crate.split_once("::").unwrap().0;
-        by_package
-            .entry(package)
-            .or_default()
-            .push(class.class_name().clone());
-    }
+    let by_package = classes_by_package(ctx.domain);
 
     for (package, class_names) in by_package {
         let mut mods = Vec::new();

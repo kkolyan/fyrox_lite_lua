@@ -4,6 +4,7 @@
 	- [Vision](#vision)
 	- [Current state](#current-state)
 	- [How to use it now](#how-to-use-it-now)
+	- [How to write scripts now](#how-to-write-scripts-now)
 - [For contributors](#for-contributors)
 	- [Lite API](#lite-api)
 	- [Contract](#contract)
@@ -48,6 +49,16 @@ Project is in deep pre-alpha. There is no downloadable pre-built version for now
 3. Run editor: `cargo run --release -p editor-lua --manifest-path $FYROX_LITE_HOME/Cargo.toml`.
 4. Run game without editor: `cargo run --release -p executor-lua --manifest-path $FYROX_LITE_HOME/Cargo.toml`.
 
+### How to write scripts now
+The best available documentation for now is the [demo game](lua/examples/guards).
+
+There are two kind of scripts:
+1. Node scripts (for instance [Bullet.lua](lua/examples/guards/scripts/Bullet.lua)), that in general replicates [Fyrox Scripts](https://fyrox-book.github.io/scripting/script.html). They can be attached to nodes in scene editor and configured via inspector.
+2. Global scripts (for instance [Game.lua](lua/examples/guards/scripts/Game.lua)). These scripts purpose to load scene initially and share global state between node scripts. It is somewhat close to [Fyrox Plugin](https://fyrox-book.github.io/scripting/plugin.html), but without technical things like scripts registration.
+
+There is [Lua Annotation](lua/annotations/fyrox-lite.lua) file, that can serve as Lite API reference of some sort.
+
+
 ## For contributors
 
 ### Lite API
@@ -59,7 +70,7 @@ Exposed API should comply with the rules. Following types allowed (owned only, n
 * primitives (limited set of them, for the sake of simplicity)
 * `data types` - `#[fyrox_lite]`-annotated structures or enums. they have copy-on-asign semantic. It's supposed that on the scripting language side they are represented in its native data structures. That's not allowed to expose Rust methods of this structures - all necessary methods should be provided by the language specific implementation.
 * `engine types` - defined by annotating non-trait `impl`s with this same `#[fyrox_lite]` attribute. Script code can invoke exposed methods (using `ffi` or analogs), but internal structure of this types is completely hidden. Script code can instantiate an engine type only if there is exposed method for this. Handles are clonable and clone operation only clones the handle, not the underlying object. If underlying object has limited lifecycle, then it should provide the methods to deal with it.
-* predefined abstract types. That's a family of traits, expected to be implemented by every language provider. they are not intended to be changed frequently. The central type is [UserScript](lua/fyrox-lua/src/user_script_impl.rs).
+* predefined abstract types. That's a family of traits, expected to be implemented by every language provider. they are not intended to be changed frequently. The central type is [UserScript](fyrox-lite/src/spi.rs).
 * `Vec<T>`, `Option<T>`, `Result<T>` where `T` is allowed type..
 
 Note that Vector3 and Quaternion for Lua are of an `engine type`, but for some languages (C# for instance) they probably would be a `data type`, because language-native implementation of vector arithmetics could be more efficient than `ffi` to `nalgebra`. That's why nalgebra-backed types are in [fyrox-lite-math](fyrox-lite-math) and [fyrox-lite](fyrox-lite) exposes methods with shallow math structs instead of nalgebra-backed ones.

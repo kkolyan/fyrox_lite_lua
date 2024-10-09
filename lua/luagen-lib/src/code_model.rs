@@ -1,4 +1,4 @@
-use std::{fs, process::{self, Stdio}};
+use std::{fmt::Display, fs, process::{self, Stdio}};
 
 #[derive(Default)]
 pub struct HierarchicalCodeBase {
@@ -24,6 +24,20 @@ pub enum ModContent {
 }
 
 impl Module {
+    pub fn code(name: impl Display, code: impl Display) -> Module {
+        Module {
+            name: name.to_string(),
+            content: ModContent::Code(code.to_string()),
+        }
+    }
+    
+    pub fn children(name: impl Display, children: Vec<Module>) -> Module {
+        Module {
+            name: name.to_string(),
+            content: ModContent::Children(children),
+        }
+    }
+
     fn write_rust(&self, parent_dir: &str)  {
         match &self.content {
             ModContent::Children(children) => {

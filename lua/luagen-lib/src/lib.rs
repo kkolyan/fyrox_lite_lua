@@ -1,3 +1,4 @@
+pub mod by_package;
 pub mod annotations;
 pub mod bindings;
 pub mod generate_lua_annotations;
