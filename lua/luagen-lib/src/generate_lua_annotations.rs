@@ -17,15 +17,14 @@ const HEADER: &str = "
 pub fn generate_lua_annotations(domain: &Domain) -> HierarchicalCodeBase {
     let mut mods = vec![];
 
-    mods.push(Module::code("Script", format!("
-            {}
+    mods.push(Module::code("Script", format!("{}
 
 			---@class Script
 			---@field node Node
 			Script = {{}}
 
 			function script_class() end
-		", HEADER).as_str().deindent()));
+		", HEADER.trim()).as_str().deindent()));
 
     let by_package = classes_by_package(domain);
     for (package, classes) in by_package {
@@ -35,7 +34,7 @@ pub fn generate_lua_annotations(domain: &Domain) -> HierarchicalCodeBase {
         for class in classes {
             let class = domain.get_class(&class).unwrap();
             let mut s = String::new();
-            writelnu!(s, "{}", HEADER);
+            writelnu!(s, "{}", HEADER.trim());
             writelnu!(s, "");
             writelnu!(
                 s,
