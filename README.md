@@ -2,8 +2,7 @@
 - [For users (who make Games)](#for-users-who-make-games)
 	- [Vision](#vision)
 	- [Current state](#current-state)
-	- [How to use Fyrox Lite Lua from code currently](#how-to-use-fyrox-lite-lua-from-code-currently)
-	- [Example](#example)
+	- [How to use it now](#how-to-use-it-now)
 - [For contributors](#for-contributors)
 	- [Lite API](#lite-api)
 	- [Contract](#contract)
@@ -17,6 +16,8 @@ Full Scripting languages support for [Fyrox Engine](https://github.com/FyroxEngi
 Project ambition is to make Fyrox a "polyglot", so there is an abstraction over the languages, called Lite API, and a number of implementations for different languages. 
 
 For a proof of concept phase `Lua` was chosen, but there is a plan to adopt some popular statically typed language. `C#` and `Kotlin` are main candidates. `$Lang` alias is used further in text instead of refering to a particular language.
+
+There is a [demo game](lua/examples/guards) that written in Lua to demonstrate the currently Lua-exposed subset of Fyrox API.
 
 ## For users (who make Games)
 
@@ -35,17 +36,15 @@ Project is in deep pre-alpha. There is no downloadable pre-built version for now
 1. There is no existing pre-built toolkit yet, so editor and executor should be run from the source code (which is pretty easy actually - see instruction below). The Fyrox Packager doesn't exist at all for now.
 2. There is only `Lua` language support currently.
 3. There are a lot of temporary limitations, decribed in [known_issues.md](known_issues.md).
+4. Subset of exposed Fyrox API is pretty limited: input, messages, working with scene graph, raycasting, basic UI Text. Though, that's already enough for gameplay prototyping.
 
-### How to use Fyrox Lite Lua from code currently
+### How to use it now
 1. install Rust (https://www.rust-lang.org/tools/install)
 2. checkout Fyrox Lite `git clone https://github.com/kkolyan/fyrox_lite_lua` to some directory (let's call it `$FYROX_LITE_HOME`).
 3. let's call a directory with your game project files a `$GAME_PROJECT`.
 4. open terminal in this directory (`cd $GAME_PROJECT`). That's important - otherwise Fyrox will not be able to find the resources attached to scene objects.
 3. Run editor: `cargo run --release -p editor-lua --manifest-path $FYROX_LITE_HOME/Cargo.toml`.
 4. Run game without editor: `cargo run --release -p executor-lua --manifest-path $FYROX_LITE_HOME/Cargo.toml`.
-
-### Example
-Feel free to chek out a [demo game](lua/examples/guards) that written in Lua to demonstrate the currently Lua-exposed subset of Fyrox API.
 
 ## For contributors
 
