@@ -43,14 +43,14 @@ fn main() {
         let file_name = "libfyrox-lua_dylib.so";
         #[cfg(target_os = "macos")]
         let file_name = "libfyrox-lua_dylib.dylib";
-        executor-lua.add_dynamic_plugin(file_name, true, true).unwrap();
+        executor.add_dynamic_plugin(file_name, true, true).unwrap();
     }
 
     // Static linking.
     #[cfg(not(feature = "dylib"))]
     {
 		use fyrox_lua::fyrox_plugin::LuaPlugin;
-        executor.add_plugin(LuaPlugin::default());
+        executor.add_dynamic_plugin_custom(LuaPlugin::default());
     }
 
     executor.run()

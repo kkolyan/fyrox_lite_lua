@@ -4,5 +4,4 @@
 /settings.ron
 /bindgen/expand
 .vscode
-/engine
 /lua/examples/guards/fyrox-lite.lua

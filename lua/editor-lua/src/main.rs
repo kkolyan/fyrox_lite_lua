@@ -29,7 +29,9 @@ fn main() {
     #[cfg(not(feature = "dylib"))]
     {
 		use fyrox_lua::fyrox_plugin::LuaPlugin;
-        editor.add_game_plugin(LuaPlugin::default());
+        if let Err(err) = editor.add_dynamic_plugin_custom(LuaPlugin::default()) {
+            Log::err(err);
+        }
     }
 
     editor.run(event_loop)

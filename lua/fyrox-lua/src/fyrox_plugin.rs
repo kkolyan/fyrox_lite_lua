@@ -1,9 +1,9 @@
 use crate::debug::override_print;
 use crate::debug::var_dump;
-use crate::generated::registry::register_classes;
-use crate::lua_utils::log_error;
 use crate::fyrox_script::invoke_callback;
 use crate::fyrox_script::LuaScript;
+use crate::generated::registry::register_classes;
+use crate::lua_utils::log_error;
 use crate::script_class::ScriptClass;
 use crate::script_data::ScriptData;
 use crate::script_def::ScriptDefinition;
@@ -12,10 +12,13 @@ use crate::script_def::ScriptMetadata;
 use crate::script_object::ScriptObject;
 use crate::typed_userdata::TypedUserData;
 use fyrox::core::log::Log;
+use fyrox::core::notify::EventKind;
 use fyrox::core::reflect::prelude::*;
 use fyrox::core::reflect::Reflect;
 use fyrox::core::visitor::prelude::*;
 use fyrox::core::visitor::Visit;
+use fyrox::core::watcher::FileSystemWatcher;
+use fyrox::plugin::DynamicPlugin;
 use fyrox::plugin::Plugin;
 use fyrox::plugin::PluginContext;
 use fyrox::plugin::PluginRegistrationContext;
@@ -32,11 +35,13 @@ use mlua::UserDataRefMut;
 use mlua::Value;
 use send_wrapper::SendWrapper;
 use std::cell::RefCell;
+use std::fmt::Debug;
 use std::ops::Deref;
 use std::ops::DerefMut;
 use std::sync::Arc;
+use std::time::Duration;
 
-#[derive(Visit, Reflect, Debug)]
+#[derive(Visit, Reflect)]
 pub struct LuaPlugin {
     #[visit(skip)]
     #[reflect(hidden)]
@@ -46,7 +51,25 @@ pub struct LuaPlugin {
     #[reflect(hidden)]
     pub failed: bool,
 
+    #[visit(skip)]
+    #[reflect(hidden)]
+    pub watcher: FileSystemWatcher,
+
+    #[visit(skip)]
+    #[reflect(hidden)]
+    pub scripts_dir: String,
+
     pub scripts: RefCell<PluginScriptList>,
+}
+
+impl Debug for LuaPlugin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("LuaPlugin")
+            .field("vm", &self.vm)
+            .field("failed", &self.failed)
+            .field("scripts", &self.scripts)
+            .finish()
+    }
 }
 
 impl LuaPlugin {
@@ -84,16 +107,71 @@ impl<'a, T> DerefMut for Mut<'a, T> {
 
 impl Default for LuaPlugin {
     fn default() -> Self {
+        Self::new("scripts")
+    }
+}
+
+thread_local! {
+    pub static LUA: RefCell<Option<&'static mlua::Lua>> = RefCell::new(None);
+}
+
+impl LuaPlugin {
+    pub fn new(scripts_dir: &str) -> Self {
         let vm = Box::leak(Box::new(Lua::new()));
+        LUA.set(Some(vm));
         let lua_version = vm.load("return _VERSION").eval::<mlua::String>().unwrap();
         println!("Lua Version: {}", lua_version.to_str().unwrap_or("unknown"));
         override_print(vm);
+
+        vm.globals()
+            .set("PINS", vm.create_table().unwrap())
+            .unwrap();
+
+        log_error(
+            "set 'package.path'",
+            vm.load(format!(
+                "package.path = '{}/?.lua;{}/?/init.lua'",
+                scripts_dir, scripts_dir
+            ))
+            .eval::<()>(),
+        );
+
+        {
+            vm.globals()
+                .set(
+                    "script_class",
+                    vm.create_function(move |_lua, _args: ()| {
+                        LOADING_CLASS_NAME.with(|class_name| {
+                            let class_name = class_name
+                                .borrow()
+                                .expect("script_class() called out of permitted context");
+
+                            Ok(ScriptClass {
+                                name: class_name,
+                                table: Default::default(),
+                                def: Default::default(),
+                            })
+                        })
+                    })
+                    .unwrap(),
+                )
+                .unwrap();
+        }
+
+        vm.globals()
+            .set("var_dump", vm.create_function(var_dump).unwrap())
+            .unwrap();
+
+        register_classes(vm);
+
         LuaPlugin {
             // mlua has approach with lifetimes that makes very difficult storing Lua types
             // here and there in Rust. But we need a single Lua VM instance for the whole life
             // of game process, so that's ok to make it 'static.
             vm,
             failed: false,
+            scripts_dir: scripts_dir.into(),
+            watcher: FileSystemWatcher::new(scripts_dir, Duration::from_millis(500)).unwrap(),
             scripts: Default::default(),
         }
     }
@@ -104,55 +182,13 @@ thread_local! {
 }
 impl Plugin for LuaPlugin {
     fn register(&self, context: PluginRegistrationContext) {
-        log_error(
-            "set 'package.path'",
-            self.vm
-                .load("package.path = 'scripts/?.lua;scripts/?/init.lua'")
-                .eval::<()>(),
-        );
-
-        {
-            self.vm
-                .globals()
-                .set(
-                    "script_class",
-                    self.vm
-                        .create_function(move |_lua, _args: ()| {
-                            LOADING_CLASS_NAME.with(|class_name| {
-                                let class_name = class_name
-                                    .borrow()
-                                    .expect("script_class() called out of permitted context");
-
-                                Ok(ScriptClass {
-                                    name: class_name,
-                                    table: Default::default(),
-                                    def: Default::default(),
-                                })
-                            })
-                        })
-                        .unwrap(),
-                )
-                .unwrap();
-        }
-
-        self.vm
-            .globals()
-            .set(
-                "var_dump",
-                self.vm
-                    .create_function(var_dump)
-                    .unwrap(),
-            )
-            .unwrap();
-
-        register_classes(self.vm);
-
-        for entry in WalkDir::new("scripts").into_iter().flatten() {
+        for entry in WalkDir::new(&self.scripts_dir).into_iter().flatten() {
             load_script(
                 &context,
                 self.vm,
                 &entry,
                 &mut self.scripts.borrow_mut(),
+                self.assembly_name(),
             );
         }
     }
@@ -181,10 +217,14 @@ fn load_script(
     lua: &'static Lua,
     entry: &DirEntry,
     plugin_scripts: &mut PluginScriptList,
+    assembly_name: &'static str,
 ) {
     if !entry.file_type().is_file() {
         return;
     }
+
+    println!("loading Lua script {:?}", entry.path());
+
     let metadata = ScriptMetadata::parse_file(entry.path());
     let metadata = match metadata {
         Ok(it) => it,
@@ -200,20 +240,23 @@ fn load_script(
         }
     };
 
-    LOADING_CLASS_NAME.with(|class_name| {
+    let class_loading: mlua::Result<()> = LOADING_CLASS_NAME.with(|class_name| {
         *class_name.borrow_mut() = Some(metadata.class);
-        lua.globals()
-            .get::<_, Function>("require")
-            .unwrap()
-            .call::<&str, ()>(metadata.class)
-            .unwrap();
+
+        lua.load(
+            "
+                return function(class) 
+                    package.loaded[class] = nil
+                    require(class)
+                end",
+        )
+        .eval::<Function>()
+        .and_then(|it| it.call::<_, ()>(metadata.class))?;
+
         *class_name.borrow_mut() = None;
+        Ok(())
     });
 
-    let class_loading = lua
-        .load("return function(x) require(x) end")
-        .eval::<Function>()
-        .and_then(|it| it.call::<_, ()>(metadata.class));
     match class_loading {
         Ok(_) => {}
         Err(err) => {
@@ -227,7 +270,6 @@ fn load_script(
 
     let name = metadata.class;
 
-    let assembly_name = "scripts/**.lua";
     let definition = Arc::new(ScriptDefinition {
         metadata,
         assembly_name,
@@ -246,7 +288,7 @@ fn load_script(
 
     match definition.metadata.kind {
         ScriptKind::Script(uuid) => {
-            context
+            let addition_result = context
                 .serialization_context
                 .script_constructors
                 .add_custom(
@@ -263,6 +305,9 @@ fn load_script(
                         assembly_name,
                     },
                 );
+            if let Err(err) = addition_result {
+                Log::err(err.to_string().as_str());
+            }
         }
         ScriptKind::Plugin => {
             plugin_scripts.inner_mut().push(LuaScript {
@@ -333,5 +378,76 @@ pub impl PluginsRefMut<'_> {
 
     fn lua_mut(&mut self) -> &mut LuaPlugin {
         self.get_mut::<LuaPlugin>()
+    }
+}
+
+impl DynamicPlugin for LuaPlugin {
+    fn display_name(&self) -> String {
+        format!("Lua Plugin (scripts path: {})", self.scripts_dir)
+    }
+
+    fn is_reload_needed_now(&self) -> bool {
+        let mut reload = false;
+        while let Some(event) = self.watcher.try_get_event() {
+            Log::info(format!("FS watcher event: {event:?}"));
+            match &event.kind {
+                EventKind::Create(_) | EventKind::Modify(_) | EventKind::Remove(_) => {
+                    reload = true;
+                }
+                _ => {}
+            }
+        }
+        reload
+    }
+
+    fn as_loaded_ref(&self) -> &dyn Plugin {
+        self
+    }
+
+    fn as_loaded_mut(&mut self) -> &mut dyn Plugin {
+        self
+    }
+
+    fn is_loaded(&self) -> bool {
+        true
+    }
+
+    // fn prepare_to_reload(&self) {
+    //     Log::info(format!("reloading Lua scripts"));
+
+    //     self.vm
+    //         .load(
+    //             "
+    //             PINS_BACKUP = {}
+    //             for k, v in pairs(PINS) do
+    //                 PINS_BACKUP[k] = v
+    //             end
+    //         ",
+    //         )
+    //         .eval::<()>()
+    //         .unwrap();
+    // }
+
+    fn reload(
+        &mut self,
+        fill_and_register: &mut dyn FnMut(&mut dyn Plugin) -> Result<(), String>,
+    ) -> Result<(), String> {
+
+        self.scripts.borrow_mut().inner_mut().clear();
+        let result = fill_and_register(self);
+
+        // self.vm
+        //     .load(
+        //         "
+        //         for k, v in pairs(PINS_BACKUP) do
+        //             PINS[k] = v
+        //         end
+        //         PINS_BACKUP = nil
+        //     ",
+        //     )
+        //     .eval::<()>()
+        //     .unwrap();
+
+        result
     }
 }

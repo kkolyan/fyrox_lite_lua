@@ -4,25 +4,30 @@ use fyrox::{
     asset::Resource,
     core::{
         algebra::{UnitQuaternion, Vector3},
+        log::Log,
         pool::Handle,
         reflect::{FieldInfo, Reflect},
+        Uuid,
     },
     gui::UiNode,
     resource::model::Model,
     scene::node::Node,
 };
-use fyrox_lite_math::{lite_math::LiteQuaternion, lite_math::LiteVector3};
 use fyrox_lite::{
-    lite_node::LiteNode,
-    lite_prefab::LitePrefab,
-    lite_ui::LiteUiNode,
+    lite_node::LiteNode, lite_prefab::LitePrefab, lite_ui::LiteUiNode,
     script_context::with_script_context,
 };
-use mlua::{MetaMethod, String, UserData, UserDataRef, Value};
-use send_wrapper::SendWrapper;
+use fyrox_lite_math::{lite_math::LiteQuaternion, lite_math::LiteVector3};
+use mlua::{Lua, MetaMethod, String, Table, UserData, UserDataRef, Value};
 
 use crate::{
-    debug::VerboseLuaValue, user_data_plus::{FyroxUserData, Traitor}, lua_error, lua_utils::{OptionX, ValueX}, reflect_base, script_class::ScriptClass
+    debug::VerboseLuaValue,
+    fyrox_plugin::LUA,
+    lua_error,
+    lua_utils::{OptionX, ValueX},
+    reflect_base,
+    script_class::ScriptClass,
+    user_data_plus::{FyroxUserData, Traitor},
 };
 
 use super::{
@@ -51,6 +56,26 @@ impl Debug for ScriptObject {
     }
 }
 
+// impl Drop for ScriptObject {
+//     fn drop(&mut self) {
+//         for it in self.values.iter_mut() {
+//             if let ScriptFieldValue::RuntimePin(it) = it {
+//                 if let Some(key) = it {
+//                     LUA.with_borrow(|it| {
+//                         it
+//                             .expect("WTF: non-empty runtime pin is used only in runtime, where Lua should be available")
+//                             .globals()
+//                             .get::<_, Table>("PINS")
+//                             .unwrap()
+//                             .set(key.as_str(), Value::Nil)
+//                             .unwrap();
+//                     });
+//                 }
+//             }
+//         }
+//     }
+// }
+
 impl ScriptObject {
     pub(crate) fn new(def: &Arc<ScriptDefinition>) -> Self {
         ScriptObject {
@@ -70,7 +95,7 @@ impl ScriptObject {
                     ScriptFieldValueType::Quaternion => {
                         ScriptFieldValue::Quaternion(Default::default())
                     }
-                    ScriptFieldValueType::RawLuaValue => ScriptFieldValue::RawLuaValue(None),
+                    ScriptFieldValueType::RuntimePin => ScriptFieldValue::RuntimePin(None),
                 })
                 .collect(),
         }
@@ -127,10 +152,14 @@ impl UserData for ScriptObject {
                                 ScriptFieldValue::Quaternion(it) => Value::UserData(
                                     lua.create_userdata(Traitor::new(LiteQuaternion::from(*it)))?,
                                 ),
-                                ScriptFieldValue::RawLuaValue(it) => it
-                                    .as_ref()
-                                    .map(|it| Value::clone(it.deref()))
-                                    .unwrap_or(Value::Nil),
+                                ScriptFieldValue::RuntimePin(it) => match it {
+                                    Some(it) => lua
+                                        .globals()
+                                        .get::<_, Table>("PINS")
+                                        .unwrap()
+                                        .get::<_, mlua::Value>(it.as_str())?,
+                                    None => Value::Nil,
+                                },
                             };
                             return Ok(result);
                         }
@@ -158,7 +187,7 @@ impl UserData for ScriptObject {
         );
         methods.add_meta_function_mut(
             MetaMethod::NewIndex.name(),
-            |_lua, (this, key, value): (Value, String, Value)| {
+            |lua, (this, key, value): (Value, String, Value)| {
                 // working with class
                 if let Value::Table(this) = this {
                     return this.raw_set(key, value);
@@ -262,10 +291,19 @@ impl UserData for ScriptObject {
                                 )?
                                 .into()
                             }
-                            ScriptFieldValue::RawLuaValue(it) => {
-                                // we use Lua interpreter as long as we use the process, so its lifetime is effectively static.
-                                let value: Value<'static> = unsafe { mem::transmute(value) };
-                                *it = Some(SendWrapper::new(value))
+                            ScriptFieldValue::RuntimePin(it) => {
+                                let key = Uuid::new_v4().to_string();
+                                lua.globals()
+                                    .get::<_, Table>("PINS")
+                                    .unwrap()
+                                    .set(key.as_str(), value)?;
+                                let prev = mem::replace(it, Some(key));
+                                if let Some(prev) = prev {
+                                    lua.globals()
+                                        .get::<_, Table>("PINS")
+                                        .unwrap()
+                                        .set(prev.as_str(), Value::Nil)?;
+                                }
                             }
                         };
                         return Ok(());
@@ -311,7 +349,7 @@ impl Reflect for ScriptObject {
             .metadata
             .fields
             .iter()
-            .filter(|it| it.ty != ScriptFieldValueType::RawLuaValue)
+            .filter(|it| it.ty != ScriptFieldValueType::RuntimePin)
             .enumerate()
             .filter(|(_i, it)| !it.private)
             .map(|(i, it)| FieldInfo {
@@ -332,7 +370,7 @@ impl Reflect for ScriptObject {
                     ScriptFieldValueType::Quaternion => {
                         std::any::type_name::<UnitQuaternion<f32>>()
                     }
-                    ScriptFieldValueType::RawLuaValue => panic!("WTF, it's excluded above"),
+                    ScriptFieldValueType::RuntimePin => panic!("WTF, it's excluded above"),
                 },
                 doc: it.description.unwrap_or(""),
                 value: match self.values.get(i).unwrap() {
@@ -344,7 +382,7 @@ impl Reflect for ScriptObject {
                     ScriptFieldValue::Prefab(it) => it,
                     ScriptFieldValue::Vector3(it) => it,
                     ScriptFieldValue::Quaternion(it) => it,
-                    ScriptFieldValue::RawLuaValue(_it) => panic!("WTF, it's excluded above"),
+                    ScriptFieldValue::RuntimePin(_it) => panic!("WTF, it's excluded above"),
                 },
                 reflect_value: self.values.get(i).unwrap().as_reflect(),
                 read_only: false,

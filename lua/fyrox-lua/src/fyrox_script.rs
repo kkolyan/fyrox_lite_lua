@@ -1,9 +1,10 @@
 use super::script_data::ScriptData;
-use crate::user_data_plus::Traitor;
 use crate::fyrox_plugin::PluginsRefMut_Ext;
+use crate::fyrox_plugin::LUA;
 use crate::reflect_base;
 use crate::script_class::ScriptClass;
 use crate::script_def::ScriptKind;
+use crate::user_data_plus::Traitor;
 use fyrox::asset::Resource;
 use fyrox::core::algebra::UnitQuaternion;
 use fyrox::core::algebra::Vector3;
@@ -23,6 +24,7 @@ use fyrox_lite::script_context::without_script_context;
 use fyrox_lite::script_context::UnsafeAsUnifiedContext;
 use mlua::IntoLuaMulti;
 use mlua::Lua;
+use mlua::Table;
 use mlua::UserDataRef;
 use mlua::Value;
 use send_wrapper::SendWrapper;
@@ -140,12 +142,15 @@ pub fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(
         if let Some(Value::Function(callback)) = callback {
             let args = args(lua).unwrap();
             match callback.call::<_, ()>((script_object_ud, args)) {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(err) => {
-                    Log::err(format!("callback \"{}:{}\" failed with Lua error:\n{}", class_name, callback_name, err));
+                    Log::err(format!(
+                        "callback \"{}:{}\" failed with Lua error:\n{}",
+                        class_name, callback_name, err
+                    ));
                     Log::warn("exiting to prevent error spamming (change this behavior in future)");
                     exit(123);
-                },
+                }
             };
         }
     });
@@ -203,7 +208,6 @@ impl Reflect for LuaScript {
 
 pub struct LuaScriptBasedExpr {}
 
-#[derive(Clone)]
 pub enum ScriptFieldValue {
     Number(f64),
     String(String),
@@ -213,8 +217,44 @@ pub enum ScriptFieldValue {
     Prefab(Option<Resource<Model>>),
     Vector3(Vector3<f32>),
     Quaternion(UnitQuaternion<f32>),
+    // global key of the value. is useful for hot-reload only, because in persistent data it's always None
     // Option is necessary to avoid creation of SendWrapper outside of main
-    RawLuaValue(Option<SendWrapper<Value<'static>>>),
+    RuntimePin(Option<String>),
+}
+
+impl Clone for ScriptFieldValue {
+    fn clone(&self) -> Self {
+        match self {
+            Self::Number(it) => Self::Number(it.clone()),
+            Self::String(it) => Self::String(it.clone()),
+            Self::Bool(it) => Self::Bool(it.clone()),
+            Self::Node(it) => Self::Node(it.clone()),
+            Self::UiNode(it) => Self::UiNode(it.clone()),
+            Self::Prefab(it) => Self::Prefab(it.clone()),
+            Self::Vector3(it) => Self::Vector3(it.clone()),
+            Self::Quaternion(it) => Self::Quaternion(it.clone()),
+            Self::RuntimePin(it) => match it {
+                Some(existing) => LUA.with_borrow(|lua| {
+                    let new = Uuid::new_v4().to_string();
+                    let ex_value = lua
+                        .unwrap()
+                        .globals()
+                        .get::<_, Table>("PINS")
+                        .unwrap()
+                        .get::<_, mlua::Value>(existing.as_str())
+                        .unwrap();
+                    lua.unwrap()
+                        .globals()
+                        .get::<_, Table>("PINS")
+                        .unwrap()
+                        .set(new.as_str(), ex_value)
+                        .unwrap();
+                    Self::RuntimePin(Some(new))
+                }),
+                None => Self::RuntimePin(None),
+            },
+        }
+    }
 }
 
 impl ScriptFieldValue {
@@ -228,7 +268,7 @@ impl ScriptFieldValue {
             ScriptFieldValue::Prefab(it) => it,
             ScriptFieldValue::Vector3(it) => it,
             ScriptFieldValue::Quaternion(it) => it,
-            ScriptFieldValue::RawLuaValue(_it) => panic!("WTF, it shouldn't be reachable"),
+            ScriptFieldValue::RuntimePin(_it) => panic!("WTF, it shouldn't be reachable"),
         }
     }
     pub fn as_reflect(&self) -> &dyn Reflect {
@@ -241,7 +281,7 @@ impl ScriptFieldValue {
             ScriptFieldValue::Prefab(it) => it,
             ScriptFieldValue::Vector3(it) => it,
             ScriptFieldValue::Quaternion(it) => it,
-            ScriptFieldValue::RawLuaValue(_it) => panic!("WTF, it shouldn't be reachable"),
+            ScriptFieldValue::RuntimePin(_it) => panic!("WTF, it shouldn't be reachable"),
         }
     }
 }
@@ -257,7 +297,7 @@ impl Debug for ScriptFieldValue {
             ScriptFieldValue::Prefab(it) => it.fmt(f),
             ScriptFieldValue::Vector3(it) => it.fmt(f),
             ScriptFieldValue::Quaternion(it) => it.fmt(f),
-            ScriptFieldValue::RawLuaValue(it) => it.fmt(f),
+            ScriptFieldValue::RuntimePin(it) => it.fmt(f),
         }
     }
 }

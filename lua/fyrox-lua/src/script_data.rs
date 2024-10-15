@@ -115,7 +115,7 @@ impl Visit for ScriptData {
                     ScriptFieldValue::Prefab(it) => it.visit(field_name, &mut guard),
                     ScriptFieldValue::Vector3(it) => it.visit(field_name, &mut guard),
                     ScriptFieldValue::Quaternion(it) => it.visit(field_name, &mut guard),
-                    ScriptFieldValue::RawLuaValue(_it) => Ok(()),
+                    ScriptFieldValue::RuntimePin(it) => it.visit(&field_name, &mut guard),
                 };
                 if let Err(err) = &result {
                     Log::warn(format!("skipping deserialization of field `{}::{}` due to error: {}", it.def.metadata.class, field_name, err).as_str());

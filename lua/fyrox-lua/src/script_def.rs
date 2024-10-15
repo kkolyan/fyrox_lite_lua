@@ -43,7 +43,7 @@ pub enum ScriptFieldValueType {
     Vector3,
     Quaternion,
     // not available in editor, but supported to allow script type annotations
-    RawLuaValue,
+    RuntimePin,
 }
 
 impl ScriptMetadata {
@@ -144,7 +144,7 @@ impl ScriptMetadata {
                                             "Prefab" => Some(ScriptFieldValueType::Prefab),
                                             "Vector3" => Some(ScriptFieldValueType::Vector3),
                                             "Quaternion" => Some(ScriptFieldValueType::Quaternion),
-                                            _ => Some(ScriptFieldValueType::RawLuaValue),
+                                            _ => Some(ScriptFieldValueType::RuntimePin),
                                         };
                                         if let Some(ty) = ty {
                                             let description = parts.next().map(|it| {
