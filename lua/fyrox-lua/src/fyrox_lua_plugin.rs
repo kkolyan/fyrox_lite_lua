@@ -22,8 +22,6 @@ use mlua::Lua;
 use mlua::Value;
 use std::cell::RefCell;
 use std::fmt::Debug;
-use std::ops::Deref;
-use std::ops::DerefMut;
 
 #[derive(Visit, Reflect)]
 pub struct LuaPlugin {
@@ -91,22 +89,6 @@ impl LuaPlugin {
         if reload {
             self.need_reload = true;
         }
-    }
-}
-
-pub struct Mut<'a, T>(&'a mut T);
-
-impl<'a, T> Deref for Mut<'a, T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        self.0
-    }
-}
-
-impl<'a, T> DerefMut for Mut<'a, T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.0
     }
 }
 
