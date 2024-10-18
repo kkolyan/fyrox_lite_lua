@@ -13,7 +13,7 @@
 - [Feedback](#feedback)
 
 ## Overview
-Full Scripting languages support for [Fyrox Engine](https://github.com/FyroxEngine/Fyrox). "Full" means that one can make games with Fyrox without seeing a single Rust line of code. The same as Godot, Unity or UE allow to make games with GDSript, C# or Blueprints.
+Full Scripting languages support for [Fyrox Engine](https://github.com/FyroxEngine/Fyrox). "Full" means that one can make games with Fyrox without seeing a single Rust line of code, not that it already covers whole Fyrox API. The principle is the same as Godot, Unity or UE allow to make games with GDSript, C# or Blueprints.
 
 Project ambition is to make Fyrox a "polyglot", so there is an abstraction over the languages, called Lite API, and a number of implementations for different languages. 
 
