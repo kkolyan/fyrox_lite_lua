@@ -11,9 +11,9 @@ Explored Fyrox APIs:
 
 # How to run a game
 ```sh
-git clone https://github.com/kkolyan/fyrox_lite_lua
-cd lua/examples/guards
-./play.sh
+git clone --recursive https://github.com/kkolyan/fyrox_lite_lua
+chmod +x lua/examples/guards/play.sh
+./lua/examples/guards/play.sh
 ```
 
 # How to play
@@ -21,7 +21,8 @@ Use WASD and mouse to shoot enemies and optionally avoid their attacks.
 
 # How to edit scenes
 ```sh
-./edit.sh
+chmod +x lua/examples/guards/edit.sh
+./lua/examples/guards/edit.sh
 ```
 
 # How to edit scripts

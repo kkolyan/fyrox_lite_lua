@@ -41,7 +41,7 @@ When this project is released, this is how games should be made:
  
 ### How to use it now
 1. install Rust (https://www.rust-lang.org/tools/install)
-2. checkout Fyrox Lite `git clone https://github.com/kkolyan/fyrox_lite_lua` to some directory (let's call it `$FYROX_LITE_HOME`).
+2. checkout Fyrox Lite `git clone --recursive https://github.com/kkolyan/fyrox_lite_lua` to some directory (let's call it `$FYROX_LITE_HOME`).
 3. let's call a directory with your game project files a `$GAME_PROJECT`.
 4. open terminal in this directory (`cd $GAME_PROJECT`). That's important - otherwise Fyrox will not be able to find the resources attached to scene objects.
 5. Run editor: `cargo run --release -p editor-lua --manifest-path $FYROX_LITE_HOME/Cargo.toml`.
