@@ -18,6 +18,8 @@ use fyrox::core::reflect::Reflect;
 use fyrox::core::visitor::prelude::*;
 use fyrox::core::visitor::Visit;
 use fyrox::core::watcher::FileSystemWatcher;
+use fyrox::event::Event;
+use fyrox::event::WindowEvent;
 use fyrox::plugin::DynamicPlugin;
 use fyrox::plugin::Plugin;
 use fyrox::plugin::PluginContext;
@@ -59,6 +61,10 @@ pub struct LuaPlugin {
     #[reflect(hidden)]
     pub scripts_dir: String,
 
+    #[visit(skip)]
+    #[reflect(hidden)]
+    pub need_reload: bool,
+
     pub scripts: RefCell<PluginScriptList>,
 }
 
@@ -86,6 +92,22 @@ impl LuaPlugin {
         'r: 'a,
     {
         return Mut(sc.plugins.get_mut::<LuaPlugin>());
+    }
+    
+    pub fn check_for_script_changes(&mut self) {
+        let mut reload = false;
+        while let Some(event) = self.watcher.try_get_event() {
+            Log::info(format!("FS watcher event: {event:?}"));
+            match &event.kind {
+                EventKind::Create(_) | EventKind::Modify(_) | EventKind::Remove(_) => {
+                    reload = true;
+                }
+                _ => {}
+            }
+        }
+        if reload {
+            self.need_reload = true;
+        }
     }
 }
 
@@ -172,6 +194,7 @@ impl LuaPlugin {
             failed: false,
             scripts_dir: scripts_dir.into(),
             watcher: FileSystemWatcher::new(scripts_dir, Duration::from_millis(500)).unwrap(),
+            need_reload: false,
             scripts: Default::default(),
         }
     }
@@ -210,6 +233,17 @@ impl Plugin for LuaPlugin {
             invoke_callback(&mut script.data, self.vm, context, "update", |_lua| Ok(()));
         }
     }
+
+    fn on_os_event(
+            &mut self,
+            event: &Event<()>,
+            _context: PluginContext,
+        ) {
+        if let Event::WindowEvent { event: WindowEvent::Focused(true), .. } = event {
+            Log::info(format!("Window received focus. Checking for Lua script updates..."));
+            self.check_for_script_changes();
+        }
+    }
 }
 
 fn load_script(
@@ -223,7 +257,7 @@ fn load_script(
         return;
     }
 
-    println!("loading Lua script {:?}", entry.path());
+    Log::info(format!("loading Lua script {:?}", entry.path()));
 
     let metadata = ScriptMetadata::parse_file(entry.path());
     let metadata = match metadata {
@@ -387,17 +421,7 @@ impl DynamicPlugin for LuaPlugin {
     }
 
     fn is_reload_needed_now(&self) -> bool {
-        let mut reload = false;
-        while let Some(event) = self.watcher.try_get_event() {
-            Log::info(format!("FS watcher event: {event:?}"));
-            match &event.kind {
-                EventKind::Create(_) | EventKind::Modify(_) | EventKind::Remove(_) => {
-                    reload = true;
-                }
-                _ => {}
-            }
-        }
-        reload
+        self.need_reload
     }
 
     fn as_loaded_ref(&self) -> &dyn Plugin {
@@ -412,21 +436,22 @@ impl DynamicPlugin for LuaPlugin {
         true
     }
 
-    // fn prepare_to_reload(&self) {
-    //     Log::info(format!("reloading Lua scripts"));
+    fn prepare_to_reload(&mut self) {
+        self.need_reload = false;
+        Log::info(format!("reloading Lua scripts"));
 
-    //     self.vm
-    //         .load(
-    //             "
-    //             PINS_BACKUP = {}
-    //             for k, v in pairs(PINS) do
-    //                 PINS_BACKUP[k] = v
-    //             end
-    //         ",
-    //         )
-    //         .eval::<()>()
-    //         .unwrap();
-    // }
+        self.vm
+            .load(
+                "
+                PINS_BACKUP = {}
+                for k, v in pairs(PINS) do
+                    PINS_BACKUP[k] = v
+                end
+            ",
+            )
+            .eval::<()>()
+            .unwrap();
+    }
 
     fn reload(
         &mut self,
@@ -436,18 +461,22 @@ impl DynamicPlugin for LuaPlugin {
         self.scripts.borrow_mut().inner_mut().clear();
         let result = fill_and_register(self);
 
-        // self.vm
-        //     .load(
-        //         "
-        //         for k, v in pairs(PINS_BACKUP) do
-        //             PINS[k] = v
-        //         end
-        //         PINS_BACKUP = nil
-        //     ",
-        //     )
-        //     .eval::<()>()
-        //     .unwrap();
+        self.vm
+            .load(
+                "
+                for k, v in pairs(PINS_BACKUP) do
+                    PINS[k] = v
+                end
+                PINS_BACKUP = nil
+            ",
+            )
+            .eval::<()>()
+            .unwrap();
 
         result
     }
+}
+
+pub fn need_to_check_for_changes() {
+    
 }

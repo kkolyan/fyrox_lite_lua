@@ -56,28 +56,29 @@ impl Debug for ScriptObject {
     }
 }
 
-// impl Drop for ScriptObject {
-//     fn drop(&mut self) {
-//         for it in self.values.iter_mut() {
-//             if let ScriptFieldValue::RuntimePin(it) = it {
-//                 if let Some(key) = it {
-//                     LUA.with_borrow(|it| {
-//                         it
-//                             .expect("WTF: non-empty runtime pin is used only in runtime, where Lua should be available")
-//                             .globals()
-//                             .get::<_, Table>("PINS")
-//                             .unwrap()
-//                             .set(key.as_str(), Value::Nil)
-//                             .unwrap();
-//                     });
-//                 }
-//             }
-//         }
-//     }
-// }
+impl Drop for ScriptObject {
+    fn drop(&mut self) {
+        for it in self.values.iter_mut() {
+            if let ScriptFieldValue::RuntimePin(it) = it {
+                if let Some(key) = it {
+                    LUA.with_borrow(|it| {
+                        it
+                            .expect("WTF: non-empty runtime pin is used only in runtime, where Lua should be available")
+                            .globals()
+                            .get::<_, Table>("PINS")
+                            .unwrap()
+                            .set(key.as_str(), Value::Nil)
+                            .unwrap();
+                    });
+                }
+            }
+        }
+    }
+}
 
 impl ScriptObject {
     pub(crate) fn new(def: &Arc<ScriptDefinition>) -> Self {
+        let obj_id = Uuid::new_v4().to_string();
         ScriptObject {
             def: def.clone(),
             values: def

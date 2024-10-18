@@ -7,6 +7,7 @@ use fyrox::core::visitor::Visitor;
 use send_wrapper::SendWrapper;
 use std::fmt::Debug;
 use std::fmt::Formatter;
+use std::ops::DerefMut;
 
 use crate::fyrox_plugin::LuaPlugin;
 use crate::fyrox_script::ScriptFieldValue;
@@ -58,7 +59,7 @@ impl ScriptData {
         }
         if self.is_packed() {
             // script was just loaded from the scene file or safe game. unpack it!
-            *self = match self {
+            let data = match self {
                 ScriptData::Packed(it) => {
                     let so = plugin
                         .vm
@@ -76,7 +77,8 @@ impl ScriptData {
                     }
                 }
                 ScriptData::Unpacked(_) => panic!("WTF?"),
-            }
+            };
+            *self = data;
         }
     }
 }
@@ -94,6 +96,23 @@ impl Clone for ScriptData {
 
             // will implement when know when cloning is really needed during game cycle
             ScriptData::Unpacked(_) => panic!("cloning for Lua-backed ScriptData is not supported"),
+        }
+    }
+}
+
+impl Drop for ScriptData {
+    fn drop(&mut self) {
+        match self {
+            ScriptData::Packed(_it) => {
+                // ScriptObject is dropped automatically without delay
+            },
+            ScriptData::Unpacked(it) => {
+                // take ScriptObject out of Lua VM and destroy it right now to prevent nested destructors 
+                // to be invoked at random moment in future by Lua GC, anth thus ruin Hit Reload
+                if let Ok(it) = TypedUserData::take(it.deref_mut()) {
+                    let _s: ScriptObject = it;
+                }
+            },
         }
     }
 }

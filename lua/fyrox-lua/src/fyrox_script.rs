@@ -268,7 +268,7 @@ impl ScriptFieldValue {
             ScriptFieldValue::Prefab(it) => it,
             ScriptFieldValue::Vector3(it) => it,
             ScriptFieldValue::Quaternion(it) => it,
-            ScriptFieldValue::RuntimePin(_it) => panic!("WTF, it shouldn't be reachable"),
+            ScriptFieldValue::RuntimePin(_) => panic!("WTF, it shouldn't be reachable"),
         }
     }
     pub fn as_reflect(&self) -> &dyn Reflect {
@@ -281,7 +281,7 @@ impl ScriptFieldValue {
             ScriptFieldValue::Prefab(it) => it,
             ScriptFieldValue::Vector3(it) => it,
             ScriptFieldValue::Quaternion(it) => it,
-            ScriptFieldValue::RuntimePin(_it) => panic!("WTF, it shouldn't be reachable"),
+            ScriptFieldValue::RuntimePin(_) => panic!("WTF, it shouldn't be reachable"),
         }
     }
 }

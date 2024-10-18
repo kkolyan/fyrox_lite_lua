@@ -31,6 +31,10 @@ impl<'lua, T: 'static> TypedUserData<'lua, T> {
     pub fn borrow_mut(&self) -> Result<std::cell::RefMut<'_, T>, mlua::Error> {
         self.ud.borrow_mut()
     }
+
+    pub fn take(&self) -> Result<T, mlua::Error> {
+        self.ud.take()
+    }
 }
 
 impl<'lua, T> IntoLua<'lua> for TypedUserData<'lua, T> {
