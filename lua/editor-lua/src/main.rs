@@ -1,7 +1,6 @@
 //! Editor with your game connected to it as a plugin.
 use fyrox::core::log::Log;
 use fyrox::core::log::MessageKind;
-use fyrox_lua::fyrox_plugin::LuaPlugin;
 use fyroxed_base::fyrox::event_loop::EventLoop;
 use fyroxed_base::plugin::EditorPlugin;
 use fyroxed_base::Editor;
@@ -30,8 +29,7 @@ fn main() {
     // Static linking.
     #[cfg(not(feature = "dylib"))]
     {
-		use fyrox_lua::fyrox_plugin::LuaPlugin;
-        if let Err(err) = editor.add_dynamic_plugin_custom(LuaPlugin::with_hot_reload(true)) {
+        if let Err(err) = editor.add_dynamic_plugin_custom(fyrox_lua::LuaPlugin::with_hot_reload(true)) {
             Log::err(err);
         }
 
@@ -41,13 +39,15 @@ fn main() {
     editor.run(event_loop)
 }
 
+#[cfg(not(feature = "dylib"))]
 struct LuaPluginRefreshOnFocus;
 
+#[cfg(not(feature = "dylib"))]
 impl EditorPlugin for LuaPluginRefreshOnFocus {
 
     fn on_resumed(&mut self, #[allow(unused_variables)] editor: &mut Editor) {
         for it in editor.engine.plugins_mut() {
-            if let Some(it) = it.cast_mut::<LuaPlugin>() {
+            if let Some(it) = it.cast_mut::<fyrox_lua::LuaPlugin>() {
                 it.check_for_script_changes();
             }
         }

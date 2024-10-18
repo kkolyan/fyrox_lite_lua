@@ -1,8 +1,8 @@
 use std::mem;
 
 use crate::{
-    user_data_plus::Traitor, fyrox_plugin::PluginsRefMut_Ext, lua_error, fyrox_plugin::LuaPlugin,
-    fyrox_script::LuaScript, script_class::ScriptClass, script_object::ScriptObject,
+    user_data_plus::Traitor, fyrox_lua_plugin::PluginsRefMut_Ext, lua_error, fyrox_lua_plugin::LuaPlugin,
+    external_script_proxy::ExternalScriptProxy, script_class::ScriptClass, script_object::ScriptObject,
     typed_userdata::TypedUserData,
 };
 use fyrox_lite::{script_context::with_script_context, spi::UserScript, LiteDataType};
@@ -12,7 +12,7 @@ use send_wrapper::SendWrapper;
 impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
     type Plugin = LuaPlugin;
 
-    type ProxyScript = LuaScript;
+    type ProxyScript = ExternalScriptProxy;
 
     type LangSpecificError = mlua::Error;
 
@@ -37,8 +37,8 @@ impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
         let name = self.borrow()?.def.metadata.class.to_string();
         // it's sound, because Lua outlives a process
         let ud: TypedUserData<'static, ScriptObject> = unsafe { mem::transmute(self) };
-        let data = crate::script_data::ScriptData::Unpacked(SendWrapper::new(ud));
-        Ok(LuaScript { name, data })
+        let data = crate::script_object_residence::ScriptResidence::Unpacked(SendWrapper::new(ud));
+        Ok(ExternalScriptProxy { name, data })
     }
 
     fn find_plugin_script(class_name: &str) -> Result<Self, Self::LangSpecificError> {

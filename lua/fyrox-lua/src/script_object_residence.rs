@@ -9,8 +9,8 @@ use std::fmt::Debug;
 use std::fmt::Formatter;
 use std::ops::DerefMut;
 
-use crate::fyrox_plugin::LuaPlugin;
-use crate::fyrox_script::ScriptFieldValue;
+use crate::fyrox_lua_plugin::LuaPlugin;
+use crate::script_object::ScriptFieldValue;
 use crate::script_object::ScriptObject;
 use crate::typed_userdata::TypedUserData;
 
@@ -18,37 +18,37 @@ use crate::typed_userdata::TypedUserData;
 /// First time this script receives `on_update` callback, it's converted to "unpacked", by
 /// transfering state into UserData managed by Lua VM. Thoughm serialization should work fine,
 /// because Visit is implemented in both modes.
-pub enum ScriptData {
+pub enum ScriptResidence {
     Packed(ScriptObject),
     Unpacked(SendWrapper<TypedUserData<'static, ScriptObject>>),
 }
 
-impl ScriptData {
+impl ScriptResidence {
     pub fn is_packed(&self) -> bool {
         match self {
-            ScriptData::Packed(_) => true,
-            ScriptData::Unpacked(_) => false,
+            ScriptResidence::Packed(_) => true,
+            ScriptResidence::Unpacked(_) => false,
         }
     }
 
     pub fn with_script_object<R>(&self, f: impl FnOnce(&ScriptObject) -> R) -> R {
         match self {
-            ScriptData::Packed(it) => f(it),
-            ScriptData::Unpacked(it) => f(&it.borrow().unwrap()),
+            ScriptResidence::Packed(it) => f(it),
+            ScriptResidence::Unpacked(it) => f(&it.borrow().unwrap()),
         }
     }
 
     pub fn with_script_object_mut<R>(&mut self, f: impl FnOnce(&mut ScriptObject) -> R) -> R {
         match self {
-            ScriptData::Packed(it) => f(it),
-            ScriptData::Unpacked(it) => f(&mut it.borrow_mut().unwrap()),
+            ScriptResidence::Packed(it) => f(it),
+            ScriptResidence::Unpacked(it) => f(&mut it.borrow_mut().unwrap()),
         }
     }
 
     pub fn inner_unpacked(&self) -> Option<TypedUserData<'static, ScriptObject>> {
         match self {
-            ScriptData::Packed(_it) => None,
-            ScriptData::Unpacked(it) => Some(TypedUserData::clone(it)),
+            ScriptResidence::Packed(_it) => None,
+            ScriptResidence::Unpacked(it) => Some(TypedUserData::clone(it)),
         }
     }
 
@@ -60,13 +60,13 @@ impl ScriptData {
         if self.is_packed() {
             // script was just loaded from the scene file or safe game. unpack it!
             let data = match self {
-                ScriptData::Packed(it) => {
+                ScriptResidence::Packed(it) => {
                     let so = plugin
                         .vm
                         .create_userdata(it.clone())
                         .map(TypedUserData::<ScriptObject>::new)
                         .map(SendWrapper::new)
-                        .map(ScriptData::Unpacked);
+                        .map(ScriptResidence::Unpacked);
                     match so {
                         Ok(it) => it,
                         Err(err) => {
@@ -76,37 +76,37 @@ impl ScriptData {
                         }
                     }
                 }
-                ScriptData::Unpacked(_) => panic!("WTF?"),
+                ScriptResidence::Unpacked(_) => panic!("WTF?"),
             };
             *self = data;
         }
     }
 }
 
-impl Debug for ScriptData {
+impl Debug for ScriptResidence {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         self.with_script_object(|it| it.fmt(f))
     }
 }
 
-impl Clone for ScriptData {
+impl Clone for ScriptResidence {
     fn clone(&self) -> Self {
         match self {
-            ScriptData::Packed(it) => ScriptData::Packed(it.clone()),
+            ScriptResidence::Packed(it) => ScriptResidence::Packed(it.clone()),
 
             // will implement when know when cloning is really needed during game cycle
-            ScriptData::Unpacked(_) => panic!("cloning for Lua-backed ScriptData is not supported"),
+            ScriptResidence::Unpacked(_) => panic!("cloning for Lua-backed ScriptData is not supported"),
         }
     }
 }
 
-impl Drop for ScriptData {
+impl Drop for ScriptResidence {
     fn drop(&mut self) {
         match self {
-            ScriptData::Packed(_it) => {
+            ScriptResidence::Packed(_it) => {
                 // ScriptObject is dropped automatically without delay
             },
-            ScriptData::Unpacked(it) => {
+            ScriptResidence::Unpacked(it) => {
                 // take ScriptObject out of Lua VM and destroy it right now to prevent nested destructors 
                 // to be invoked at random moment in future by Lua GC, anth thus ruin Hit Reload
                 if let Ok(it) = TypedUserData::take(it.deref_mut()) {
@@ -117,7 +117,7 @@ impl Drop for ScriptData {
     }
 }
 
-impl Visit for ScriptData {
+impl Visit for ScriptResidence {
     fn visit(&mut self, name: &str, visitor: &mut Visitor) -> VisitResult {
         let mut guard = visitor.enter_region(name)?;
 

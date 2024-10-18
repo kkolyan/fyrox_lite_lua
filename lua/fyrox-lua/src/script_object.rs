@@ -1,45 +1,42 @@
-use std::{any::TypeId, fmt::Debug, mem, ops::Deref, sync::Arc};
+use std::{fmt::{Debug, Formatter}, sync::Arc};
 
 use fyrox::{
     asset::Resource,
     core::{
         algebra::{UnitQuaternion, Vector3},
-        log::Log,
         pool::Handle,
-        reflect::{FieldInfo, Reflect},
+        reflect::Reflect,
         Uuid,
     },
     gui::UiNode,
     resource::model::Model,
     scene::node::Node,
 };
-use fyrox_lite::{
-    lite_node::LiteNode, lite_prefab::LitePrefab, lite_ui::LiteUiNode,
-    script_context::with_script_context,
-};
-use fyrox_lite_math::{lite_math::LiteQuaternion, lite_math::LiteVector3};
-use mlua::{Lua, MetaMethod, String, Table, UserData, UserDataRef, Value};
+use mlua::{Table, Value};
 
-use crate::{
-    debug::VerboseLuaValue,
-    fyrox_plugin::LUA,
-    lua_error,
-    lua_utils::{OptionX, ValueX},
-    reflect_base,
-    script_class::ScriptClass,
-    user_data_plus::{FyroxUserData, Traitor},
-};
+use crate::lua_lifecycle::LUA;
 
-use super::{
-    fyrox_script::ScriptFieldValue,
-    script_def::{ScriptDefinition, ScriptFieldValueType},
-};
+use super::script_metadata::{ScriptDefinition, ScriptFieldValueType};
 
-/// For MLua API integration
+/// This object is what passed to mlua to represent a script
 #[derive(Clone)]
 pub struct ScriptObject {
     pub def: Arc<ScriptDefinition>,
     pub values: Vec<ScriptFieldValue>,
+}
+
+pub enum ScriptFieldValue {
+    Number(f64),
+    String(String),
+    Bool(bool),
+    Node(Handle<Node>),
+    UiNode(Handle<UiNode>),
+    Prefab(Option<Resource<Model>>),
+    Vector3(Vector3<f32>),
+    Quaternion(UnitQuaternion<f32>),
+    // global key of the value. is useful for hot-reload only, because in persistent data it's always None
+    // Option is necessary to avoid creation of SendWrapper outside of main
+    RuntimePin(Option<String>),
 }
 
 impl Debug for ScriptObject {
@@ -78,7 +75,6 @@ impl Drop for ScriptObject {
 
 impl ScriptObject {
     pub(crate) fn new(def: &Arc<ScriptDefinition>) -> Self {
-        let obj_id = Uuid::new_v4().to_string();
         ScriptObject {
             def: def.clone(),
             values: def
@@ -103,343 +99,84 @@ impl ScriptObject {
     }
 }
 
-impl UserData for ScriptObject {
-    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
-        fields.add_field_method_get("node", |_lua, _this| {
-            with_script_context(|ctx| Ok(ctx.handle.map(|it| Traitor::new(LiteNode::new(it)))))
-        });
-    }
-    fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_meta_method(MetaMethod::ToString.name(), |_lua, this, _args: ()| {
-            Ok(format!("{:?}", this))
-        });
-        methods.add_meta_function(
-            MetaMethod::Index.name(),
-            |lua, (this, key): (Value, String)| {
-                // working with class
-                if let Value::Table(this) = this {
-                    return this.raw_get(key);
-                }
-                if let Value::UserData(this) = this {
-                    if let Ok(this) = this.borrow::<ScriptObject>() {
-                        let field_name = key.to_string_lossy();
-                        let field_index = this
-                            .def
-                            .metadata
-                            .field_name_to_index
-                            .get(field_name.as_ref());
-                        if let Some(field_index) = field_index {
-                            let value = &this.values[*field_index];
-                            let result = match value {
-                                ScriptFieldValue::Number(it) => Value::Number(*it),
-                                ScriptFieldValue::String(it) => {
-                                    Value::String(lua.create_string(it)?)
-                                }
-                                ScriptFieldValue::Bool(it) => Value::Boolean(*it),
-                                ScriptFieldValue::Node(it) => Value::UserData(
-                                    lua.create_userdata(Traitor::new(LiteNode::new(*it)))?,
-                                ),
-                                ScriptFieldValue::UiNode(it) => Value::UserData(
-                                    lua.create_userdata(Traitor::new(LiteUiNode::new(*it)))?,
-                                ),
-                                ScriptFieldValue::Prefab(it) => {
-                                    Value::UserData(lua.create_userdata(Traitor::new(
-                                        LitePrefab::new(it.clone().unwrap()),
-                                    ))?)
-                                }
-                                ScriptFieldValue::Vector3(it) => Value::UserData(
-                                    lua.create_userdata(Traitor::new(LiteVector3::from(*it)))?,
-                                ),
-                                ScriptFieldValue::Quaternion(it) => Value::UserData(
-                                    lua.create_userdata(Traitor::new(LiteQuaternion::from(*it)))?,
-                                ),
-                                ScriptFieldValue::RuntimePin(it) => match it {
-                                    Some(it) => lua
-                                        .globals()
-                                        .get::<_, Table>("PINS")
-                                        .unwrap()
-                                        .get::<_, mlua::Value>(it.as_str())?,
-                                    None => Value::Nil,
-                                },
-                            };
-                            return Ok(result);
-                        }
 
-                        let class = lua
-                            .globals()
-                            .get::<_, Option<UserDataRef<ScriptClass>>>(this.def.metadata.class)?;
-                        if let Some(class) = class {
-                            let value = class.table.get(field_name.as_ref());
-                            if let Some(value) = value {
-                                if !value.is_nil() {
-                                    return Ok(value.clone());
-                                }
-                            }
-                        }
-                        return Err(lua_error!(
-                            "cannot index {} with \"{}\": no such method or field",
-                            this.def.metadata.class,
-                            key.to_string_lossy()
-                        ));
-                    }
-                }
-                Err(lua_error!("unexpected type"))
-            },
-        );
-        methods.add_meta_function_mut(
-            MetaMethod::NewIndex.name(),
-            |lua, (this, key, value): (Value, String, Value)| {
-                // working with class
-                if let Value::Table(this) = this {
-                    return this.raw_set(key, value);
-                }
-                if let Value::UserData(this) = this {
-                    // working with script instances
-                    if let Ok(mut this) = this.borrow_mut::<ScriptObject>() {
-                        let field_name = key.to_string_lossy();
-                        let class = this.def.metadata.class;
-                        let field_index = *this
-                            .def
-                            .metadata
-                            .field_name_to_index
-                            .get(field_name.as_ref())
-                            .lua_ok_or_else(|| {
-                                lua_error!("unknown field {}.`{}`", class, field_name)
-                            })?;
-                        let value_storage = &mut this.values[field_index];
-                        match value_storage {
-                            ScriptFieldValue::Number(it) => {
-                                *it = value.as_f64_tolerant().ok_or_else(|| {
-                                    lua_error!(
-                                        "cannot assign {}.{} with {:?}",
-                                        class,
-                                        field_name,
-                                        VerboseLuaValue::new(value)
-                                    )
-                                })?;
-                            }
-                            ScriptFieldValue::String(it) => {
-                                *it = value
-                                    .as_string_lossy()
-                                    .map(|it| it.to_string())
-                                    .ok_or_else(|| {
-                                        lua_error!(
-                                            "cannot assign {}.{} with {:?}",
-                                            class,
-                                            field_name,
-                                            VerboseLuaValue::new(value)
-                                        )
-                                    })?;
-                            }
-                            ScriptFieldValue::Bool(it) => {
-                                *it = value.as_boolean().ok_or_else(|| {
-                                    lua_error!(
-                                        "cannot assign {}.{} with {:?}",
-                                        class,
-                                        field_name,
-                                        VerboseLuaValue::new(value)
-                                    )
-                                })?
-                            }
-                            ScriptFieldValue::Node(it) => {
-                                *it = match value {
-                                    Value::Nil => Default::default(),
-                                    _ => extract_userdata_value::<LiteNode>(
-                                        value,
-                                        class,
-                                        &field_name,
-                                    )?
-                                    .inner(),
-                                }
-                            }
-                            ScriptFieldValue::UiNode(it) => {
-                                *it = match value {
-                                    Value::Nil => Default::default(),
-                                    _ => extract_userdata_value::<LiteUiNode>(
-                                        value,
-                                        class,
-                                        &field_name,
-                                    )?
-                                    .inner(),
-                                }
-                            }
-                            ScriptFieldValue::Prefab(it) => {
-                                *it = match value {
-                                    Value::Nil => Default::default(),
-                                    _ => Some(
-                                        extract_userdata_value::<LitePrefab>(
-                                            value,
-                                            class,
-                                            &field_name,
-                                        )?
-                                        .inner(),
-                                    ),
-                                }
-                            }
-                            ScriptFieldValue::Vector3(it) => {
-                                *it = extract_userdata_value::<LiteVector3>(
-                                    value,
-                                    class,
-                                    &field_name,
-                                )?
-                                .into()
-                            }
-                            ScriptFieldValue::Quaternion(it) => {
-                                *it = extract_userdata_value::<LiteQuaternion>(
-                                    value,
-                                    class,
-                                    &field_name,
-                                )?
-                                .into()
-                            }
-                            ScriptFieldValue::RuntimePin(it) => {
-                                let key = Uuid::new_v4().to_string();
-                                lua.globals()
-                                    .get::<_, Table>("PINS")
-                                    .unwrap()
-                                    .set(key.as_str(), value)?;
-                                let prev = mem::replace(it, Some(key));
-                                if let Some(prev) = prev {
-                                    lua.globals()
-                                        .get::<_, Table>("PINS")
-                                        .unwrap()
-                                        .set(prev.as_str(), Value::Nil)?;
-                                }
-                            }
-                        };
-                        return Ok(());
-                    }
-                }
-                Err(lua_error!("unexpected type"))
-            },
-        );
-    }
-}
 
-fn extract_userdata_value<T: FyroxUserData + 'static + Clone>(
-    value: Value,
-    class: &str,
-    field: &str,
-) -> mlua::Result<T> {
-    if let Value::UserData(value) = value {
-        match value.borrow::<Traitor<T>>() {
-            Ok(it) => return Ok(it.inner().clone()),
-            Err(err) => match err {
-                mlua::Error::UserDataBorrowError => panic!(
-                    "immutable borrow failed while getting {}.`{}`",
-                    class, field
-                ),
-                err => return Err(err),
+impl Clone for ScriptFieldValue {
+    fn clone(&self) -> Self {
+        match self {
+            Self::Number(it) => Self::Number(it.clone()),
+            Self::String(it) => Self::String(it.clone()),
+            Self::Bool(it) => Self::Bool(it.clone()),
+            Self::Node(it) => Self::Node(it.clone()),
+            Self::UiNode(it) => Self::UiNode(it.clone()),
+            Self::Prefab(it) => Self::Prefab(it.clone()),
+            Self::Vector3(it) => Self::Vector3(it.clone()),
+            Self::Quaternion(it) => Self::Quaternion(it.clone()),
+            Self::RuntimePin(it) => match it {
+                Some(existing) => LUA.with_borrow(|lua| {
+                    let new = Uuid::new_v4().to_string();
+                    let ex_value = lua
+                        .unwrap()
+                        .globals()
+                        .get::<_, Table>("PINS")
+                        .unwrap()
+                        .get::<_, mlua::Value>(existing.as_str())
+                        .unwrap();
+                    lua.unwrap()
+                        .globals()
+                        .get::<_, Table>("PINS")
+                        .unwrap()
+                        .set(new.as_str(), ex_value)
+                        .unwrap();
+                    Self::RuntimePin(Some(new))
+                }),
+                None => Self::RuntimePin(None),
             },
         }
     }
-    Err(lua_error!(
-        "cannot assign {}.`{}` with {:?}",
-        class,
-        field,
-        value
-    ))
 }
 
-impl Reflect for ScriptObject {
-    reflect_base!();
-
-    fn fields_info(&self, func: &mut dyn FnMut(&[FieldInfo])) {
-        let def = self.def.clone();
-        let fields = def
-            .metadata
-            .fields
-            .iter()
-            .filter(|it| it.ty != ScriptFieldValueType::RuntimePin)
-            .enumerate()
-            .filter(|(_i, it)| !it.private)
-            .map(|(i, it)| FieldInfo {
-                owner_type_id: TypeId::of::<ScriptObject>(),
-                name: it.name.as_str(),
-                display_name: it.title.as_str(),
-                description: it.name.as_str(),
-                type_name: match it.ty {
-                    ScriptFieldValueType::Number => std::any::type_name::<f32>(),
-                    ScriptFieldValueType::String => std::any::type_name::<String>(),
-                    ScriptFieldValueType::Bool => std::any::type_name::<bool>(),
-                    ScriptFieldValueType::Node => std::any::type_name::<Handle<Node>>(),
-                    ScriptFieldValueType::UiNode => std::any::type_name::<Handle<UiNode>>(),
-                    ScriptFieldValueType::Prefab => {
-                        std::any::type_name::<Option<Resource<Model>>>()
-                    }
-                    ScriptFieldValueType::Vector3 => std::any::type_name::<Vector3<f32>>(),
-                    ScriptFieldValueType::Quaternion => {
-                        std::any::type_name::<UnitQuaternion<f32>>()
-                    }
-                    ScriptFieldValueType::RuntimePin => panic!("WTF, it's excluded above"),
-                },
-                doc: it.description.unwrap_or(""),
-                value: match self.values.get(i).unwrap() {
-                    ScriptFieldValue::Number(it) => it,
-                    ScriptFieldValue::String(it) => it,
-                    ScriptFieldValue::Bool(it) => it,
-                    ScriptFieldValue::Node(it) => it,
-                    ScriptFieldValue::UiNode(it) => it,
-                    ScriptFieldValue::Prefab(it) => it,
-                    ScriptFieldValue::Vector3(it) => it,
-                    ScriptFieldValue::Quaternion(it) => it,
-                    ScriptFieldValue::RuntimePin(_it) => panic!("WTF, it's excluded above"),
-                },
-                reflect_value: self.values.get(i).unwrap().as_reflect(),
-                read_only: false,
-                immutable_collection: false,
-                min_value: None,
-                max_value: None,
-                step: None,
-                precision: None,
-            })
-            .collect::<Vec<_>>();
-        func(&fields)
+impl ScriptFieldValue {
+    pub fn as_reflect_mut(&mut self) -> &mut dyn Reflect {
+        match self {
+            ScriptFieldValue::Number(it) => it,
+            ScriptFieldValue::String(it) => it,
+            ScriptFieldValue::Bool(it) => it,
+            ScriptFieldValue::Node(it) => it,
+            ScriptFieldValue::UiNode(it) => it,
+            ScriptFieldValue::Prefab(it) => it,
+            ScriptFieldValue::Vector3(it) => it,
+            ScriptFieldValue::Quaternion(it) => it,
+            ScriptFieldValue::RuntimePin(_) => panic!("WTF, it shouldn't be reachable"),
+        }
     }
-
-    fn fields(&self, func: &mut dyn FnMut(&[&dyn Reflect])) {
-        let fields = self
-            .values
-            .iter()
-            .enumerate()
-            .filter(|(i, _it)| !self.def.metadata.fields[*i].private)
-            .map(|(_i, it)| {
-                let it: &dyn Reflect = it.as_reflect();
-                it
-            })
-            .collect::<Vec<_>>();
-        func(&fields)
+    pub fn as_reflect(&self) -> &dyn Reflect {
+        match self {
+            ScriptFieldValue::Number(it) => it,
+            ScriptFieldValue::String(it) => it,
+            ScriptFieldValue::Bool(it) => it,
+            ScriptFieldValue::Node(it) => it,
+            ScriptFieldValue::UiNode(it) => it,
+            ScriptFieldValue::Prefab(it) => it,
+            ScriptFieldValue::Vector3(it) => it,
+            ScriptFieldValue::Quaternion(it) => it,
+            ScriptFieldValue::RuntimePin(_) => panic!("WTF, it shouldn't be reachable"),
+        }
     }
+}
 
-    fn fields_mut(&mut self, func: &mut dyn FnMut(&mut [&mut dyn Reflect])) {
-        let mut fields = self
-            .values
-            .iter_mut()
-            .enumerate()
-            .filter(|(i, _it)| !self.def.metadata.fields[*i].private)
-            .map(|(_i, it)| {
-                let it: &mut dyn Reflect = it.as_reflect_mut();
-                it
-            })
-            .collect::<Vec<_>>();
-        func(&mut fields)
-    }
-
-    fn field(&self, name: &str, func: &mut dyn FnMut(Option<&dyn Reflect>)) {
-        let def = self.def.clone();
-        let value = self.values.get(def.metadata.field_name_to_index[name]);
-        func(value.map(|it| {
-            let x: &dyn Reflect = it.as_reflect();
-            x
-        }))
-    }
-
-    fn field_mut(&mut self, name: &str, func: &mut dyn FnMut(Option<&mut dyn Reflect>)) {
-        let def = self.def.clone();
-        let value = self.values.get_mut(def.metadata.field_name_to_index[name]);
-        func(value.map(|it| {
-            let x: &mut dyn Reflect = it.as_reflect_mut();
-            x
-        }))
+impl Debug for ScriptFieldValue {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ScriptFieldValue::Number(it) => it.fmt(f),
+            ScriptFieldValue::String(it) => it.fmt(f),
+            ScriptFieldValue::Bool(it) => it.fmt(f),
+            ScriptFieldValue::Node(it) => it.fmt(f),
+            ScriptFieldValue::UiNode(it) => it.fmt(f),
+            ScriptFieldValue::Prefab(it) => it.fmt(f),
+            ScriptFieldValue::Vector3(it) => it.fmt(f),
+            ScriptFieldValue::Quaternion(it) => it.fmt(f),
+            ScriptFieldValue::RuntimePin(it) => it.fmt(f),
+        }
     }
 }

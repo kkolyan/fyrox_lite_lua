@@ -80,7 +80,7 @@ impl ScriptMetadata {
     ---@field ttl_sec number
     ---@field owner Node
          */
-    pub fn parse_source(script_source: Vec<u8>) -> Result<ScriptMetadata, Vec<String>> {
+    pub(crate) fn parse_source(script_source: Vec<u8>) -> Result<ScriptMetadata, Vec<String>> {
         let mut uuid = None;
         let mut class = None;
         let mut parent_class = None;

@@ -82,7 +82,7 @@ There is a [metadata model](lite-model/src/lib.rs) that serves as contract betwe
 There is no specific rules for this, but it's supposed that language implementation consumes the Lite API metadata and produces a Rust code with Fyrox `Plugin` implementation that loads scripts metadata (script names, property types and names), allowing attaching them in inspector, and provides a runtime for a target scripting language.
 
 ### Lua Implementation
-* `lua/fyrox-lua` - the runtime library, provides [LuaPlugin](lua/fyrox-lua/src/fyrox_plugin.rs) and [LuaScript](lua/fyrox-lua/src/fyrox_script.rs). [mlua](https://github.com/mlua-rs/mlua) crate used to embed Lua. LuaU interpreter is choosen (mlua allow to switch them easily) just because it was easiest to compile on Windows, but there is no dependency on specific interpreter features.
+* `lua/fyrox-lua` - the runtime library, provides [LuaPlugin](lua/fyrox-lua/src/fyrox_lua_plugin.rs) and [ExternalScriptProxy](lua/fyrox-lua/src/external_script_proxy.rs). [mlua](https://github.com/mlua-rs/mlua) crate used to embed Lua. LuaU interpreter is choosen (mlua allow to switch them easily) just because it was easiest to compile on Windows, but there is no dependency on specific interpreter features.
 * `lua/editor-lua` / `lua/executor-lua` - desktop instantiations of previously mentioned `LuaPlugin`.
 * `lua/luagen-lib` - dynamic part. It uses Lite API metadata to generate both [Lua bindings](lua/fyrox-lua/src/generated) and [Lua annotations](lua/annotations). Currently, `luagen-lib` is not integrated with build and invoked with `cargo run --bin luagen` ([code](tools/src/bin/luagen.rs)).
 

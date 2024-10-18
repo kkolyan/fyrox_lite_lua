@@ -44,10 +44,6 @@ impl<'a> VerboseLuaValue<'a> {
     pub fn new(value: Value<'a>) -> Self {
         Self(value)
     }
-
-    pub fn inner(&self) -> &Value<'a> {
-        &self.0
-    }
 }
 
 impl<'a> Debug for VerboseLuaValue<'a> {
