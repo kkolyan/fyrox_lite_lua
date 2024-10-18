@@ -39,12 +39,15 @@ thread_local! {
 }
 
 thread_local! {
-    pub(crate) static LUA: RefCell<Option<&'static mlua::Lua>> = RefCell::new(None);
+    static LUA: RefCell<Option<&'static mlua::Lua>> = RefCell::new(None);
+}
+
+pub(crate) fn lua_vm() -> &'static Lua {
+    LUA.with_borrow(|it| it.unwrap())
 }
 
 pub(crate) fn load_script(
     context: &PluginRegistrationContext,
-    lua: &'static Lua,
     entry: &DirEntry,
     plugin_scripts: &mut PluginScriptList,
     assembly_name: &'static str,
@@ -73,7 +76,7 @@ pub(crate) fn load_script(
     let class_loading: mlua::Result<()> = LOADING_CLASS_NAME.with(|class_name| {
         *class_name.borrow_mut() = Some(metadata.class);
 
-        lua.load(
+        lua_vm().load(
             "
                 return function(class) 
                     package.loaded[class] = nil
@@ -105,7 +108,7 @@ pub(crate) fn load_script(
         assembly_name,
     });
 
-    let class = lua
+    let class = lua_vm()
         .globals()
         .get::<_, Option<UserDataRefMut<ScriptClass>>>(definition.metadata.class)
         .unwrap();
@@ -143,7 +146,7 @@ pub(crate) fn load_script(
             plugin_scripts.inner_mut().push(ExternalScriptProxy {
                 name: name.to_string(),
                 data: ScriptResidence::Unpacked(SendWrapper::new(TypedUserData::new(
-                    lua.create_userdata(ScriptObject::new(&definition)).unwrap(),
+                    lua_vm().create_userdata(ScriptObject::new(&definition)).unwrap(),
                 ))),
             });
         }
@@ -157,6 +160,9 @@ pub(crate) fn load_script(
 
 
 pub(crate) fn create_plugin(scripts_dir: &str, hot_reload_enabled: bool) -> LuaPlugin {
+    // mlua has approach with lifetimes that makes very difficult storing Lua types
+    // here and there in Rust. But we need a single Lua VM instance for the whole life
+    // of game process, so that's ok to make it 'static.
     let vm = Box::leak(Box::new(Lua::new()));
     LUA.set(Some(vm));
     let lua_version = vm.load("return _VERSION").eval::<mlua::String>().unwrap();
@@ -205,10 +211,6 @@ pub(crate) fn create_plugin(scripts_dir: &str, hot_reload_enabled: bool) -> LuaP
     register_classes(vm);
 
     LuaPlugin {
-        // mlua has approach with lifetimes that makes very difficult storing Lua types
-        // here and there in Rust. But we need a single Lua VM instance for the whole life
-        // of game process, so that's ok to make it 'static.
-        vm,
         failed: false,
         scripts_dir: scripts_dir.into(),
         hot_reload: match hot_reload_enabled {
@@ -226,10 +228,9 @@ pub(crate) fn create_plugin(scripts_dir: &str, hot_reload_enabled: bool) -> LuaP
 
 pub(crate) fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(
     data: &mut ScriptResidence,
-    lua: &'static Lua,
     ctx: &mut dyn UnsafeAsUnifiedContext<'a, 'b, 'c>,
     callback_name: &str,
-    args: impl FnOnce(&'lua Lua) -> mlua::Result<A>,
+    args: impl FnOnce() -> mlua::Result<A>,
 ) {
     without_script_context(ctx, || {
         let script_object_ud = data
@@ -238,7 +239,7 @@ pub(crate) fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(
 
         let class_name = script_object_ud.borrow().unwrap().def.metadata.class;
         // TODO optimize me
-        let class = lua
+        let class = LUA.with_borrow(|it| it.unwrap())
             .globals()
             .get::<_, UserDataRef<ScriptClass>>(class_name)
             .unwrap_or_else(|err| panic!("class not found: {}. error: {}", class_name, err));
@@ -246,7 +247,7 @@ pub(crate) fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(
         let callback = class.table.get(callback_name);
 
         if let Some(Value::Function(callback)) = callback {
-            let args = args(lua).unwrap();
+            let args = args().unwrap();
             match callback.call::<_, ()>((script_object_ud, args)) {
                 Ok(_) => {}
                 Err(err) => {

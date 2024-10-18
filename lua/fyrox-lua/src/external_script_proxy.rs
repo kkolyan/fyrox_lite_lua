@@ -27,10 +27,9 @@ impl ScriptTrait for ExternalScriptProxy {
         self.data.ensure_unpacked(ctx.plugins.lua_mut());
         invoke_callback(
             &mut self.data,
-            ctx.plugins.lua().vm,
             ctx,
             "on_init",
-            |_lua| Ok(()),
+            || Ok(()),
         );
     }
 
@@ -38,10 +37,9 @@ impl ScriptTrait for ExternalScriptProxy {
         self.data.ensure_unpacked(ctx.plugins.lua_mut());
         invoke_callback(
             &mut self.data,
-            ctx.plugins.lua().vm,
             ctx,
             "on_start",
-            |_lua| Ok(()),
+            || Ok(()),
         );
     }
 
@@ -49,10 +47,9 @@ impl ScriptTrait for ExternalScriptProxy {
         self.data.ensure_unpacked(ctx.plugins.lua_mut());
         invoke_callback(
             &mut self.data,
-            ctx.plugins.lua().vm,
             ctx,
             "on_deinit",
-            |_lua| Ok(()),
+            || Ok(()),
         );
     }
 
@@ -61,10 +58,9 @@ impl ScriptTrait for ExternalScriptProxy {
             self.data.ensure_unpacked(ctx.plugins.lua_mut());
             invoke_callback(
                 &mut self.data,
-                ctx.plugins.lua().vm,
                 ctx,
                 "on_os_event",
-                |_lua| Ok(Traitor::new(event.clone())),
+                || Ok(Traitor::new(event.clone())),
             );
         }
     }
@@ -74,10 +70,9 @@ impl ScriptTrait for ExternalScriptProxy {
         let dt = ctx.dt;
         invoke_callback(
             &mut self.data,
-            ctx.plugins.lua().vm,
             ctx,
             "on_update",
-            |_lua| Ok(dt),
+            || Ok(dt),
         );
     }
 
@@ -90,10 +85,9 @@ impl ScriptTrait for ExternalScriptProxy {
             self.data.ensure_unpacked(ctx.plugins.lua_mut());
             invoke_callback(
                 &mut self.data,
-                ctx.plugins.lua().vm,
                 ctx,
                 "on_message",
-                |_lua| Ok(Value::clone(lua_message)),
+                || Ok(Value::clone(lua_message)),
             );
         } else {
             panic!("non-lua messages not supported by lua scripts")

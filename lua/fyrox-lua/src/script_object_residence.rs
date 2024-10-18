@@ -10,6 +10,7 @@ use std::fmt::Formatter;
 use std::ops::DerefMut;
 
 use crate::fyrox_lua_plugin::LuaPlugin;
+use crate::lua_lifecycle::lua_vm;
 use crate::script_object::ScriptFieldValue;
 use crate::script_object::ScriptObject;
 use crate::typed_userdata::TypedUserData;
@@ -61,8 +62,7 @@ impl ScriptResidence {
             // script was just loaded from the scene file or safe game. unpack it!
             let data = match self {
                 ScriptResidence::Packed(it) => {
-                    let so = plugin
-                        .vm
+                    let so = lua_vm()
                         .create_userdata(it.clone())
                         .map(TypedUserData::<ScriptObject>::new)
                         .map(SendWrapper::new)

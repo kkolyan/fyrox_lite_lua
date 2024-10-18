@@ -1,9 +1,9 @@
 use std::mem;
 
 use crate::{
-    user_data_plus::Traitor, fyrox_lua_plugin::PluginsRefMut_Ext, lua_error, fyrox_lua_plugin::LuaPlugin,
-    external_script_proxy::ExternalScriptProxy, script_class::ScriptClass, script_object::ScriptObject,
-    typed_userdata::TypedUserData,
+    external_script_proxy::ExternalScriptProxy, fyrox_lua_plugin::LuaPlugin, lua_error,
+    lua_lifecycle::lua_vm, script_class::ScriptClass, script_object::ScriptObject,
+    typed_userdata::TypedUserData, user_data_plus::Traitor,
 };
 use fyrox_lite::{script_context::with_script_context, spi::UserScript, LiteDataType};
 use mlua::{UserDataRef, Value};
@@ -63,23 +63,17 @@ impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
     }
 
     fn new_instance(class_name: &str) -> Result<Self, Self::LangSpecificError> {
-        with_script_context(|ctx| {
-            let Some(plugins) = ctx.plugins.as_mut() else {
-                return Err(lua_error!("cannot create scripts programmatically from Plugin scripts. to be implemented in future."));
-            };
-            let lua = plugins.lua_mut().vm;
-            let class = lua
-                .globals()
-                .get::<_, Option<UserDataRef<ScriptClass>>>(class_name)?;
-            let Some(class) = class else {
-                return Err(lua_error!("class not found: {}", class_name));
-            };
-            let Some(def) = &class.def else {
-                return Err(lua_error!("invalid class: {}", class_name));
-            };
-            let obj = lua.create_userdata(ScriptObject::new(def))?;
-            Ok(TypedUserData::<ScriptObject>::new(obj))
-        })
+        let class = lua_vm()
+            .globals()
+            .get::<_, Option<UserDataRef<ScriptClass>>>(class_name)?;
+        let Some(class) = class else {
+            return Err(lua_error!("class not found: {}", class_name));
+        };
+        let Some(def) = &class.def else {
+            return Err(lua_error!("invalid class: {}", class_name));
+        };
+        let obj = lua_vm().create_userdata(ScriptObject::new(def))?;
+        Ok(TypedUserData::<ScriptObject>::new(obj))
     }
 }
 

@@ -2,6 +2,7 @@ use crate::external_script_proxy::ExternalScriptProxy;
 use crate::lua_lifecycle::create_plugin;
 use crate::lua_lifecycle::invoke_callback;
 use crate::lua_lifecycle::load_script;
+use crate::lua_lifecycle::lua_vm;
 use fyrox::core::log::Log;
 use fyrox::core::notify::EventKind;
 use fyrox::core::reflect::prelude::*;
@@ -18,16 +19,12 @@ use fyrox::plugin::PluginRegistrationContext;
 use fyrox::script::PluginsRefMut;
 use fyrox::walkdir::WalkDir;
 use fyrox_lite::wrapper_reflect;
-use mlua::Lua;
 use mlua::Value;
 use std::cell::RefCell;
 use std::fmt::Debug;
 
 #[derive(Visit, Reflect)]
 pub struct LuaPlugin {
-    #[visit(skip)]
-    #[reflect(hidden)]
-    pub vm: &'static Lua,
 
     #[visit(skip)]
     #[reflect(hidden)]
@@ -56,7 +53,6 @@ pub enum HotReload {
 impl Debug for LuaPlugin {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("LuaPlugin")
-            .field("vm", &self.vm)
             .field("failed", &self.failed)
             .field("scripts", &self.scripts)
             .finish()
@@ -103,7 +99,6 @@ impl Plugin for LuaPlugin {
         for entry in WalkDir::new(&self.scripts_dir).into_iter().flatten() {
             load_script(
                 &context,
-                self.vm,
                 &entry,
                 &mut self.scripts.borrow_mut(),
                 self.assembly_name(),
@@ -113,9 +108,9 @@ impl Plugin for LuaPlugin {
 
     fn init(&mut self, scene_path: Option<&str>, mut context: PluginContext) {
         for script in self.scripts.borrow_mut().0.iter_mut() {
-            invoke_callback(&mut script.data, self.vm, &mut context, "init", |lua| {
+            invoke_callback(&mut script.data,&mut context, "init", || {
                 if let Some(scene_path) = scene_path {
-                    Ok(Value::String(lua.create_string(scene_path)?))
+                    Ok(Value::String(lua_vm().create_string(scene_path)?))
                 } else {
                     Ok(Value::Nil)
                 }
@@ -125,7 +120,7 @@ impl Plugin for LuaPlugin {
 
     fn update(&mut self, context: &mut PluginContext) {
         for script in self.scripts.borrow_mut().0.iter_mut() {
-            invoke_callback(&mut script.data, self.vm, context, "update", |_lua| Ok(()));
+            invoke_callback(&mut script.data, context, "update", || Ok(()));
         }
     }
 
@@ -224,7 +219,7 @@ impl DynamicPlugin for LuaPlugin {
         self.need_reload = false;
         Log::info(format!("reloading Lua scripts"));
 
-        self.vm
+        lua_vm()
             .load(
                 "
                 PINS_BACKUP = {}
@@ -244,7 +239,7 @@ impl DynamicPlugin for LuaPlugin {
         self.scripts.borrow_mut().inner_mut().clear();
         let result = fill_and_register(self);
 
-        self.vm
+        lua_vm()
             .load(
                 "
                 for k, v in pairs(PINS_BACKUP) do

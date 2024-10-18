@@ -14,7 +14,7 @@ use fyrox::{
 };
 use mlua::{Table, Value};
 
-use crate::lua_lifecycle::LUA;
+use crate::lua_lifecycle::lua_vm;
 
 use super::script_metadata::{ScriptDefinition, ScriptFieldValueType};
 
@@ -58,15 +58,12 @@ impl Drop for ScriptObject {
         for it in self.values.iter_mut() {
             if let ScriptFieldValue::RuntimePin(it) = it {
                 if let Some(key) = it {
-                    LUA.with_borrow(|it| {
-                        it
-                            .expect("WTF: non-empty runtime pin is used only in runtime, where Lua should be available")
-                            .globals()
-                            .get::<_, Table>("PINS")
-                            .unwrap()
-                            .set(key.as_str(), Value::Nil)
-                            .unwrap();
-                    });
+                    lua_vm()
+                        .globals()
+                        .get::<_, Table>("PINS")
+                        .unwrap()
+                        .set(key.as_str(), Value::Nil)
+                        .unwrap();
                 }
             }
         }
@@ -113,23 +110,22 @@ impl Clone for ScriptFieldValue {
             Self::Vector3(it) => Self::Vector3(it.clone()),
             Self::Quaternion(it) => Self::Quaternion(it.clone()),
             Self::RuntimePin(it) => match it {
-                Some(existing) => LUA.with_borrow(|lua| {
+                Some(existing) => {
                     let new = Uuid::new_v4().to_string();
-                    let ex_value = lua
-                        .unwrap()
+                    let ex_value = lua_vm()
                         .globals()
                         .get::<_, Table>("PINS")
                         .unwrap()
                         .get::<_, mlua::Value>(existing.as_str())
                         .unwrap();
-                    lua.unwrap()
+                    lua_vm()
                         .globals()
                         .get::<_, Table>("PINS")
                         .unwrap()
                         .set(new.as_str(), ex_value)
                         .unwrap();
                     Self::RuntimePin(Some(new))
-                }),
+                },
                 None => Self::RuntimePin(None),
             },
         }
