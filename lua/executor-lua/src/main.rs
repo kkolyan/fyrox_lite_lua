@@ -50,7 +50,7 @@ fn main() {
     #[cfg(not(feature = "dylib"))]
     {
 		use fyrox_lua::fyrox_plugin::LuaPlugin;
-        executor.add_dynamic_plugin_custom(LuaPlugin::default());
+        executor.add_dynamic_plugin_custom(LuaPlugin::with_hot_reload(false));
     }
 
     executor.run()

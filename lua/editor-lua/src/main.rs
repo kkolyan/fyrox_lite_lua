@@ -31,7 +31,7 @@ fn main() {
     #[cfg(not(feature = "dylib"))]
     {
 		use fyrox_lua::fyrox_plugin::LuaPlugin;
-        if let Err(err) = editor.add_dynamic_plugin_custom(LuaPlugin::default()) {
+        if let Err(err) = editor.add_dynamic_plugin_custom(LuaPlugin::with_hot_reload(true)) {
             Log::err(err);
         }
 

@@ -36,8 +36,9 @@ When this project is released, this is how games should be made:
 ### Current state
 1. Subset of exposed Fyrox API is pretty limited: input, messages, working with scene graph, prefab instantiation, basic physics, basic UI Text. Check out [Lua Annotations](lua/annotations) for details. Though, that's already enough for gameplay prototyping.
 2. There is only `Lua` language support currently.
-3. There is no existing pre-built toolkit yet, so editor and executor should be run from the source code (which is pretty easy actually - see instruction below).
-4. There are a lot of temporary limitations, decribed in [known_issues.md](known_issues.md).
+3. Hot-reload supported for Lua. In-editor hot-reload enabled by default (affects list of scripts and available fields in inspector). In-game hot-reload allows to write a game literally when playing it, but it's fundamentally error-prone and requires a skill to be used with convenience, so it's disabled by default and can be enabled with LuaPlugin constructor parameter. Hot-reload check is triggered when window is switched back to editor (or game, if enabled).
+4. There is no existing pre-built toolkit yet, so editor and executor should be run from the source code (which is pretty easy actually - see instruction below).
+5. There are a lot of temporary limitations, decribed in [known_issues.md](known_issues.md).
  
 ### How to use it now
 1. install Rust (https://www.rust-lang.org/tools/install)

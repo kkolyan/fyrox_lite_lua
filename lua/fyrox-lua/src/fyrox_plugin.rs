@@ -55,10 +55,6 @@ pub struct LuaPlugin {
 
     #[visit(skip)]
     #[reflect(hidden)]
-    pub watcher: FileSystemWatcher,
-
-    #[visit(skip)]
-    #[reflect(hidden)]
     pub scripts_dir: String,
 
     #[visit(skip)]
@@ -66,6 +62,15 @@ pub struct LuaPlugin {
     pub need_reload: bool,
 
     pub scripts: RefCell<PluginScriptList>,
+
+    #[visit(skip)]
+    #[reflect(hidden)]
+    hot_reload: HotReload,
+}
+
+enum HotReload {
+    Disabled,
+    Enabled { watcher: FileSystemWatcher },
 }
 
 impl Debug for LuaPlugin {
@@ -93,10 +98,13 @@ impl LuaPlugin {
     {
         return Mut(sc.plugins.get_mut::<LuaPlugin>());
     }
-    
+
     pub fn check_for_script_changes(&mut self) {
+        let HotReload::Enabled { watcher } = &self.hot_reload else {
+            return;
+        };
         let mut reload = false;
-        while let Some(event) = self.watcher.try_get_event() {
+        while let Some(event) = watcher.try_get_event() {
             Log::info(format!("FS watcher event: {event:?}"));
             match &event.kind {
                 EventKind::Create(_) | EventKind::Modify(_) | EventKind::Remove(_) => {
@@ -129,7 +137,7 @@ impl<'a, T> DerefMut for Mut<'a, T> {
 
 impl Default for LuaPlugin {
     fn default() -> Self {
-        Self::new("scripts")
+        Self::new("scripts", true)
     }
 }
 
@@ -138,7 +146,10 @@ thread_local! {
 }
 
 impl LuaPlugin {
-    pub fn new(scripts_dir: &str) -> Self {
+    pub fn with_hot_reload(hot_reload_enabled: bool) -> Self {
+        Self::new("scripts", hot_reload_enabled)
+    }
+    pub fn new(scripts_dir: &str, hot_reload_enabled: bool) -> Self {
         let vm = Box::leak(Box::new(Lua::new()));
         LUA.set(Some(vm));
         let lua_version = vm.load("return _VERSION").eval::<mlua::String>().unwrap();
@@ -193,7 +204,13 @@ impl LuaPlugin {
             vm,
             failed: false,
             scripts_dir: scripts_dir.into(),
-            watcher: FileSystemWatcher::new(scripts_dir, Duration::from_millis(500)).unwrap(),
+            hot_reload: match hot_reload_enabled {
+                true => HotReload::Enabled {
+                    watcher: FileSystemWatcher::new(scripts_dir, Duration::from_millis(500))
+                        .unwrap(),
+                },
+                false => HotReload::Disabled,
+            },
             need_reload: false,
             scripts: Default::default(),
         }
@@ -234,13 +251,15 @@ impl Plugin for LuaPlugin {
         }
     }
 
-    fn on_os_event(
-            &mut self,
-            event: &Event<()>,
-            _context: PluginContext,
-        ) {
-        if let Event::WindowEvent { event: WindowEvent::Focused(true), .. } = event {
-            Log::info(format!("Window received focus. Checking for Lua script updates..."));
+    fn on_os_event(&mut self, event: &Event<()>, _context: PluginContext) {
+        if let Event::WindowEvent {
+            event: WindowEvent::Focused(true),
+            ..
+        } = event
+        {
+            Log::info(format!(
+                "Window received focus. Checking for Lua script updates..."
+            ));
             self.check_for_script_changes();
         }
     }
@@ -457,7 +476,6 @@ impl DynamicPlugin for LuaPlugin {
         &mut self,
         fill_and_register: &mut dyn FnMut(&mut dyn Plugin) -> Result<(), String>,
     ) -> Result<(), String> {
-
         self.scripts.borrow_mut().inner_mut().clear();
         let result = fill_and_register(self);
 
@@ -477,6 +495,4 @@ impl DynamicPlugin for LuaPlugin {
     }
 }
 
-pub fn need_to_check_for_changes() {
-    
-}
+pub fn need_to_check_for_changes() {}

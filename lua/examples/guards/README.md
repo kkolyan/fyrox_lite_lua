@@ -26,7 +26,7 @@ chmod +x lua/examples/guards/edit.sh
 ```
 
 # How to edit scripts
-Use any text editor to edit existing files under [scripts](scripts) directory. If you use VSCode, make sure that the [annotations](lua/annotations) are in the scope of the VSCode project, because it will provide some code insight (autocompletion, type checking, Fyrox Lite API reference). Though, it's optional and doesn't impact code execution.
+Use any text editor to edit existing files under [scripts](scripts) directory. If you use VSCode, make sure that the [annotations](lua/annotations) are in the scope of the VSCode project, because it will provide some code insight (autocompletion, type checking, Fyrox Lite API reference). Though, it's optional and doesn't impact code execution. Hot reload of scripts is enabled by default in editor. To allow hot-reload in game mode, replace `LuaPlugin::with_hot_reload(false)` with `LuaPlugin::with_hot_reload(true)` in [executor-lua/src/main.rs](../../executor-lua/src/main.rs), though, hot-reload of game code can be tricky and requires a skill for good use.
 
 # Screenshots
 ![gameplay.png](gameplay.png)
