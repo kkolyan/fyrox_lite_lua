@@ -1,15 +1,13 @@
 use std::mem;
 
 use crate::{
-    external_script_proxy::ExternalScriptProxy, fyrox_lua_plugin::LuaPlugin, lua_error,
-    lua_lifecycle::lua_vm, script_class::ScriptClass, script_object::ScriptObject,
-    typed_userdata::TypedUserData, user_data_plus::Traitor,
+    external_script_proxy::ExternalScriptProxy, fyrox_lua_plugin::LuaPlugin, lua_error, lua_lang::UnpackedScriptObjectVisit, lua_lifecycle::lua_vm, script_class::ScriptClass, script_object::ScriptObject, script_object_residence::{ensure_unpacked, inner_unpacked}, typed_userdata::TypedUserData, user_data_plus::Traitor
 };
 use fyrox_lite::{script_context::with_script_context, spi::UserScript, LiteDataType};
 use mlua::{UserDataRef, Value};
 use send_wrapper::SendWrapper;
 
-impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
+impl<'a> UserScript for TypedUserData<'a, Traitor<ScriptObject>> {
     type Plugin = LuaPlugin;
 
     type ProxyScript = ExternalScriptProxy;
@@ -26,8 +24,8 @@ impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
         plugin: &mut Self::Plugin,
     ) -> Option<Self> {
         if proxy.name == class_name {
-            proxy.data.ensure_unpacked(plugin);
-            let script_data = proxy.data.inner_unpacked();
+            ensure_unpacked(&mut proxy.data, plugin);
+            let script_data = inner_unpacked(&mut proxy.data);
             return Some(script_data.expect("expected to be unpacked here"));
         }
         None
@@ -36,8 +34,8 @@ impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
     fn into_proxy_script(self) -> mlua::Result<Self::ProxyScript> {
         let name = self.borrow()?.def.metadata.class.to_string();
         // it's sound, because Lua outlives a process
-        let ud: TypedUserData<'static, ScriptObject> = unsafe { mem::transmute(self) };
-        let data = crate::script_object_residence::ScriptResidence::Unpacked(SendWrapper::new(ud));
+        let ud: TypedUserData<'static, Traitor<ScriptObject>> = unsafe { mem::transmute(self) };
+        let data = crate::script_object_residence::ScriptResidence::Unpacked(UnpackedScriptObjectVisit(SendWrapper::new(ud)));
         Ok(ExternalScriptProxy { name, data })
     }
 
@@ -51,7 +49,7 @@ impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
                 .expect("WTF: Lua Plugin not found!");
             for script in plugin.scripts.borrow_mut().inner_mut().iter_mut() {
                 if script.name == class_name {
-                    return Ok(script.data.inner_unpacked().unwrap());
+                    return Ok(inner_unpacked(&mut script.data).unwrap());
                 }
             }
             Err(lua_error!("plugin script not found: {}", class_name))
@@ -72,11 +70,11 @@ impl<'a> UserScript for TypedUserData<'a, ScriptObject> {
         let Some(def) = &class.def else {
             return Err(lua_error!("invalid class: {}", class_name));
         };
-        let obj = lua_vm().create_userdata(ScriptObject::new(def))?;
-        Ok(TypedUserData::<ScriptObject>::new(obj))
+        let obj = lua_vm().create_userdata(Traitor::new(ScriptObject::new(def)))?;
+        Ok(TypedUserData::<Traitor<ScriptObject>>::new(obj))
     }
 }
 
 impl LiteDataType for Traitor<SendWrapper<Value<'static>>> {}
 
-impl<'a> LiteDataType for TypedUserData<'a, ScriptObject> {}
+impl<'a> LiteDataType for TypedUserData<'a, Traitor<ScriptObject>> {}

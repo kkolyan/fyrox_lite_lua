@@ -9,7 +9,7 @@ pub fn generate_registry(ctx: &GenerationContext) -> Module {
         &mut s,
         r#"
         pub fn register_classes(lua: &mlua::Lua) {
-            use crate::fyrox_lite_class::FyroxUserData;
+            use crate::user_data_plus::FyroxUserData;
     "#,
         [],
     );

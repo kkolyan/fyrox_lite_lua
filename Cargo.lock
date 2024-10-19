@@ -1153,6 +1153,10 @@ dependencies = [
 [[package]]
 name = "fyrox-c"
 version = "0.1.0"
+dependencies = [
+ "fyrox",
+ "fyrox-lite",
+]
 
 [[package]]
 name = "fyrox-core"
@@ -1279,6 +1283,7 @@ dependencies = [
 name = "fyrox-lite"
 version = "0.1.0"
 dependencies = [
+ "convert_case",
  "extend",
  "fyrox",
  "lite-macro",

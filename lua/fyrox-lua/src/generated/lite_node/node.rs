@@ -16,9 +16,9 @@ use fyrox_lite_math::*;
 use mlua;
 
 use crate::{
-    user_data_plus::{FyroxUserData, Traitor, UserDataClass},
     script_object::ScriptObject,
     typed_userdata::TypedUserData,
+    user_data_plus::{FyroxUserData, Traitor, UserDataClass},
 };
 
 impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
@@ -71,7 +71,8 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
                     std::mem::transmute::<mlua::Value<'_>, mlua::Value<'static>>(payload)
                 }));
 
-                let ret = this.send_hierarchical::<TypedUserData<ScriptObject>>(routing, payload);
+                let ret = this
+                    .send_hierarchical::<TypedUserData<Traitor<ScriptObject>>>(routing, payload);
                 let ret = ret;
                 Ok(ret)
             },
@@ -80,7 +81,7 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
         methods.add_method_mut("subscribe_to", |lua, this, (): ()| {
             let _stub = Default::default();
 
-            let ret = this.subscribe_to::<TypedUserData<ScriptObject>>(_stub);
+            let ret = this.subscribe_to::<TypedUserData<Traitor<ScriptObject>>>(_stub);
             let ret = ret;
             Ok(ret)
         });
@@ -100,7 +101,7 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
 
             let _stub = Default::default();
 
-            let ret = this.add_script::<TypedUserData<ScriptObject>>(class_name, _stub);
+            let ret = this.add_script::<TypedUserData<Traitor<ScriptObject>>>(class_name, _stub);
             let ret = match ret {
                 Ok(ret) => ret,
                 Err(err) => return Err(err),
@@ -113,7 +114,7 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
 
             let _stub = Default::default();
 
-            let ret = this.find_script::<TypedUserData<ScriptObject>>(class_name, _stub);
+            let ret = this.find_script::<TypedUserData<Traitor<ScriptObject>>>(class_name, _stub);
             let ret = match ret {
                 Ok(ret) => {
                     if let Some(ret) = ret {

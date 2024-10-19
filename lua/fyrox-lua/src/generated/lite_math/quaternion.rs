@@ -16,9 +16,9 @@ use fyrox_lite_math::*;
 use mlua;
 
 use crate::{
-    user_data_plus::{FyroxUserData, Traitor, UserDataClass},
     script_object::ScriptObject,
     typed_userdata::TypedUserData,
+    user_data_plus::{FyroxUserData, Traitor, UserDataClass},
 };
 
 impl FyroxUserData for fyrox_lite_math::lite_math::LiteQuaternion {

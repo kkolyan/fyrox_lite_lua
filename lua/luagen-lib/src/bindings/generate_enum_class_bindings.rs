@@ -23,7 +23,7 @@ pub fn generate_enum_class_bindings(class: &EnumClass, ctx: &GenerationContext) 
         use mlua;
 
         use crate::{
-            fyrox_lite_class::{FyroxUserData, Traitor, UserDataClass},
+            user_data_plus::{FyroxUserData, Traitor, UserDataClass},
             lua_error,
             script_object::ScriptObject,
             typed_userdata::TypedUserData,

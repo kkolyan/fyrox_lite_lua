@@ -5,14 +5,17 @@ use crate::fyrox_lua_plugin::LuaPlugin;
 use crate::fyrox_lua_plugin::PluginScriptList;
 use crate::external_script_proxy::ExternalScriptProxy;
 use crate::generated::registry::register_classes;
+use crate::lua_lang::UnpackedScriptObjectVisit;
 use crate::lua_utils::log_error;
 use crate::script_class::ScriptClass;
+use crate::script_object_residence::inner_unpacked;
 use crate::script_object_residence::ScriptResidence;
 use crate::script_metadata::ScriptDefinition;
 use crate::script_metadata::ScriptKind;
 use crate::script_metadata::ScriptMetadata;
 use crate::script_object::ScriptObject;
 use crate::typed_userdata::TypedUserData;
+use crate::user_data_plus::Traitor;
 use fyrox::core::log::Log;
 use fyrox::core::watcher::FileSystemWatcher;
 use fyrox::plugin::PluginRegistrationContext;
@@ -145,9 +148,9 @@ pub(crate) fn load_script(
         ScriptKind::Plugin => {
             plugin_scripts.inner_mut().push(ExternalScriptProxy {
                 name: name.to_string(),
-                data: ScriptResidence::Unpacked(SendWrapper::new(TypedUserData::new(
-                    lua_vm().create_userdata(ScriptObject::new(&definition)).unwrap(),
-                ))),
+                data: ScriptResidence::Unpacked(UnpackedScriptObjectVisit(SendWrapper::new(TypedUserData::new(
+                    lua_vm().create_userdata(Traitor::new(ScriptObject::new(&definition))).unwrap(),
+                )))),
             });
         }
     }
@@ -233,8 +236,7 @@ pub(crate) fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(
     args: impl FnOnce() -> mlua::Result<A>,
 ) {
     without_script_context(ctx, || {
-        let script_object_ud = data
-            .inner_unpacked()
+        let script_object_ud = inner_unpacked(data)
             .expect("WTF, it's guaranteed to be unpacked here");
 
         let class_name = script_object_ud.borrow().unwrap().def.metadata.class;

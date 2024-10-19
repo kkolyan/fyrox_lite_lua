@@ -16,10 +16,10 @@ use fyrox_lite_math::*;
 use mlua;
 
 use crate::{
-    user_data_plus::{FyroxUserData, Traitor, UserDataClass},
     lua_error,
     script_object::ScriptObject,
     typed_userdata::TypedUserData,
+    user_data_plus::{FyroxUserData, Traitor, UserDataClass},
 };
 
 impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_event::Touch> {

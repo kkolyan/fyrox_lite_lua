@@ -7,6 +7,7 @@ edition = "2021"
 fyrox = { workspace = true }
 extend = "1.2.0"
 lite-macro = { path = "../lite-macro" }
+convert_case = {workspace = true}
 
 [features]
 default = ["fyrox/fyrox-impl"]

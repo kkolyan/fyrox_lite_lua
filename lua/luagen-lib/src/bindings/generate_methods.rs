@@ -40,7 +40,7 @@ pub fn generate_methods(
                         | DataType::UserScriptGenericStub
                 )
             })
-            .map(|_| "::<TypedUserData<ScriptObject>>")
+            .map(|_| "::<TypedUserData<Traitor<ScriptObject>>>")
             .unwrap_or("");
 
         let input_names = params.iter().map(|it| it.name.as_str()).to_vec().join(", ");

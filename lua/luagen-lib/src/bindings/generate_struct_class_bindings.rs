@@ -20,7 +20,7 @@ pub fn generate_struct_class_bindings(class: &StructClass, ctx: &GenerationConte
         use mlua;
 
         use crate::{
-            fyrox_lite_class::{FyroxUserData, Traitor, UserDataClass}, lua_error, script_object::ScriptObject, typed_userdata::TypedUserData
+            user_data_plus::{FyroxUserData, Traitor, UserDataClass}, lua_error, script_object::ScriptObject, typed_userdata::TypedUserData
         };
     "#,
         [],

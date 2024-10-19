@@ -1,6 +1,86 @@
 {
   "classes": [
     {
+      "Engine": {
+        "class_name": "Prefab",
+        "rust_struct_path": "fyrox_lite::lite_prefab::LitePrefab",
+        "methods": [
+          {
+            "instance": true,
+            "method_name": "instantiate_at",
+            "signature": {
+              "params": [
+                {
+                  "name": "position",
+                  "ty": {
+                    "Object": "Vector3"
+                  },
+                  "variadic": false
+                },
+                {
+                  "name": "orientation",
+                  "ty": {
+                    "Object": "Quaternion"
+                  },
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Object": "Node"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "Engine": {
+        "class_name": "Log",
+        "rust_struct_path": "fyrox_lite::lite_log::LiteLog",
+        "methods": [
+          {
+            "instance": false,
+            "method_name": "info",
+            "signature": {
+              "params": [
+                {
+                  "name": "msg",
+                  "ty": "String",
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "warn",
+            "signature": {
+              "params": [
+                {
+                  "name": "msg",
+                  "ty": "String",
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "err",
+            "signature": {
+              "params": [
+                {
+                  "name": "msg",
+                  "ty": "String",
+                  "variadic": false
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
       "Enum": {
         "class_name": "Event",
         "rust_struct_path": "fyrox_lite::lite_event::Event",
@@ -1320,43 +1400,19 @@
     },
     {
       "Engine": {
-        "class_name": "Log",
-        "rust_struct_path": "fyrox_lite::lite_log::LiteLog",
+        "class_name": "Window",
+        "rust_struct_path": "fyrox_lite::lite_window::LiteWindow",
         "methods": [
           {
             "instance": false,
-            "method_name": "info",
+            "method_name": "set_cursor_grab",
             "signature": {
               "params": [
                 {
-                  "name": "msg",
-                  "ty": "String",
-                  "variadic": false
-                }
-              ]
-            }
-          },
-          {
-            "instance": false,
-            "method_name": "warn",
-            "signature": {
-              "params": [
-                {
-                  "name": "msg",
-                  "ty": "String",
-                  "variadic": false
-                }
-              ]
-            }
-          },
-          {
-            "instance": false,
-            "method_name": "err",
-            "signature": {
-              "params": [
-                {
-                  "name": "msg",
-                  "ty": "String",
+                  "name": "mode",
+                  "ty": {
+                    "Object": "CursorGrabMode"
+                  },
                   "variadic": false
                 }
               ]
@@ -1366,342 +1422,39 @@
       }
     },
     {
-      "Struct": {
-        "class_name": "Vector3",
-        "rust_struct_path": "fyrox_lite::lite_math::PodVector3",
-        "fields": [
+      "Enum": {
+        "class_name": "CursorGrabMode",
+        "rust_struct_path": "fyrox_lite::lite_window::LiteCursorGrabMode",
+        "variants": [
           {
-            "name": "x",
-            "ty": "F32"
+            "tag": "None"
           },
           {
-            "name": "y",
-            "ty": "F32"
+            "tag": "Confined"
           },
           {
-            "name": "z",
-            "ty": "F32"
-          }
-        ]
-      }
-    },
-    {
-      "Struct": {
-        "class_name": "Vector2",
-        "rust_struct_path": "fyrox_lite::lite_math::PodVector2",
-        "fields": [
-          {
-            "name": "x",
-            "ty": "F32"
-          },
-          {
-            "name": "y",
-            "ty": "F32"
-          }
-        ]
-      }
-    },
-    {
-      "Struct": {
-        "class_name": "Vector2i",
-        "rust_struct_path": "fyrox_lite::lite_math::PodVector2i",
-        "fields": [
-          {
-            "name": "x",
-            "ty": "I64"
-          },
-          {
-            "name": "y",
-            "ty": "I64"
-          }
-        ]
-      }
-    },
-    {
-      "Struct": {
-        "class_name": "Quaternion",
-        "rust_struct_path": "fyrox_lite::lite_math::PodQuaternion",
-        "fields": [
-          {
-            "name": "x",
-            "ty": "F32"
-          },
-          {
-            "name": "y",
-            "ty": "F32"
-          },
-          {
-            "name": "z",
-            "ty": "F32"
-          },
-          {
-            "name": "w",
-            "ty": "F32"
+            "tag": "Locked"
           }
         ]
       }
     },
     {
       "Engine": {
-        "class_name": "Node",
-        "rust_struct_path": "fyrox_lite::lite_node::LiteNode",
+        "class_name": "Scene",
+        "rust_struct_path": "fyrox_lite::lite_scene::LiteScene",
         "methods": [
           {
-            "instance": true,
-            "method_name": "as_rigid_body",
-            "signature": {
-              "return_ty": {
-                "Option": {
-                  "Object": "RigidBody"
-                }
-              }
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "get_name",
-            "signature": {
-              "return_ty": {
-                "Option": "String"
-              }
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "get_alive",
-            "signature": {
-              "return_ty": "Bool"
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "destroy",
-            "signature": {}
-          },
-          {
-            "instance": true,
-            "method_name": "get_global_position",
-            "signature": {
-              "return_ty": {
-                "Object": "Vector3"
-              }
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "get_local_position",
-            "signature": {
-              "return_ty": {
-                "Object": "Vector3"
-              }
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "get_local_rotation",
-            "signature": {
-              "return_ty": {
-                "Object": "Quaternion"
-              }
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "send_hierarchical",
+            "instance": false,
+            "method_name": "load_async",
             "signature": {
               "params": [
                 {
-                  "name": "routing",
-                  "ty": {
-                    "Object": "RoutingStrategy"
-                  },
-                  "variadic": false
-                },
-                {
-                  "name": "payload",
-                  "ty": "UserScriptMessage",
-                  "variadic": false
-                }
-              ]
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "set_local_position",
-            "signature": {
-              "params": [
-                {
-                  "name": "new_pos",
-                  "ty": {
-                    "Object": "Vector3"
-                  },
-                  "variadic": false
-                }
-              ]
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "set_local_rotation",
-            "signature": {
-              "params": [
-                {
-                  "name": "value",
-                  "ty": {
-                    "Object": "Quaternion"
-                  },
-                  "variadic": false
-                }
-              ]
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "subscribe_to",
-            "signature": {
-              "params": [
-                {
-                  "name": "_stub",
-                  "ty": "UserScriptGenericStub",
-                  "variadic": false
-                }
-              ]
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "find_collider_in_children",
-            "signature": {
-              "return_ty": {
-                "Option": {
-                  "Object": "Node"
-                }
-              }
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "get_valid",
-            "signature": {
-              "return_ty": "Bool"
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "get_parent",
-            "signature": {
-              "return_ty": {
-                "Object": "Node"
-              }
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "add_script",
-            "signature": {
-              "params": [
-                {
-                  "name": "class_name",
-                  "ty": "ClassName",
-                  "variadic": false
-                },
-                {
-                  "name": "_stub",
-                  "ty": "UserScriptGenericStub",
-                  "variadic": false
-                }
-              ],
-              "return_ty": {
-                "Result": {
-                  "ok": "UserScript"
-                }
-              }
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "find_script",
-            "signature": {
-              "params": [
-                {
-                  "name": "class_name",
-                  "ty": "ClassName",
-                  "variadic": false
-                },
-                {
-                  "name": "_stub",
-                  "ty": "UserScriptGenericStub",
-                  "variadic": false
-                }
-              ],
-              "return_ty": {
-                "Result": {
-                  "ok": {
-                    "Option": "UserScript"
-                  }
-                }
-              }
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "get_global_rotation",
-            "signature": {
-              "return_ty": {
-                "Object": "Quaternion"
-              }
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "tag_is",
-            "signature": {
-              "params": [
-                {
-                  "name": "tag",
-                  "ty": "String",
-                  "variadic": false
-                }
-              ],
-              "return_ty": "Bool"
-            }
-          },
-          {
-            "instance": true,
-            "method_name": "set_tag",
-            "signature": {
-              "params": [
-                {
-                  "name": "tag",
+                  "name": "scene_path",
                   "ty": "String",
                   "variadic": false
                 }
               ]
             }
-          },
-          {
-            "instance": true,
-            "method_name": "get_tag",
-            "signature": {
-              "return_ty": "String"
-            }
-          }
-        ],
-        "features": [
-          "Eq"
-        ]
-      }
-    },
-    {
-      "Enum": {
-        "class_name": "RoutingStrategy",
-        "rust_struct_path": "fyrox_lite::lite_node::LiteRoutingStrategy",
-        "variants": [
-          {
-            "tag": "Up"
-          },
-          {
-            "tag": "Down"
           }
         ]
       }
@@ -1906,91 +1659,6 @@
                   "ty": {
                     "Object": "Vector3"
                   },
-                  "variadic": false
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "Engine": {
-        "class_name": "Plugin",
-        "rust_struct_path": "fyrox_lite::lite_plugin::LitePlugin",
-        "methods": [
-          {
-            "instance": false,
-            "method_name": "get",
-            "signature": {
-              "params": [
-                {
-                  "name": "class_name",
-                  "ty": "ClassName",
-                  "variadic": false
-                },
-                {
-                  "name": "_stub",
-                  "ty": "UserScriptGenericStub",
-                  "variadic": false
-                }
-              ],
-              "return_ty": {
-                "Result": {
-                  "ok": "UserScript"
-                }
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "Engine": {
-        "class_name": "Prefab",
-        "rust_struct_path": "fyrox_lite::lite_prefab::LitePrefab",
-        "methods": [
-          {
-            "instance": true,
-            "method_name": "instantiate_at",
-            "signature": {
-              "params": [
-                {
-                  "name": "position",
-                  "ty": {
-                    "Object": "Vector3"
-                  },
-                  "variadic": false
-                },
-                {
-                  "name": "orientation",
-                  "ty": {
-                    "Object": "Quaternion"
-                  },
-                  "variadic": false
-                }
-              ],
-              "return_ty": {
-                "Object": "Node"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "Engine": {
-        "class_name": "Scene",
-        "rust_struct_path": "fyrox_lite::lite_scene::LiteScene",
-        "methods": [
-          {
-            "instance": false,
-            "method_name": "load_async",
-            "signature": {
-              "params": [
-                {
-                  "name": "scene_path",
-                  "ty": "String",
                   "variadic": false
                 }
               ]
@@ -2999,41 +2667,373 @@
       }
     },
     {
+      "Struct": {
+        "class_name": "Vector3",
+        "rust_struct_path": "fyrox_lite::lite_math::PodVector3",
+        "fields": [
+          {
+            "name": "x",
+            "ty": "F32"
+          },
+          {
+            "name": "y",
+            "ty": "F32"
+          },
+          {
+            "name": "z",
+            "ty": "F32"
+          }
+        ]
+      }
+    },
+    {
+      "Struct": {
+        "class_name": "Vector2",
+        "rust_struct_path": "fyrox_lite::lite_math::PodVector2",
+        "fields": [
+          {
+            "name": "x",
+            "ty": "F32"
+          },
+          {
+            "name": "y",
+            "ty": "F32"
+          }
+        ]
+      }
+    },
+    {
+      "Struct": {
+        "class_name": "Vector2i",
+        "rust_struct_path": "fyrox_lite::lite_math::PodVector2i",
+        "fields": [
+          {
+            "name": "x",
+            "ty": "I64"
+          },
+          {
+            "name": "y",
+            "ty": "I64"
+          }
+        ]
+      }
+    },
+    {
+      "Struct": {
+        "class_name": "Quaternion",
+        "rust_struct_path": "fyrox_lite::lite_math::PodQuaternion",
+        "fields": [
+          {
+            "name": "x",
+            "ty": "F32"
+          },
+          {
+            "name": "y",
+            "ty": "F32"
+          },
+          {
+            "name": "z",
+            "ty": "F32"
+          },
+          {
+            "name": "w",
+            "ty": "F32"
+          }
+        ]
+      }
+    },
+    {
       "Engine": {
-        "class_name": "Window",
-        "rust_struct_path": "fyrox_lite::lite_window::LiteWindow",
+        "class_name": "Plugin",
+        "rust_struct_path": "fyrox_lite::lite_plugin::LitePlugin",
         "methods": [
           {
             "instance": false,
-            "method_name": "set_cursor_grab",
+            "method_name": "get",
             "signature": {
               "params": [
                 {
-                  "name": "mode",
-                  "ty": {
-                    "Object": "CursorGrabMode"
-                  },
+                  "name": "class_name",
+                  "ty": "ClassName",
+                  "variadic": false
+                },
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub",
                   "variadic": false
                 }
-              ]
+              ],
+              "return_ty": {
+                "Result": {
+                  "ok": "UserScript"
+                }
+              }
             }
           }
         ]
       }
     },
     {
+      "Engine": {
+        "class_name": "Node",
+        "rust_struct_path": "fyrox_lite::lite_node::LiteNode",
+        "methods": [
+          {
+            "instance": true,
+            "method_name": "as_rigid_body",
+            "signature": {
+              "return_ty": {
+                "Option": {
+                  "Object": "RigidBody"
+                }
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "get_name",
+            "signature": {
+              "return_ty": {
+                "Option": "String"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "get_alive",
+            "signature": {
+              "return_ty": "Bool"
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "destroy",
+            "signature": {}
+          },
+          {
+            "instance": true,
+            "method_name": "get_global_position",
+            "signature": {
+              "return_ty": {
+                "Object": "Vector3"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "get_local_position",
+            "signature": {
+              "return_ty": {
+                "Object": "Vector3"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "get_local_rotation",
+            "signature": {
+              "return_ty": {
+                "Object": "Quaternion"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "send_hierarchical",
+            "signature": {
+              "params": [
+                {
+                  "name": "routing",
+                  "ty": {
+                    "Object": "RoutingStrategy"
+                  },
+                  "variadic": false
+                },
+                {
+                  "name": "payload",
+                  "ty": "UserScriptMessage",
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "set_local_position",
+            "signature": {
+              "params": [
+                {
+                  "name": "new_pos",
+                  "ty": {
+                    "Object": "Vector3"
+                  },
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "set_local_rotation",
+            "signature": {
+              "params": [
+                {
+                  "name": "value",
+                  "ty": {
+                    "Object": "Quaternion"
+                  },
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "subscribe_to",
+            "signature": {
+              "params": [
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub",
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "find_collider_in_children",
+            "signature": {
+              "return_ty": {
+                "Option": {
+                  "Object": "Node"
+                }
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "get_valid",
+            "signature": {
+              "return_ty": "Bool"
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "get_parent",
+            "signature": {
+              "return_ty": {
+                "Object": "Node"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "add_script",
+            "signature": {
+              "params": [
+                {
+                  "name": "class_name",
+                  "ty": "ClassName",
+                  "variadic": false
+                },
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub",
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Result": {
+                  "ok": "UserScript"
+                }
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "find_script",
+            "signature": {
+              "params": [
+                {
+                  "name": "class_name",
+                  "ty": "ClassName",
+                  "variadic": false
+                },
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub",
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Result": {
+                  "ok": {
+                    "Option": "UserScript"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "get_global_rotation",
+            "signature": {
+              "return_ty": {
+                "Object": "Quaternion"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "tag_is",
+            "signature": {
+              "params": [
+                {
+                  "name": "tag",
+                  "ty": "String",
+                  "variadic": false
+                }
+              ],
+              "return_ty": "Bool"
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "set_tag",
+            "signature": {
+              "params": [
+                {
+                  "name": "tag",
+                  "ty": "String",
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "get_tag",
+            "signature": {
+              "return_ty": "String"
+            }
+          }
+        ],
+        "features": [
+          "Eq"
+        ]
+      }
+    },
+    {
       "Enum": {
-        "class_name": "CursorGrabMode",
-        "rust_struct_path": "fyrox_lite::lite_window::LiteCursorGrabMode",
+        "class_name": "RoutingStrategy",
+        "rust_struct_path": "fyrox_lite::lite_node::LiteRoutingStrategy",
         "variants": [
           {
-            "tag": "None"
+            "tag": "Up"
           },
           {
-            "tag": "Confined"
-          },
-          {
-            "tag": "Locked"
+            "tag": "Down"
           }
         ]
       }

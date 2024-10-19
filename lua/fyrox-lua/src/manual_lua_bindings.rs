@@ -32,7 +32,7 @@ impl UserData for ScriptClass {
 }
 
 
-impl UserData for ScriptObject {
+impl UserData for Traitor<ScriptObject> {
     fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
         fields.add_field_method_get("node", |_lua, _this| {
             with_script_context(|ctx| Ok(ctx.handle.map(|it| Traitor::new(LiteNode::new(it)))))
@@ -46,11 +46,11 @@ impl UserData for ScriptObject {
             MetaMethod::Index.name(),
             |lua, (this, key): (Value, LuaString)| {
                 // working with class
-                if let Value::Table(this) = this {
+                if let Value::Table(this) = &this {
                     return this.raw_get(key);
                 }
-                if let Value::UserData(this) = this {
-                    if let Ok(this) = this.borrow::<ScriptObject>() {
+                if let Value::UserData(this) = &this {
+                    if let Ok(this) = this.borrow::<Traitor<ScriptObject>>() {
                         let field_name = key.to_string_lossy();
                         let field_index = this
                             .def
@@ -119,12 +119,12 @@ impl UserData for ScriptObject {
             MetaMethod::NewIndex.name(),
             |lua, (this, key, value): (Value, LuaString, Value)| {
                 // working with class
-                if let Value::Table(this) = this {
+                if let Value::Table(this) = &this {
                     return this.raw_set(key, value);
                 }
-                if let Value::UserData(this) = this {
+                if let Value::UserData(this) = &this {
                     // working with script instances
-                    if let Ok(mut this) = this.borrow_mut::<ScriptObject>() {
+                    if let Ok(mut this) = this.borrow_mut::<Traitor<ScriptObject>>() {
                         let field_name = key.to_string_lossy();
                         let class = this.def.metadata.class;
                         let field_index = *this

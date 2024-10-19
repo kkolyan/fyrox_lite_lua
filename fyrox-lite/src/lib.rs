@@ -11,6 +11,10 @@ pub mod lite_physics;
 pub mod lite_ctx;
 pub mod lite_node;
 pub mod script_context;
-
+pub mod script_object;
+pub mod script_metadata;
+pub mod script_object_fyrox_traits;
+pub mod reflect_base_macro;
+pub mod script_object_residence;
 
 pub use crate::spi::LiteDataType;

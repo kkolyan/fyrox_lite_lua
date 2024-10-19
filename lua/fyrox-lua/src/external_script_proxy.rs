@@ -1,8 +1,8 @@
 use super::script_object_residence::ScriptResidence;
 use crate::fyrox_lua_plugin::PluginsRefMut_Ext;
 use crate::lua_lifecycle::invoke_callback;
-use crate::reflect_base;
 use crate::script_metadata::ScriptKind;
+use crate::script_object_residence::ensure_unpacked;
 use crate::user_data_plus::Traitor;
 use fyrox::core::reflect::prelude::*;
 use fyrox::core::type_traits::prelude::*;
@@ -11,6 +11,7 @@ use fyrox::script::BaseScript;
 use fyrox::script::ScriptContext;
 use fyrox::script::ScriptTrait;
 use fyrox_lite::lite_event::to_lite;
+use fyrox_lite::reflect_base;
 use mlua::Value;
 use send_wrapper::SendWrapper;
 use std::any::Any;
@@ -24,7 +25,7 @@ pub struct ExternalScriptProxy {
 
 impl ScriptTrait for ExternalScriptProxy {
     fn on_init(&mut self, ctx: &mut ScriptContext) {
-        self.data.ensure_unpacked(ctx.plugins.lua_mut());
+        ensure_unpacked(&mut self.data, ctx.plugins.lua_mut());
         invoke_callback(
             &mut self.data,
             ctx,
@@ -34,7 +35,7 @@ impl ScriptTrait for ExternalScriptProxy {
     }
 
     fn on_start(&mut self, ctx: &mut ScriptContext) {
-        self.data.ensure_unpacked(ctx.plugins.lua_mut());
+        ensure_unpacked(&mut self.data, ctx.plugins.lua_mut());
         invoke_callback(
             &mut self.data,
             ctx,
@@ -44,7 +45,7 @@ impl ScriptTrait for ExternalScriptProxy {
     }
 
     fn on_deinit(&mut self, ctx: &mut fyrox::script::ScriptDeinitContext) {
-        self.data.ensure_unpacked(ctx.plugins.lua_mut());
+        ensure_unpacked(&mut self.data, ctx.plugins.lua_mut());
         invoke_callback(
             &mut self.data,
             ctx,
@@ -55,7 +56,7 @@ impl ScriptTrait for ExternalScriptProxy {
 
     fn on_os_event(&mut self, event: &fyrox::event::Event<()>, ctx: &mut ScriptContext) {
         if let Some(event) = to_lite(event.clone()) {
-            self.data.ensure_unpacked(ctx.plugins.lua_mut());
+            ensure_unpacked(&mut self.data, ctx.plugins.lua_mut());
             invoke_callback(
                 &mut self.data,
                 ctx,
@@ -66,7 +67,7 @@ impl ScriptTrait for ExternalScriptProxy {
     }
 
     fn on_update(&mut self, ctx: &mut ScriptContext) {
-        self.data.ensure_unpacked(ctx.plugins.lua_mut());
+        ensure_unpacked(&mut self.data, ctx.plugins.lua_mut());
         let dt = ctx.dt;
         invoke_callback(
             &mut self.data,
@@ -82,7 +83,7 @@ impl ScriptTrait for ExternalScriptProxy {
         ctx: &mut fyrox::script::ScriptMessageContext,
     ) {
         if let Some(lua_message) = message.downcast_ref::<Traitor<SendWrapper<Value>>>() {
-            self.data.ensure_unpacked(ctx.plugins.lua_mut());
+            ensure_unpacked(&mut self.data, ctx.plugins.lua_mut());
             invoke_callback(
                 &mut self.data,
                 ctx,
@@ -107,11 +108,7 @@ impl BaseScript for ExternalScriptProxy {
         self
     }
     fn id(&self) -> Uuid {
-        self.data
-            .with_script_object(|it| match it.def.metadata.kind {
-                ScriptKind::Script(uuid) => uuid,
-                ScriptKind::Plugin => panic!("not expected to be called for Plugin scripts"),
-            })
+        self.data.id()
     }
 }
 

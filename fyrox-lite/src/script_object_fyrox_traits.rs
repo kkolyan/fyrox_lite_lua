@@ -2,10 +2,10 @@ use std::any::TypeId;
 
 use fyrox::{asset::Resource, core::{algebra::{UnitQuaternion, Vector3}, pool::Handle, reflect::{FieldInfo, Reflect}}, gui::UiNode, resource::model::Model, scene::node::Node};
 
-use crate::{reflect_base, script_metadata::ScriptFieldValueType, script_object::{ScriptFieldValue, ScriptObject}};
+use crate::{reflect_base, script_metadata::ScriptFieldValueType, script_object::{Lang, ScriptFieldValue, ScriptObject}};
 
 
-impl Reflect for ScriptObject {
+impl <T: Lang> Reflect for ScriptObject<T> {
     reflect_base!();
 
     fn fields_info(&self, func: &mut dyn FnMut(&[FieldInfo])) {
@@ -18,13 +18,13 @@ impl Reflect for ScriptObject {
             .enumerate()
             .filter(|(_i, it)| !it.private)
             .map(|(i, it)| FieldInfo {
-                owner_type_id: TypeId::of::<ScriptObject>(),
+                owner_type_id: TypeId::of::<ScriptObject<T> >(),
                 name: it.name.as_str(),
                 display_name: it.title.as_str(),
                 description: it.name.as_str(),
                 type_name: match it.ty {
                     ScriptFieldValueType::Number => std::any::type_name::<f32>(),
-                    ScriptFieldValueType::String => std::any::type_name::<mlua::String>(),
+                    ScriptFieldValueType::String => std::any::type_name::<T::String<'_>>(),
                     ScriptFieldValueType::Bool => std::any::type_name::<bool>(),
                     ScriptFieldValueType::Node => std::any::type_name::<Handle<Node>>(),
                     ScriptFieldValueType::UiNode => std::any::type_name::<Handle<UiNode>>(),

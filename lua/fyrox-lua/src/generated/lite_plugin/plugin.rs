@@ -16,9 +16,9 @@ use fyrox_lite_math::*;
 use mlua;
 
 use crate::{
-    user_data_plus::{FyroxUserData, Traitor, UserDataClass},
     script_object::ScriptObject,
     typed_userdata::TypedUserData,
+    user_data_plus::{FyroxUserData, Traitor, UserDataClass},
 };
 
 impl FyroxUserData for fyrox_lite::lite_plugin::LitePlugin {
@@ -38,9 +38,9 @@ impl FyroxUserData for fyrox_lite::lite_plugin::LitePlugin {
 
             let _stub = Default::default();
 
-            let ret = fyrox_lite::lite_plugin::LitePlugin::get::<TypedUserData<ScriptObject>>(
-                class_name, _stub,
-            );
+            let ret = fyrox_lite::lite_plugin::LitePlugin::get::<
+                TypedUserData<Traitor<ScriptObject>>,
+            >(class_name, _stub);
             let ret = match ret {
                 Ok(ret) => ret,
                 Err(err) => return Err(err),

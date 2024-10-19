@@ -5,7 +5,6 @@ pub(crate) mod typed_userdata;
 pub(crate) mod script_class;
 pub(crate) mod user_script_impl;
 pub(crate) mod lua_utils;
-pub(crate) mod reflect_base_macro;
 pub(crate) mod fyrox_lua_plugin;
 pub(crate) mod script_object_residence;
 pub(crate) mod external_script_proxy;
@@ -14,6 +13,6 @@ pub(crate) mod script_object;
 pub(crate) mod generated;
 pub(crate) mod lua_lifecycle;
 pub(crate) mod manual_lua_bindings;
-pub(crate) mod script_object_fyrox_traits;
+pub(crate) mod lua_lang;
 
 pub use fyrox_lua_plugin::LuaPlugin;
