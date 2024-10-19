@@ -1151,6 +1151,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "fyrox-c"
+version = "0.1.0"
+
+[[package]]
 name = "fyrox-core"
 version = "0.28.1"
 dependencies = [

@@ -12,6 +12,7 @@ members = [
 	"lite-model",
 	"lite-parser",
 	"tools",
+	"cs/fyrox-c",
 ]
 resolver = "2"
 exclude = ["mlua"]

@@ -7,6 +7,7 @@ use crate::script_metadata::ScriptDefinition;
 #[derive(Debug)]
 pub struct ScriptClass {
 	pub name: &'static str,
+    // static fields (including user-defined methods)
     pub table: HashMap<String, mlua::Value<'static>>,
     pub def: Option<Arc<ScriptDefinition>>,
 }

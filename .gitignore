@@ -5,3 +5,5 @@
 /bindgen/expand
 .vscode
 /lua/examples/guards/fyrox-lite.lua
+/cs/App01/bin
+/cs/App01/obj
