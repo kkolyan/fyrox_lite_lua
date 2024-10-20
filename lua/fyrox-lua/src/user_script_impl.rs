@@ -1,7 +1,9 @@
 use std::mem;
 
 use crate::{
-    external_script_proxy::ExternalScriptProxy, fyrox_lua_plugin::LuaPlugin, lua_error, lua_lang::UnpackedScriptObjectVisit, lua_lifecycle::lua_vm, script_class::ScriptClass, script_object::ScriptObject, script_object_residence::{ensure_unpacked, inner_unpacked}, typed_userdata::TypedUserData, user_data_plus::Traitor
+    external_script_proxy::ExternalScriptProxy, fyrox_lua_plugin::LuaPlugin, lua_error,
+    lua_lang::UnpackedScriptObjectVisit, lua_lifecycle::lua_vm, script_class::ScriptClass,
+    script_object::ScriptObject, typed_userdata::TypedUserData, user_data_plus::Traitor,
 };
 use fyrox_lite::{script_context::with_script_context, spi::UserScript, LiteDataType};
 use mlua::{UserDataRef, Value};
@@ -24,9 +26,11 @@ impl<'a> UserScript for TypedUserData<'a, Traitor<ScriptObject>> {
         plugin: &mut Self::Plugin,
     ) -> Option<Self> {
         if proxy.name == class_name {
-            ensure_unpacked(&mut proxy.data, plugin);
-            let script_data = inner_unpacked(&mut proxy.data);
-            return Some(script_data.expect("expected to be unpacked here"));
+            proxy.data.ensure_unpacked(&mut plugin.failed);
+            let script_data = &mut proxy.data.inner_unpacked();
+            return Some(TypedUserData::clone(
+                &script_data.expect("expected to be unpacked here").0,
+            ));
         }
         None
     }
@@ -35,7 +39,9 @@ impl<'a> UserScript for TypedUserData<'a, Traitor<ScriptObject>> {
         let name = self.borrow()?.def.metadata.class.to_string();
         // it's sound, because Lua outlives a process
         let ud: TypedUserData<'static, Traitor<ScriptObject>> = unsafe { mem::transmute(self) };
-        let data = crate::script_object_residence::ScriptResidence::Unpacked(UnpackedScriptObjectVisit(SendWrapper::new(ud)));
+        let data = crate::script_object_residence::ScriptResidence::Unpacked(
+            UnpackedScriptObjectVisit(SendWrapper::new(ud)),
+        );
         Ok(ExternalScriptProxy { name, data })
     }
 
@@ -49,7 +55,9 @@ impl<'a> UserScript for TypedUserData<'a, Traitor<ScriptObject>> {
                 .expect("WTF: Lua Plugin not found!");
             for script in plugin.scripts.borrow_mut().inner_mut().iter_mut() {
                 if script.name == class_name {
-                    return Ok(inner_unpacked(&mut script.data).unwrap());
+                    return Ok(TypedUserData::clone(
+                        &script.data.inner_unpacked().unwrap().0,
+                    ));
                 }
             }
             Err(lua_error!("plugin script not found: {}", class_name))

@@ -60,11 +60,15 @@ impl UserData for Traitor<ScriptObject> {
                         if let Some(field_index) = field_index {
                             let value = &this.values[*field_index];
                             let result = match value {
-                                ScriptFieldValue::Number(it) => Value::Number(*it),
+                                ScriptFieldValue::f32(it) => Value::Number(*it as f64),
+                                ScriptFieldValue::f64(it) => Value::Number(*it),
+                                ScriptFieldValue::i16(it) => Value::Number(*it as f64),
+                                ScriptFieldValue::i32(it) => Value::Number(*it as f64),
+                                ScriptFieldValue::i64(it) => Value::Number(*it as f64),
                                 ScriptFieldValue::String(it) => {
                                     Value::String(lua.create_string(it)?)
                                 }
-                                ScriptFieldValue::Bool(it) => Value::Boolean(*it),
+                                ScriptFieldValue::bool(it) => Value::Boolean(*it),
                                 ScriptFieldValue::Node(it) => Value::UserData(
                                     lua.create_userdata(Traitor::new(LiteNode::new(*it)))?,
                                 ),
@@ -96,7 +100,7 @@ impl UserData for Traitor<ScriptObject> {
 
                         let class = lua
                             .globals()
-                            .get::<_, Option<UserDataRef<ScriptClass>>>(this.def.metadata.class)?;
+                            .get::<_, Option<UserDataRef<ScriptClass>>>(this.def.metadata.class.as_str())?;
                         if let Some(class) = class {
                             let value = class.table.get(field_name.as_ref());
                             if let Some(value) = value {
@@ -126,7 +130,7 @@ impl UserData for Traitor<ScriptObject> {
                     // working with script instances
                     if let Ok(mut this) = this.borrow_mut::<Traitor<ScriptObject>>() {
                         let field_name = key.to_string_lossy();
-                        let class = this.def.metadata.class;
+                        let class = this.def.metadata.class.clone();
                         let field_index = *this
                             .def
                             .metadata
@@ -137,7 +141,17 @@ impl UserData for Traitor<ScriptObject> {
                             })?;
                         let value_storage = &mut this.values[field_index];
                         match value_storage {
-                            ScriptFieldValue::Number(it) => {
+                            ScriptFieldValue::f32(it) => {
+                                *it = value.as_f64_tolerant().ok_or_else(|| {
+                                    lua_error!(
+                                        "cannot assign {}.{} with {:?}",
+                                        class,
+                                        field_name,
+                                        VerboseLuaValue::new(value)
+                                    )
+                                })? as f32;
+                            }
+                            ScriptFieldValue::f64(it) => {
                                 *it = value.as_f64_tolerant().ok_or_else(|| {
                                     lua_error!(
                                         "cannot assign {}.{} with {:?}",
@@ -147,6 +161,36 @@ impl UserData for Traitor<ScriptObject> {
                                     )
                                 })?;
                             }
+                            ScriptFieldValue::i16(it) => {
+                                *it = value.as_f64_tolerant().ok_or_else(|| {
+                                    lua_error!(
+                                        "cannot assign {}.{} with {:?}",
+                                        class,
+                                        field_name,
+                                        VerboseLuaValue::new(value)
+                                    )
+                                })? as i16;
+                            }
+                            ScriptFieldValue::i32(it) => {
+                                *it = value.as_f64_tolerant().ok_or_else(|| {
+                                    lua_error!(
+                                        "cannot assign {}.{} with {:?}",
+                                        class,
+                                        field_name,
+                                        VerboseLuaValue::new(value)
+                                    )
+                                })? as i32;
+                            }
+                            ScriptFieldValue::i64(it) => {
+                                *it = value.as_f64_tolerant().ok_or_else(|| {
+                                    lua_error!(
+                                        "cannot assign {}.{} with {:?}",
+                                        class,
+                                        field_name,
+                                        VerboseLuaValue::new(value)
+                                    )
+                                })? as i64;
+                            }
                             ScriptFieldValue::String(it) => {
                                 *it = value
                                     .as_string_lossy()
@@ -154,17 +198,17 @@ impl UserData for Traitor<ScriptObject> {
                                     .ok_or_else(|| {
                                         lua_error!(
                                             "cannot assign {}.{} with {:?}",
-                                            class,
+                                            &class,
                                             field_name,
                                             VerboseLuaValue::new(value)
                                         )
                                     })?;
                             }
-                            ScriptFieldValue::Bool(it) => {
+                            ScriptFieldValue::bool(it) => {
                                 *it = value.as_boolean().ok_or_else(|| {
                                     lua_error!(
                                         "cannot assign {}.{} with {:?}",
-                                        class,
+                                        &class,
                                         field_name,
                                         VerboseLuaValue::new(value)
                                     )
@@ -175,7 +219,7 @@ impl UserData for Traitor<ScriptObject> {
                                     Value::Nil => Default::default(),
                                     _ => extract_userdata_value::<LiteNode>(
                                         value,
-                                        class,
+                                        &class,
                                         &field_name,
                                     )?
                                     .inner(),
@@ -186,7 +230,7 @@ impl UserData for Traitor<ScriptObject> {
                                     Value::Nil => Default::default(),
                                     _ => extract_userdata_value::<LiteUiNode>(
                                         value,
-                                        class,
+                                        &class,
                                         &field_name,
                                     )?
                                     .inner(),
@@ -198,7 +242,7 @@ impl UserData for Traitor<ScriptObject> {
                                     _ => Some(
                                         extract_userdata_value::<LitePrefab>(
                                             value,
-                                            class,
+                                            &class,
                                             &field_name,
                                         )?
                                         .inner(),
@@ -208,7 +252,7 @@ impl UserData for Traitor<ScriptObject> {
                             ScriptFieldValue::Vector3(it) => {
                                 *it = extract_userdata_value::<LiteVector3>(
                                     value,
-                                    class,
+                                    &class,
                                     &field_name,
                                 )?
                                 .into()
@@ -216,7 +260,7 @@ impl UserData for Traitor<ScriptObject> {
                             ScriptFieldValue::Quaternion(it) => {
                                 *it = extract_userdata_value::<LiteQuaternion>(
                                     value,
-                                    class,
+                                    &class,
                                     &field_name,
                                 )?
                                 .into()

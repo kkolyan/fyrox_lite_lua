@@ -1,19 +1,19 @@
 use crate::debug::override_print;
 use crate::debug::var_dump;
+use crate::external_script_proxy::ExternalScriptProxy;
 use crate::fyrox_lua_plugin::HotReload;
 use crate::fyrox_lua_plugin::LuaPlugin;
 use crate::fyrox_lua_plugin::PluginScriptList;
-use crate::external_script_proxy::ExternalScriptProxy;
 use crate::generated::registry::register_classes;
 use crate::lua_lang::UnpackedScriptObjectVisit;
+use crate::lua_script_metadata::parse_file;
 use crate::lua_utils::log_error;
 use crate::script_class::ScriptClass;
-use crate::script_object_residence::inner_unpacked;
-use crate::script_object_residence::ScriptResidence;
 use crate::script_metadata::ScriptDefinition;
 use crate::script_metadata::ScriptKind;
 use crate::script_metadata::ScriptMetadata;
 use crate::script_object::ScriptObject;
+use crate::script_object_residence::ScriptResidence;
 use crate::typed_userdata::TypedUserData;
 use crate::user_data_plus::Traitor;
 use fyrox::core::log::Log;
@@ -32,13 +32,13 @@ use mlua::UserDataRefMut;
 use mlua::Value;
 use send_wrapper::SendWrapper;
 use std::cell::RefCell;
+use std::ops::Deref;
 use std::process::exit;
 use std::sync::Arc;
 use std::time::Duration;
 
-
 thread_local! {
-    static LOADING_CLASS_NAME: RefCell<Option<&'static str>> = Default::default();
+    static LOADING_CLASS_NAME: RefCell<Option<String>> = Default::default();
 }
 
 thread_local! {
@@ -61,7 +61,7 @@ pub(crate) fn load_script(
 
     Log::info(format!("loading Lua script {:?}", entry.path()));
 
-    let metadata = ScriptMetadata::parse_file(entry.path());
+    let metadata = parse_file(entry.path());
     let metadata = match metadata {
         Ok(it) => it,
         Err(errs) => {
@@ -77,17 +77,18 @@ pub(crate) fn load_script(
     };
 
     let class_loading: mlua::Result<()> = LOADING_CLASS_NAME.with(|class_name| {
-        *class_name.borrow_mut() = Some(metadata.class);
+        *class_name.borrow_mut() = Some(metadata.class.clone());
 
-        lua_vm().load(
-            "
+        lua_vm()
+            .load(
+                "
                 return function(class) 
                     package.loaded[class] = nil
                     require(class)
                 end",
-        )
-        .eval::<Function>()
-        .and_then(|it| it.call::<_, ()>(metadata.class))?;
+            )
+            .eval::<Function>()
+            .and_then(|it| it.call::<_, ()>(metadata.class.clone()))?;
 
         *class_name.borrow_mut() = None;
         Ok(())
@@ -104,7 +105,7 @@ pub(crate) fn load_script(
         }
     }
 
-    let name = metadata.class;
+    let name = metadata.class.clone();
 
     let definition = Arc::new(ScriptDefinition {
         metadata,
@@ -113,7 +114,7 @@ pub(crate) fn load_script(
 
     let class = lua_vm()
         .globals()
-        .get::<_, Option<UserDataRefMut<ScriptClass>>>(definition.metadata.class)
+        .get::<_, Option<UserDataRefMut<ScriptClass>>>(definition.metadata.class.as_str())
         .unwrap();
     let Some(mut class) = class else {
         Log::err(format!("invalid class file: {:?}", entry.path()));
@@ -148,9 +149,13 @@ pub(crate) fn load_script(
         ScriptKind::Plugin => {
             plugin_scripts.inner_mut().push(ExternalScriptProxy {
                 name: name.to_string(),
-                data: ScriptResidence::Unpacked(UnpackedScriptObjectVisit(SendWrapper::new(TypedUserData::new(
-                    lua_vm().create_userdata(Traitor::new(ScriptObject::new(&definition))).unwrap(),
-                )))),
+                data: ScriptResidence::Unpacked(UnpackedScriptObjectVisit(SendWrapper::new(
+                    TypedUserData::new(
+                        lua_vm()
+                            .create_userdata(Traitor::new(ScriptObject::new(&definition)))
+                            .unwrap(),
+                    ),
+                ))),
             });
         }
     }
@@ -160,7 +165,6 @@ pub(crate) fn load_script(
         entry.path().to_string_lossy()
     ));
 }
-
 
 pub(crate) fn create_plugin(scripts_dir: &str, hot_reload_enabled: bool) -> LuaPlugin {
     // mlua has approach with lifetimes that makes very difficult storing Lua types
@@ -193,10 +197,12 @@ pub(crate) fn create_plugin(scripts_dir: &str, hot_reload_enabled: bool) -> LuaP
                     LOADING_CLASS_NAME.with(|class_name| {
                         let class_name = class_name
                             .borrow()
-                            .expect("script_class() called out of permitted context");
+                            .as_ref()
+                            .expect("script_class() called out of permitted context")
+                            .clone();
 
                         Ok(ScriptClass {
-                            name: class_name,
+                            name: class_name.clone(),
                             table: Default::default(),
                             def: Default::default(),
                         })
@@ -218,8 +224,7 @@ pub(crate) fn create_plugin(scripts_dir: &str, hot_reload_enabled: bool) -> LuaP
         scripts_dir: scripts_dir.into(),
         hot_reload: match hot_reload_enabled {
             true => HotReload::Enabled {
-                watcher: FileSystemWatcher::new(scripts_dir, Duration::from_millis(500))
-                    .unwrap(),
+                watcher: FileSystemWatcher::new(scripts_dir, Duration::from_millis(500)).unwrap(),
             },
             false => HotReload::Disabled,
         },
@@ -228,7 +233,6 @@ pub(crate) fn create_plugin(scripts_dir: &str, hot_reload_enabled: bool) -> LuaP
     }
 }
 
-
 pub(crate) fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(
     data: &mut ScriptResidence,
     ctx: &mut dyn UnsafeAsUnifiedContext<'a, 'b, 'c>,
@@ -236,14 +240,19 @@ pub(crate) fn invoke_callback<'a, 'b, 'c, 'lua, A: IntoLuaMulti<'lua>>(
     args: impl FnOnce() -> mlua::Result<A>,
 ) {
     without_script_context(ctx, || {
-        let script_object_ud = inner_unpacked(data)
-            .expect("WTF, it's guaranteed to be unpacked here");
+        let script_object_ud = TypedUserData::clone(
+            &data
+                .inner_unpacked()
+                .expect("WTF, it's guaranteed to be unpacked here")
+                .0,
+        );
 
-        let class_name = script_object_ud.borrow().unwrap().def.metadata.class;
+        let class_name = script_object_ud.borrow().unwrap().def.metadata.class.clone();
         // TODO optimize me
-        let class = LUA.with_borrow(|it| it.unwrap())
+        let class = LUA
+            .with_borrow(|it| it.unwrap())
             .globals()
-            .get::<_, UserDataRef<ScriptClass>>(class_name)
+            .get::<_, UserDataRef<ScriptClass>>(class_name.as_str())
             .unwrap_or_else(|err| panic!("class not found: {}. error: {}", class_name, err));
 
         let callback = class.table.get(callback_name);

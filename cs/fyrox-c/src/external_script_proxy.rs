@@ -1,78 +1,63 @@
-use super::script_object_residence::ScriptResidence;
-use crate::fyrox_lua_plugin::PluginsRefMut_Ext;
-use crate::lua_lifecycle::invoke_callback;
-use crate::user_data_plus::Traitor;
+
 use fyrox::core::reflect::prelude::*;
 use fyrox::core::type_traits::prelude::*;
 use fyrox::core::visitor::prelude::*;
 use fyrox::script::BaseScript;
 use fyrox::script::ScriptContext;
 use fyrox::script::ScriptTrait;
-use fyrox_lite::lite_event::to_lite;
 use fyrox_lite::reflect_base;
-use mlua::Value;
-use send_wrapper::SendWrapper;
+use fyrox_lite::script_context::without_script_context;
+use fyrox_lite::script_context::UnsafeAsUnifiedContext;
+use fyrox_lite::script_object_residence::ScriptResidence;
 use std::any::Any;
 use std::fmt::Debug;
+
+use crate::c_lang::CCompatibleLang;
+use crate::fyrox_c_plugin::CPlugin;
+use crate::scripted_app::ScriptedApp;
+use crate::scripted_app::APP;
 
 #[derive(Debug, Clone, ComponentProvider)]
 pub struct ExternalScriptProxy {
     pub name: String,
-    pub data: ScriptResidence,
+    pub data: ScriptResidence<CCompatibleLang>,
 }
 
 impl ScriptTrait for ExternalScriptProxy {
     fn on_init(&mut self, ctx: &mut ScriptContext) {
-        self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed);
-        invoke_callback(
-            &mut self.data,
-            ctx,
-            "on_init",
-            || Ok(()),
-        );
+        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
+        invoke_callback(ctx, |app| {
+            (app.functions.on_init)(self.data.inner_unpacked().unwrap().handle)
+        });
     }
 
     fn on_start(&mut self, ctx: &mut ScriptContext) {
-        self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed);
-        invoke_callback(
-            &mut self.data,
-            ctx,
-            "on_start",
-            || Ok(()),
-        );
+        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
+        invoke_callback(ctx, |app| {
+            (app.functions.on_start)(self.data.inner_unpacked().unwrap().handle);
+        });
     }
 
     fn on_deinit(&mut self, ctx: &mut fyrox::script::ScriptDeinitContext) {
-        self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed);
-        invoke_callback(
-            &mut self.data,
-            ctx,
-            "on_deinit",
-            || Ok(()),
-        );
+        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
+        invoke_callback(ctx, |app| {
+            (app.functions.on_deinit)(self.data.inner_unpacked().unwrap().handle);
+        });
     }
 
     fn on_os_event(&mut self, event: &fyrox::event::Event<()>, ctx: &mut ScriptContext) {
-        if let Some(event) = to_lite(event.clone()) {
-            self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed);
-            invoke_callback(
-                &mut self.data,
-                ctx,
-                "on_os_event",
-                || Ok(Traitor::new(event.clone())),
-            );
-        }
+        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
+        invoke_callback(ctx, |app| {
+            (app.functions.on_os_event)(self.data.inner_unpacked().unwrap().handle);
+        });
     }
 
     fn on_update(&mut self, ctx: &mut ScriptContext) {
-        self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed);
+        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
         let dt = ctx.dt;
-        invoke_callback(
-            &mut self.data,
-            ctx,
-            "on_update",
-            || Ok(dt),
-        );
+        invoke_callback(ctx, |app| {
+            (app.functions.on_update)(self.data.inner_unpacked().unwrap().handle, dt);
+        });
     }
 
     fn on_message(
@@ -80,18 +65,19 @@ impl ScriptTrait for ExternalScriptProxy {
         message: &mut dyn fyrox::script::ScriptMessagePayload,
         ctx: &mut fyrox::script::ScriptMessageContext,
     ) {
-        if let Some(lua_message) = message.downcast_ref::<Traitor<SendWrapper<Value>>>() {
-            self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed);
-            invoke_callback(
-                &mut self.data,
-                ctx,
-                "on_message",
-                || Ok(Value::clone(lua_message)),
-            );
-        } else {
-            panic!("non-lua messages not supported by lua scripts")
-        }
+        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
+        invoke_callback(ctx, |app| {
+            (app.functions.on_message)(self.data.inner_unpacked().unwrap().handle, todo!());
+        });
     }
+}
+
+pub(crate) fn invoke_callback(sc: &mut dyn UnsafeAsUnifiedContext<'_, '_, '_>, callback: impl FnOnce(&ScriptedApp)) {
+    APP.with_borrow(|app| {
+        without_script_context(sc, || {
+            callback(app.as_ref().unwrap());
+        });
+    });
 }
 
 
@@ -106,7 +92,7 @@ impl BaseScript for ExternalScriptProxy {
         self
     }
     fn id(&self) -> Uuid {
-        self.data.id()
+        todo!()
     }
 }
 

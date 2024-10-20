@@ -31,6 +31,38 @@ impl<T: Lang> ScriptResidence<T> {
         }
     }
 
+    pub fn inner_unpacked(self: &ScriptResidence<T>) -> Option<&T::UnpackedScriptObject> {
+        match self {
+            ScriptResidence::Packed(_it) => None,
+            ScriptResidence::Unpacked(it) => Some(it),
+        }
+    }
+
+    pub fn ensure_unpacked(self: &mut ScriptResidence<T>, failed: &mut bool) {
+        if *failed {
+            // don't spam logs, though, plugin is completely broken at this point
+            return;
+        }
+        if self.is_packed() {
+            // script was just loaded from the scene file or safe game. unpack it!
+            let data = match self {
+                ScriptResidence::Packed(it) => {
+                    let so = T::unpack_script(it);
+                    match so {
+                        Ok(it) => it,
+                        Err(err) => {
+                            Log::err(format!("failed to unpack script: {:?}", err));
+                            *failed = true;
+                            return;
+                        }
+                    }
+                }
+                ScriptResidence::Unpacked(_) => panic!("WTF?"),
+            };
+            *self = Self::Unpacked(data);
+        }
+    }
+
     pub fn with_script_object<R>(&self, f: impl FnOnce(&ScriptObject<T>) -> R) -> R {
         match self {
             ScriptResidence::Packed(it) => f(it),
@@ -112,15 +144,19 @@ impl<T: Lang> Visit for ScriptObject<T> {
         for (i, field) in def.metadata.fields.iter().enumerate() {
             let field_name = &field.name.to_case(Case::UpperCamel);
             let result = match &mut it.values[i] {
-                ScriptFieldValue::Number(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::String(it) => it.visit(field_name, &mut guard),
-                ScriptFieldValue::Bool(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::Node(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::UiNode(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::Prefab(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::Vector3(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::Quaternion(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::RuntimePin(it) => it.visit(&field_name, &mut guard),
+                ScriptFieldValue::bool(it) => it.visit(name, &mut guard),
+                ScriptFieldValue::f32(it) => it.visit(name, &mut guard),
+                ScriptFieldValue::f64(it) => it.visit(name, &mut guard),
+                ScriptFieldValue::i16(it) => it.visit(name, &mut guard),
+                ScriptFieldValue::i32(it) => it.visit(name, &mut guard),
+                ScriptFieldValue::i64(it) => it.visit(name, &mut guard),
             };
             if let Err(err) = &result {
                 Log::warn(format!("skipping deserialization of field `{}::{}` due to error: {}", it.def.metadata.class, field_name, err).as_str());

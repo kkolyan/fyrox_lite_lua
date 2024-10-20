@@ -7,3 +7,8 @@ edition = "2021"
 crate-type = ["dylib"]
 
 [dependencies]
+fyrox = { workspace = true }
+fyrox-lite = { workspace = true }
+extend = { workspace = true }
+to_vec = { workspace = true }
+convert_case = { workspace = true }
