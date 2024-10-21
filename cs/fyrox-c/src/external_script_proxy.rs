@@ -67,7 +67,7 @@ impl ScriptTrait for ExternalScriptProxy {
     ) {
         self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
         invoke_callback(ctx, |app| {
-            (app.functions.on_message)(self.data.inner_unpacked().unwrap().handle, todo!());
+            (app.functions.on_message)(self.data.inner_unpacked().unwrap().handle);
         });
     }
 }

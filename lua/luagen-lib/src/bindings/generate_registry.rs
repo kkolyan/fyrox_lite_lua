@@ -1,6 +1,6 @@
 use lite_model::Class;
 
-use crate::{code_model::{Module, ModContent}, context::GenerationContext, templating::render};
+use gen_common::{code_model::{Module, ModContent}, context::GenerationContext, templating::render};
 
 
 pub fn generate_registry(ctx: &GenerationContext) -> Module {

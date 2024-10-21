@@ -13,7 +13,7 @@ members = [
 	"lite-parser",
 	"tools",
 	"cs/fyrox-c",
-	"cs/cgen-lib",
+	"cs/csgen-lib", "gen-common",
 ]
 resolver = "2"
 exclude = ["mlua"]
@@ -21,11 +21,13 @@ exclude = ["mlua"]
 [workspace.dependencies]
 luagen-lib = { path = "lua/luagen-lib" }
 fyrox-lua = { path = "lua/fyrox-lua"}
+csgen-lib = { path = "cs/csgen-lib" }
 fyrox-lite = {path = "fyrox-lite"}
 fyrox-lite-math = {path = "fyrox-lite-math"}
 lite-model = { path = "lite-model" }
 lite-parser = { path = "lite-parser" }
 lite-macro = { path = "lite-macro" }
+gen-common = { path = "gen-common" }
 
 # fyrox = { git = "https://github.com/FyroxEngine/Fyrox", default-features = false }
 # fyrox-core = { git = "https://github.com/FyroxEngine/Fyrox", default-features = false }

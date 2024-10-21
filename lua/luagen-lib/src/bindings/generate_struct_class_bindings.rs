@@ -3,7 +3,7 @@ use convert_case::{Case, Casing};
 use lite_model::StructClass;
 use to_vec::ToVec;
 
-use crate::{
+use gen_common::{
     code_model::{Module, ModContent}, context::GenerationContext, templating::render
 };
 use super::{expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, supress_lint::SUPRESSIONS};

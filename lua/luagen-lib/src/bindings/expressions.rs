@@ -2,7 +2,7 @@ use std::ops::Deref;
 
 use lite_model::{Class, DataType};
 
-use crate::context::GenerationContext;
+use gen_common::context::GenerationContext;
 
 pub fn mlua_to_rust_expr(param: &str, ty: &DataType, ctx: &GenerationContext) -> String {
     match ty {

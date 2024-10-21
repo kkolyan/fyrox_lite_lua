@@ -1,6 +1,6 @@
 use lite_model::{Class, Domain};
 
-use crate::{by_package::classes_by_package, code_model::{HierarchicalCodeBase, ModContent, Module}, context::GenerationContext };
+use gen_common::{by_package::classes_by_package, code_model::{HierarchicalCodeBase, ModContent, Module}, context::GenerationContext };
 use crate::bindings::{generate_engine_class_bindings::generate_engine_class_bindings, generate_enum_class_bindings::generate_enum_class_bindings, generate_registry::generate_registry, generate_struct_class_bindings::generate_struct_class_bindings};
 
 

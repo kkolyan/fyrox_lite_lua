@@ -3,11 +3,7 @@ use std::ffi::{c_char, CString};
 use crate::scripted_app::{ScriptedApp, APP};
 
 #[no_mangle]
-pub extern "C" fn ScriptUpdate() {
-    println!("I'm a Fyrox C. 001")
-}
-
-#[no_mangle]
+///@owner_class FyroxCApi
 pub extern "C" fn init_fyrox(app: NativeScriptedApp) {
     APP.set(Some(ScriptedApp::from_native(app)));
 }
@@ -61,9 +57,33 @@ pub union NativeValue {
     /// pointer, because CString is not Copy
     pub String: *const c_char,
     /// Node and their derivatives. also, Resource passed as the handles in the specially allocated pool of Resource. because Fyrox Resource is not portable itself.
-    pub Handle: u128,
-    pub Vector3: [f32; 3],
-    pub Quaternion: [f32; 4],
+    pub Handle: NativeHandle,
+    pub Vector3: NativeVector3,
+    pub Quaternion: NativeQuaternion,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeVector3 {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeQuaternion {
+    pub i: f32,
+    pub j: f32,
+    pub k: f32,
+    pub w: f32,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeHandle {
+    pub high: u64,
+    pub low: u64,
 }
 
 #[repr(C)]
@@ -103,16 +123,30 @@ pub struct NativeScriptedApp {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct NativeScriptAppFunctions {
-    pub on_init: fn(this: NativeInstanceId),
-    pub on_start: fn(this: NativeInstanceId),
-    pub on_deinit: fn(this: NativeInstanceId),
-    pub on_os_event: fn(this: NativeInstanceId),
-    pub on_update: fn(this: NativeInstanceId, dt: f32),
-    pub on_message: fn(this: NativeInstanceId, message: NativeInstanceId),
+    pub on_init: NodeOnInit,
+    pub on_start: NodeOnStart,
+    pub on_deinit: NodeOnDeinit,
+    pub on_os_event: NodeOnOsEvent,
+    pub on_update: NodeOnUpdate,
+    pub on_message: NodeOnMessage,
 
-    pub on_game_init: fn(this: NativeInstanceId),
-    pub on_game_update: fn(this: NativeInstanceId),
-    pub on_game_on_os_event: fn(this: NativeInstanceId),
-    pub create_script_instance: fn(NativeClassId) -> NativeInstanceId,
-    pub set_property: fn(this: NativeInstanceId, value: NativeValue),
+    pub on_game_init: GameOnInit,
+    pub on_game_update: GameOnUpdate,
+    pub on_game_on_os_event: GameOnOsEvent,
+    pub create_script_instance: CreateScriptInstance,
+    pub set_property: SetProperty,
 }
+
+pub type NodeOnUpdate = extern fn(thiz: NativeInstanceId, dt: f32);
+pub type NodeOnInit= extern fn(thiz: NativeInstanceId);
+pub type NodeOnDeinit= extern fn(thiz: NativeInstanceId);
+pub type NodeOnStart= extern fn(thiz: NativeInstanceId);
+pub type NodeOnOsEvent= extern fn(thiz: NativeInstanceId);
+pub type NodeOnMessage= extern fn(thiz: NativeInstanceId);
+
+pub type GameOnInit = extern fn(thiz: NativeInstanceId);
+pub type GameOnUpdate = extern fn(thiz: NativeInstanceId);
+pub type GameOnOsEvent = extern fn(thiz: NativeInstanceId);
+
+pub type CreateScriptInstance = extern fn(thiz: NativeClassId) -> NativeInstanceId;
+pub type SetProperty = extern fn(thiz: NativeInstanceId, property: u16, value: NativeValue);

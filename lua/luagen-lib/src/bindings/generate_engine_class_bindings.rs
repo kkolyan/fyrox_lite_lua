@@ -4,7 +4,7 @@ use lite_model::EngineClass;
 use std::borrow::Cow;
 use to_vec::ToVec;
 
-use crate::{
+use gen_common::{
     code_model::{Module, ModContent}, context::GenerationContext, templating::render
 };
 use super::{eq::generate_eq, expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua}, generate_methods::{generate_methods, is_getter, is_setter}, supress_lint::SUPRESSIONS};

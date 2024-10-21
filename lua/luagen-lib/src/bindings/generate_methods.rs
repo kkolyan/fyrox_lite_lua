@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use lite_model::{DataType, EngineClass, Method};
 use to_vec::ToVec;
 
-use crate::{
+use gen_common::{
     context::GenerationContext,
     templating::render,
 };

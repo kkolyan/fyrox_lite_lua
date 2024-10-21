@@ -9,11 +9,15 @@ use fyrox::{
     },
 };
 use fyrox_lite::{
-    script_metadata::ScriptFieldValueType, script_object::{Lang, ScriptFieldValue, ScriptObject}, script_object_residence::uuid_of_script
+    script_metadata::ScriptFieldValueType,
+    script_object::{Lang, ScriptFieldValue, ScriptObject},
+    script_object_residence::uuid_of_script,
 };
 
 use crate::{
-    manual_bindings::{NativeInstanceId, NativeValue, NativeValueType},
+    manual_bindings::{
+        NativeHandle, NativeInstanceId, NativeQuaternion, NativeValue, NativeVector3,
+    },
     scripted_app::APP,
 };
 
@@ -53,7 +57,7 @@ impl Lang for CCompatibleLang {
                     ScriptFieldValue::String(it) => {
                         let s = CString::new(it.as_str()).unwrap();
                         assert_eq!(prop.ty, ScriptFieldValueType::String);
-                        (app.functions.set_property)(instance, NativeValue { String: s.as_ptr() });
+                        (app.functions.set_property)(instance, i as u16, NativeValue { String: s.as_ptr() });
                     }
                     ScriptFieldValue::Prefab(resource) => {
                         assert_eq!(prop.ty, ScriptFieldValueType::Prefab);
@@ -71,15 +75,17 @@ impl Lang for CCompatibleLang {
                                     .unwrap_or_else(|| registry.resources.spawn(resource));
                                 (app.functions.set_property)(
                                     instance,
+                                    i as u16,
                                     NativeValue {
-                                        Handle: handle.encode_to_u128(),
+                                        Handle: handle.into(),
                                     },
                                 );
                             } else {
                                 (app.functions.set_property)(
                                     instance,
+                                    i as u16,
                                     NativeValue {
-                                        Handle: Handle::<()>::NONE.encode_to_u128(),
+                                        Handle: Handle::<()>::NONE.into(),
                                     },
                                 );
                             }
@@ -89,8 +95,11 @@ impl Lang for CCompatibleLang {
                         assert_eq!(prop.ty, ScriptFieldValueType::Vector3);
                         (app.functions.set_property)(
                             instance,
+                            i as u16,
                             NativeValue {
-                                Vector3: [it.x, it.y, it.z],
+                                Vector3: NativeVector3 {
+                                    x: it.x, y: it.y, z: it.z
+                                },
                             },
                         );
                     }
@@ -98,8 +107,11 @@ impl Lang for CCompatibleLang {
                         assert_eq!(prop.ty, ScriptFieldValueType::Quaternion);
                         (app.functions.set_property)(
                             instance,
+                            i as u16,
                             NativeValue {
-                                Quaternion: [it.i, it.j, it.k, it.w],
+                                Quaternion: NativeQuaternion {
+                                    i: it.i,j: it.j,k: it.k, w:it.w
+                                },
                             },
                         );
                     }
@@ -112,21 +124,38 @@ impl Lang for CCompatibleLang {
                             ScriptFieldValue::i16(it) => { assert_eq!(prop.ty, ScriptFieldValueType::i16); NativeValue { i16: *it} },
                             ScriptFieldValue::i32(it) => { assert_eq!(prop.ty, ScriptFieldValueType::i32); NativeValue { i32: *it} },
                             ScriptFieldValue::i64(it) => { assert_eq!(prop.ty, ScriptFieldValueType::i64); NativeValue { i64: *it} },
-                            ScriptFieldValue::Node(it) => { assert_eq!(prop.ty, ScriptFieldValueType::Node); NativeValue { Handle: it.encode_to_u128()} },
-                            ScriptFieldValue::UiNode(it) => { assert_eq!(prop.ty, ScriptFieldValueType::UiNode); NativeValue { Handle: it.encode_to_u128()} },
+                            ScriptFieldValue::Node(it) => { assert_eq!(prop.ty, ScriptFieldValueType::Node); NativeValue { Handle: (*it).into()} },
+                            ScriptFieldValue::UiNode(it) => { assert_eq!(prop.ty, ScriptFieldValueType::UiNode); NativeValue { Handle: (*it).into()} },
                             ScriptFieldValue::String(_) => { todo!("handled in another block") },
                             ScriptFieldValue::Prefab(_) => { todo!("handled in another block") },
                             ScriptFieldValue::Vector3(_) => { todo!("handled in another block") },
                             ScriptFieldValue::Quaternion(_) => { todo!("handled in another block") },
                             ScriptFieldValue::RuntimePin(_) => { todo!("not supported for C") },
                         };
-                        (app.functions.set_property)(instance, native_value);
+                        (app.functions.set_property)(instance, i as u16, native_value);
                     }
                 }
             }
             instance
         });
         Ok(UnpackedObject { uuid, handle })
+    }
+}
+
+impl<T> From<Handle<T>> for NativeHandle {
+    fn from(value: Handle<T>) -> Self {
+        let value = value.encode_to_u128();
+        NativeHandle {
+            high: (value >> 64) as u64,
+            low: value as u64,
+        }
+    }
+}
+
+impl<T> From<NativeHandle> for Handle<T> {
+    fn from(value: NativeHandle) -> Self {
+        let value = (value.high as u128) << 64 | (value.low as u128);
+        Handle::decode_from_u128(value)
     }
 }
 

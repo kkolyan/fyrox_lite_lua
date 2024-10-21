@@ -2,7 +2,7 @@ use std::fs;
 
 use lite_model::Domain;
 use lite_parser::parse_domain_metadata::parse_domain_metadata;
-use luagen_lib::code_model::HierarchicalCodeBase;
+use gen_common::code_model::HierarchicalCodeBase;
 
 pub fn write_annotations(annotations: HierarchicalCodeBase) {
     let target_path = "lua/annotations";

@@ -4,7 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-lite-parser = {workspace = true}
-luagen-lib = {workspace = true}
-lite-model = {workspace = true}
-itertools = {workspace = true}
+lite-parser = { workspace = true }
+luagen-lib = { workspace = true }
+gen-common = { workspace = true }
+lite-model = { workspace = true }
+itertools = { workspace = true }
+csgen-lib = { workspace = true }
