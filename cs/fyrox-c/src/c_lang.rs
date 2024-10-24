@@ -15,7 +15,7 @@ use fyrox_lite::{
 };
 
 use crate::{
-    manual_bindings::{
+    bindings_manual::{
         NativeHandle, NativeInstanceId, NativeQuaternion, NativeValue, NativeVector3,
     },
     scripted_app::APP,
@@ -55,9 +55,9 @@ impl Lang for CCompatibleLang {
 
                 match value {
                     ScriptFieldValue::String(it) => {
-                        let s = CString::new(it.as_str()).unwrap();
-                        assert_eq!(prop.ty, ScriptFieldValueType::String);
-                        (app.functions.set_property)(instance, i as u16, NativeValue { String: s.as_ptr() });
+                        // let mut s = CString::new(it.as_str()).unwrap();
+                        // assert_eq!(prop.ty, ScriptFieldValueType::String);
+                        // (app.functions.set_property)(instance, i as u16, NativeValue { String: s.() });
                     }
                     ScriptFieldValue::Prefab(resource) => {
                         assert_eq!(prop.ty, ScriptFieldValueType::Prefab);

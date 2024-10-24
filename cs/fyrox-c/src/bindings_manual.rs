@@ -1,6 +1,12 @@
-use std::ffi::{c_char, CString};
+use std::{
+    ffi::{c_char, CString},
+    fmt::Display,
+};
 
-use crate::scripted_app::{ScriptedApp, APP};
+use fyrox::core::algebra::iter;
+use fyrox_lite::spi::UserScript;
+
+use crate::{native_utils, scripted_app::{ScriptedApp, APP}};
 
 #[no_mangle]
 ///@owner_class FyroxCApi
@@ -45,6 +51,22 @@ pub enum NativeValueType {
     Quaternion,
 }
 
+native_utils!(u8, Native_u8_array, Native_u8_option, Native_u8_result);
+native_utils!(bool, Native_bool_array, Native_bool_option, Native_bool_result);
+native_utils!(f32, Native_f32_array, Native_f32_option, Native_f32_result);
+native_utils!(f64, Native_f64_array, Native_f64_option, Native_f64_result);
+native_utils!(i16, Native_i16_array, Native_i16_option, Native_i16_result);
+native_utils!(i32, Native_i32_array, Native_i32_option, Native_i32_result);
+native_utils!(i64, Native_i64_array, Native_i64_option, Native_i64_result);
+native_utils!(Native_u8_array, Native_String_array, Native_String_option, Native_String_result);
+native_utils!(NativeHandle, NativeHandle_array, NativeHandle_option, NativeHandle_result);
+native_utils!(NativeVector3, Native_Vector3_array, Native_Vector3_option, Native_Vector3_result);
+native_utils!(NativeQuaternion, Native_Quaternion_array, Native_Quaternion_option, Native_Quaternion_result);
+
+
+pub type NativeString = <u8 as NativeType>::Array;
+
+
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub union NativeValue {
@@ -54,8 +76,7 @@ pub union NativeValue {
     pub i16: i16,
     pub i32: i32,
     pub i64: i64,
-    /// pointer, because CString is not Copy
-    pub String: *const c_char,
+    pub String: NativeString,
     /// Node and their derivatives. also, Resource passed as the handles in the specially allocated pool of Resource. because Fyrox Resource is not portable itself.
     pub Handle: NativeHandle,
     pub Vector3: NativeVector3,
@@ -78,6 +99,22 @@ pub struct NativeQuaternion {
     pub k: f32,
     pub w: f32,
 }
+
+pub trait NativeType: Sized {
+    type Array;
+    type Option;
+    type Result;
+
+    fn to_native_array(v: Vec<Self>) -> Self::Array;
+    fn from_native_array(v: Self::Array) -> Vec<Self>;
+
+    fn to_native_option(v: Option<Self>) -> Self::Option;
+    fn from_native_option(v: Self::Option) -> Option<Self>;
+
+    fn to_native_result<E: Display>(v: Result<Self, E>) -> Self::Result;
+    fn from_native_result<U: UserScript>(v: Self::Result) -> Result<Self, U::LangSpecificError>;
+}
+
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -137,16 +174,16 @@ pub struct NativeScriptAppFunctions {
     pub set_property: SetProperty,
 }
 
-pub type NodeOnUpdate = extern fn(thiz: NativeInstanceId, dt: f32);
-pub type NodeOnInit= extern fn(thiz: NativeInstanceId);
-pub type NodeOnDeinit= extern fn(thiz: NativeInstanceId);
-pub type NodeOnStart= extern fn(thiz: NativeInstanceId);
-pub type NodeOnOsEvent= extern fn(thiz: NativeInstanceId);
-pub type NodeOnMessage= extern fn(thiz: NativeInstanceId);
+pub type NodeOnUpdate = extern "C" fn(thiz: NativeInstanceId, dt: f32);
+pub type NodeOnInit = extern "C" fn(thiz: NativeInstanceId);
+pub type NodeOnDeinit = extern "C" fn(thiz: NativeInstanceId);
+pub type NodeOnStart = extern "C" fn(thiz: NativeInstanceId);
+pub type NodeOnOsEvent = extern "C" fn(thiz: NativeInstanceId);
+pub type NodeOnMessage = extern "C" fn(thiz: NativeInstanceId);
 
-pub type GameOnInit = extern fn(thiz: NativeInstanceId);
-pub type GameOnUpdate = extern fn(thiz: NativeInstanceId);
-pub type GameOnOsEvent = extern fn(thiz: NativeInstanceId);
+pub type GameOnInit = extern "C" fn(thiz: NativeInstanceId);
+pub type GameOnUpdate = extern "C" fn(thiz: NativeInstanceId);
+pub type GameOnOsEvent = extern "C" fn(thiz: NativeInstanceId);
 
-pub type CreateScriptInstance = extern fn(thiz: NativeClassId) -> NativeInstanceId;
-pub type SetProperty = extern fn(thiz: NativeInstanceId, property: u16, value: NativeValue);
+pub type CreateScriptInstance = extern "C" fn(thiz: NativeClassId) -> NativeInstanceId;
+pub type SetProperty = extern "C" fn(thiz: NativeInstanceId, property: u16, value: NativeValue);

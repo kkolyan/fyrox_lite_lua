@@ -45,7 +45,7 @@ public partial class FyroxManualBindings {
         [FieldOffset(0)]
         public long i64;
         [FieldOffset(0)]
-        public byte* String;
+        public IntPtr String;
         [FieldOffset(0)]
         public NativeHandle Handle;
         [FieldOffset(0)]

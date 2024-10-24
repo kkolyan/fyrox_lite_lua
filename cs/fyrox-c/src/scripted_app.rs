@@ -7,7 +7,7 @@ use fyrox_lite::script_metadata::{
 };
 use to_vec::ToVec;
 
-use crate::manual_bindings::{
+use crate::bindings_manual::{
     NativeClassId, NativeScriptAppFunctions, NativeScriptKind, NativeScriptMetadata,
     NativeScriptedApp, NativeValueType,
 };
