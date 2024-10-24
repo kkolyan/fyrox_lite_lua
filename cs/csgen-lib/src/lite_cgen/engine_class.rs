@@ -6,7 +6,11 @@ use to_vec::ToVec;
 
 use super::types;
 
-pub(crate) fn generate_engine_class(s: &mut String, class: &EngineClass, client_replicated_types: &HashSet<ClassName>) {
+pub(crate) fn generate_engine_class(
+    s: &mut String,
+    class: &EngineClass,
+    client_replicated_types: &HashSet<ClassName>,
+) {
     for method in class.methods.iter() {
         let mut input_args = vec![];
         let mut output_args = vec![];
@@ -18,8 +22,13 @@ pub(crate) fn generate_engine_class(s: &mut String, class: &EngineClass, client_
             .filter(|it| !matches!(it.ty, DataType::UserScriptGenericStub))
             .to_vec();
 
+        let generics = match (params_final.len() != method.signature.params.len()) {
+            true => "::<NativeHandle>",
+            false => "",
+        };
+
         if method.instance {
-            input_args.push("__this: NativeInstanceId".to_string());
+            input_args.push("__this: NativeHandle".to_string());
         }
 
         for param in params_final.iter() {
@@ -49,16 +58,33 @@ pub(crate) fn generate_engine_class(s: &mut String, class: &EngineClass, client_
             ],
         );
 
-        for param in params_final.iter() {
+        if method.instance {
+            let ty = DataType::Object(class.class_name.clone());
+            render(
+                s,
+                "
+                let mut __this: ${type} = ${expr};
+            ",
+                [
+                    ("expr", &types::generate_from_native(&ty, "__this", client_replicated_types)),
+                    (
+                        "type",
+                        &class.rust_struct_path,
+                    ),
+                ],
+            );
+        }
+
+        for param in method.signature.params.iter() {
             output_args.push(format!("{}", param.name));
 
             render(
                 s,
                 "
-                let ${var} = ${expr};
+                let mut ${var} = ${expr};
             ",
                 [
-                    ("expr", &types::generate_from_native(&param.ty, &param.name)),
+                    ("expr", &types::generate_from_native(&param.ty, &param.name, client_replicated_types)),
                     ("var", &param.name),
                 ],
             );
@@ -67,11 +93,12 @@ pub(crate) fn generate_engine_class(s: &mut String, class: &EngineClass, client_
         render(
             s,
             r#"
-                let __result = ${receiver}${method}(${output_args});
+                let __result = ${receiver}${method}${generics}(${output_args});
         "#,
             [
                 ("method", &method.method_name),
                 ("output_args", &output_args.join(", ")),
+                ("generics", &generics),
                 (
                     "receiver",
                     &match method.instance {
@@ -88,7 +115,10 @@ pub(crate) fn generate_engine_class(s: &mut String, class: &EngineClass, client_
                 "
                 let __result = ${expr};
             ",
-                [("expr", &types::generate_to_native(ty, "__result", client_replicated_types))],
+                [(
+                    "expr",
+                    &types::generate_to_native(ty, "__result", client_replicated_types),
+                )],
             );
         }
 

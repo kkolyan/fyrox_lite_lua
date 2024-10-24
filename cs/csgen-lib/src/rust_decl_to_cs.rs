@@ -84,7 +84,7 @@ fn extract_owner_class(attrs: &[Attribute]) -> String {
 fn convert_function(s: &mut String, item: &syn::ItemFn, custom_type_names: &HashMap<String, CustomTypeProps> ) {
     let ret = match &item.sig.output {
         ReturnType::Default => "void".to_string(),
-        ReturnType::Type(_, ty) => convert_type(ty.as_ref(), custom_type_names),
+        ReturnType::Type(_, ty) => type_rs2cs(ty.as_ref(), custom_type_names),
     };
     let name = item.sig.ident.to_string();
     let args = item
@@ -102,7 +102,7 @@ fn convert_function(s: &mut String, item: &syn::ItemFn, custom_type_names: &Hash
                     it.to_token_stream()
                 ),
             };
-            format!("{} {}", convert_type(&it.ty, custom_type_names), &ident)
+            format!("{} {}", type_rs2cs(&it.ty, custom_type_names), &ident)
         })
         .to_vec();
     render(
@@ -119,7 +119,7 @@ fn convert_functor_def(s: &mut String, item: &syn::ItemType, custom_type_names: 
     if let Type::BareFn(f) = item.ty.as_ref() {
         let ret = match &f.output {
             ReturnType::Default => "void".to_string(),
-            ReturnType::Type(_, ty) => convert_type(ty.as_ref(), custom_type_names),
+            ReturnType::Type(_, ty) => type_rs2cs(ty.as_ref(), custom_type_names),
         };
         let name = item.ident.to_string();
         let args = f
@@ -128,7 +128,7 @@ fn convert_functor_def(s: &mut String, item: &syn::ItemType, custom_type_names: 
             .map(|arg| {
                 format!(
                     "{} {}",
-                    convert_type(&arg.ty, custom_type_names),
+                    type_rs2cs(&arg.ty, custom_type_names),
                     match arg.name.as_ref() {
                         Some(it) => it.0.to_string(),
                         None => panic!("arg name missed: {}", item.to_token_stream()),
@@ -214,7 +214,7 @@ fn convert_struct(s: &mut String, item: &syn::ItemStruct, custom_type_names: &Ha
                 ",
                 [
                     ("name", field.ident.as_ref().unwrap()),
-                    ("type", &convert_type(&field.ty, &custom_type_names)),
+                    ("type", &type_rs2cs(&field.ty, &custom_type_names)),
                 ],
             );
         }
@@ -255,7 +255,7 @@ fn convert_union(s: &mut String, item: &syn::ItemUnion, custom_type_names: &Hash
                     ",
                 [
                     ("name", &escape_keywords(field.ident.as_ref().unwrap().to_string().as_str())),
-                    ("type", &convert_type(&field.ty, &custom_type_names)),
+                    ("type", &type_rs2cs(&field.ty, &custom_type_names)),
                 ],
             );
         }
@@ -271,7 +271,7 @@ fn convert_union(s: &mut String, item: &syn::ItemUnion, custom_type_names: &Hash
 }
 
 #[rustfmt::skip]
-fn convert_type(ty: &Type, custom_type_names: &HashMap<String, CustomTypeProps> ) -> String {
+fn type_rs2cs(ty: &Type, custom_type_names: &HashMap<String, CustomTypeProps> ) -> String {
     let s = ty.to_token_stream().to_string();
     if let Type::Path(ty) = ty {
         if let Some(ident) = ty.path.get_ident() {

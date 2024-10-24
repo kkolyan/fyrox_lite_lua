@@ -3,10 +3,16 @@ use std::{
     fmt::Display,
 };
 
-use fyrox::core::algebra::iter;
-use fyrox_lite::spi::UserScript;
+use fyrox::core::{algebra::iter, pool::Handle};
+use fyrox_lite::{
+    lite_math::{PodQuaternion, PodVector3},
+    spi::UserScript,
+};
 
-use crate::{native_utils, scripted_app::{ScriptedApp, APP}};
+use crate::{
+    native_utils,
+    scripted_app::{ScriptedApp, APP},
+};
 
 #[no_mangle]
 ///@owner_class FyroxCApi
@@ -51,21 +57,46 @@ pub enum NativeValueType {
     Quaternion,
 }
 
-native_utils!(u8, Native_u8_array, Native_u8_option, Native_u8_result);
-native_utils!(bool, Native_bool_array, Native_bool_option, Native_bool_result);
-native_utils!(f32, Native_f32_array, Native_f32_option, Native_f32_result);
-native_utils!(f64, Native_f64_array, Native_f64_option, Native_f64_result);
-native_utils!(i16, Native_i16_array, Native_i16_option, Native_i16_result);
-native_utils!(i32, Native_i32_array, Native_i32_option, Native_i32_result);
-native_utils!(i64, Native_i64_array, Native_i64_option, Native_i64_result);
-native_utils!(Native_u8_array, Native_String_array, Native_String_option, Native_String_result);
-native_utils!(NativeHandle, NativeHandle_array, NativeHandle_option, NativeHandle_result);
-native_utils!(NativeVector3, Native_Vector3_array, Native_Vector3_option, Native_Vector3_result);
-native_utils!(NativeQuaternion, Native_Quaternion_array, Native_Quaternion_option, Native_Quaternion_result);
-
+native_utils!(u8, u8_array, u8_option, u8_result);
+native_utils!(bool, bool_array, bool_option, bool_result);
+native_utils!(f32, f32_array, f32_option, f32_result);
+native_utils!(f64, f64_array, f64_option, f64_result);
+native_utils!(i16, i16_array, i16_option, i16_result);
+native_utils!(i32, i32_array, i32_option, i32_result);
+native_utils!(i64, i64_array, i64_option, i64_result);
+native_utils!(
+    u8_array,
+    NativeString_array,
+    NativeString_option,
+    NativeString_result
+);
+native_utils!(
+    NativeHandle,
+    NativeHandle_array,
+    NativeHandle_option,
+    NativeHandle_result
+);
+native_utils!(
+    NativeInstanceId,
+    NativeInstanceId_array,
+    NativeInstanceId_option,
+    NativeInstanceId_result
+);
+native_utils!(
+    NativeInstanceId_option,
+    NativeInstanceId_option_array,
+    NativeInstanceId_option_option,
+    NativeInstanceId_option_result
+);
+native_utils!(NativeVector3, Vector3_array, Vector3_option, Vector3_result);
+native_utils!(
+    NativeQuaternion,
+    Quaternion_array,
+    Quaternion_option,
+    Quaternion_result
+);
 
 pub type NativeString = <u8 as NativeType>::Array;
-
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -91,6 +122,18 @@ pub struct NativeVector3 {
     pub z: f32,
 }
 
+impl From<PodVector3> for NativeVector3 {
+    fn from(PodVector3 { x, y, z }: PodVector3) -> Self {
+        Self { x, y, z }
+    }
+}
+
+impl From<NativeVector3> for PodVector3 {
+    fn from(NativeVector3 { x, y, z }: NativeVector3) -> Self {
+        Self { x, y, z }
+    }
+}
+
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct NativeQuaternion {
@@ -98,6 +141,18 @@ pub struct NativeQuaternion {
     pub j: f32,
     pub k: f32,
     pub w: f32,
+}
+
+impl From<PodQuaternion> for NativeQuaternion {
+    fn from(PodQuaternion { i, j, k, w }: PodQuaternion) -> Self {
+        Self { i, j, k, w }
+    }
+}
+
+impl From<NativeQuaternion> for PodQuaternion {
+    fn from(NativeQuaternion { i, j, k, w }: NativeQuaternion) -> Self {
+        Self { i, j, k, w }
+    }
 }
 
 pub trait NativeType: Sized {
@@ -115,12 +170,24 @@ pub trait NativeType: Sized {
     fn from_native_result<U: UserScript>(v: Self::Result) -> Result<Self, U::LangSpecificError>;
 }
 
-
 #[repr(C)]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct NativeHandle {
     pub high: u64,
     pub low: u64,
+}
+
+impl NativeHandle {
+    pub fn from_u128(value: u128) -> Self {
+        Self {
+            high: (value >> 64) as u64,
+            low: value as u64,
+        }
+    }
+
+    pub fn as_u128(&self) -> u128 {
+        (self.high as u128) << 64 | (self.low as u128)
+    }
 }
 
 #[repr(C)]

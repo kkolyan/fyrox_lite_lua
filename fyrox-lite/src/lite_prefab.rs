@@ -7,8 +7,10 @@ use fyrox::{
 use lite_macro::lite_api;
 
 use crate::{
+    externalizable::Externalizable,
     lite_math::{PodQuaternion, PodVector3},
     lite_node::LiteNode,
+    resource_registry,
     script_context::with_script_context,
 };
 
@@ -48,5 +50,17 @@ impl LitePrefab {
                     .finish(),
             )
         })
+    }
+}
+
+impl Externalizable for LitePrefab {
+    fn to_external(&self) -> u128 {
+        resource_registry::externalize_resource(self.resource.clone().into_untyped())
+    }
+
+    fn from_external(handle: u128) -> Self {
+        LitePrefab {
+            resource: resource_registry::retrieve_externalized(handle).into(),
+        }
     }
 }

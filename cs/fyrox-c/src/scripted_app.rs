@@ -12,6 +12,7 @@ use crate::bindings_manual::{
     NativeScriptedApp, NativeValueType,
 };
 
+// TODO replace with SendWrapper
 thread_local! {
     pub static APP: RefCell<Option<ScriptedApp>> = Default::default();
 }

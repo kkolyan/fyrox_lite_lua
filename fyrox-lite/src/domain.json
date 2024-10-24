@@ -2724,15 +2724,15 @@
         "rust_struct_path": "fyrox_lite::lite_math::PodQuaternion",
         "fields": [
           {
-            "name": "x",
+            "name": "i",
             "ty": "F32"
           },
           {
-            "name": "y",
+            "name": "j",
             "ty": "F32"
           },
           {
-            "name": "z",
+            "name": "k",
             "ty": "F32"
           },
           {

@@ -56,18 +56,18 @@ impl From<PodVector2> for Vector2<f32> {
 #[lite_api(class=Quaternion)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PodQuaternion {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
+    pub i: f32,
+    pub j: f32,
+    pub k: f32,
     pub w: f32,
 }
 
 impl From<UnitQuaternion<f32>> for PodQuaternion {
     fn from(v: UnitQuaternion<f32>) -> Self {
         Self {
-            x: v.i,
-            y: v.j,
-            z: v.k,
+            i: v.i,
+            j: v.j,
+            k: v.k,
             w: v.w,
         }
     }
@@ -75,6 +75,6 @@ impl From<UnitQuaternion<f32>> for PodQuaternion {
 
 impl From<PodQuaternion> for UnitQuaternion<f32> {
     fn from(v: PodQuaternion) -> Self {
-        UnitQuaternion::from_quaternion(Quaternion::new(v.w, v.x, v.y, v.z))
+        UnitQuaternion::from_quaternion(Quaternion::new(v.w, v.i, v.j, v.k))
     }
 }

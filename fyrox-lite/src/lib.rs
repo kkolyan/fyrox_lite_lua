@@ -16,5 +16,7 @@ pub mod script_metadata;
 pub mod script_object_fyrox_traits;
 pub mod reflect_base_macro;
 pub mod script_object_residence;
+pub mod externalizable;
+pub(crate) mod resource_registry;
 
 pub use crate::spi::LiteDataType;

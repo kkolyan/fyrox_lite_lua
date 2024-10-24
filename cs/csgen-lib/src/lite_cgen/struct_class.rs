@@ -8,7 +8,7 @@ use super::types;
 pub(crate) fn generate_struct(s: &mut String, class: &StructClass, client_replicated_types: &HashSet<ClassName>) {
     render(s, r#"
             #[repr(C)]
-            #[derive(Debug, Clone, Copy)]
+            #[derive(Clone, Copy)]
             pub struct Native${class} {
     "#, [("class", &class.class_name)]);
 
@@ -25,6 +25,6 @@ pub(crate) fn generate_struct(s: &mut String, class: &StructClass, client_replic
     "#, []);
 
     render(s, r#"
-            native_utils!(${class}, Native_${class}_array, Native_${class}_option, Native_${class}_result);
+            native_utils!(Native${class}, Native${class}_array, Native${class}_option, Native${class}_result);
     "#, [("class", &class.class_name)]);
 }

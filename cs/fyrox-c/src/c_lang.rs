@@ -9,16 +9,13 @@ use fyrox::{
     },
 };
 use fyrox_lite::{
-    script_metadata::ScriptFieldValueType,
-    script_object::{Lang, ScriptFieldValue, ScriptObject},
-    script_object_residence::uuid_of_script,
+    externalizable::Externalizable, lite_prefab::LitePrefab, script_metadata::ScriptFieldValueType, script_object::{Lang, ScriptFieldValue, ScriptObject}, script_object_residence::uuid_of_script
 };
 
 use crate::{
     bindings_manual::{
         NativeHandle, NativeInstanceId, NativeQuaternion, NativeValue, NativeVector3,
-    },
-    scripted_app::APP,
+    }, scripted_app::APP
 };
 
 #[derive(Debug, Clone)]
@@ -61,26 +58,19 @@ impl Lang for CCompatibleLang {
                     }
                     ScriptFieldValue::Prefab(resource) => {
                         assert_eq!(prop.ty, ScriptFieldValueType::Prefab);
-                        RESOURCES.with_borrow_mut(|registry| {
-                            if registry.is_none() {
-                                *registry = Some(Default::default());
-                            }
-                            let registry = registry.as_mut().unwrap();
-                            if let Some(resource) = resource {
-                                let resource = resource.clone().into_untyped();
-                                let existing_handle =
-                                    registry.reverse_resources.get(&resource.0.data_ptr());
-                                let handle = existing_handle
-                                    .copied()
-                                    .unwrap_or_else(|| registry.resources.spawn(resource));
+                        match resource {
+                            Some(resource) => {
+                                let prefab = LitePrefab::new(resource.clone());
                                 (app.functions.set_property)(
                                     instance,
                                     i as u16,
                                     NativeValue {
-                                        Handle: handle.into(),
+                                        Handle: NativeHandle::from_u128(prefab.to_external()),
                                     },
                                 );
-                            } else {
+                            },
+                            None => {
+
                                 (app.functions.set_property)(
                                     instance,
                                     i as u16,
@@ -88,8 +78,8 @@ impl Lang for CCompatibleLang {
                                         Handle: Handle::<()>::NONE.into(),
                                     },
                                 );
-                            }
-                        });
+                            },
+                        }
                     }
                     ScriptFieldValue::Vector3(it) => {
                         assert_eq!(prop.ty, ScriptFieldValueType::Vector3);
@@ -157,16 +147,6 @@ impl<T> From<NativeHandle> for Handle<T> {
         let value = (value.high as u128) << 64 | (value.low as u128);
         Handle::decode_from_u128(value)
     }
-}
-
-thread_local! {
-    static RESOURCES: RefCell<Option<ResourceRegistry>> = Default::default();
-}
-
-#[derive(Debug, Default)]
-pub struct ResourceRegistry {
-    pub resources: Pool<UntypedResource>,
-    pub reverse_resources: HashMap<*mut ResourceHeader, Handle<UntypedResource>>,
 }
 
 #[derive(Debug, Default, Clone)]

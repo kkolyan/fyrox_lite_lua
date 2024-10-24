@@ -49,6 +49,7 @@ to_vec = "0.1.0"
 mlua = { version = "0.9.1", features = ["luau"] }
 # mlua = { path = "../mlua", features = ["luau"] }
 itertools = "0.13.0"
+send_wrapper = "0.6.0"
 
 # Separate build profiles for hot reloading. These profiles ensures that build artifacts for
 # hot reloading will be placed into their own folders and does not interfere with standard (static)

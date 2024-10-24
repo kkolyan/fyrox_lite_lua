@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-fyrox-lite = {workspace = true}
-fyrox-lite-math = {workspace = true}
-fyrox = {workspace = true}
-mlua = {workspace = true}
-send_wrapper = "0.6.0"
+fyrox-lite = { workspace = true }
+fyrox-lite-math = { workspace = true }
+fyrox = { workspace = true }
+mlua = { workspace = true }
+send_wrapper = { workspace = true }
 extend = "1.2.0"
 convert_case = "0.6.0"
 

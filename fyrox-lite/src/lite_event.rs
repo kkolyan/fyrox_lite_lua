@@ -35,7 +35,7 @@
 
 use lite_macro::lite_api;
 
-use crate::lite_math::{PodVector2, PodVector2i};
+use crate::{externalizable::Externalizable, lite_math::{PodVector2, PodVector2i}};
 #[cfg(doc)]
 use crate::window::Window;
 use fyrox::dpi::{PhysicalPosition, PhysicalSize};
@@ -1812,4 +1812,14 @@ fn physical_key_to_lite(it: fyrox::keyboard::PhysicalKey) -> Option<PhysicalKey>
             fyrox::keyboard::NativeKeyCode::Xkb(it) => NativeKeyCode::Xkb(it as i32),
         }),
     })
+}
+
+impl Externalizable for InnerSizeWriter {
+    fn to_external(&self) -> u128 {
+        todo!()
+    }
+
+    fn from_external(handle: u128) -> Self {
+        todo!()
+    }
 }

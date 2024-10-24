@@ -1,3 +1,4 @@
+use crate::externalizable::Externalizable;
 use crate::lite_math::{PodQuaternion, PodVector3};
 use crate::spi::UserScript;
 use crate::wrapper_reflect;
@@ -217,9 +218,9 @@ impl LiteNode {
             let rot = camera_global_transform.fixed_view::<3, 3>(0, 0);
             let r = UnitQuaternion::from_matrix(&rot.into());
             PodQuaternion {
-                x: r.i,
-                y: r.j,
-                z: r.k,
+                i: r.i,
+                j: r.j,
+                k: r.k,
                 w: r.w,
             }
         })
@@ -372,4 +373,13 @@ macro_rules! wrapper_reflect {
             self.$ident.as_hash_map_mut(func)
         }
     };
+}
+impl Externalizable for LiteNode {
+    fn to_external(&self) -> u128 {
+        self.handle.encode_to_u128()
+    }
+
+    fn from_external(v: u128) -> Self {
+        Self { handle: Handle::decode_from_u128(v) }
+    }
 }

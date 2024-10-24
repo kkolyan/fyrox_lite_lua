@@ -20,8 +20,12 @@ pub fn write_bindings(bindings: HierarchicalCodeBase) {
     bindings.write_rust(target_path);
 }
 
+pub fn get_fyrox_lite_domain() -> Domain {
+    parse_domain_metadata("fyrox-lite")
+}
+
 pub fn get_combined_domain() -> Domain {
-    let mut fyrox: Domain = parse_domain_metadata("fyrox-lite");
+    let mut fyrox: Domain = get_fyrox_lite_domain();
     let math: Domain = parse_domain_metadata("fyrox-lite-math");
 
     // math "overrides" classes in fyrox by name

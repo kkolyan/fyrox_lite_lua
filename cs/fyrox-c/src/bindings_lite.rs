@@ -1,366 +1,1371 @@
 
-use crate::{bindings_manual::*, native_utils};
-    
-pub extern "C" fn fyrox_lite_Prefab_instantiate_at(__this: NativeInstanceId, position: NativeVector3, orientation: NativeQuaternion) -> NativeNode {
-    let position = position.into();
-    let orientation = orientation.into();
+#![allow(non_camel_case_types)]
+#![allow(non_upper_case_globals)]
+#![allow(non_snake_case)]
+use crate::bindings_manual::*;
+use crate::native_utils;
+use fyrox_lite::externalizable::Externalizable;
+use fyrox_lite::spi::UserScript;
+use std::fmt::Display;
+
+// fyrox_lite::lite_prefab::LitePrefab
+
+pub extern "C" fn fyrox_lite_Prefab_instantiate_at(
+    __this: NativeHandle,
+    position: NativeVector3,
+    orientation: NativeQuaternion,
+) -> NativeHandle {
+    let mut __this: fyrox_lite::lite_prefab::LitePrefab =
+        Externalizable::from_external(__this.as_u128());
+    let mut position = position;
+    let mut orientation = orientation;
     let __result = __this.instantiate_at(position, orientation);
     let __result = __result.into();
     __result
 }
+
+// fyrox_lite::lite_log::LiteLog
+
 pub extern "C" fn fyrox_lite_Log_info(msg: NativeString) -> () {
-    let msg = String::from_utf8(<u8 as NativeType>::from_native_array(msg)).unwrap();
+    let mut msg = String::from_utf8(<u8 as NativeType>::from_native_array(msg)).unwrap();
     let __result = fyrox_lite::lite_log::LiteLog::info(msg);
     __result
 }
 pub extern "C" fn fyrox_lite_Log_warn(msg: NativeString) -> () {
-    let msg = String::from_utf8(<u8 as NativeType>::from_native_array(msg)).unwrap();
+    let mut msg = String::from_utf8(<u8 as NativeType>::from_native_array(msg)).unwrap();
     let __result = fyrox_lite::lite_log::LiteLog::warn(msg);
     __result
 }
 pub extern "C" fn fyrox_lite_Log_err(msg: NativeString) -> () {
-    let msg = String::from_utf8(<u8 as NativeType>::from_native_array(msg)).unwrap();
+    let mut msg = String::from_utf8(<u8 as NativeType>::from_native_array(msg)).unwrap();
     let __result = fyrox_lite::lite_log::LiteLog::err(msg);
     __result
 }
+
+// fyrox_lite::lite_event::Event
+
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
+pub struct NativeEvent {
+    pub tag: u8,
+    pub value: NativeEventVariantContainer,
+}
+native_utils!(
+    NativeEvent,
+    NativeEvent_array,
+    NativeEvent_option,
+    NativeEvent_result
+);
+
+impl NativeEvent {
+    pub const WindowEvent: u8 = 0;
+    pub const DeviceEvent: u8 = 1;
+    pub const Suspended: u8 = 2;
+    pub const Resumed: u8 = 3;
+    pub const AboutToWait: u8 = 4;
+    pub const LoopExiting: u8 = 5;
+    pub const MemoryWarning: u8 = 6;
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeEventVariantContainer {
+    pub WindowEvent: NativeEvent_WindowEvent,
+    pub DeviceEvent: NativeEvent_DeviceEvent,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeEvent_WindowEvent {
+    pub window_id: i64,
+    pub event: NativeWindowEvent,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeEvent_DeviceEvent {
+    pub event: NativeDeviceEvent,
+}
+
+// fyrox_lite::lite_event::StartCause
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeStartCause {
+    pub tag: u8,
+}
+native_utils!(
+    NativeStartCause,
+    NativeStartCause_array,
+    NativeStartCause_option,
+    NativeStartCause_result
+);
+
+impl NativeStartCause {
+    pub const ResumeTimeReached: u8 = 0;
+    pub const WaitCancelled: u8 = 1;
+    pub const Poll: u8 = 2;
+    pub const Init: u8 = 3;
+}
+
+// fyrox_lite::lite_event::WindowEvent
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent {
+    pub tag: u8,
+    pub value: NativeWindowEventVariantContainer,
+}
+native_utils!(
+    NativeWindowEvent,
+    NativeWindowEvent_array,
+    NativeWindowEvent_option,
+    NativeWindowEvent_result
+);
+
+impl NativeWindowEvent {
+    pub const ActivationTokenDone: u8 = 0;
+    pub const Resized: u8 = 1;
+    pub const Moved: u8 = 2;
+    pub const CloseRequested: u8 = 3;
+    pub const Destroyed: u8 = 4;
+    pub const DroppedFile: u8 = 5;
+    pub const HoveredFile: u8 = 6;
+    pub const HoveredFileCancelled: u8 = 7;
+    pub const Focused: u8 = 8;
+    pub const KeyboardInput: u8 = 9;
+    pub const ModifiersChanged: u8 = 10;
+    pub const Ime: u8 = 11;
+    pub const CursorMoved: u8 = 12;
+    pub const CursorEntered: u8 = 13;
+    pub const CursorLeft: u8 = 14;
+    pub const MouseWheel: u8 = 15;
+    pub const MouseInput: u8 = 16;
+    pub const TouchpadMagnify: u8 = 17;
+    pub const SmartMagnify: u8 = 18;
+    pub const TouchpadRotate: u8 = 19;
+    pub const TouchpadPressure: u8 = 20;
+    pub const AxisMotion: u8 = 21;
+    pub const Touch: u8 = 22;
+    pub const ScaleFactorChanged: u8 = 23;
+    pub const ThemeChanged: u8 = 24;
+    pub const Occluded: u8 = 25;
+    pub const RedrawRequested: u8 = 26;
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeWindowEventVariantContainer {
+    pub Resized: NativeWindowEvent_Resized,
+    pub Moved: NativeWindowEvent_Moved,
+    pub DroppedFile: NativeWindowEvent_DroppedFile,
+    pub HoveredFile: NativeWindowEvent_HoveredFile,
+    pub Focused: NativeWindowEvent_Focused,
+    pub KeyboardInput: NativeWindowEvent_KeyboardInput,
+    pub CursorMoved: NativeWindowEvent_CursorMoved,
+    pub MouseWheel: NativeWindowEvent_MouseWheel,
+    pub MouseInput: NativeWindowEvent_MouseInput,
+    pub TouchpadMagnify: NativeWindowEvent_TouchpadMagnify,
+    pub TouchpadRotate: NativeWindowEvent_TouchpadRotate,
+    pub TouchpadPressure: NativeWindowEvent_TouchpadPressure,
+    pub AxisMotion: NativeWindowEvent_AxisMotion,
+    pub Touch: NativeWindowEvent_Touch,
+    pub ScaleFactorChanged: NativeWindowEvent_ScaleFactorChanged,
+    pub Occluded: NativeWindowEvent_Occluded,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_Resized {
+    pub _0: NativeVector2i,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_Moved {
+    pub _0: NativeVector2i,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_DroppedFile {
+    pub _0: NativeString,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_HoveredFile {
+    pub _0: NativeString,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_Focused {
+    pub _0: bool,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_KeyboardInput {
+    pub event: NativeKeyEvent,
+    pub is_synthetic: bool,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_CursorMoved {
+    pub position: NativeVector2i,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_MouseWheel {
+    pub delta: NativeMouseScrollDelta,
+    pub phase: NativeTouchPhase,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_MouseInput {
+    pub state: NativeElementState,
+    pub button: NativeMouseButton,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_TouchpadMagnify {
+    pub delta: f64,
+    pub phase: NativeTouchPhase,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_TouchpadRotate {
+    pub delta: f32,
+    pub phase: NativeTouchPhase,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_TouchpadPressure {
+    pub pressure: f32,
+    pub stage: i64,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_AxisMotion {
+    pub axis: i32,
+    pub value: f64,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_Touch {
+    pub _0: NativeTouch,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_ScaleFactorChanged {
+    pub scale_factor: f64,
+    pub inner_size_writer: NativeHandle,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindowEvent_Occluded {
+    pub _0: bool,
+}
+
+// fyrox_lite::lite_event::DeviceEvent
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeDeviceEvent {
+    pub tag: u8,
+    pub value: NativeDeviceEventVariantContainer,
+}
+native_utils!(
+    NativeDeviceEvent,
+    NativeDeviceEvent_array,
+    NativeDeviceEvent_option,
+    NativeDeviceEvent_result
+);
+
+impl NativeDeviceEvent {
+    pub const Added: u8 = 0;
+    pub const Removed: u8 = 1;
+    pub const MouseMotion: u8 = 2;
+    pub const MouseWheel: u8 = 3;
+    pub const Motion: u8 = 4;
+    pub const Button: u8 = 5;
+    pub const Key: u8 = 6;
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeDeviceEventVariantContainer {
+    pub MouseMotion: NativeDeviceEvent_MouseMotion,
+    pub MouseWheel: NativeDeviceEvent_MouseWheel,
+    pub Motion: NativeDeviceEvent_Motion,
+    pub Button: NativeDeviceEvent_Button,
+    pub Key: NativeDeviceEvent_Key,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeDeviceEvent_MouseMotion {
+    pub delta: NativeVector2,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeDeviceEvent_MouseWheel {
+    pub delta: NativeMouseScrollDelta,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeDeviceEvent_Motion {
+    pub axis: i32,
+    pub value: f64,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeDeviceEvent_Button {
+    pub button: i32,
+    pub state: NativeElementState,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeDeviceEvent_Key {
+    pub _0: NativeRawKeyEvent,
+}
+
+// fyrox_lite::lite_event::RawKeyEvent
+
+#[repr(C)]
+#[derive(Clone, Copy)]
 pub struct NativeRawKeyEvent {
     pub physical_key: NativePhysicalKey,
     pub state: NativeElementState,
 }
-native_utils!(RawKeyEvent, Native_RawKeyEvent_array, Native_RawKeyEvent_option, Native_RawKeyEvent_result);
+native_utils!(
+    NativeRawKeyEvent,
+    NativeRawKeyEvent_array,
+    NativeRawKeyEvent_option,
+    NativeRawKeyEvent_result
+);
+
+// fyrox_lite::lite_event::PhysicalKey
+
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
+pub struct NativePhysicalKey {
+    pub tag: u8,
+    pub value: NativePhysicalKeyVariantContainer,
+}
+native_utils!(
+    NativePhysicalKey,
+    NativePhysicalKey_array,
+    NativePhysicalKey_option,
+    NativePhysicalKey_result
+);
+
+impl NativePhysicalKey {
+    pub const Code: u8 = 0;
+    pub const Unidentified: u8 = 1;
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativePhysicalKeyVariantContainer {
+    pub Code: NativePhysicalKey_Code,
+    pub Unidentified: NativePhysicalKey_Unidentified,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativePhysicalKey_Code {
+    pub _0: NativeKeyCode,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativePhysicalKey_Unidentified {
+    pub _0: NativeNativeKeyCode,
+}
+
+// fyrox_lite::lite_event::KeyCode
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeKeyCode {
+    pub tag: u8,
+}
+native_utils!(
+    NativeKeyCode,
+    NativeKeyCode_array,
+    NativeKeyCode_option,
+    NativeKeyCode_result
+);
+
+impl NativeKeyCode {
+    pub const Backquote: u8 = 0;
+    pub const Backslash: u8 = 1;
+    pub const BracketLeft: u8 = 2;
+    pub const BracketRight: u8 = 3;
+    pub const Comma: u8 = 4;
+    pub const Digit0: u8 = 5;
+    pub const Digit1: u8 = 6;
+    pub const Digit2: u8 = 7;
+    pub const Digit3: u8 = 8;
+    pub const Digit4: u8 = 9;
+    pub const Digit5: u8 = 10;
+    pub const Digit6: u8 = 11;
+    pub const Digit7: u8 = 12;
+    pub const Digit8: u8 = 13;
+    pub const Digit9: u8 = 14;
+    pub const Equal: u8 = 15;
+    pub const IntlBackslash: u8 = 16;
+    pub const IntlRo: u8 = 17;
+    pub const IntlYen: u8 = 18;
+    pub const KeyA: u8 = 19;
+    pub const KeyB: u8 = 20;
+    pub const KeyC: u8 = 21;
+    pub const KeyD: u8 = 22;
+    pub const KeyE: u8 = 23;
+    pub const KeyF: u8 = 24;
+    pub const KeyG: u8 = 25;
+    pub const KeyH: u8 = 26;
+    pub const KeyI: u8 = 27;
+    pub const KeyJ: u8 = 28;
+    pub const KeyK: u8 = 29;
+    pub const KeyL: u8 = 30;
+    pub const KeyM: u8 = 31;
+    pub const KeyN: u8 = 32;
+    pub const KeyO: u8 = 33;
+    pub const KeyP: u8 = 34;
+    pub const KeyQ: u8 = 35;
+    pub const KeyR: u8 = 36;
+    pub const KeyS: u8 = 37;
+    pub const KeyT: u8 = 38;
+    pub const KeyU: u8 = 39;
+    pub const KeyV: u8 = 40;
+    pub const KeyW: u8 = 41;
+    pub const KeyX: u8 = 42;
+    pub const KeyY: u8 = 43;
+    pub const KeyZ: u8 = 44;
+    pub const Minus: u8 = 45;
+    pub const Period: u8 = 46;
+    pub const Quote: u8 = 47;
+    pub const Semicolon: u8 = 48;
+    pub const Slash: u8 = 49;
+    pub const AltLeft: u8 = 50;
+    pub const AltRight: u8 = 51;
+    pub const Backspace: u8 = 52;
+    pub const CapsLock: u8 = 53;
+    pub const ContextMenu: u8 = 54;
+    pub const ControlLeft: u8 = 55;
+    pub const ControlRight: u8 = 56;
+    pub const Enter: u8 = 57;
+    pub const SuperLeft: u8 = 58;
+    pub const SuperRight: u8 = 59;
+    pub const ShiftLeft: u8 = 60;
+    pub const ShiftRight: u8 = 61;
+    pub const Space: u8 = 62;
+    pub const Tab: u8 = 63;
+    pub const Convert: u8 = 64;
+    pub const KanaMode: u8 = 65;
+    pub const Lang1: u8 = 66;
+    pub const Lang2: u8 = 67;
+    pub const Lang3: u8 = 68;
+    pub const Lang4: u8 = 69;
+    pub const Lang5: u8 = 70;
+    pub const NonConvert: u8 = 71;
+    pub const Delete: u8 = 72;
+    pub const End: u8 = 73;
+    pub const Help: u8 = 74;
+    pub const Home: u8 = 75;
+    pub const Insert: u8 = 76;
+    pub const PageDown: u8 = 77;
+    pub const PageUp: u8 = 78;
+    pub const ArrowDown: u8 = 79;
+    pub const ArrowLeft: u8 = 80;
+    pub const ArrowRight: u8 = 81;
+    pub const ArrowUp: u8 = 82;
+    pub const NumLock: u8 = 83;
+    pub const Numpad0: u8 = 84;
+    pub const Numpad1: u8 = 85;
+    pub const Numpad2: u8 = 86;
+    pub const Numpad3: u8 = 87;
+    pub const Numpad4: u8 = 88;
+    pub const Numpad5: u8 = 89;
+    pub const Numpad6: u8 = 90;
+    pub const Numpad7: u8 = 91;
+    pub const Numpad8: u8 = 92;
+    pub const Numpad9: u8 = 93;
+    pub const NumpadAdd: u8 = 94;
+    pub const NumpadBackspace: u8 = 95;
+    pub const NumpadClear: u8 = 96;
+    pub const NumpadClearEntry: u8 = 97;
+    pub const NumpadComma: u8 = 98;
+    pub const NumpadDecimal: u8 = 99;
+    pub const NumpadDivide: u8 = 100;
+    pub const NumpadEnter: u8 = 101;
+    pub const NumpadEqual: u8 = 102;
+    pub const NumpadHash: u8 = 103;
+    pub const NumpadMemoryAdd: u8 = 104;
+    pub const NumpadMemoryClear: u8 = 105;
+    pub const NumpadMemoryRecall: u8 = 106;
+    pub const NumpadMemoryStore: u8 = 107;
+    pub const NumpadMemorySubtract: u8 = 108;
+    pub const NumpadMultiply: u8 = 109;
+    pub const NumpadParenLeft: u8 = 110;
+    pub const NumpadParenRight: u8 = 111;
+    pub const NumpadStar: u8 = 112;
+    pub const NumpadSubtract: u8 = 113;
+    pub const Escape: u8 = 114;
+    pub const Fn: u8 = 115;
+    pub const FnLock: u8 = 116;
+    pub const PrintScreen: u8 = 117;
+    pub const ScrollLock: u8 = 118;
+    pub const Pause: u8 = 119;
+    pub const BrowserBack: u8 = 120;
+    pub const BrowserFavorites: u8 = 121;
+    pub const BrowserForward: u8 = 122;
+    pub const BrowserHome: u8 = 123;
+    pub const BrowserRefresh: u8 = 124;
+    pub const BrowserSearch: u8 = 125;
+    pub const BrowserStop: u8 = 126;
+    pub const Eject: u8 = 127;
+    pub const LaunchApp1: u8 = 128;
+    pub const LaunchApp2: u8 = 129;
+    pub const LaunchMail: u8 = 130;
+    pub const MediaPlayPause: u8 = 131;
+    pub const MediaSelect: u8 = 132;
+    pub const MediaStop: u8 = 133;
+    pub const MediaTrackNext: u8 = 134;
+    pub const MediaTrackPrevious: u8 = 135;
+    pub const Power: u8 = 136;
+    pub const Sleep: u8 = 137;
+    pub const AudioVolumeDown: u8 = 138;
+    pub const AudioVolumeMute: u8 = 139;
+    pub const AudioVolumeUp: u8 = 140;
+    pub const WakeUp: u8 = 141;
+    pub const Meta: u8 = 142;
+    pub const Hyper: u8 = 143;
+    pub const Turbo: u8 = 144;
+    pub const Abort: u8 = 145;
+    pub const Resume: u8 = 146;
+    pub const Suspend: u8 = 147;
+    pub const Again: u8 = 148;
+    pub const Copy: u8 = 149;
+    pub const Cut: u8 = 150;
+    pub const Find: u8 = 151;
+    pub const Open: u8 = 152;
+    pub const Paste: u8 = 153;
+    pub const Props: u8 = 154;
+    pub const Select: u8 = 155;
+    pub const Undo: u8 = 156;
+    pub const Hiragana: u8 = 157;
+    pub const Katakana: u8 = 158;
+    pub const F1: u8 = 159;
+    pub const F2: u8 = 160;
+    pub const F3: u8 = 161;
+    pub const F4: u8 = 162;
+    pub const F5: u8 = 163;
+    pub const F6: u8 = 164;
+    pub const F7: u8 = 165;
+    pub const F8: u8 = 166;
+    pub const F9: u8 = 167;
+    pub const F10: u8 = 168;
+    pub const F11: u8 = 169;
+    pub const F12: u8 = 170;
+    pub const F13: u8 = 171;
+    pub const F14: u8 = 172;
+    pub const F15: u8 = 173;
+    pub const F16: u8 = 174;
+    pub const F17: u8 = 175;
+    pub const F18: u8 = 176;
+    pub const F19: u8 = 177;
+    pub const F20: u8 = 178;
+    pub const F21: u8 = 179;
+    pub const F22: u8 = 180;
+    pub const F23: u8 = 181;
+    pub const F24: u8 = 182;
+    pub const F25: u8 = 183;
+    pub const F26: u8 = 184;
+    pub const F27: u8 = 185;
+    pub const F28: u8 = 186;
+    pub const F29: u8 = 187;
+    pub const F30: u8 = 188;
+    pub const F31: u8 = 189;
+    pub const F32: u8 = 190;
+    pub const F33: u8 = 191;
+    pub const F34: u8 = 192;
+    pub const F35: u8 = 193;
+}
+
+// fyrox_lite::lite_event::NativeKeyCode
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeNativeKeyCode {
+    pub tag: u8,
+    pub value: NativeNativeKeyCodeVariantContainer,
+}
+native_utils!(
+    NativeNativeKeyCode,
+    NativeNativeKeyCode_array,
+    NativeNativeKeyCode_option,
+    NativeNativeKeyCode_result
+);
+
+impl NativeNativeKeyCode {
+    pub const Unidentified: u8 = 0;
+    pub const Android: u8 = 1;
+    pub const MacOS: u8 = 2;
+    pub const Windows: u8 = 3;
+    pub const Xkb: u8 = 4;
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeNativeKeyCodeVariantContainer {
+    pub Android: NativeNativeKeyCode_Android,
+    pub MacOS: NativeNativeKeyCode_MacOS,
+    pub Windows: NativeNativeKeyCode_Windows,
+    pub Xkb: NativeNativeKeyCode_Xkb,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeNativeKeyCode_Android {
+    pub _0: i32,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeNativeKeyCode_MacOS {
+    pub _0: i32,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeNativeKeyCode_Windows {
+    pub _0: i32,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeNativeKeyCode_Xkb {
+    pub _0: i32,
+}
+
+// fyrox_lite::lite_event::KeyEvent
+
+#[repr(C)]
+#[derive(Clone, Copy)]
 pub struct NativeKeyEvent {
     pub physical_key: NativePhysicalKey,
     pub state: NativeElementState,
     pub repeat: bool,
 }
-native_utils!(KeyEvent, Native_KeyEvent_array, Native_KeyEvent_option, Native_KeyEvent_result);
+native_utils!(
+    NativeKeyEvent,
+    NativeKeyEvent_array,
+    NativeKeyEvent_option,
+    NativeKeyEvent_result
+);
+
+// fyrox_lite::lite_event::KeyLocation
+
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
+pub struct NativeKeyLocation {
+    pub tag: u8,
+}
+native_utils!(
+    NativeKeyLocation,
+    NativeKeyLocation_array,
+    NativeKeyLocation_option,
+    NativeKeyLocation_result
+);
+
+impl NativeKeyLocation {
+    pub const Standard: u8 = 0;
+    pub const Left: u8 = 1;
+    pub const Right: u8 = 2;
+    pub const Numpad: u8 = 3;
+}
+
+// fyrox_lite::lite_event::TouchPhase
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeTouchPhase {
+    pub tag: u8,
+}
+native_utils!(
+    NativeTouchPhase,
+    NativeTouchPhase_array,
+    NativeTouchPhase_option,
+    NativeTouchPhase_result
+);
+
+impl NativeTouchPhase {
+    pub const Started: u8 = 0;
+    pub const Moved: u8 = 1;
+    pub const Ended: u8 = 2;
+    pub const Cancelled: u8 = 3;
+}
+
+// fyrox_lite::lite_event::Touch
+
+#[repr(C)]
+#[derive(Clone, Copy)]
 pub struct NativeTouch {
     pub phase: NativeTouchPhase,
-    pub location: NativeInstanceId,
-    pub force: NativeNativeForceOption,
+    pub location: NativeVector2,
+    pub force: NativeForce_option,
     pub id: i64,
 }
-native_utils!(Touch, Native_Touch_array, Native_Touch_option, Native_Touch_result);
-pub extern "C" fn fyrox_lite_InnerSizeWriter_request_inner_size(__this: NativeInstanceId, new_inner_size: NativeInstanceId) -> bool {
-    let new_inner_size = new_inner_size.into();
+native_utils!(
+    NativeTouch,
+    NativeTouch_array,
+    NativeTouch_option,
+    NativeTouch_result
+);
+
+// fyrox_lite::lite_event::Force
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeForce {
+    pub tag: u8,
+    pub value: NativeForceVariantContainer,
+}
+native_utils!(
+    NativeForce,
+    NativeForce_array,
+    NativeForce_option,
+    NativeForce_result
+);
+
+impl NativeForce {
+    pub const Calibrated: u8 = 0;
+    pub const Normalized: u8 = 1;
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeForceVariantContainer {
+    pub Calibrated: NativeForce_Calibrated,
+    pub Normalized: NativeForce_Normalized,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeForce_Calibrated {
+    pub force: f64,
+    pub max_possible_force: f64,
+    pub altitude_angle: f64_option,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeForce_Normalized {
+    pub _0: f64,
+}
+
+// fyrox_lite::lite_event::ElementState
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeElementState {
+    pub tag: u8,
+}
+native_utils!(
+    NativeElementState,
+    NativeElementState_array,
+    NativeElementState_option,
+    NativeElementState_result
+);
+
+impl NativeElementState {
+    pub const Pressed: u8 = 0;
+    pub const Released: u8 = 1;
+}
+
+// fyrox_lite::lite_event::MouseButton
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeMouseButton {
+    pub tag: u8,
+    pub value: NativeMouseButtonVariantContainer,
+}
+native_utils!(
+    NativeMouseButton,
+    NativeMouseButton_array,
+    NativeMouseButton_option,
+    NativeMouseButton_result
+);
+
+impl NativeMouseButton {
+    pub const Left: u8 = 0;
+    pub const Right: u8 = 1;
+    pub const Middle: u8 = 2;
+    pub const Back: u8 = 3;
+    pub const Forward: u8 = 4;
+    pub const Other: u8 = 5;
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeMouseButtonVariantContainer {
+    pub Other: NativeMouseButton_Other,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeMouseButton_Other {
+    pub _0: i32,
+}
+
+// fyrox_lite::lite_event::MouseScrollDelta
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeMouseScrollDelta {
+    pub tag: u8,
+    pub value: NativeMouseScrollDeltaVariantContainer,
+}
+native_utils!(
+    NativeMouseScrollDelta,
+    NativeMouseScrollDelta_array,
+    NativeMouseScrollDelta_option,
+    NativeMouseScrollDelta_result
+);
+
+impl NativeMouseScrollDelta {
+    pub const LineDelta: u8 = 0;
+    pub const PixelDelta: u8 = 1;
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeMouseScrollDeltaVariantContainer {
+    pub LineDelta: NativeMouseScrollDelta_LineDelta,
+    pub PixelDelta: NativeMouseScrollDelta_PixelDelta,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeMouseScrollDelta_LineDelta {
+    pub _0: NativeVector2,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeMouseScrollDelta_PixelDelta {
+    pub _0: NativeVector2,
+}
+
+// fyrox_lite::lite_event::InnerSizeWriter
+
+pub extern "C" fn fyrox_lite_InnerSizeWriter_request_inner_size(
+    __this: NativeHandle,
+    new_inner_size: NativeVector2i,
+) -> bool {
+    let mut __this: fyrox_lite::lite_event::InnerSizeWriter =
+        Externalizable::from_external(__this.as_u128());
+    let mut new_inner_size = new_inner_size;
     let __result = __this.request_inner_size(new_inner_size);
     let __result = __result;
     __result
 }
+
+// fyrox_lite::lite_window::LiteWindow
+
 pub extern "C" fn fyrox_lite_Window_set_cursor_grab(mode: NativeCursorGrabMode) -> () {
-    let mode = mode.into();
+    let mut mode = mode;
     let __result = fyrox_lite::lite_window::LiteWindow::set_cursor_grab(mode);
     __result
 }
+
+// fyrox_lite::lite_window::LiteCursorGrabMode
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeCursorGrabMode {
+    pub tag: u8,
+}
+native_utils!(
+    NativeCursorGrabMode,
+    NativeCursorGrabMode_array,
+    NativeCursorGrabMode_option,
+    NativeCursorGrabMode_result
+);
+
+impl NativeCursorGrabMode {
+    pub const None: u8 = 0;
+    pub const Confined: u8 = 1;
+    pub const Locked: u8 = 2;
+}
+
+// fyrox_lite::lite_scene::LiteScene
+
 pub extern "C" fn fyrox_lite_Scene_load_async(scene_path: NativeString) -> () {
-    let scene_path = String::from_utf8(<u8 as NativeType>::from_native_array(scene_path)).unwrap();
+    let mut scene_path =
+        String::from_utf8(<u8 as NativeType>::from_native_array(scene_path)).unwrap();
     let __result = fyrox_lite::lite_scene::LiteScene::load_async(scene_path);
     __result
 }
-pub extern "C" fn fyrox_lite_Physics_cast_ray(opts: NativeInstanceId) -> NativeNativeInstanceIdArray {
-    let opts = opts.into();
+
+// fyrox_lite::lite_physics::LitePhysics
+
+pub extern "C" fn fyrox_lite_Physics_cast_ray(
+    opts: NativeRayCastOptions,
+) -> NativeIntersection_array {
+    let mut opts = opts;
     let __result = fyrox_lite::lite_physics::LitePhysics::cast_ray(opts);
-    let __result = <NativeInstanceId as NativeType>::to_native_option(__result);
+    let __result = <NativeIntersection as NativeType>::to_native_option(__result);
     __result
 }
+
+// fyrox_lite::lite_physics::LiteIntersection
+
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct NativeIntersection {
-    pub collider: NativeNode,
+    pub collider: NativeHandle,
     pub normal: NativeVector3,
     pub position: NativeVector3,
     pub feature: NativeFeatureId,
     pub toi: f32,
 }
-native_utils!(Intersection, Native_Intersection_array, Native_Intersection_option, Native_Intersection_result);
+native_utils!(
+    NativeIntersection,
+    NativeIntersection_array,
+    NativeIntersection_option,
+    NativeIntersection_result
+);
+
+// fyrox_lite::lite_physics::LiteFeatureId
+
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
+pub struct NativeFeatureId {
+    pub tag: u8,
+    pub value: NativeFeatureIdVariantContainer,
+}
+native_utils!(
+    NativeFeatureId,
+    NativeFeatureId_array,
+    NativeFeatureId_option,
+    NativeFeatureId_result
+);
+
+impl NativeFeatureId {
+    pub const Vertex: u8 = 0;
+    pub const Edge: u8 = 1;
+    pub const Face: u8 = 2;
+    pub const Unknown: u8 = 3;
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeFeatureIdVariantContainer {
+    pub Vertex: NativeFeatureId_Vertex,
+    pub Edge: NativeFeatureId_Edge,
+    pub Face: NativeFeatureId_Face,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeFeatureId_Vertex {
+    pub _0: i32,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeFeatureId_Edge {
+    pub _0: i32,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeFeatureId_Face {
+    pub _0: i32,
+}
+
+// fyrox_lite::lite_physics::LiteRayCastOptions
+
+#[repr(C)]
+#[derive(Clone, Copy)]
 pub struct NativeRayCastOptions {
     pub ray_origin: NativeVector3,
     pub ray_direction: NativeVector3,
     pub max_len: f32,
-    pub groups: NativeNativeInstanceIdOption,
+    pub groups: NativeInteractionGroups_option,
     pub sort_results: bool,
 }
-native_utils!(RayCastOptions, Native_RayCastOptions_array, Native_RayCastOptions_option, Native_RayCastOptions_result);
+native_utils!(
+    NativeRayCastOptions,
+    NativeRayCastOptions_array,
+    NativeRayCastOptions_option,
+    NativeRayCastOptions_result
+);
+
+// fyrox_lite::lite_physics::LiteInteractionGroups
+
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct NativeInteractionGroups {
     pub memberships: i32,
     pub filter: i32,
 }
-native_utils!(InteractionGroups, Native_InteractionGroups_array, Native_InteractionGroups_option, Native_InteractionGroups_result);
-pub extern "C" fn fyrox_lite_RigidBody_apply_force(__this: NativeInstanceId, force: NativeVector3) -> () {
-    let force = force.into();
+native_utils!(
+    NativeInteractionGroups,
+    NativeInteractionGroups_array,
+    NativeInteractionGroups_option,
+    NativeInteractionGroups_result
+);
+
+// fyrox_lite::lite_physics::LiteRigidBody
+
+pub extern "C" fn fyrox_lite_RigidBody_apply_force(
+    __this: NativeHandle,
+    force: NativeVector3,
+) -> () {
+    let mut __this: fyrox_lite::lite_physics::LiteRigidBody =
+        Externalizable::from_external(__this.as_u128());
+    let mut force = force;
     let __result = __this.apply_force(force);
     __result
 }
-pub extern "C" fn fyrox_lite_Text_set_text_async(__this: NativeInstanceId, text: NativeString) -> () {
-    let text = String::from_utf8(<u8 as NativeType>::from_native_array(text)).unwrap();
+
+// fyrox_lite::lite_ui::LiteUiNode
+
+// fyrox_lite::lite_ui::LiteText
+
+pub extern "C" fn fyrox_lite_Text_set_text_async(__this: NativeHandle, text: NativeString) -> () {
+    let mut __this: fyrox_lite::lite_ui::LiteText = Externalizable::from_external(__this.as_u128());
+    let mut text = String::from_utf8(<u8 as NativeType>::from_native_array(text)).unwrap();
     let __result = __this.set_text_async(text);
     __result
 }
-pub extern "C" fn fyrox_lite_Text_new(state: NativeInstanceId) -> NativeText {
-    let state = state.into();
+pub extern "C" fn fyrox_lite_Text_new(state: NativeTextBuilder) -> NativeHandle {
+    let mut state = state;
     let __result = fyrox_lite::lite_ui::LiteText::new(state);
     let __result = __result.into();
     __result
 }
+
+// fyrox_lite::lite_ui::TextBuilder
+
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct NativeTextBuilder {
-    pub foregound: NativeNativeBrushOption,
-    pub font_size: Nativef32Option,
+    pub foregound: NativeBrush_option,
+    pub font_size: f32_option,
 }
-native_utils!(TextBuilder, Native_TextBuilder_array, Native_TextBuilder_option, Native_TextBuilder_result);
+native_utils!(
+    NativeTextBuilder,
+    NativeTextBuilder_array,
+    NativeTextBuilder_option,
+    NativeTextBuilder_result
+);
+
+// fyrox_lite::lite_ui::Brush
+
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
+pub struct NativeBrush {
+    pub tag: u8,
+    pub value: NativeBrushVariantContainer,
+}
+native_utils!(
+    NativeBrush,
+    NativeBrush_array,
+    NativeBrush_option,
+    NativeBrush_result
+);
+
+impl NativeBrush {
+    pub const Solid: u8 = 0;
+    pub const LinearGradient: u8 = 1;
+    pub const RadialGradient: u8 = 2;
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeBrushVariantContainer {
+    pub Solid: NativeBrush_Solid,
+    pub LinearGradient: NativeBrush_LinearGradient,
+    pub RadialGradient: NativeBrush_RadialGradient,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeBrush_Solid {
+    pub _0: NativeHandle,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeBrush_LinearGradient {
+    pub from: NativeVector2,
+    pub to: NativeVector2,
+    pub stops: NativeGradientPoint_array,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeBrush_RadialGradient {
+    pub center: NativeVector2,
+    pub stops: NativeGradientPoint_array,
+}
+
+// fyrox_lite::lite_ui::Color
+
+// fyrox_lite::lite_ui::GradientPoint
+
+#[repr(C)]
+#[derive(Clone, Copy)]
 pub struct NativeGradientPoint {
     pub stop: f32,
-    pub color: NativeColor,
+    pub color: NativeHandle,
 }
-native_utils!(GradientPoint, Native_GradientPoint_array, Native_GradientPoint_option, Native_GradientPoint_result);
+native_utils!(
+    NativeGradientPoint,
+    NativeGradientPoint_array,
+    NativeGradientPoint_option,
+    NativeGradientPoint_result
+);
+
+// fyrox_lite::lite_math::PodVector3
+
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
+pub struct NativeVector3 {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+}
+native_utils!(
+    NativeVector3,
+    NativeVector3_array,
+    NativeVector3_option,
+    NativeVector3_result
+);
+
+// fyrox_lite::lite_math::PodVector2
+
+#[repr(C)]
+#[derive(Clone, Copy)]
 pub struct NativeVector2 {
     pub x: f32,
     pub y: f32,
 }
-native_utils!(Vector2, Native_Vector2_array, Native_Vector2_option, Native_Vector2_result);
+native_utils!(
+    NativeVector2,
+    NativeVector2_array,
+    NativeVector2_option,
+    NativeVector2_result
+);
+
+// fyrox_lite::lite_math::PodVector2i
+
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct NativeVector2i {
     pub x: i64,
     pub y: i64,
 }
-native_utils!(Vector2i, Native_Vector2i_array, Native_Vector2i_option, Native_Vector2i_result);
-pub extern "C" fn fyrox_lite_Plugin_get(class_name: NativeString) -> NativeNativeInstanceIdResult {
-    let class_name = String::from_utf8(<u8 as NativeType>::from_native_array(class_name)).unwrap();
-    let __result = fyrox_lite::lite_plugin::LitePlugin::get(class_name);
-    let __result = <NativeInstanceId as NativeType>::to_native_result(__result);
+native_utils!(
+    NativeVector2i,
+    NativeVector2i_array,
+    NativeVector2i_option,
+    NativeVector2i_result
+);
+
+// fyrox_lite::lite_math::PodQuaternion
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeQuaternion {
+    pub i: f32,
+    pub j: f32,
+    pub k: f32,
+    pub w: f32,
+}
+native_utils!(
+    NativeQuaternion,
+    NativeQuaternion_array,
+    NativeQuaternion_option,
+    NativeQuaternion_result
+);
+
+// fyrox_lite::lite_plugin::LitePlugin
+
+pub extern "C" fn fyrox_lite_Plugin_get(class_name: NativeString) -> NativeHandle_result {
+    let mut class_name =
+        String::from_utf8(<u8 as NativeType>::from_native_array(class_name)).unwrap();
+    let mut _stub = ();
+    let __result = fyrox_lite::lite_plugin::LitePlugin::get::<NativeHandle>(class_name, _stub);
+    let __result = <NativeHandle as NativeType>::to_native_result(__result);
     __result
 }
-pub extern "C" fn fyrox_lite_Node_as_rigid_body(__this: NativeInstanceId) -> NativeNativeRigidBodyOption {
+
+// fyrox_lite::lite_node::LiteNode
+
+pub extern "C" fn fyrox_lite_Node_as_rigid_body(__this: NativeHandle) -> NativeHandle_option {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
     let __result = __this.as_rigid_body();
-    let __result = <NativeRigidBody as NativeType>::to_native_option(__result);
+    let __result = <NativeHandle as NativeType>::to_native_option(__result);
     __result
 }
-pub extern "C" fn fyrox_lite_Node_get_name(__this: NativeInstanceId) -> NativeNativeStringOption {
+pub extern "C" fn fyrox_lite_Node_get_name(__this: NativeHandle) -> NativeString_option {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
     let __result = __this.get_name();
     let __result = <NativeString as NativeType>::to_native_option(__result);
     __result
 }
-pub extern "C" fn fyrox_lite_Node_get_alive(__this: NativeInstanceId) -> bool {
+pub extern "C" fn fyrox_lite_Node_get_alive(__this: NativeHandle) -> bool {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
     let __result = __this.get_alive();
     let __result = __result;
     __result
 }
-pub extern "C" fn fyrox_lite_Node_destroy(__this: NativeInstanceId) -> () {
+pub extern "C" fn fyrox_lite_Node_destroy(__this: NativeHandle) -> () {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
     let __result = __this.destroy();
     __result
 }
-pub extern "C" fn fyrox_lite_Node_get_global_position(__this: NativeInstanceId) -> NativeVector3 {
+pub extern "C" fn fyrox_lite_Node_get_global_position(__this: NativeHandle) -> NativeVector3 {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
     let __result = __this.get_global_position();
     let __result = __result.into();
     __result
 }
-pub extern "C" fn fyrox_lite_Node_get_local_position(__this: NativeInstanceId) -> NativeVector3 {
+pub extern "C" fn fyrox_lite_Node_get_local_position(__this: NativeHandle) -> NativeVector3 {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
     let __result = __this.get_local_position();
     let __result = __result.into();
     __result
 }
-pub extern "C" fn fyrox_lite_Node_get_local_rotation(__this: NativeInstanceId) -> NativeQuaternion {
+pub extern "C" fn fyrox_lite_Node_get_local_rotation(__this: NativeHandle) -> NativeQuaternion {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
     let __result = __this.get_local_rotation();
     let __result = __result.into();
     __result
 }
-pub extern "C" fn fyrox_lite_Node_send_hierarchical(__this: NativeInstanceId, routing: NativeRoutingStrategy, payload: NativeMessageId) -> () {
-    let routing = routing.into();
-    let payload = payload.into();
+pub extern "C" fn fyrox_lite_Node_send_hierarchical(
+    __this: NativeHandle,
+    routing: NativeRoutingStrategy,
+    payload: NativeInstanceId,
+) -> () {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
+    let mut routing = routing;
+    let mut payload = payload.into();
     let __result = __this.send_hierarchical(routing, payload);
     __result
 }
-pub extern "C" fn fyrox_lite_Node_set_local_position(__this: NativeInstanceId, new_pos: NativeVector3) -> () {
-    let new_pos = new_pos.into();
+pub extern "C" fn fyrox_lite_Node_set_local_position(
+    __this: NativeHandle,
+    new_pos: NativeVector3,
+) -> () {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
+    let mut new_pos = new_pos;
     let __result = __this.set_local_position(new_pos);
     __result
 }
-pub extern "C" fn fyrox_lite_Node_set_local_rotation(__this: NativeInstanceId, value: NativeQuaternion) -> () {
-    let value = value.into();
+pub extern "C" fn fyrox_lite_Node_set_local_rotation(
+    __this: NativeHandle,
+    value: NativeQuaternion,
+) -> () {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
+    let mut value = value;
     let __result = __this.set_local_rotation(value);
     __result
 }
-pub extern "C" fn fyrox_lite_Node_subscribe_to(__this: NativeInstanceId) -> () {
-    let __result = __this.subscribe_to();
+pub extern "C" fn fyrox_lite_Node_subscribe_to(__this: NativeHandle) -> () {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
+    let mut _stub = ();
+    let __result = __this.subscribe_to::<NativeHandle>(_stub);
     __result
 }
-pub extern "C" fn fyrox_lite_Node_find_collider_in_children(__this: NativeInstanceId) -> NativeNativeNodeOption {
+pub extern "C" fn fyrox_lite_Node_find_collider_in_children(
+    __this: NativeHandle,
+) -> NativeHandle_option {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
     let __result = __this.find_collider_in_children();
-    let __result = <NativeNode as NativeType>::to_native_option(__result);
+    let __result = <NativeHandle as NativeType>::to_native_option(__result);
     __result
 }
-pub extern "C" fn fyrox_lite_Node_get_valid(__this: NativeInstanceId) -> bool {
+pub extern "C" fn fyrox_lite_Node_get_valid(__this: NativeHandle) -> bool {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
     let __result = __this.get_valid();
     let __result = __result;
     __result
 }
-pub extern "C" fn fyrox_lite_Node_get_parent(__this: NativeInstanceId) -> NativeNode {
+pub extern "C" fn fyrox_lite_Node_get_parent(__this: NativeHandle) -> NativeHandle {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
     let __result = __this.get_parent();
     let __result = __result.into();
     __result
 }
-pub extern "C" fn fyrox_lite_Node_add_script(__this: NativeInstanceId, class_name: NativeString) -> NativeNativeInstanceIdResult {
-    let class_name = String::from_utf8(<u8 as NativeType>::from_native_array(class_name)).unwrap();
-    let __result = __this.add_script(class_name);
-    let __result = <NativeInstanceId as NativeType>::to_native_result(__result);
+pub extern "C" fn fyrox_lite_Node_add_script(
+    __this: NativeHandle,
+    class_name: NativeString,
+) -> NativeHandle_result {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
+    let mut class_name =
+        String::from_utf8(<u8 as NativeType>::from_native_array(class_name)).unwrap();
+    let mut _stub = ();
+    let __result = __this.add_script::<NativeHandle>(class_name, _stub);
+    let __result = <NativeHandle as NativeType>::to_native_result(__result);
     __result
 }
-pub extern "C" fn fyrox_lite_Node_find_script(__this: NativeInstanceId, class_name: NativeString) -> NativeNativeNativeInstanceIdOptionResult {
-    let class_name = String::from_utf8(<u8 as NativeType>::from_native_array(class_name)).unwrap();
-    let __result = __this.find_script(class_name);
-    let __result = <NativeNativeInstanceIdOption as NativeType>::to_native_result(__result);
+pub extern "C" fn fyrox_lite_Node_find_script(
+    __this: NativeHandle,
+    class_name: NativeString,
+) -> NativeHandle_option_result {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
+    let mut class_name =
+        String::from_utf8(<u8 as NativeType>::from_native_array(class_name)).unwrap();
+    let mut _stub = ();
+    let __result = __this.find_script::<NativeHandle>(class_name, _stub);
+    let __result = <NativeHandle_option as NativeType>::to_native_result(__result);
     __result
 }
-pub extern "C" fn fyrox_lite_Node_get_global_rotation(__this: NativeInstanceId) -> NativeQuaternion {
+pub extern "C" fn fyrox_lite_Node_get_global_rotation(__this: NativeHandle) -> NativeQuaternion {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
     let __result = __this.get_global_rotation();
     let __result = __result.into();
     __result
 }
-pub extern "C" fn fyrox_lite_Node_tag_is(__this: NativeInstanceId, tag: NativeString) -> bool {
-    let tag = String::from_utf8(<u8 as NativeType>::from_native_array(tag)).unwrap();
+pub extern "C" fn fyrox_lite_Node_tag_is(__this: NativeHandle, tag: NativeString) -> bool {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
+    let mut tag = String::from_utf8(<u8 as NativeType>::from_native_array(tag)).unwrap();
     let __result = __this.tag_is(tag);
     let __result = __result;
     __result
 }
-pub extern "C" fn fyrox_lite_Node_set_tag(__this: NativeInstanceId, tag: NativeString) -> () {
-    let tag = String::from_utf8(<u8 as NativeType>::from_native_array(tag)).unwrap();
+pub extern "C" fn fyrox_lite_Node_set_tag(__this: NativeHandle, tag: NativeString) -> () {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
+    let mut tag = String::from_utf8(<u8 as NativeType>::from_native_array(tag)).unwrap();
     let __result = __this.set_tag(tag);
     __result
 }
-pub extern "C" fn fyrox_lite_Node_get_tag(__this: NativeInstanceId) -> NativeString {
+pub extern "C" fn fyrox_lite_Node_get_tag(__this: NativeHandle) -> NativeString {
+    let mut __this: fyrox_lite::lite_node::LiteNode =
+        Externalizable::from_external(__this.as_u128());
     let __result = __this.get_tag();
-    let __result = Arena::allocate_vec(__result.into_bytes());
+    let __result = <u8 as NativeType>::to_native_array(__result.into_bytes());
     __result
 }
-pub extern "C" fn fyrox_lite_Quaternion_face_towards(dir: NativeVector3, up: NativeVector3) -> NativeQuaternion {
-    let dir = dir.into();
-    let up = up.into();
-    let __result = fyrox_lite_math::lite_math::LiteQuaternion::face_towards(dir, up);
-    let __result = __result.into();
-    __result
+
+// fyrox_lite::lite_node::LiteRoutingStrategy
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeRoutingStrategy {
+    pub tag: u8,
 }
-pub extern "C" fn fyrox_lite_Quaternion_from_axis_angle(axis: NativeVector3, angle: f32) -> NativeQuaternion {
-    let axis = axis.into();
-    let angle = angle;
-    let __result = fyrox_lite_math::lite_math::LiteQuaternion::from_axis_angle(axis, angle);
-    let __result = __result.into();
-    __result
-}
-pub extern "C" fn fyrox_lite_Quaternion_mul_vec(__this: NativeInstanceId, o: NativeVector3) -> NativeVector3 {
-    let o = o.into();
-    let __result = __this.mul_vec(o);
-    let __result = __result.into();
-    __result
-}
-pub extern "C" fn fyrox_lite_Quaternion_mul_quat(__this: NativeInstanceId, rot_delta: NativeQuaternion) -> NativeQuaternion {
-    let rot_delta = rot_delta.into();
-    let __result = __this.mul_quat(rot_delta);
-    let __result = __result.into();
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_get_x(__this: NativeInstanceId) -> f32 {
-    let __result = __this.get_x();
-    let __result = __result;
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_get_y(__this: NativeInstanceId) -> f32 {
-    let __result = __this.get_y();
-    let __result = __result;
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_get_z(__this: NativeInstanceId) -> f32 {
-    let __result = __this.get_z();
-    let __result = __result;
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_set_x(__this: NativeInstanceId, value: f32) -> () {
-    let value = value;
-    let __result = __this.set_x(value);
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_set_y(__this: NativeInstanceId, value: f32) -> () {
-    let value = value;
-    let __result = __this.set_y(value);
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_set_z(__this: NativeInstanceId, value: f32) -> () {
-    let value = value;
-    let __result = __this.set_z(value);
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_get_X() -> NativeVector3 {
-    let __result = fyrox_lite_math::lite_math::LiteVector3::get_X();
-    let __result = __result.into();
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_get_Y() -> NativeVector3 {
-    let __result = fyrox_lite_math::lite_math::LiteVector3::get_Y();
-    let __result = __result.into();
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_get_Z() -> NativeVector3 {
-    let __result = fyrox_lite_math::lite_math::LiteVector3::get_Z();
-    let __result = __result.into();
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_get_ZERO() -> NativeVector3 {
-    let __result = fyrox_lite_math::lite_math::LiteVector3::get_ZERO();
-    let __result = __result.into();
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_new(x: f32, y: f32, z: f32) -> NativeVector3 {
-    let x = x;
-    let y = y;
-    let z = z;
-    let __result = fyrox_lite_math::lite_math::LiteVector3::new(x, y, z);
-    let __result = __result.into();
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_mul(__this: NativeInstanceId, o: f32) -> NativeVector3 {
-    let o = o;
-    let __result = __this.mul(o);
-    let __result = __result.into();
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_add(__this: NativeInstanceId, o: NativeVector3) -> NativeVector3 {
-    let o = o.into();
-    let __result = __this.add(o);
-    let __result = __result.into();
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_normalize(__this: NativeInstanceId) -> NativeVector3 {
-    let __result = __this.normalize();
-    let __result = __result.into();
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_sub(__this: NativeInstanceId, o: NativeVector3) -> NativeVector3 {
-    let o = o.into();
-    let __result = __this.sub(o);
-    let __result = __result.into();
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_magnitude(__this: NativeInstanceId) -> f32 {
-    let __result = __this.magnitude();
-    let __result = __result;
-    __result
-}
-pub extern "C" fn fyrox_lite_Vector3_normalize_inplace(__this: NativeInstanceId) -> () {
-    let __result = __this.normalize_inplace();
-    __result
+native_utils!(
+    NativeRoutingStrategy,
+    NativeRoutingStrategy_array,
+    NativeRoutingStrategy_option,
+    NativeRoutingStrategy_result
+);
+
+impl NativeRoutingStrategy {
+    pub const Up: u8 = 0;
+    pub const Down: u8 = 1;
 }

@@ -4,6 +4,7 @@ use std::{
     os::raw::c_void,
 };
 
+// TODO replace with SendWrapper
 thread_local! {
     static ARENA: RefCell<Arena> = Default::default();
 }

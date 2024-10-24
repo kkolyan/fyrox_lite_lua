@@ -15,18 +15,18 @@ pub(crate) fn generate_ffi_type(ty: &DataType, client_replicated_types: &HashSet
         DataType::F64 => format!("f64"),
         DataType::String => format!("NativeString"),
         DataType::ClassName => format!("NativeString"),
-        DataType::Vec(it) => format!("Native{}Array", generate_ffi_type(it, client_replicated_types)),
-        DataType::UserScript => format!("NativeInstanceId"),
-        DataType::UserScriptMessage => format!("NativeMessageId"),
+        DataType::Vec(it) => format!("{}_array", generate_ffi_type(it, client_replicated_types)),
+        DataType::UserScript => format!("NativeHandle"),
+        DataType::UserScriptMessage => format!("NativeInstanceId"),
         DataType::UserScriptGenericStub => {
             panic!("UserScriptGenericStub should not be exposed in bindings")
         }
         DataType::Object(it) => match client_replicated_types.contains(it) {
-            true => format!("NativeInstanceId"),
-            false => format!("Native{}", it),
+            false => format!("NativeHandle"),
+            true => format!("Native{}", it),
         },
-        DataType::Option(it) => format!("Native{}Option", generate_ffi_type(it, client_replicated_types)),
-        DataType::Result { ok } => format!("Native{}Result", generate_ffi_type(ok, client_replicated_types)),
+        DataType::Option(it) => format!("{}_option", generate_ffi_type(it, client_replicated_types)),
+        DataType::Result { ok } => format!("{}_result", generate_ffi_type(ok, client_replicated_types)),
     }
 }
 
@@ -40,8 +40,8 @@ pub(crate) fn generate_to_native(ty: &DataType, var: &str, client_replicated_typ
         DataType::I64 => format!("{}", var),
         DataType::F32 => format!("{}", var),
         DataType::F64 => format!("{}", var),
-        DataType::String => format!("Arena::allocate_vec({}.into_bytes())", var),
-        DataType::ClassName => format!("Arena::allocate_vec({}.into_bytes())", var),
+        DataType::String => format!("<u8 as NativeType>::to_native_array({}.into_bytes())", var),
+        DataType::ClassName => format!("<u8 as NativeType>::to_native_array({}.into_bytes())", var),
         DataType::Vec(data_type) => format!(
             "<{} as NativeType>::to_native_option({})", 
             generate_ffi_type(data_type.deref(), client_replicated_types),
@@ -74,7 +74,7 @@ pub(crate) fn generate_to_native(ty: &DataType, var: &str, client_replicated_typ
     }
 }
 
-pub(crate) fn generate_from_native(ty: &DataType, var: &str) -> String {
+pub(crate) fn generate_from_native(ty: &DataType, var: &str, client_replicated_types: &HashSet<ClassName>) -> String {
 
     match ty {
         DataType::UnresolvedClass(it) => panic!("unresolved class: {}", it),
@@ -88,12 +88,13 @@ pub(crate) fn generate_from_native(ty: &DataType, var: &str) -> String {
         DataType::String => format!("String::from_utf8(<u8 as NativeType>::from_native_array({})).unwrap()", var),
         DataType::ClassName => format!("String::from_utf8(<u8 as NativeType>::from_native_array({})).unwrap()", var),
         DataType::Vec(it) => format!(r#"todo!("Vec<> not implemented for {}")"#, it),
-        DataType::UserScript => format!("{}.into()", var),
+        DataType::UserScript => format!("{}", var),
         DataType::UserScriptMessage => format!("{}.into()", var),
-        DataType::UserScriptGenericStub => {
-            panic!("UserScriptGenericStub should not be exposed in bindings")
-        }
-        DataType::Object(it) => format!("{}.into()", var),
+        DataType::UserScriptGenericStub => format!("()"),
+        DataType::Object(it) => match client_replicated_types.contains(it) {
+            true => format!("{}", var),
+            false => format!("Externalizable::from_external({}.as_u128())", var),
+        },
         DataType::Option(it) => format!(r#"todo!("Vec<> not implemented for {}")"#, it),
         DataType::Result { ok } => format!(r#"todo!("Vec<> not implemented for {}")"#, ok.deref()),
     }

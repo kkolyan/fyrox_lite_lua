@@ -16,16 +16,30 @@ pub fn generate_c_bindings_lite(domain: &Domain) -> String {
         if let Class::Struct(class) = class {
             client_replicated_types.insert(class.class_name.clone());
         }
+        if let Class::Enum(class) = class {
+            client_replicated_types.insert(class.class_name.clone());
+        }
     }
     let mut s = String::new();
     s += "
-            use crate::{bindings_manual::*, native_utils};
+            #![allow(non_camel_case_types)]
+            #![allow(non_upper_case_globals)]
+            #![allow(non_snake_case)]
+            use std::fmt::Display;
+            use fyrox_lite::spi::UserScript;
+            use fyrox_lite::externalizable::Externalizable;
+            use crate::bindings_manual::*;
+            use crate::native_utils;
     ";
     for class in domain.classes.iter() {
+        s += &format!("
+        
+            // {}
+        ", class.rust_name());
         match class {
             Class::Engine(class) => generate_engine_class(&mut s, class, &client_replicated_types),
             Class::Struct(class) => generate_struct(&mut s, class, &client_replicated_types),
-            Class::Enum(class) => generate_enum(&mut s, class),
+            Class::Enum(class) => generate_enum(&mut s, class, &client_replicated_types),
         }
     }
     s

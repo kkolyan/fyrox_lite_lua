@@ -10,3 +10,4 @@ pub(crate) mod invoke_callback;
 pub(crate) mod native_utils;
 pub(crate) mod packed_script;
 pub(crate) mod scripted_app;
+pub(crate) mod user_script_impl;
