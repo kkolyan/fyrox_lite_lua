@@ -13,8 +13,8 @@ use fyrox_lite::{
 };
 
 use crate::{
-    bindings_manual::{
-        NativeHandle, NativeInstanceId, NativeQuaternion, NativeValue, NativeVector3,
+    bindings_lite::{NativeQuaternion, NativeVector3}, bindings_manual::{
+        NativeHandle, NativeInstanceId, NativeValue,
     }, scripted_app::APP
 };
 

@@ -10,8 +10,7 @@ use fyrox_lite::{
 };
 
 use crate::{
-    native_utils,
-    scripted_app::{ScriptedApp, APP},
+    bindings_lite::{NativeQuaternion, NativeVector3}, native_utils, scripted_app::{ScriptedApp, APP}
 };
 
 #[no_mangle]
@@ -88,12 +87,11 @@ native_utils!(
     NativeInstanceId_option_option,
     NativeInstanceId_option_result
 );
-native_utils!(NativeVector3, Vector3_array, Vector3_option, Vector3_result);
 native_utils!(
-    NativeQuaternion,
-    Quaternion_array,
-    Quaternion_option,
-    Quaternion_result
+    NativeHandle_option,
+    NativeHandle_option_array,
+    NativeHandle_option_option,
+    NativeHandle_option_result
 );
 
 pub type NativeString = <u8 as NativeType>::Array;
@@ -112,47 +110,6 @@ pub union NativeValue {
     pub Handle: NativeHandle,
     pub Vector3: NativeVector3,
     pub Quaternion: NativeQuaternion,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector3 {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-}
-
-impl From<PodVector3> for NativeVector3 {
-    fn from(PodVector3 { x, y, z }: PodVector3) -> Self {
-        Self { x, y, z }
-    }
-}
-
-impl From<NativeVector3> for PodVector3 {
-    fn from(NativeVector3 { x, y, z }: NativeVector3) -> Self {
-        Self { x, y, z }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeQuaternion {
-    pub i: f32,
-    pub j: f32,
-    pub k: f32,
-    pub w: f32,
-}
-
-impl From<PodQuaternion> for NativeQuaternion {
-    fn from(PodQuaternion { i, j, k, w }: PodQuaternion) -> Self {
-        Self { i, j, k, w }
-    }
-}
-
-impl From<NativeQuaternion> for PodQuaternion {
-    fn from(NativeQuaternion { i, j, k, w }: NativeQuaternion) -> Self {
-        Self { i, j, k, w }
-    }
 }
 
 pub trait NativeType: Sized {

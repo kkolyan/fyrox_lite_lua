@@ -13,7 +13,7 @@ use fyrox::{
 };
 use lite_macro::lite_api;
 
-use crate::{lite_math::PodVector3, lite_node::LiteNode, script_context::with_script_context};
+use crate::{externalizable::Externalizable, lite_math::PodVector3, lite_node::LiteNode, script_context::with_script_context};
 
 #[derive(Debug, Clone)]
 pub struct LitePhysics;
@@ -236,5 +236,15 @@ impl LiteRigidBody {
                 .as_rigid_body_mut()
                 .apply_force(force.into())
         })
+    }
+}
+
+impl Externalizable for LiteRigidBody {
+    fn to_external(&self) -> u128 {
+        self.handle.encode_to_u128()
+    }
+
+    fn from_external(handle: u128) -> Self {
+        Self { handle: Handle::decode_from_u128(handle) }
     }
 }

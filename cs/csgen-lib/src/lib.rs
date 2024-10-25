@@ -51,7 +51,9 @@ pub fn generate_manual_bindings_cs() {
 
 pub fn generate_lite_bindings_cs(domain: &Domain) {
     let s = lite_cgen::generate_c_bindings_lite(domain);
-    fs::write("cs/fyrox-c/src/bindings_lite.rs", &s).unwrap();
+    let file = "cs/fyrox-c/src/bindings_lite.rs";
+    fs::write(file, &s).unwrap();
+    gen_common::fmt::fmt_file(file);
 
     write_bindings_cs("FyroxLiteBindings", &s);
 

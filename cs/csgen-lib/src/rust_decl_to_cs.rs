@@ -273,10 +273,16 @@ fn convert_union(s: &mut String, item: &syn::ItemUnion, custom_type_names: &Hash
 #[rustfmt::skip]
 fn type_rs2cs(ty: &Type, custom_type_names: &HashMap<String, CustomTypeProps> ) -> String {
     let s = ty.to_token_stream().to_string();
+    if let Type::Tuple(ty) = ty {
+        if ty.elems.is_empty() {
+            return "void".to_owned();
+        }
+    }
     if let Type::Path(ty) = ty {
         if let Some(ident) = ty.path.get_ident() {
             let ident = ident.to_string();
             if ident == "bool" { return "bool".to_owned(); }
+            if ident == "u8" { return "ubyte".to_owned(); }
             if ident == "u16" { return "ushort".to_owned(); }
             if ident == "u32" { return "uint".to_owned(); }
             if ident == "u64" { return "ulong".to_owned(); }
@@ -285,6 +291,10 @@ fn type_rs2cs(ty: &Type, custom_type_names: &HashMap<String, CustomTypeProps> ) 
             if ident == "i16" { return "short".to_owned(); }
             if ident == "i32" { return "int".to_owned(); }
             if ident == "i64" { return "long".to_owned(); }
+            if ident == "NativeString" { return "NativeString".to_owned(); }
+            if ident == "NativeHandle" { return "NativeHandle".to_owned(); }
+            if ident == "NativeVector3" { return "NativeVector3".to_owned(); }
+            if ident == "NativeQuaternion" { return "NativeQuaternion".to_owned(); }
             if let Some(it) = custom_type_names.get(&ident) {
                 if it.is_delegate {
                     return format!("IntPtr");
@@ -306,5 +316,8 @@ fn type_rs2cs(ty: &Type, custom_type_names: &HashMap<String, CustomTypeProps> ) 
             }
         }
     }
-    panic!("unsupported type: {}", s)
+    if custom_type_names.contains_key(&s) {
+        return s;
+    }
+    panic!("unsupported type: {} ({:?})", s, ty)
 }

@@ -45,26 +45,13 @@ public partial class FyroxManualBindings {
         [FieldOffset(0)]
         public long i64;
         [FieldOffset(0)]
-        public IntPtr String;
+        public NativeString String;
         [FieldOffset(0)]
         public NativeHandle Handle;
         [FieldOffset(0)]
         public NativeVector3 Vector3;
         [FieldOffset(0)]
         public NativeQuaternion Quaternion;
-    }
-    [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeVector3 {
-        public float x;
-        public float y;
-        public float z;
-    }
-    [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeQuaternion {
-        public float i;
-        public float j;
-        public float k;
-        public float w;
     }
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct NativeHandle {

@@ -28,6 +28,15 @@ pub impl str {
     }
 }
 
+pub fn render_string<const N: usize>(
+    template: &str,
+    vars: [(&str, &dyn Display); N],
+) -> String {
+    let mut s = String::new();
+    render(&mut s, template, vars);
+    s
+}
+
 pub fn render<const N: usize>(
     target: &mut dyn Write,
     template: &str,

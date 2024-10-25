@@ -17,10 +17,10 @@ pub extern "C" fn fyrox_lite_Prefab_instantiate_at(
 ) -> NativeHandle {
     let mut __this: fyrox_lite::lite_prefab::LitePrefab =
         Externalizable::from_external(__this.as_u128());
-    let mut position = position;
-    let mut orientation = orientation;
+    let mut position = position.into();
+    let mut orientation = orientation.into();
     let __result = __this.instantiate_at(position, orientation);
-    let __result = __result.into();
+    let __result = NativeHandle::from_u128(Externalizable::to_external(&__result));
     __result
 }
 
@@ -336,6 +336,30 @@ native_utils!(
     NativeRawKeyEvent_option,
     NativeRawKeyEvent_result
 );
+impl From<NativeRawKeyEvent> for fyrox_lite::lite_event::RawKeyEvent {
+    fn from(__value: NativeRawKeyEvent) -> Self {
+        let physical_key = __value.physical_key;
+        let physical_key = physical_key.into();
+        let state = __value.state;
+        let state = state.into();
+        Self {
+            physical_key,
+            state,
+        }
+    }
+}
+impl From<fyrox_lite::lite_event::RawKeyEvent> for NativeRawKeyEvent {
+    fn from(__value: fyrox_lite::lite_event::RawKeyEvent) -> Self {
+        let physical_key = __value.physical_key;
+        let physical_key = physical_key.into();
+        let state = __value.state;
+        let state = state.into();
+        Self {
+            physical_key,
+            state,
+        }
+    }
+}
 
 // fyrox_lite::lite_event::PhysicalKey
 
@@ -652,6 +676,36 @@ native_utils!(
     NativeKeyEvent_option,
     NativeKeyEvent_result
 );
+impl From<NativeKeyEvent> for fyrox_lite::lite_event::KeyEvent {
+    fn from(__value: NativeKeyEvent) -> Self {
+        let physical_key = __value.physical_key;
+        let physical_key = physical_key.into();
+        let state = __value.state;
+        let state = state.into();
+        let repeat = __value.repeat;
+        let repeat = repeat;
+        Self {
+            physical_key,
+            state,
+            repeat,
+        }
+    }
+}
+impl From<fyrox_lite::lite_event::KeyEvent> for NativeKeyEvent {
+    fn from(__value: fyrox_lite::lite_event::KeyEvent) -> Self {
+        let physical_key = __value.physical_key;
+        let physical_key = physical_key.into();
+        let state = __value.state;
+        let state = state.into();
+        let repeat = __value.repeat;
+        let repeat = repeat;
+        Self {
+            physical_key,
+            state,
+            repeat,
+        }
+    }
+}
 
 // fyrox_lite::lite_event::KeyLocation
 
@@ -711,6 +765,50 @@ native_utils!(
     NativeTouch_option,
     NativeTouch_result
 );
+impl From<NativeTouch> for fyrox_lite::lite_event::Touch {
+    fn from(__value: NativeTouch) -> Self {
+        let phase = __value.phase;
+        let phase = phase.into();
+        let location = __value.location;
+        let location = location.into();
+        let force = __value.force;
+        let force = if force.present {
+            Some((force.into()).value)
+        } else {
+            None
+        };
+        let id = __value.id;
+        let id = id;
+        Self {
+            phase,
+            location,
+            force,
+            id,
+        }
+    }
+}
+impl From<fyrox_lite::lite_event::Touch> for NativeTouch {
+    fn from(__value: fyrox_lite::lite_event::Touch) -> Self {
+        let phase = __value.phase;
+        let phase = phase.into();
+        let location = __value.location;
+        let location = location.into();
+        let force = __value.force;
+        let force = <NativeForce as NativeType>::to_native_option(if let Some(force) = force {
+            Some(force.into())
+        } else {
+            None
+        });
+        let id = __value.id;
+        let id = id;
+        Self {
+            phase,
+            location,
+            force,
+            id,
+        }
+    }
+}
 
 // fyrox_lite::lite_event::Force
 
@@ -850,7 +948,7 @@ pub extern "C" fn fyrox_lite_InnerSizeWriter_request_inner_size(
 ) -> bool {
     let mut __this: fyrox_lite::lite_event::InnerSizeWriter =
         Externalizable::from_external(__this.as_u128());
-    let mut new_inner_size = new_inner_size;
+    let mut new_inner_size = new_inner_size.into();
     let __result = __this.request_inner_size(new_inner_size);
     let __result = __result;
     __result
@@ -859,7 +957,7 @@ pub extern "C" fn fyrox_lite_InnerSizeWriter_request_inner_size(
 // fyrox_lite::lite_window::LiteWindow
 
 pub extern "C" fn fyrox_lite_Window_set_cursor_grab(mode: NativeCursorGrabMode) -> () {
-    let mut mode = mode;
+    let mut mode = mode.into();
     let __result = fyrox_lite::lite_window::LiteWindow::set_cursor_grab(mode);
     __result
 }
@@ -898,9 +996,9 @@ pub extern "C" fn fyrox_lite_Scene_load_async(scene_path: NativeString) -> () {
 pub extern "C" fn fyrox_lite_Physics_cast_ray(
     opts: NativeRayCastOptions,
 ) -> NativeIntersection_array {
-    let mut opts = opts;
+    let mut opts = opts.into();
     let __result = fyrox_lite::lite_physics::LitePhysics::cast_ray(opts);
-    let __result = <NativeIntersection as NativeType>::to_native_option(__result);
+    let __result = <NativeIntersection as NativeType>::to_native_array(__result);
     __result
 }
 
@@ -921,6 +1019,48 @@ native_utils!(
     NativeIntersection_option,
     NativeIntersection_result
 );
+impl From<NativeIntersection> for fyrox_lite::lite_physics::LiteIntersection {
+    fn from(__value: NativeIntersection) -> Self {
+        let collider = __value.collider;
+        let collider = Externalizable::from_external(collider.as_u128());
+        let normal = __value.normal;
+        let normal = normal.into();
+        let position = __value.position;
+        let position = position.into();
+        let feature = __value.feature;
+        let feature = feature.into();
+        let toi = __value.toi;
+        let toi = toi;
+        Self {
+            collider,
+            normal,
+            position,
+            feature,
+            toi,
+        }
+    }
+}
+impl From<fyrox_lite::lite_physics::LiteIntersection> for NativeIntersection {
+    fn from(__value: fyrox_lite::lite_physics::LiteIntersection) -> Self {
+        let collider = __value.collider;
+        let collider = NativeHandle::from_u128(Externalizable::to_external(&collider));
+        let normal = __value.normal;
+        let normal = normal.into();
+        let position = __value.position;
+        let position = position.into();
+        let feature = __value.feature;
+        let feature = feature.into();
+        let toi = __value.toi;
+        let toi = toi;
+        Self {
+            collider,
+            normal,
+            position,
+            feature,
+            toi,
+        }
+    }
+}
 
 // fyrox_lite::lite_physics::LiteFeatureId
 
@@ -984,6 +1124,58 @@ native_utils!(
     NativeRayCastOptions_option,
     NativeRayCastOptions_result
 );
+impl From<NativeRayCastOptions> for fyrox_lite::lite_physics::LiteRayCastOptions {
+    fn from(__value: NativeRayCastOptions) -> Self {
+        let ray_origin = __value.ray_origin;
+        let ray_origin = ray_origin.into();
+        let ray_direction = __value.ray_direction;
+        let ray_direction = ray_direction.into();
+        let max_len = __value.max_len;
+        let max_len = max_len;
+        let groups = __value.groups;
+        let groups = if groups.present {
+            Some((groups.into()).value)
+        } else {
+            None
+        };
+        let sort_results = __value.sort_results;
+        let sort_results = sort_results;
+        Self {
+            ray_origin,
+            ray_direction,
+            max_len,
+            groups,
+            sort_results,
+        }
+    }
+}
+impl From<fyrox_lite::lite_physics::LiteRayCastOptions> for NativeRayCastOptions {
+    fn from(__value: fyrox_lite::lite_physics::LiteRayCastOptions) -> Self {
+        let ray_origin = __value.ray_origin;
+        let ray_origin = ray_origin.into();
+        let ray_direction = __value.ray_direction;
+        let ray_direction = ray_direction.into();
+        let max_len = __value.max_len;
+        let max_len = max_len;
+        let groups = __value.groups;
+        let groups = <NativeInteractionGroups as NativeType>::to_native_option(
+            if let Some(groups) = groups {
+                Some(groups.into())
+            } else {
+                None
+            },
+        );
+        let sort_results = __value.sort_results;
+        let sort_results = sort_results;
+        Self {
+            ray_origin,
+            ray_direction,
+            max_len,
+            groups,
+            sort_results,
+        }
+    }
+}
 
 // fyrox_lite::lite_physics::LiteInteractionGroups
 
@@ -999,6 +1191,30 @@ native_utils!(
     NativeInteractionGroups_option,
     NativeInteractionGroups_result
 );
+impl From<NativeInteractionGroups> for fyrox_lite::lite_physics::LiteInteractionGroups {
+    fn from(__value: NativeInteractionGroups) -> Self {
+        let memberships = __value.memberships;
+        let memberships = memberships;
+        let filter = __value.filter;
+        let filter = filter;
+        Self {
+            memberships,
+            filter,
+        }
+    }
+}
+impl From<fyrox_lite::lite_physics::LiteInteractionGroups> for NativeInteractionGroups {
+    fn from(__value: fyrox_lite::lite_physics::LiteInteractionGroups) -> Self {
+        let memberships = __value.memberships;
+        let memberships = memberships;
+        let filter = __value.filter;
+        let filter = filter;
+        Self {
+            memberships,
+            filter,
+        }
+    }
+}
 
 // fyrox_lite::lite_physics::LiteRigidBody
 
@@ -1008,7 +1224,7 @@ pub extern "C" fn fyrox_lite_RigidBody_apply_force(
 ) -> () {
     let mut __this: fyrox_lite::lite_physics::LiteRigidBody =
         Externalizable::from_external(__this.as_u128());
-    let mut force = force;
+    let mut force = force.into();
     let __result = __this.apply_force(force);
     __result
 }
@@ -1024,13 +1240,14 @@ pub extern "C" fn fyrox_lite_Text_set_text_async(__this: NativeHandle, text: Nat
     __result
 }
 pub extern "C" fn fyrox_lite_Text_new(state: NativeTextBuilder) -> NativeHandle {
-    let mut state = state;
+    let mut state = state.into();
     let __result = fyrox_lite::lite_ui::LiteText::new(state);
-    let __result = __result.into();
+    let __result = NativeHandle::from_u128(Externalizable::to_external(&__result));
     __result
 }
 
 // fyrox_lite::lite_ui::TextBuilder
+
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -1044,6 +1261,47 @@ native_utils!(
     NativeTextBuilder_option,
     NativeTextBuilder_result
 );
+impl From<NativeTextBuilder> for fyrox_lite::lite_ui::TextBuilder {
+    fn from(__value: NativeTextBuilder) -> Self {
+        let foregound = __value.foregound;
+        let foregound = if foregound.present {
+            Some((foregound.into()).value)
+        } else {
+            None
+        };
+        let font_size = __value.font_size;
+        let font_size = if font_size.present {
+            Some((font_size).value)
+        } else {
+            None
+        };
+        Self {
+            foregound,
+            font_size,
+        }
+    }
+}
+impl From<fyrox_lite::lite_ui::TextBuilder> for NativeTextBuilder {
+    fn from(__value: fyrox_lite::lite_ui::TextBuilder) -> Self {
+        let foregound = __value.foregound;
+        let foregound =
+            <NativeBrush as NativeType>::to_native_option(if let Some(foregound) = foregound {
+                Some(foregound.into())
+            } else {
+                None
+            });
+        let font_size = __value.font_size;
+        let font_size = <f32 as NativeType>::to_native_option(if let Some(font_size) = font_size {
+            Some(font_size)
+        } else {
+            None
+        });
+        Self {
+            foregound,
+            font_size,
+        }
+    }
+}
 
 // fyrox_lite::lite_ui::Brush
 
@@ -1108,6 +1366,24 @@ native_utils!(
     NativeGradientPoint_option,
     NativeGradientPoint_result
 );
+impl From<NativeGradientPoint> for fyrox_lite::lite_ui::GradientPoint {
+    fn from(__value: NativeGradientPoint) -> Self {
+        let stop = __value.stop;
+        let stop = stop;
+        let color = __value.color;
+        let color = Externalizable::from_external(color.as_u128());
+        Self { stop, color }
+    }
+}
+impl From<fyrox_lite::lite_ui::GradientPoint> for NativeGradientPoint {
+    fn from(__value: fyrox_lite::lite_ui::GradientPoint) -> Self {
+        let stop = __value.stop;
+        let stop = stop;
+        let color = __value.color;
+        let color = NativeHandle::from_u128(Externalizable::to_external(&color));
+        Self { stop, color }
+    }
+}
 
 // fyrox_lite::lite_math::PodVector3
 
@@ -1124,6 +1400,28 @@ native_utils!(
     NativeVector3_option,
     NativeVector3_result
 );
+impl From<NativeVector3> for fyrox_lite::lite_math::PodVector3 {
+    fn from(__value: NativeVector3) -> Self {
+        let x = __value.x;
+        let x = x;
+        let y = __value.y;
+        let y = y;
+        let z = __value.z;
+        let z = z;
+        Self { x, y, z }
+    }
+}
+impl From<fyrox_lite::lite_math::PodVector3> for NativeVector3 {
+    fn from(__value: fyrox_lite::lite_math::PodVector3) -> Self {
+        let x = __value.x;
+        let x = x;
+        let y = __value.y;
+        let y = y;
+        let z = __value.z;
+        let z = z;
+        Self { x, y, z }
+    }
+}
 
 // fyrox_lite::lite_math::PodVector2
 
@@ -1139,6 +1437,24 @@ native_utils!(
     NativeVector2_option,
     NativeVector2_result
 );
+impl From<NativeVector2> for fyrox_lite::lite_math::PodVector2 {
+    fn from(__value: NativeVector2) -> Self {
+        let x = __value.x;
+        let x = x;
+        let y = __value.y;
+        let y = y;
+        Self { x, y }
+    }
+}
+impl From<fyrox_lite::lite_math::PodVector2> for NativeVector2 {
+    fn from(__value: fyrox_lite::lite_math::PodVector2) -> Self {
+        let x = __value.x;
+        let x = x;
+        let y = __value.y;
+        let y = y;
+        Self { x, y }
+    }
+}
 
 // fyrox_lite::lite_math::PodVector2i
 
@@ -1154,6 +1470,24 @@ native_utils!(
     NativeVector2i_option,
     NativeVector2i_result
 );
+impl From<NativeVector2i> for fyrox_lite::lite_math::PodVector2i {
+    fn from(__value: NativeVector2i) -> Self {
+        let x = __value.x;
+        let x = x;
+        let y = __value.y;
+        let y = y;
+        Self { x, y }
+    }
+}
+impl From<fyrox_lite::lite_math::PodVector2i> for NativeVector2i {
+    fn from(__value: fyrox_lite::lite_math::PodVector2i) -> Self {
+        let x = __value.x;
+        let x = x;
+        let y = __value.y;
+        let y = y;
+        Self { x, y }
+    }
+}
 
 // fyrox_lite::lite_math::PodQuaternion
 
@@ -1171,6 +1505,32 @@ native_utils!(
     NativeQuaternion_option,
     NativeQuaternion_result
 );
+impl From<NativeQuaternion> for fyrox_lite::lite_math::PodQuaternion {
+    fn from(__value: NativeQuaternion) -> Self {
+        let i = __value.i;
+        let i = i;
+        let j = __value.j;
+        let j = j;
+        let k = __value.k;
+        let k = k;
+        let w = __value.w;
+        let w = w;
+        Self { i, j, k, w }
+    }
+}
+impl From<fyrox_lite::lite_math::PodQuaternion> for NativeQuaternion {
+    fn from(__value: fyrox_lite::lite_math::PodQuaternion) -> Self {
+        let i = __value.i;
+        let i = i;
+        let j = __value.j;
+        let j = j;
+        let k = __value.k;
+        let k = k;
+        let w = __value.w;
+        let w = w;
+        Self { i, j, k, w }
+    }
+}
 
 // fyrox_lite::lite_plugin::LitePlugin
 
@@ -1179,7 +1539,10 @@ pub extern "C" fn fyrox_lite_Plugin_get(class_name: NativeString) -> NativeHandl
         String::from_utf8(<u8 as NativeType>::from_native_array(class_name)).unwrap();
     let mut _stub = ();
     let __result = fyrox_lite::lite_plugin::LitePlugin::get::<NativeHandle>(class_name, _stub);
-    let __result = <NativeHandle as NativeType>::to_native_result(__result);
+    let __result = <NativeHandle as NativeType>::to_native_result(match __result {
+        Ok(__result) => Ok(__result.into()),
+        Err(err) => Err(err),
+    });
     __result
 }
 
@@ -1189,14 +1552,26 @@ pub extern "C" fn fyrox_lite_Node_as_rigid_body(__this: NativeHandle) -> NativeH
     let mut __this: fyrox_lite::lite_node::LiteNode =
         Externalizable::from_external(__this.as_u128());
     let __result = __this.as_rigid_body();
-    let __result = <NativeHandle as NativeType>::to_native_option(__result);
+    let __result =
+        <NativeHandle as NativeType>::to_native_option(if let Some(__result) = __result {
+            Some(NativeHandle::from_u128(Externalizable::to_external(
+                &__result,
+            )))
+        } else {
+            None
+        });
     __result
 }
 pub extern "C" fn fyrox_lite_Node_get_name(__this: NativeHandle) -> NativeString_option {
     let mut __this: fyrox_lite::lite_node::LiteNode =
         Externalizable::from_external(__this.as_u128());
     let __result = __this.get_name();
-    let __result = <NativeString as NativeType>::to_native_option(__result);
+    let __result =
+        <NativeString as NativeType>::to_native_option(if let Some(__result) = __result {
+            Some(<u8 as NativeType>::to_native_array(__result.into_bytes()))
+        } else {
+            None
+        });
     __result
 }
 pub extern "C" fn fyrox_lite_Node_get_alive(__this: NativeHandle) -> bool {
@@ -1240,7 +1615,7 @@ pub extern "C" fn fyrox_lite_Node_send_hierarchical(
 ) -> () {
     let mut __this: fyrox_lite::lite_node::LiteNode =
         Externalizable::from_external(__this.as_u128());
-    let mut routing = routing;
+    let mut routing = routing.into();
     let mut payload = payload.into();
     let __result = __this.send_hierarchical(routing, payload);
     __result
@@ -1251,7 +1626,7 @@ pub extern "C" fn fyrox_lite_Node_set_local_position(
 ) -> () {
     let mut __this: fyrox_lite::lite_node::LiteNode =
         Externalizable::from_external(__this.as_u128());
-    let mut new_pos = new_pos;
+    let mut new_pos = new_pos.into();
     let __result = __this.set_local_position(new_pos);
     __result
 }
@@ -1261,7 +1636,7 @@ pub extern "C" fn fyrox_lite_Node_set_local_rotation(
 ) -> () {
     let mut __this: fyrox_lite::lite_node::LiteNode =
         Externalizable::from_external(__this.as_u128());
-    let mut value = value;
+    let mut value = value.into();
     let __result = __this.set_local_rotation(value);
     __result
 }
@@ -1278,7 +1653,14 @@ pub extern "C" fn fyrox_lite_Node_find_collider_in_children(
     let mut __this: fyrox_lite::lite_node::LiteNode =
         Externalizable::from_external(__this.as_u128());
     let __result = __this.find_collider_in_children();
-    let __result = <NativeHandle as NativeType>::to_native_option(__result);
+    let __result =
+        <NativeHandle as NativeType>::to_native_option(if let Some(__result) = __result {
+            Some(NativeHandle::from_u128(Externalizable::to_external(
+                &__result,
+            )))
+        } else {
+            None
+        });
     __result
 }
 pub extern "C" fn fyrox_lite_Node_get_valid(__this: NativeHandle) -> bool {
@@ -1292,7 +1674,7 @@ pub extern "C" fn fyrox_lite_Node_get_parent(__this: NativeHandle) -> NativeHand
     let mut __this: fyrox_lite::lite_node::LiteNode =
         Externalizable::from_external(__this.as_u128());
     let __result = __this.get_parent();
-    let __result = __result.into();
+    let __result = NativeHandle::from_u128(Externalizable::to_external(&__result));
     __result
 }
 pub extern "C" fn fyrox_lite_Node_add_script(
@@ -1305,7 +1687,10 @@ pub extern "C" fn fyrox_lite_Node_add_script(
         String::from_utf8(<u8 as NativeType>::from_native_array(class_name)).unwrap();
     let mut _stub = ();
     let __result = __this.add_script::<NativeHandle>(class_name, _stub);
-    let __result = <NativeHandle as NativeType>::to_native_result(__result);
+    let __result = <NativeHandle as NativeType>::to_native_result(match __result {
+        Ok(__result) => Ok(__result.into()),
+        Err(err) => Err(err),
+    });
     __result
 }
 pub extern "C" fn fyrox_lite_Node_find_script(
@@ -1318,7 +1703,16 @@ pub extern "C" fn fyrox_lite_Node_find_script(
         String::from_utf8(<u8 as NativeType>::from_native_array(class_name)).unwrap();
     let mut _stub = ();
     let __result = __this.find_script::<NativeHandle>(class_name, _stub);
-    let __result = <NativeHandle_option as NativeType>::to_native_result(__result);
+    let __result = <NativeHandle_option as NativeType>::to_native_result(match __result {
+        Ok(__result) => Ok(<NativeHandle as NativeType>::to_native_option(
+            if let Some(__result) = __result {
+                Some(__result.into())
+            } else {
+                None
+            },
+        )),
+        Err(err) => Err(err),
+    });
     __result
 }
 pub extern "C" fn fyrox_lite_Node_get_global_rotation(__this: NativeHandle) -> NativeQuaternion {

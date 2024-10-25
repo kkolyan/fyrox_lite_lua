@@ -49,13 +49,7 @@ impl Module {
             ModContent::Code(code) => {
                 let file = format!("{}/{}.rs", parent_dir, self.name);
                 fs::write(&file, code).unwrap();
-                process::Command::new("rustfmt")
-                .arg(file)
-                .stderr(Stdio::null())
-                .spawn()
-                .unwrap()
-                .wait()
-                .unwrap();
+                crate::fmt::fmt_file(file);
             },
         }
     }
@@ -70,13 +64,7 @@ impl Module {
             ModContent::Code(code) => {
                 let file = format!("{}/{}.lua", parent_dir, self.name);
                 fs::write(&file, code).unwrap();
-                process::Command::new("rustfmt")
-                .arg(file)
-                .stderr(Stdio::null())
-                .spawn()
-                .unwrap()
-                .wait()
-                .unwrap();
+                crate::fmt::fmt_file(file);
             },
         }
     }

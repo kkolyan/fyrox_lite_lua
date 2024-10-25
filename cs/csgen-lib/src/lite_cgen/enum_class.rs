@@ -20,7 +20,7 @@ pub(crate) fn generate_enum(
             #[repr(C)]
             #[derive(Clone, Copy)]
             pub struct Native${class} {
-                pub tag: u8,
+                    pub tag: u8,
                 pub value: Native${class}VariantContainer,
             }
         "#,

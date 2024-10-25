@@ -4,7 +4,9 @@ use fyrox::{
 };
 use lite_macro::lite_api;
 
-use crate::{lite_math::PodVector2, script_context::with_script_context};
+use crate::{
+    externalizable::Externalizable, lite_math::PodVector2, script_context::with_script_context,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct LiteUiNode {
@@ -67,6 +69,18 @@ impl LiteText {
                 handle: builder.build(&mut ctx.ui().first_mut().build_ctx()),
             }
         })
+    }
+}
+
+impl Externalizable for LiteText {
+    fn to_external(&self) -> u128 {
+        self.handle.encode_to_u128()
+    }
+
+    fn from_external(handle: u128) -> Self {
+        Self {
+            handle: Handle::decode_from_u128(handle),
+        }
     }
 }
 
@@ -179,10 +193,12 @@ impl Color {
     pub const LIGHT_GREEN: Color = color_to_lite(fyrox::core::color::Color::LIGHT_GREEN);
     pub const PALE_GREEN: Color = color_to_lite(fyrox::core::color::Color::PALE_GREEN);
     pub const DARK_SEA_GREEN: Color = color_to_lite(fyrox::core::color::Color::DARK_SEA_GREEN);
-    pub const MEDIUM_SPRING_GREEN: Color =color_to_lite(fyrox::core::color::Color::MEDIUM_SPRING_GREEN);
+    pub const MEDIUM_SPRING_GREEN: Color =
+        color_to_lite(fyrox::core::color::Color::MEDIUM_SPRING_GREEN);
     pub const SPRING_GREEN: Color = color_to_lite(fyrox::core::color::Color::SPRING_GREEN);
     pub const SEA_GREEN: Color = color_to_lite(fyrox::core::color::Color::SEA_GREEN);
-    pub const MEDIUM_AQUA_MARINE: Color =color_to_lite(fyrox::core::color::Color::MEDIUM_AQUA_MARINE);
+    pub const MEDIUM_AQUA_MARINE: Color =
+        color_to_lite(fyrox::core::color::Color::MEDIUM_AQUA_MARINE);
     pub const MEDIUM_SEA_GREEN: Color = color_to_lite(fyrox::core::color::Color::MEDIUM_SEA_GREEN);
     pub const LIGHT_SEA_GREEN: Color = color_to_lite(fyrox::core::color::Color::LIGHT_SEA_GREEN);
     pub const DARK_SLATE_GRAY: Color = color_to_lite(fyrox::core::color::Color::DARK_SLATE_GRAY);
@@ -214,7 +230,8 @@ impl Color {
     pub const INDIGO: Color = color_to_lite(fyrox::core::color::Color::INDIGO);
     pub const DARK_SLATE_BLUE: Color = color_to_lite(fyrox::core::color::Color::DARK_SLATE_BLUE);
     pub const SLATE_BLUE: Color = color_to_lite(fyrox::core::color::Color::SLATE_BLUE);
-    pub const MEDIUM_SLATE_BLUE: Color = color_to_lite(fyrox::core::color::Color::MEDIUM_SLATE_BLUE);
+    pub const MEDIUM_SLATE_BLUE: Color =
+        color_to_lite(fyrox::core::color::Color::MEDIUM_SLATE_BLUE);
     pub const MEDIUM_PURPLE: Color = color_to_lite(fyrox::core::color::Color::MEDIUM_PURPLE);
     pub const DARK_MAGENTA: Color = color_to_lite(fyrox::core::color::Color::DARK_MAGENTA);
     pub const DARK_VIOLET: Color = color_to_lite(fyrox::core::color::Color::DARK_VIOLET);
@@ -226,7 +243,8 @@ impl Color {
     pub const VIOLET: Color = color_to_lite(fyrox::core::color::Color::VIOLET);
     pub const MAGENTA: Color = color_to_lite(fyrox::core::color::Color::MAGENTA);
     pub const ORCHID: Color = color_to_lite(fyrox::core::color::Color::ORCHID);
-    pub const MEDIUM_VIOLET_RED: Color = color_to_lite(fyrox::core::color::Color::MEDIUM_VIOLET_RED);
+    pub const MEDIUM_VIOLET_RED: Color =
+        color_to_lite(fyrox::core::color::Color::MEDIUM_VIOLET_RED);
     pub const PALE_VIOLET_RED: Color = color_to_lite(fyrox::core::color::Color::PALE_VIOLET_RED);
     pub const DEEP_PINK: Color = color_to_lite(fyrox::core::color::Color::DEEP_PINK);
     pub const HOT_PINK: Color = color_to_lite(fyrox::core::color::Color::HOT_PINK);
@@ -239,7 +257,8 @@ impl Color {
     pub const WHEAT: Color = color_to_lite(fyrox::core::color::Color::WHEAT);
     pub const CORN_SILK: Color = color_to_lite(fyrox::core::color::Color::CORN_SILK);
     pub const LEMON_CHIFFON: Color = color_to_lite(fyrox::core::color::Color::LEMON_CHIFFON);
-    pub const LIGHT_GOLDEN_ROD_YELLOW: Color = color_to_lite(fyrox::core::color::Color::LIGHT_GOLDEN_ROD_YELLOW);
+    pub const LIGHT_GOLDEN_ROD_YELLOW: Color =
+        color_to_lite(fyrox::core::color::Color::LIGHT_GOLDEN_ROD_YELLOW);
     pub const LIGHT_YELLOW: Color = color_to_lite(fyrox::core::color::Color::LIGHT_YELLOW);
     pub const SADDLE_BROWN: Color = color_to_lite(fyrox::core::color::Color::SADDLE_BROWN);
     pub const SIENNA: Color = color_to_lite(fyrox::core::color::Color::SIENNA);
@@ -303,5 +322,19 @@ impl From<GradientPoint> for brush::GradientPoint {
             stop: value.stop,
             color: value.color.into(),
         }
+    }
+}
+
+// TODO move Color to external crate like lite-math, because only Lua need it this way
+impl Externalizable for Color {
+    fn to_external(&self) -> u128 {
+        let Color { r, g, b, a } = *self;
+        let rgba = u32::from_le_bytes([r, g, b, a]);
+        rgba as u128
+    }
+
+    fn from_external(handle: u128) -> Self {
+        let [r, g, b, a] = u32::to_le_bytes(handle as u32);
+        Self { r, g, b, a }
     }
 }
