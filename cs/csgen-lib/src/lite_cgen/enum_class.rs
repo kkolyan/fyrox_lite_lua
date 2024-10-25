@@ -1,17 +1,24 @@
 use std::collections::{HashMap, HashSet};
 
 use gen_common::templating::render;
-use lite_model::{Class, ClassName, DataType, Domain, EngineClass, EnumClass, EnumValue, EnumVariant, Field};
+use lite_model::{
+    Class, ClassName, DataType, Domain, EngineClass, EnumClass, EnumValue, EnumVariant, Field,
+};
 
-use super::types::generate_ffi_type;
+use super::{
+    simple_from,
+    types::{self, generate_ffi_type},
+};
 
 pub(crate) fn generate_enum(
     s: &mut String,
     class: &EnumClass,
     client_replicated_types: &HashSet<ClassName>,
 ) {
-
-    let has_fields = class.variants.iter().any(|it| !matches!(it.value, EnumValue::Unit));
+    let has_fields = class
+        .variants
+        .iter()
+        .any(|it| !matches!(it.value, EnumValue::Unit));
 
     if has_fields {
         render(
@@ -27,7 +34,6 @@ pub(crate) fn generate_enum(
             [("class", &class.class_name)],
         );
     } else {
-
         render(
             s,
             r#"
@@ -41,9 +47,15 @@ pub(crate) fn generate_enum(
         );
     }
 
-    render(s, r#"
+    render(
+        s,
+        r#"
             native_utils!(Native${class}, Native${class}_array, Native${class}_option, Native${class}_result);
-    "#, [("class", &class.class_name)]);
+    "#,
+        [("class", &class.class_name)],
+    );
+
+    generate_from_native(s, class, client_replicated_types);
 
     generate_tag_constants_impl(s, class);
 
@@ -58,9 +70,9 @@ pub(crate) fn generate_enum(
         "#,
             [("class", &class.class_name)],
         );
-    
+
         generate_variant_container_fields(s, class);
-    
+
         render(
             s,
             r#"
@@ -196,4 +208,124 @@ fn generate_variant_container_fields(s: &mut String, class: &EnumClass) {
             [("name", &variant.tag), ("class", &class.class_name)],
         );
     }
+}
+
+fn generate_from_native(
+    s: &mut String,
+    class: &EnumClass,
+    client_replicated_types: &HashSet<ClassName>,
+) {
+    render(
+        s,
+        r#"
+            impl From<Native${class}> for ${rust_class} {
+                fn from(__value: Native${class}) -> Self {
+    "#,
+        [
+            ("rust_class", &class.rust_struct_path),
+            ("class", &class.class_name),
+        ],
+    );
+
+    for variant in class.variants.iter() {
+        render(
+            s,
+            r#"
+                    if __value.tag == Native${class}::${variant} {
+        "#,
+            [("class", &class.class_name), ("variant", &variant.tag)],
+        );
+
+        match &variant.value {
+            EnumValue::Unit => {
+                render(
+                    s,
+                    r#"
+                        return Self::${variant};
+                    }
+                "#,
+                    [("variant", &variant.tag)],
+                );
+            }
+            EnumValue::Tuple { fields } => {
+                let mut output_fields = vec![];
+                for (i, ty) in fields.iter().enumerate() {
+                    let var = format!("_{}", i);
+                    output_fields.push(var.clone());
+
+                    render(
+                        s,
+                        r#"
+                        let ${var} = unsafe { __value.value.${variant}.${var} };
+                        let ${var} = ${expr};
+                    "#,
+                        [
+                            ("var", &var),
+                            ("variant", &variant.tag),
+                            (
+                                "expr",
+                                &types::generate_from_native(ty, &var, client_replicated_types),
+                            ),
+                        ],
+                    );
+                }
+                render(
+                    s,
+                    r#"
+                        return Self::${variant}( ${output_fields} );
+                    }
+                "#,
+                    [
+                        ("variant", &variant.tag),
+                        ("output_fields", &output_fields.join(", ")),
+                    ],
+                );
+            }
+            EnumValue::Struct { fields } => {
+                let mut output_fields = vec![];
+                for field in fields.iter() {
+                    let var = &field.name;
+                    let ty = &field.ty;
+                    output_fields.push(var.clone());
+
+                    render(
+                        s,
+                        r#"
+                        let ${var} = unsafe { __value.value.${variant}.${var} };
+                        let ${var} = ${expr};
+                    "#,
+                        [
+                            ("var", &var),
+                            ("variant", &variant.tag),
+                            (
+                                "expr",
+                                &types::generate_from_native(ty, &var, client_replicated_types),
+                            ),
+                        ],
+                    );
+                }
+                render(
+                    s,
+                    r#"
+                        return Self::${variant} { ${output_fields} };
+                    }
+                "#,
+                    [
+                        ("variant", &variant.tag),
+                        ("output_fields", &output_fields.join(", ")),
+                    ],
+                );
+            }
+        }
+    }
+
+    render(
+        s,
+        r#"
+                    panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+                }
+            }
+    "#,
+        [],
+    );
 }

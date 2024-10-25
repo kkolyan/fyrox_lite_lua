@@ -56,6 +56,38 @@ native_utils!(
     NativeEvent_option,
     NativeEvent_result
 );
+impl From<NativeEvent> for fyrox_lite::lite_event::Event {
+    fn from(__value: NativeEvent) -> Self {
+        if __value.tag == NativeEvent::WindowEvent {
+            let window_id = unsafe { __value.value.WindowEvent.window_id };
+            let window_id = window_id;
+            let event = unsafe { __value.value.WindowEvent.event };
+            let event = event.into();
+            return Self::WindowEvent { window_id, event };
+        }
+        if __value.tag == NativeEvent::DeviceEvent {
+            let event = unsafe { __value.value.DeviceEvent.event };
+            let event = event.into();
+            return Self::DeviceEvent { event };
+        }
+        if __value.tag == NativeEvent::Suspended {
+            return Self::Suspended;
+        }
+        if __value.tag == NativeEvent::Resumed {
+            return Self::Resumed;
+        }
+        if __value.tag == NativeEvent::AboutToWait {
+            return Self::AboutToWait;
+        }
+        if __value.tag == NativeEvent::LoopExiting {
+            return Self::LoopExiting;
+        }
+        if __value.tag == NativeEvent::MemoryWarning {
+            return Self::MemoryWarning;
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeEvent {
     pub const WindowEvent: u8 = 0;
@@ -98,6 +130,23 @@ native_utils!(
     NativeStartCause_option,
     NativeStartCause_result
 );
+impl From<NativeStartCause> for fyrox_lite::lite_event::StartCause {
+    fn from(__value: NativeStartCause) -> Self {
+        if __value.tag == NativeStartCause::ResumeTimeReached {
+            return Self::ResumeTimeReached;
+        }
+        if __value.tag == NativeStartCause::WaitCancelled {
+            return Self::WaitCancelled;
+        }
+        if __value.tag == NativeStartCause::Poll {
+            return Self::Poll;
+        }
+        if __value.tag == NativeStartCause::Init {
+            return Self::Init;
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeStartCause {
     pub const ResumeTimeReached: u8 = 0;
@@ -120,6 +169,147 @@ native_utils!(
     NativeWindowEvent_option,
     NativeWindowEvent_result
 );
+impl From<NativeWindowEvent> for fyrox_lite::lite_event::WindowEvent {
+    fn from(__value: NativeWindowEvent) -> Self {
+        if __value.tag == NativeWindowEvent::ActivationTokenDone {
+            return Self::ActivationTokenDone;
+        }
+        if __value.tag == NativeWindowEvent::Resized {
+            let _0 = unsafe { __value.value.Resized._0 };
+            let _0 = _0.into();
+            return Self::Resized(_0);
+        }
+        if __value.tag == NativeWindowEvent::Moved {
+            let _0 = unsafe { __value.value.Moved._0 };
+            let _0 = _0.into();
+            return Self::Moved(_0);
+        }
+        if __value.tag == NativeWindowEvent::CloseRequested {
+            return Self::CloseRequested;
+        }
+        if __value.tag == NativeWindowEvent::Destroyed {
+            return Self::Destroyed;
+        }
+        if __value.tag == NativeWindowEvent::DroppedFile {
+            let _0 = unsafe { __value.value.DroppedFile._0 };
+            let _0 = String::from_utf8(<u8 as NativeType>::from_native_array(_0)).unwrap();
+            return Self::DroppedFile(_0);
+        }
+        if __value.tag == NativeWindowEvent::HoveredFile {
+            let _0 = unsafe { __value.value.HoveredFile._0 };
+            let _0 = String::from_utf8(<u8 as NativeType>::from_native_array(_0)).unwrap();
+            return Self::HoveredFile(_0);
+        }
+        if __value.tag == NativeWindowEvent::HoveredFileCancelled {
+            return Self::HoveredFileCancelled;
+        }
+        if __value.tag == NativeWindowEvent::Focused {
+            let _0 = unsafe { __value.value.Focused._0 };
+            let _0 = _0;
+            return Self::Focused(_0);
+            
+        }
+        if __value.tag == NativeWindowEvent::KeyboardInput {
+            let event = unsafe { __value.value.KeyboardInput.event };
+            let event = event.into();
+            let is_synthetic = unsafe { __value.value.KeyboardInput.is_synthetic };
+            let is_synthetic = is_synthetic;
+            return Self::KeyboardInput {
+                event,
+                is_synthetic,
+            };
+        }
+        if __value.tag == NativeWindowEvent::ModifiersChanged {
+            return Self::ModifiersChanged;
+        }
+        if __value.tag == NativeWindowEvent::Ime {
+            return Self::Ime;
+        }
+        if __value.tag == NativeWindowEvent::CursorMoved {
+            let position = unsafe { __value.value.CursorMoved.position };
+            let position = position.into();
+            return Self::CursorMoved { position };
+        }
+        if __value.tag == NativeWindowEvent::CursorEntered {
+            return Self::CursorEntered;
+        }
+        if __value.tag == NativeWindowEvent::CursorLeft {
+            return Self::CursorLeft;
+        }
+        if __value.tag == NativeWindowEvent::MouseWheel {
+            let delta = unsafe { __value.value.MouseWheel.delta };
+            let delta = delta.into();
+            let phase = unsafe { __value.value.MouseWheel.phase };
+            let phase = phase.into();
+            return Self::MouseWheel { delta, phase };
+        }
+        if __value.tag == NativeWindowEvent::MouseInput {
+            let state = unsafe { __value.value.MouseInput.state };
+            let state = state.into();
+            let button = unsafe { __value.value.MouseInput.button };
+            let button = button.into();
+            return Self::MouseInput { state, button };
+        }
+        if __value.tag == NativeWindowEvent::TouchpadMagnify {
+            let delta = unsafe { __value.value.TouchpadMagnify.delta };
+            let delta = delta;
+            let phase = unsafe { __value.value.TouchpadMagnify.phase };
+            let phase = phase.into();
+            return Self::TouchpadMagnify { delta, phase };
+        }
+        if __value.tag == NativeWindowEvent::SmartMagnify {
+            return Self::SmartMagnify;
+        }
+        if __value.tag == NativeWindowEvent::TouchpadRotate {
+            let delta = unsafe { __value.value.TouchpadRotate.delta };
+            let delta = delta;
+            let phase = unsafe { __value.value.TouchpadRotate.phase };
+            let phase = phase.into();
+            return Self::TouchpadRotate { delta, phase };
+        }
+        if __value.tag == NativeWindowEvent::TouchpadPressure {
+            let pressure = unsafe { __value.value.TouchpadPressure.pressure };
+            let pressure = pressure;
+            let stage = unsafe { __value.value.TouchpadPressure.stage };
+            let stage = stage;
+            return Self::TouchpadPressure { pressure, stage };
+        }
+        if __value.tag == NativeWindowEvent::AxisMotion {
+            let axis = unsafe { __value.value.AxisMotion.axis };
+            let axis = axis;
+            let value = unsafe { __value.value.AxisMotion.value };
+            let value = value;
+            return Self::AxisMotion { axis, value };
+        }
+        if __value.tag == NativeWindowEvent::Touch {
+            let _0 = unsafe { __value.value.Touch._0 };
+            let _0 = _0.into();
+            return Self::Touch(_0);
+        }
+        if __value.tag == NativeWindowEvent::ScaleFactorChanged {
+            let scale_factor = unsafe { __value.value.ScaleFactorChanged.scale_factor };
+            let scale_factor = scale_factor;
+            let inner_size_writer = unsafe { __value.value.ScaleFactorChanged.inner_size_writer };
+            let inner_size_writer = Externalizable::from_external(inner_size_writer.as_u128());
+            return Self::ScaleFactorChanged {
+                scale_factor,
+                inner_size_writer,
+            };
+        }
+        if __value.tag == NativeWindowEvent::ThemeChanged {
+            return Self::ThemeChanged;
+        }
+        if __value.tag == NativeWindowEvent::Occluded {
+            let _0 = unsafe { __value.value.Occluded._0 };
+            let _0 = _0;
+            return Self::Occluded(_0);
+        }
+        if __value.tag == NativeWindowEvent::RedrawRequested {
+            return Self::RedrawRequested;
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeWindowEvent {
     pub const ActivationTokenDone: u8 = 0;
@@ -274,6 +464,46 @@ native_utils!(
     NativeDeviceEvent_option,
     NativeDeviceEvent_result
 );
+impl From<NativeDeviceEvent> for fyrox_lite::lite_event::DeviceEvent {
+    fn from(__value: NativeDeviceEvent) -> Self {
+        if __value.tag == NativeDeviceEvent::Added {
+            return Self::Added;
+        }
+        if __value.tag == NativeDeviceEvent::Removed {
+            return Self::Removed;
+        }
+        if __value.tag == NativeDeviceEvent::MouseMotion {
+            let delta = unsafe { __value.value.MouseMotion.delta };
+            let delta = delta.into();
+            return Self::MouseMotion { delta };
+        }
+        if __value.tag == NativeDeviceEvent::MouseWheel {
+            let delta = unsafe { __value.value.MouseWheel.delta };
+            let delta = delta.into();
+            return Self::MouseWheel { delta };
+        }
+        if __value.tag == NativeDeviceEvent::Motion {
+            let axis = unsafe { __value.value.Motion.axis };
+            let axis = axis;
+            let value = unsafe { __value.value.Motion.value };
+            let value = value;
+            return Self::Motion { axis, value };
+        }
+        if __value.tag == NativeDeviceEvent::Button {
+            let button = unsafe { __value.value.Button.button };
+            let button = button;
+            let state = unsafe { __value.value.Button.state };
+            let state = state.into();
+            return Self::Button { button, state };
+        }
+        if __value.tag == NativeDeviceEvent::Key {
+            let _0 = unsafe { __value.value.Key._0 };
+            let _0 = _0.into();
+            return Self::Key(_0);
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeDeviceEvent {
     pub const Added: u8 = 0;
@@ -375,6 +605,21 @@ native_utils!(
     NativePhysicalKey_option,
     NativePhysicalKey_result
 );
+impl From<NativePhysicalKey> for fyrox_lite::lite_event::PhysicalKey {
+    fn from(__value: NativePhysicalKey) -> Self {
+        if __value.tag == NativePhysicalKey::Code {
+            let _0 = unsafe { __value.value.Code._0 };
+            let _0 = _0.into();
+            return Self::Code(_0);
+        }
+        if __value.tag == NativePhysicalKey::Unidentified {
+            let _0 = unsafe { __value.value.Unidentified._0 };
+            let _0 = _0.into();
+            return Self::Unidentified(_0);
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativePhysicalKey {
     pub const Code: u8 = 0;
@@ -411,6 +656,593 @@ native_utils!(
     NativeKeyCode_option,
     NativeKeyCode_result
 );
+impl From<NativeKeyCode> for fyrox_lite::lite_event::KeyCode {
+    fn from(__value: NativeKeyCode) -> Self {
+        if __value.tag == NativeKeyCode::Backquote {
+            return Self::Backquote;
+        }
+        if __value.tag == NativeKeyCode::Backslash {
+            return Self::Backslash;
+        }
+        if __value.tag == NativeKeyCode::BracketLeft {
+            return Self::BracketLeft;
+        }
+        if __value.tag == NativeKeyCode::BracketRight {
+            return Self::BracketRight;
+        }
+        if __value.tag == NativeKeyCode::Comma {
+            return Self::Comma;
+        }
+        if __value.tag == NativeKeyCode::Digit0 {
+            return Self::Digit0;
+        }
+        if __value.tag == NativeKeyCode::Digit1 {
+            return Self::Digit1;
+        }
+        if __value.tag == NativeKeyCode::Digit2 {
+            return Self::Digit2;
+        }
+        if __value.tag == NativeKeyCode::Digit3 {
+            return Self::Digit3;
+        }
+        if __value.tag == NativeKeyCode::Digit4 {
+            return Self::Digit4;
+        }
+        if __value.tag == NativeKeyCode::Digit5 {
+            return Self::Digit5;
+        }
+        if __value.tag == NativeKeyCode::Digit6 {
+            return Self::Digit6;
+        }
+        if __value.tag == NativeKeyCode::Digit7 {
+            return Self::Digit7;
+        }
+        if __value.tag == NativeKeyCode::Digit8 {
+            return Self::Digit8;
+        }
+        if __value.tag == NativeKeyCode::Digit9 {
+            return Self::Digit9;
+        }
+        if __value.tag == NativeKeyCode::Equal {
+            return Self::Equal;
+        }
+        if __value.tag == NativeKeyCode::IntlBackslash {
+            return Self::IntlBackslash;
+        }
+        if __value.tag == NativeKeyCode::IntlRo {
+            return Self::IntlRo;
+        }
+        if __value.tag == NativeKeyCode::IntlYen {
+            return Self::IntlYen;
+        }
+        if __value.tag == NativeKeyCode::KeyA {
+            return Self::KeyA;
+        }
+        if __value.tag == NativeKeyCode::KeyB {
+            return Self::KeyB;
+        }
+        if __value.tag == NativeKeyCode::KeyC {
+            return Self::KeyC;
+        }
+        if __value.tag == NativeKeyCode::KeyD {
+            return Self::KeyD;
+        }
+        if __value.tag == NativeKeyCode::KeyE {
+            return Self::KeyE;
+        }
+        if __value.tag == NativeKeyCode::KeyF {
+            return Self::KeyF;
+        }
+        if __value.tag == NativeKeyCode::KeyG {
+            return Self::KeyG;
+        }
+        if __value.tag == NativeKeyCode::KeyH {
+            return Self::KeyH;
+        }
+        if __value.tag == NativeKeyCode::KeyI {
+            return Self::KeyI;
+        }
+        if __value.tag == NativeKeyCode::KeyJ {
+            return Self::KeyJ;
+        }
+        if __value.tag == NativeKeyCode::KeyK {
+            return Self::KeyK;
+        }
+        if __value.tag == NativeKeyCode::KeyL {
+            return Self::KeyL;
+        }
+        if __value.tag == NativeKeyCode::KeyM {
+            return Self::KeyM;
+        }
+        if __value.tag == NativeKeyCode::KeyN {
+            return Self::KeyN;
+        }
+        if __value.tag == NativeKeyCode::KeyO {
+            return Self::KeyO;
+        }
+        if __value.tag == NativeKeyCode::KeyP {
+            return Self::KeyP;
+        }
+        if __value.tag == NativeKeyCode::KeyQ {
+            return Self::KeyQ;
+        }
+        if __value.tag == NativeKeyCode::KeyR {
+            return Self::KeyR;
+        }
+        if __value.tag == NativeKeyCode::KeyS {
+            return Self::KeyS;
+        }
+        if __value.tag == NativeKeyCode::KeyT {
+            return Self::KeyT;
+        }
+        if __value.tag == NativeKeyCode::KeyU {
+            return Self::KeyU;
+        }
+        if __value.tag == NativeKeyCode::KeyV {
+            return Self::KeyV;
+        }
+        if __value.tag == NativeKeyCode::KeyW {
+            return Self::KeyW;
+        }
+        if __value.tag == NativeKeyCode::KeyX {
+            return Self::KeyX;
+        }
+        if __value.tag == NativeKeyCode::KeyY {
+            return Self::KeyY;
+        }
+        if __value.tag == NativeKeyCode::KeyZ {
+            return Self::KeyZ;
+        }
+        if __value.tag == NativeKeyCode::Minus {
+            return Self::Minus;
+        }
+        if __value.tag == NativeKeyCode::Period {
+            return Self::Period;
+        }
+        if __value.tag == NativeKeyCode::Quote {
+            return Self::Quote;
+        }
+        if __value.tag == NativeKeyCode::Semicolon {
+            return Self::Semicolon;
+        }
+        if __value.tag == NativeKeyCode::Slash {
+            return Self::Slash;
+        }
+        if __value.tag == NativeKeyCode::AltLeft {
+            return Self::AltLeft;
+        }
+        if __value.tag == NativeKeyCode::AltRight {
+            return Self::AltRight;
+        }
+        if __value.tag == NativeKeyCode::Backspace {
+            return Self::Backspace;
+        }
+        if __value.tag == NativeKeyCode::CapsLock {
+            return Self::CapsLock;
+        }
+        if __value.tag == NativeKeyCode::ContextMenu {
+            return Self::ContextMenu;
+        }
+        if __value.tag == NativeKeyCode::ControlLeft {
+            return Self::ControlLeft;
+        }
+        if __value.tag == NativeKeyCode::ControlRight {
+            return Self::ControlRight;
+        }
+        if __value.tag == NativeKeyCode::Enter {
+            return Self::Enter;
+        }
+        if __value.tag == NativeKeyCode::SuperLeft {
+            return Self::SuperLeft;
+        }
+        if __value.tag == NativeKeyCode::SuperRight {
+            return Self::SuperRight;
+        }
+        if __value.tag == NativeKeyCode::ShiftLeft {
+            return Self::ShiftLeft;
+        }
+        if __value.tag == NativeKeyCode::ShiftRight {
+            return Self::ShiftRight;
+        }
+        if __value.tag == NativeKeyCode::Space {
+            return Self::Space;
+        }
+        if __value.tag == NativeKeyCode::Tab {
+            return Self::Tab;
+        }
+        if __value.tag == NativeKeyCode::Convert {
+            return Self::Convert;
+        }
+        if __value.tag == NativeKeyCode::KanaMode {
+            return Self::KanaMode;
+        }
+        if __value.tag == NativeKeyCode::Lang1 {
+            return Self::Lang1;
+        }
+        if __value.tag == NativeKeyCode::Lang2 {
+            return Self::Lang2;
+        }
+        if __value.tag == NativeKeyCode::Lang3 {
+            return Self::Lang3;
+        }
+        if __value.tag == NativeKeyCode::Lang4 {
+            return Self::Lang4;
+        }
+        if __value.tag == NativeKeyCode::Lang5 {
+            return Self::Lang5;
+        }
+        if __value.tag == NativeKeyCode::NonConvert {
+            return Self::NonConvert;
+        }
+        if __value.tag == NativeKeyCode::Delete {
+            return Self::Delete;
+        }
+        if __value.tag == NativeKeyCode::End {
+            return Self::End;
+        }
+        if __value.tag == NativeKeyCode::Help {
+            return Self::Help;
+        }
+        if __value.tag == NativeKeyCode::Home {
+            return Self::Home;
+        }
+        if __value.tag == NativeKeyCode::Insert {
+            return Self::Insert;
+        }
+        if __value.tag == NativeKeyCode::PageDown {
+            return Self::PageDown;
+        }
+        if __value.tag == NativeKeyCode::PageUp {
+            return Self::PageUp;
+        }
+        if __value.tag == NativeKeyCode::ArrowDown {
+            return Self::ArrowDown;
+        }
+        if __value.tag == NativeKeyCode::ArrowLeft {
+            return Self::ArrowLeft;
+        }
+        if __value.tag == NativeKeyCode::ArrowRight {
+            return Self::ArrowRight;
+        }
+        if __value.tag == NativeKeyCode::ArrowUp {
+            return Self::ArrowUp;
+        }
+        if __value.tag == NativeKeyCode::NumLock {
+            return Self::NumLock;
+        }
+        if __value.tag == NativeKeyCode::Numpad0 {
+            return Self::Numpad0;
+        }
+        if __value.tag == NativeKeyCode::Numpad1 {
+            return Self::Numpad1;
+        }
+        if __value.tag == NativeKeyCode::Numpad2 {
+            return Self::Numpad2;
+        }
+        if __value.tag == NativeKeyCode::Numpad3 {
+            return Self::Numpad3;
+        }
+        if __value.tag == NativeKeyCode::Numpad4 {
+            return Self::Numpad4;
+        }
+        if __value.tag == NativeKeyCode::Numpad5 {
+            return Self::Numpad5;
+        }
+        if __value.tag == NativeKeyCode::Numpad6 {
+            return Self::Numpad6;
+        }
+        if __value.tag == NativeKeyCode::Numpad7 {
+            return Self::Numpad7;
+        }
+        if __value.tag == NativeKeyCode::Numpad8 {
+            return Self::Numpad8;
+        }
+        if __value.tag == NativeKeyCode::Numpad9 {
+            return Self::Numpad9;
+        }
+        if __value.tag == NativeKeyCode::NumpadAdd {
+            return Self::NumpadAdd;
+        }
+        if __value.tag == NativeKeyCode::NumpadBackspace {
+            return Self::NumpadBackspace;
+        }
+        if __value.tag == NativeKeyCode::NumpadClear {
+            return Self::NumpadClear;
+        }
+        if __value.tag == NativeKeyCode::NumpadClearEntry {
+            return Self::NumpadClearEntry;
+        }
+        if __value.tag == NativeKeyCode::NumpadComma {
+            return Self::NumpadComma;
+        }
+        if __value.tag == NativeKeyCode::NumpadDecimal {
+            return Self::NumpadDecimal;
+        }
+        if __value.tag == NativeKeyCode::NumpadDivide {
+            return Self::NumpadDivide;
+        }
+        if __value.tag == NativeKeyCode::NumpadEnter {
+            return Self::NumpadEnter;
+        }
+        if __value.tag == NativeKeyCode::NumpadEqual {
+            return Self::NumpadEqual;
+        }
+        if __value.tag == NativeKeyCode::NumpadHash {
+            return Self::NumpadHash;
+        }
+        if __value.tag == NativeKeyCode::NumpadMemoryAdd {
+            return Self::NumpadMemoryAdd;
+        }
+        if __value.tag == NativeKeyCode::NumpadMemoryClear {
+            return Self::NumpadMemoryClear;
+        }
+        if __value.tag == NativeKeyCode::NumpadMemoryRecall {
+            return Self::NumpadMemoryRecall;
+        }
+        if __value.tag == NativeKeyCode::NumpadMemoryStore {
+            return Self::NumpadMemoryStore;
+        }
+        if __value.tag == NativeKeyCode::NumpadMemorySubtract {
+            return Self::NumpadMemorySubtract;
+        }
+        if __value.tag == NativeKeyCode::NumpadMultiply {
+            return Self::NumpadMultiply;
+        }
+        if __value.tag == NativeKeyCode::NumpadParenLeft {
+            return Self::NumpadParenLeft;
+        }
+        if __value.tag == NativeKeyCode::NumpadParenRight {
+            return Self::NumpadParenRight;
+        }
+        if __value.tag == NativeKeyCode::NumpadStar {
+            return Self::NumpadStar;
+        }
+        if __value.tag == NativeKeyCode::NumpadSubtract {
+            return Self::NumpadSubtract;
+        }
+        if __value.tag == NativeKeyCode::Escape {
+            return Self::Escape;
+        }
+        if __value.tag == NativeKeyCode::Fn {
+            return Self::Fn;
+        }
+        if __value.tag == NativeKeyCode::FnLock {
+            return Self::FnLock;
+        }
+        if __value.tag == NativeKeyCode::PrintScreen {
+            return Self::PrintScreen;
+        }
+        if __value.tag == NativeKeyCode::ScrollLock {
+            return Self::ScrollLock;
+        }
+        if __value.tag == NativeKeyCode::Pause {
+            return Self::Pause;
+        }
+        if __value.tag == NativeKeyCode::BrowserBack {
+            return Self::BrowserBack;
+        }
+        if __value.tag == NativeKeyCode::BrowserFavorites {
+            return Self::BrowserFavorites;
+        }
+        if __value.tag == NativeKeyCode::BrowserForward {
+            return Self::BrowserForward;
+        }
+        if __value.tag == NativeKeyCode::BrowserHome {
+            return Self::BrowserHome;
+        }
+        if __value.tag == NativeKeyCode::BrowserRefresh {
+            return Self::BrowserRefresh;
+        }
+        if __value.tag == NativeKeyCode::BrowserSearch {
+            return Self::BrowserSearch;
+        }
+        if __value.tag == NativeKeyCode::BrowserStop {
+            return Self::BrowserStop;
+        }
+        if __value.tag == NativeKeyCode::Eject {
+            return Self::Eject;
+        }
+        if __value.tag == NativeKeyCode::LaunchApp1 {
+            return Self::LaunchApp1;
+        }
+        if __value.tag == NativeKeyCode::LaunchApp2 {
+            return Self::LaunchApp2;
+        }
+        if __value.tag == NativeKeyCode::LaunchMail {
+            return Self::LaunchMail;
+        }
+        if __value.tag == NativeKeyCode::MediaPlayPause {
+            return Self::MediaPlayPause;
+        }
+        if __value.tag == NativeKeyCode::MediaSelect {
+            return Self::MediaSelect;
+        }
+        if __value.tag == NativeKeyCode::MediaStop {
+            return Self::MediaStop;
+        }
+        if __value.tag == NativeKeyCode::MediaTrackNext {
+            return Self::MediaTrackNext;
+        }
+        if __value.tag == NativeKeyCode::MediaTrackPrevious {
+            return Self::MediaTrackPrevious;
+        }
+        if __value.tag == NativeKeyCode::Power {
+            return Self::Power;
+        }
+        if __value.tag == NativeKeyCode::Sleep {
+            return Self::Sleep;
+        }
+        if __value.tag == NativeKeyCode::AudioVolumeDown {
+            return Self::AudioVolumeDown;
+        }
+        if __value.tag == NativeKeyCode::AudioVolumeMute {
+            return Self::AudioVolumeMute;
+        }
+        if __value.tag == NativeKeyCode::AudioVolumeUp {
+            return Self::AudioVolumeUp;
+        }
+        if __value.tag == NativeKeyCode::WakeUp {
+            return Self::WakeUp;
+        }
+        if __value.tag == NativeKeyCode::Meta {
+            return Self::Meta;
+        }
+        if __value.tag == NativeKeyCode::Hyper {
+            return Self::Hyper;
+        }
+        if __value.tag == NativeKeyCode::Turbo {
+            return Self::Turbo;
+        }
+        if __value.tag == NativeKeyCode::Abort {
+            return Self::Abort;
+        }
+        if __value.tag == NativeKeyCode::Resume {
+            return Self::Resume;
+        }
+        if __value.tag == NativeKeyCode::Suspend {
+            return Self::Suspend;
+        }
+        if __value.tag == NativeKeyCode::Again {
+            return Self::Again;
+        }
+        if __value.tag == NativeKeyCode::Copy {
+            return Self::Copy;
+        }
+        if __value.tag == NativeKeyCode::Cut {
+            return Self::Cut;
+        }
+        if __value.tag == NativeKeyCode::Find {
+            return Self::Find;
+        }
+        if __value.tag == NativeKeyCode::Open {
+            return Self::Open;
+        }
+        if __value.tag == NativeKeyCode::Paste {
+            return Self::Paste;
+        }
+        if __value.tag == NativeKeyCode::Props {
+            return Self::Props;
+        }
+        if __value.tag == NativeKeyCode::Select {
+            return Self::Select;
+        }
+        if __value.tag == NativeKeyCode::Undo {
+            return Self::Undo;
+        }
+        if __value.tag == NativeKeyCode::Hiragana {
+            return Self::Hiragana;
+        }
+        if __value.tag == NativeKeyCode::Katakana {
+            return Self::Katakana;
+        }
+        if __value.tag == NativeKeyCode::F1 {
+            return Self::F1;
+        }
+        if __value.tag == NativeKeyCode::F2 {
+            return Self::F2;
+        }
+        if __value.tag == NativeKeyCode::F3 {
+            return Self::F3;
+        }
+        if __value.tag == NativeKeyCode::F4 {
+            return Self::F4;
+        }
+        if __value.tag == NativeKeyCode::F5 {
+            return Self::F5;
+        }
+        if __value.tag == NativeKeyCode::F6 {
+            return Self::F6;
+        }
+        if __value.tag == NativeKeyCode::F7 {
+            return Self::F7;
+        }
+        if __value.tag == NativeKeyCode::F8 {
+            return Self::F8;
+        }
+        if __value.tag == NativeKeyCode::F9 {
+            return Self::F9;
+        }
+        if __value.tag == NativeKeyCode::F10 {
+            return Self::F10;
+        }
+        if __value.tag == NativeKeyCode::F11 {
+            return Self::F11;
+        }
+        if __value.tag == NativeKeyCode::F12 {
+            return Self::F12;
+        }
+        if __value.tag == NativeKeyCode::F13 {
+            return Self::F13;
+        }
+        if __value.tag == NativeKeyCode::F14 {
+            return Self::F14;
+        }
+        if __value.tag == NativeKeyCode::F15 {
+            return Self::F15;
+        }
+        if __value.tag == NativeKeyCode::F16 {
+            return Self::F16;
+        }
+        if __value.tag == NativeKeyCode::F17 {
+            return Self::F17;
+        }
+        if __value.tag == NativeKeyCode::F18 {
+            return Self::F18;
+        }
+        if __value.tag == NativeKeyCode::F19 {
+            return Self::F19;
+        }
+        if __value.tag == NativeKeyCode::F20 {
+            return Self::F20;
+        }
+        if __value.tag == NativeKeyCode::F21 {
+            return Self::F21;
+        }
+        if __value.tag == NativeKeyCode::F22 {
+            return Self::F22;
+        }
+        if __value.tag == NativeKeyCode::F23 {
+            return Self::F23;
+        }
+        if __value.tag == NativeKeyCode::F24 {
+            return Self::F24;
+        }
+        if __value.tag == NativeKeyCode::F25 {
+            return Self::F25;
+        }
+        if __value.tag == NativeKeyCode::F26 {
+            return Self::F26;
+        }
+        if __value.tag == NativeKeyCode::F27 {
+            return Self::F27;
+        }
+        if __value.tag == NativeKeyCode::F28 {
+            return Self::F28;
+        }
+        if __value.tag == NativeKeyCode::F29 {
+            return Self::F29;
+        }
+        if __value.tag == NativeKeyCode::F30 {
+            return Self::F30;
+        }
+        if __value.tag == NativeKeyCode::F31 {
+            return Self::F31;
+        }
+        if __value.tag == NativeKeyCode::F32 {
+            return Self::F32;
+        }
+        if __value.tag == NativeKeyCode::F33 {
+            return Self::F33;
+        }
+        if __value.tag == NativeKeyCode::F34 {
+            return Self::F34;
+        }
+        if __value.tag == NativeKeyCode::F35 {
+            return Self::F35;
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeKeyCode {
     pub const Backquote: u8 = 0;
@@ -623,6 +1455,34 @@ native_utils!(
     NativeNativeKeyCode_option,
     NativeNativeKeyCode_result
 );
+impl From<NativeNativeKeyCode> for fyrox_lite::lite_event::NativeKeyCode {
+    fn from(__value: NativeNativeKeyCode) -> Self {
+        if __value.tag == NativeNativeKeyCode::Unidentified {
+            return Self::Unidentified;
+        }
+        if __value.tag == NativeNativeKeyCode::Android {
+            let _0 = unsafe { __value.value.Android._0 };
+            let _0 = _0;
+            return Self::Android(_0);
+        }
+        if __value.tag == NativeNativeKeyCode::MacOS {
+            let _0 = unsafe { __value.value.MacOS._0 };
+            let _0 = _0;
+            return Self::MacOS(_0);
+        }
+        if __value.tag == NativeNativeKeyCode::Windows {
+            let _0 = unsafe { __value.value.Windows._0 };
+            let _0 = _0;
+            return Self::Windows(_0);
+        }
+        if __value.tag == NativeNativeKeyCode::Xkb {
+            let _0 = unsafe { __value.value.Xkb._0 };
+            let _0 = _0;
+            return Self::Xkb(_0);
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeNativeKeyCode {
     pub const Unidentified: u8 = 0;
@@ -720,6 +1580,23 @@ native_utils!(
     NativeKeyLocation_option,
     NativeKeyLocation_result
 );
+impl From<NativeKeyLocation> for fyrox_lite::lite_event::KeyLocation {
+    fn from(__value: NativeKeyLocation) -> Self {
+        if __value.tag == NativeKeyLocation::Standard {
+            return Self::Standard;
+        }
+        if __value.tag == NativeKeyLocation::Left {
+            return Self::Left;
+        }
+        if __value.tag == NativeKeyLocation::Right {
+            return Self::Right;
+        }
+        if __value.tag == NativeKeyLocation::Numpad {
+            return Self::Numpad;
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeKeyLocation {
     pub const Standard: u8 = 0;
@@ -741,6 +1618,23 @@ native_utils!(
     NativeTouchPhase_option,
     NativeTouchPhase_result
 );
+impl From<NativeTouchPhase> for fyrox_lite::lite_event::TouchPhase {
+    fn from(__value: NativeTouchPhase) -> Self {
+        if __value.tag == NativeTouchPhase::Started {
+            return Self::Started;
+        }
+        if __value.tag == NativeTouchPhase::Moved {
+            return Self::Moved;
+        }
+        if __value.tag == NativeTouchPhase::Ended {
+            return Self::Ended;
+        }
+        if __value.tag == NativeTouchPhase::Cancelled {
+            return Self::Cancelled;
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeTouchPhase {
     pub const Started: u8 = 0;
@@ -772,11 +1666,11 @@ impl From<NativeTouch> for fyrox_lite::lite_event::Touch {
         let location = __value.location;
         let location = location.into();
         let force = __value.force;
-        let force = if force.present {
-            Some((force.into()).value)
+        let force = <NativeForce as NativeType>::to_native_option(if let Some(force) = force {
+            Some(force.into())
         } else {
             None
-        };
+        });
         let id = __value.id;
         let id = id;
         Self {
@@ -824,6 +1718,33 @@ native_utils!(
     NativeForce_option,
     NativeForce_result
 );
+impl From<NativeForce> for fyrox_lite::lite_event::Force {
+    fn from(__value: NativeForce) -> Self {
+        if __value.tag == NativeForce::Calibrated {
+            let force = unsafe { __value.value.Calibrated.force };
+            let force = force;
+            let max_possible_force = unsafe { __value.value.Calibrated.max_possible_force };
+            let max_possible_force = max_possible_force;
+            let altitude_angle = unsafe { __value.value.Calibrated.altitude_angle };
+            let altitude_angle = if altitude_angle.present {
+                Some((altitude_angle).value)
+            } else {
+                None
+            };
+            return Self::Calibrated {
+                force,
+                max_possible_force,
+                altitude_angle,
+            };
+        }
+        if __value.tag == NativeForce::Normalized {
+            let _0 = unsafe { __value.value.Normalized._0 };
+            let _0 = _0;
+            return Self::Normalized(_0);
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeForce {
     pub const Calibrated: u8 = 0;
@@ -862,6 +1783,17 @@ native_utils!(
     NativeElementState_option,
     NativeElementState_result
 );
+impl From<NativeElementState> for fyrox_lite::lite_event::ElementState {
+    fn from(__value: NativeElementState) -> Self {
+        if __value.tag == NativeElementState::Pressed {
+            return Self::Pressed;
+        }
+        if __value.tag == NativeElementState::Released {
+            return Self::Released;
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeElementState {
     pub const Pressed: u8 = 0;
@@ -882,6 +1814,31 @@ native_utils!(
     NativeMouseButton_option,
     NativeMouseButton_result
 );
+impl From<NativeMouseButton> for fyrox_lite::lite_event::MouseButton {
+    fn from(__value: NativeMouseButton) -> Self {
+        if __value.tag == NativeMouseButton::Left {
+            return Self::Left;
+        }
+        if __value.tag == NativeMouseButton::Right {
+            return Self::Right;
+        }
+        if __value.tag == NativeMouseButton::Middle {
+            return Self::Middle;
+        }
+        if __value.tag == NativeMouseButton::Back {
+            return Self::Back;
+        }
+        if __value.tag == NativeMouseButton::Forward {
+            return Self::Forward;
+        }
+        if __value.tag == NativeMouseButton::Other {
+            let _0 = unsafe { __value.value.Other._0 };
+            let _0 = _0;
+            return Self::Other(_0);
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeMouseButton {
     pub const Left: u8 = 0;
@@ -917,6 +1874,21 @@ native_utils!(
     NativeMouseScrollDelta_option,
     NativeMouseScrollDelta_result
 );
+impl From<NativeMouseScrollDelta> for fyrox_lite::lite_event::MouseScrollDelta {
+    fn from(__value: NativeMouseScrollDelta) -> Self {
+        if __value.tag == NativeMouseScrollDelta::LineDelta {
+            let _0 = unsafe { __value.value.LineDelta._0 };
+            let _0 = _0.into();
+            return Self::LineDelta(_0);
+        }
+        if __value.tag == NativeMouseScrollDelta::PixelDelta {
+            let _0 = unsafe { __value.value.PixelDelta._0 };
+            let _0 = _0.into();
+            return Self::PixelDelta(_0);
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeMouseScrollDelta {
     pub const LineDelta: u8 = 0;
@@ -975,6 +1947,20 @@ native_utils!(
     NativeCursorGrabMode_option,
     NativeCursorGrabMode_result
 );
+impl From<NativeCursorGrabMode> for fyrox_lite::lite_window::LiteCursorGrabMode {
+    fn from(__value: NativeCursorGrabMode) -> Self {
+        if __value.tag == NativeCursorGrabMode::None {
+            return Self::None;
+        }
+        if __value.tag == NativeCursorGrabMode::Confined {
+            return Self::Confined;
+        }
+        if __value.tag == NativeCursorGrabMode::Locked {
+            return Self::Locked;
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeCursorGrabMode {
     pub const None: u8 = 0;
@@ -1022,7 +2008,7 @@ native_utils!(
 impl From<NativeIntersection> for fyrox_lite::lite_physics::LiteIntersection {
     fn from(__value: NativeIntersection) -> Self {
         let collider = __value.collider;
-        let collider = Externalizable::from_external(collider.as_u128());
+        let collider = NativeHandle::from_u128(Externalizable::to_external(&collider));
         let normal = __value.normal;
         let normal = normal.into();
         let position = __value.position;
@@ -1076,6 +2062,29 @@ native_utils!(
     NativeFeatureId_option,
     NativeFeatureId_result
 );
+impl From<NativeFeatureId> for fyrox_lite::lite_physics::LiteFeatureId {
+    fn from(__value: NativeFeatureId) -> Self {
+        if __value.tag == NativeFeatureId::Vertex {
+            let _0 = unsafe { __value.value.Vertex._0 };
+            let _0 = _0;
+            return Self::Vertex(_0);
+        }
+        if __value.tag == NativeFeatureId::Edge {
+            let _0 = unsafe { __value.value.Edge._0 };
+            let _0 = _0;
+            return Self::Edge(_0);
+        }
+        if __value.tag == NativeFeatureId::Face {
+            let _0 = unsafe { __value.value.Face._0 };
+            let _0 = _0;
+            return Self::Face(_0);
+        }
+        if __value.tag == NativeFeatureId::Unknown {
+            return Self::Unknown;
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeFeatureId {
     pub const Vertex: u8 = 0;
@@ -1133,11 +2142,13 @@ impl From<NativeRayCastOptions> for fyrox_lite::lite_physics::LiteRayCastOptions
         let max_len = __value.max_len;
         let max_len = max_len;
         let groups = __value.groups;
-        let groups = if groups.present {
-            Some((groups.into()).value)
-        } else {
-            None
-        };
+        let groups = <NativeInteractionGroups as NativeType>::to_native_option(
+            if let Some(groups) = groups {
+                Some(groups.into())
+            } else {
+                None
+            },
+        );
         let sort_results = __value.sort_results;
         let sort_results = sort_results;
         Self {
@@ -1248,7 +2259,6 @@ pub extern "C" fn fyrox_lite_Text_new(state: NativeTextBuilder) -> NativeHandle 
 
 // fyrox_lite::lite_ui::TextBuilder
 
-
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct NativeTextBuilder {
@@ -1264,17 +2274,18 @@ native_utils!(
 impl From<NativeTextBuilder> for fyrox_lite::lite_ui::TextBuilder {
     fn from(__value: NativeTextBuilder) -> Self {
         let foregound = __value.foregound;
-        let foregound = if foregound.present {
-            Some((foregound.into()).value)
-        } else {
-            None
-        };
+        let foregound =
+            <NativeBrush as NativeType>::to_native_option(if let Some(foregound) = foregound {
+                Some(foregound.into())
+            } else {
+                None
+            });
         let font_size = __value.font_size;
-        let font_size = if font_size.present {
-            Some((font_size).value)
+        let font_size = <f32 as NativeType>::to_native_option(if let Some(font_size) = font_size {
+            Some(font_size)
         } else {
             None
-        };
+        });
         Self {
             foregound,
             font_size,
@@ -1317,6 +2328,32 @@ native_utils!(
     NativeBrush_option,
     NativeBrush_result
 );
+impl From<NativeBrush> for fyrox_lite::lite_ui::Brush {
+    fn from(__value: NativeBrush) -> Self {
+        if __value.tag == NativeBrush::Solid {
+            let _0 = unsafe { __value.value.Solid._0 };
+            let _0 = Externalizable::from_external(_0.as_u128());
+            return Self::Solid(_0);
+        }
+        if __value.tag == NativeBrush::LinearGradient {
+            let from = unsafe { __value.value.LinearGradient.from };
+            let from = from.into();
+            let to = unsafe { __value.value.LinearGradient.to };
+            let to = to.into();
+            let stops = unsafe { __value.value.LinearGradient.stops };
+            let stops = <NativeGradientPoint as NativeType>::to_native_array(stops);
+            return Self::LinearGradient { from, to, stops };
+        }
+        if __value.tag == NativeBrush::RadialGradient {
+            let center = unsafe { __value.value.RadialGradient.center };
+            let center = center.into();
+            let stops = unsafe { __value.value.RadialGradient.stops };
+            let stops = <NativeGradientPoint as NativeType>::to_native_array(stops);
+            return Self::RadialGradient { center, stops };
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeBrush {
     pub const Solid: u8 = 0;
@@ -1371,7 +2408,7 @@ impl From<NativeGradientPoint> for fyrox_lite::lite_ui::GradientPoint {
         let stop = __value.stop;
         let stop = stop;
         let color = __value.color;
-        let color = Externalizable::from_external(color.as_u128());
+        let color = NativeHandle::from_u128(Externalizable::to_external(&color));
         Self { stop, color }
     }
 }
@@ -1758,6 +2795,17 @@ native_utils!(
     NativeRoutingStrategy_option,
     NativeRoutingStrategy_result
 );
+impl From<NativeRoutingStrategy> for fyrox_lite::lite_node::LiteRoutingStrategy {
+    fn from(__value: NativeRoutingStrategy) -> Self {
+        if __value.tag == NativeRoutingStrategy::Up {
+            return Self::Up;
+        }
+        if __value.tag == NativeRoutingStrategy::Down {
+            return Self::Down;
+        }
+        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+    }
+}
 
 impl NativeRoutingStrategy {
     pub const Up: u8 = 0;

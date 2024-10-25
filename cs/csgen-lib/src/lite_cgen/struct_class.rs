@@ -1,9 +1,10 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, fmt::Display};
 
 use gen_common::templating::render;
-use lite_model::{ClassName, StructClass};
+use lite_model::{ClassName, DataType, StructClass};
+use to_vec::ToVec;
 
-use super::types;
+use super::{simple_from, types};
 
 pub(crate) fn generate_struct(
     s: &mut String,
@@ -55,74 +56,30 @@ pub(crate) fn generate_struct(
     generate_to_native(s, class, client_replicated_types);
 }
 
-fn generate_to_native(s: &mut String, class: &StructClass, client_replicated_types: &HashSet<ClassName>) {
-
-    let mut field_names = vec![];
-
-    render(
+fn generate_to_native(
+    s: &mut String,
+    class: &StructClass,
+    client_replicated_types: &HashSet<ClassName>,
+) {
+    simple_from::generate_from(
         s,
-        r#"
-            impl From<${rust_class}> for Native${class} {
-                fn from(__value: ${rust_class}) -> Self {
-    "#,
-        [("rust_class", &class.rust_struct_path), ("class", &class.class_name)],
-    );
-
-    for field in class.fields.iter() {
-        field_names.push(field.name.to_string());
-
-        render(s, "
-                    let ${name} = __value.${name};
-                    let ${name} = ${expr};
-        ", [
-            ("name", &field.name),
-            ("expr", &types::generate_to_native(&field.ty, &field.name, client_replicated_types)),
-        ]);
-    }
-
-    render(
-        s,
-        r#"
-                    Self { ${field_names} }
-                }
-            }
-    "#,
-        [("field_names", &field_names.join(", "))],
+        &class.rust_struct_path,
+        &format!("Native{}", &class.class_name),
+        client_replicated_types,
+        class.fields.iter().map(|it| (it.name.as_str(), &it.ty)),
     );
 }
 
-fn generate_from_native(s: &mut String, class: &StructClass, client_replicated_types: &HashSet<ClassName>) {
-
-    let mut field_names = vec![];
-
-    render(
+fn generate_from_native(
+    s: &mut String,
+    class: &StructClass,
+    client_replicated_types: &HashSet<ClassName>,
+) {
+    simple_from::generate_from(
         s,
-        r#"
-            impl From<Native${class}> for ${rust_class} {
-                fn from(__value: Native${class}) -> Self {
-    "#,
-        [("rust_class", &class.rust_struct_path), ("class", &class.class_name)],
-    );
-
-    for field in class.fields.iter() {
-        field_names.push(field.name.to_string());
-
-        render(s, "
-                    let ${name} = __value.${name};
-                    let ${name} = ${expr};
-        ", [
-            ("name", &field.name),
-            ("expr", &types::generate_from_native(&field.ty, &field.name, client_replicated_types)),
-        ]);
-    }
-
-    render(
-        s,
-        r#"
-                    Self { ${field_names} }
-                }
-            }
-    "#,
-        [("field_names", &field_names.join(", "))],
+        &format!("Native{}", &class.class_name),
+        &class.rust_struct_path,
+        client_replicated_types,
+        class.fields.iter().map(|it| (it.name.as_str(), &it.ty)),
     );
 }

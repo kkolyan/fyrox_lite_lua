@@ -9,6 +9,7 @@ pub mod engine_class;
 pub mod enum_class;
 pub mod struct_class;
 pub mod types;
+pub mod simple_from;
 
 pub fn generate_c_bindings_lite(domain: &Domain) -> String {
     let mut client_replicated_types: HashSet<lite_model::ClassName> = Default::default();
