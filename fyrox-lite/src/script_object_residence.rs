@@ -150,16 +150,16 @@ impl<T: Lang> Visit for ScriptObject<T> {
                 ScriptFieldValue::Prefab(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::Vector3(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::Quaternion(it) => it.visit(field_name, &mut guard),
-                ScriptFieldValue::RuntimePin(it) => it.visit(&field_name, &mut guard),
-                ScriptFieldValue::bool(it) => it.visit(name, &mut guard),
-                ScriptFieldValue::f32(it) => it.visit(name, &mut guard),
-                ScriptFieldValue::f64(it) => it.visit(name, &mut guard),
-                ScriptFieldValue::i16(it) => it.visit(name, &mut guard),
-                ScriptFieldValue::i32(it) => it.visit(name, &mut guard),
-                ScriptFieldValue::i64(it) => it.visit(name, &mut guard),
+                ScriptFieldValue::RuntimePin(it) => it.visit(field_name, &mut guard),
+                ScriptFieldValue::bool(it) => it.visit(field_name, &mut guard),
+                ScriptFieldValue::f32(it) => it.visit(field_name, &mut guard),
+                ScriptFieldValue::f64(it) => it.visit(field_name, &mut guard),
+                ScriptFieldValue::i16(it) => it.visit(field_name, &mut guard),
+                ScriptFieldValue::i32(it) => it.visit(field_name, &mut guard),
+                ScriptFieldValue::i64(it) => it.visit(field_name, &mut guard),
             };
             if let Err(err) = &result {
-                Log::warn(format!("skipping deserialization of field `{}::{}` due to error: {}", it.def.metadata.class, field_name, err).as_str());
+                Log::warn(format!("skipping deserialization of field `{}::{}` ({:?}) due to error: {}", it.def.metadata.class, field_name, it.values[i], err).as_str());
             }
         }
         Ok(())

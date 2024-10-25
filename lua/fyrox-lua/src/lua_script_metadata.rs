@@ -74,7 +74,7 @@ pub(crate) fn parse_source(script_source: Vec<u8>) -> Result<ScriptMetadata, Vec
                                 errors.push("duplicated class tag".to_string());
                             }
                             let mut parts = value.splitn(2, ":");
-                            class = Some(parts.next().unwrap().trim().to_string().leak());
+                            class = Some(parts.next().unwrap().trim().to_string());
                             parent_class = parts.next().map(|it| it.trim().to_string());
                         }
                         "field" => {
@@ -159,7 +159,7 @@ pub(crate) fn parse_source(script_source: Vec<u8>) -> Result<ScriptMetadata, Vec
         unknown => panic!("unknown ScriptKind constant: {:?}", unknown),
     };
     Ok(ScriptMetadata {
-        class: class.unwrap().to_string(),
+        class: class.unwrap(),
         kind,
         fields,
         field_name_to_index,

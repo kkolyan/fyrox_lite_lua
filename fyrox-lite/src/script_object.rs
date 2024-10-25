@@ -35,6 +35,7 @@ pub trait Lang: Debug + Clone + 'static {
 }
 
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 pub enum ScriptFieldValue<T: Lang> {
     bool(bool),
     f32(f32),
@@ -166,22 +167,22 @@ impl<T: Lang> ScriptFieldValue<T> {
     }
 }
 
-impl<T: Lang> Debug for ScriptFieldValue<T> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ScriptFieldValue::String(it) => it.fmt(f),
-            ScriptFieldValue::Node(it) => it.fmt(f),
-            ScriptFieldValue::UiNode(it) => it.fmt(f),
-            ScriptFieldValue::Prefab(it) => it.fmt(f),
-            ScriptFieldValue::Vector3(it) => it.fmt(f),
-            ScriptFieldValue::Quaternion(it) => it.fmt(f),
-            ScriptFieldValue::RuntimePin(it) => it.fmt(f),
-            ScriptFieldValue::bool(it) => it.fmt(f),
-            ScriptFieldValue::f32(it) => it.fmt(f),
-            ScriptFieldValue::f64(it) => it.fmt(f),
-            ScriptFieldValue::i16(it) => it.fmt(f),
-            ScriptFieldValue::i32(it) => it.fmt(f),
-            ScriptFieldValue::i64(it) => it.fmt(f),
-        }
-    }
-}
+// impl<T: Lang> Debug for ScriptFieldValue<T> {
+//     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+//         match self {
+//             ScriptFieldValue::String(it) => it.fmt(f),
+//             ScriptFieldValue::Node(it) => it.fmt(f),
+//             ScriptFieldValue::UiNode(it) => it.fmt(f),
+//             ScriptFieldValue::Prefab(it) => it.fmt(f),
+//             ScriptFieldValue::Vector3(it) => it.fmt(f),
+//             ScriptFieldValue::Quaternion(it) => it.fmt(f),
+//             ScriptFieldValue::RuntimePin(it) => it.fmt(f),
+//             ScriptFieldValue::bool(it) => it.fmt(f),
+//             ScriptFieldValue::f32(it) => it.fmt(f),
+//             ScriptFieldValue::f64(it) => it.fmt(f),
+//             ScriptFieldValue::i16(it) => it.fmt(f),
+//             ScriptFieldValue::i32(it) => it.fmt(f),
+//             ScriptFieldValue::i64(it) => it.fmt(f),
+//         }
+//     }
+// }
