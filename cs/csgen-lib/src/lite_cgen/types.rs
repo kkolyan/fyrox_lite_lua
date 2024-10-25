@@ -53,13 +53,16 @@ pub(crate) fn generate_to_native(
         DataType::F64 => format!("{}", var),
         DataType::String => format!("<u8 as NativeType>::to_native_array({}.into_bytes())", var),
         DataType::ClassName => format!("<u8 as NativeType>::to_native_array({}.into_bytes())", var),
-        DataType::Vec(data_type) => format!(
-            "<{} as NativeType>::to_native_array({})", 
-            generate_ffi_type(data_type.deref(), client_replicated_types),
-            var
+        DataType::Vec(it) => render_string(
+            "<${element} as NativeType>::to_native_array(${var}.into_iter().map(|${var}| ${expr}).collect::<Vec<_>>())",
+            [
+                ("element", &generate_ffi_type(it.deref(), client_replicated_types)),
+                ("var", &var),
+                ("expr", &generate_to_native(it.deref(), var, client_replicated_types))
+            ],
         ),
         DataType::UserScript => format!("{}.into()", var),
-        DataType::UserScriptMessage => format!("{}.into()", var),
+        DataType::UserScriptMessage => format!("{}", var),
         DataType::UserScriptGenericStub => {
             panic!("UserScriptGenericStub should not be exposed in bindings")
         }
@@ -112,20 +115,23 @@ pub(crate) fn generate_from_native(
             "String::from_utf8(<u8 as NativeType>::from_native_array({})).unwrap()",
             var
         ),
-        DataType::Vec(it) => format!(
-            "<{} as NativeType>::to_native_array({})",
-            generate_ffi_type(it.deref(), client_replicated_types),
-            var
+        DataType::Vec(it) => render_string(
+            "<${element} as NativeType>::from_native_array(${var}).into_iter().map(|${var}| ${expr}).collect::<Vec<_>>()",
+            [
+                ("element", &generate_ffi_type(it.deref(), client_replicated_types)),
+                ("var", &var),
+                ("expr", &generate_from_native(it.deref(), var, client_replicated_types))
+            ],
         ),
         DataType::UserScript => format!("{}", var),
-        DataType::UserScriptMessage => format!("{}.into()", var),
+        DataType::UserScriptMessage => format!("{}", var),
         DataType::UserScriptGenericStub => format!("()"),
         DataType::Object(it) => match client_replicated_types.contains(it) {
             true => format!("{}.into()", var),
             false => format!("Externalizable::from_external({}.as_u128())", var),
         },
         DataType::Option(it) => render_string(
-            "if ${var}.present { Some((${expr}).value) } else { None }",
+            "if ${var}.present { Some( { let ${var} = ${var}.value; ${expr} } ) } else { None }",
             [
                 ("var", &var),
                 (

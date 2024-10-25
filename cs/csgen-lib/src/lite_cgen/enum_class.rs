@@ -4,6 +4,7 @@ use gen_common::templating::render;
 use lite_model::{
     Class, ClassName, DataType, Domain, EngineClass, EnumClass, EnumValue, EnumVariant, Field,
 };
+use to_vec::ToVec;
 
 use super::{
     simple_from,
@@ -55,7 +56,8 @@ pub(crate) fn generate_enum(
         [("class", &class.class_name)],
     );
 
-    generate_from_native(s, class, client_replicated_types);
+    generate_from_native(s, class, client_replicated_types, has_fields);
+    generate_to_native(s, class, client_replicated_types, has_fields);
 
     generate_tag_constants_impl(s, class);
 
@@ -214,6 +216,7 @@ fn generate_from_native(
     s: &mut String,
     class: &EnumClass,
     client_replicated_types: &HashSet<ClassName>,
+    has_fields: bool,
 ) {
     render(
         s,
@@ -323,6 +326,160 @@ fn generate_from_native(
         s,
         r#"
                     panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
+                }
+            }
+    "#,
+        [],
+    );
+}
+
+fn generate_to_native(
+    s: &mut String,
+    class: &EnumClass,
+    client_replicated_types: &HashSet<ClassName>,
+    has_fields: bool,
+) {
+    render(
+        s,
+        r#"
+            impl From<${rust_class}> for Native${class} {
+                fn from(__value: ${rust_class}) -> Self {
+    "#,
+        [
+            ("rust_class", &class.rust_struct_path),
+            ("class", &class.class_name),
+        ],
+    );
+
+    for variant in class.variants.iter() {
+        match &variant.value {
+            EnumValue::Unit => {
+                if has_fields {
+                    render(
+                        s,
+                        r#"
+                    if let ${rust_class}::${variant} = __value {
+                        return Native${class} { tag: Native${class}::${variant}, value: unsafe { std::mem::zeroed() } };
+                    }
+                    "#,
+                        [
+                            ("rust_class", &class.rust_struct_path),
+                            ("class", &class.class_name),
+                            ("variant", &variant.tag),
+                        ],
+                    );
+                } else {
+                    render(
+                        s,
+                        r#"
+                    if let ${rust_class}::${variant} = __value {
+                        return Native${class} { tag: Native${class}::${variant} };
+                    }
+                    "#,
+                        [
+                            ("rust_class", &class.rust_struct_path),
+                            ("class", &class.class_name),
+                            ("variant", &variant.tag),
+                        ],
+                    );
+                }
+            }
+            EnumValue::Tuple { fields } => {
+                let mut field_names = fields.iter().enumerate().map(|(i, _)| format!("_{}", i)).to_vec();
+                render(
+                    s,
+                    r#"
+                    if let ${rust_class}::${variant}( ${field_names} ) = __value {
+                "#,
+                    [
+                        ("rust_class", &class.rust_struct_path),
+                        ("variant", &variant.tag),
+                        ("field_names", &field_names.join(", ")),
+                    ],
+                );
+
+                for (i, ty) in fields.iter().enumerate() {
+                    let var = format!("_{}", i);
+
+                    render(
+                        s,
+                        r#"
+                        let ${var} = ${expr};
+                    "#,
+                        [
+                            ("var", &var),
+                            (
+                                "expr",
+                                &types::generate_to_native(ty, &var, client_replicated_types),
+                            ),
+                        ],
+                    );
+                }
+                render(
+                    s,
+                    r#"
+                        return Native${class} { tag: Native${class}::${variant}, value: Native${class}VariantContainer { ${variant}: Native${class}_${variant} { ${field_names} }} };
+                    }
+                "#,
+                    [
+                        ("variant", &variant.tag),
+                        ("class", &class.class_name),
+                        ("field_names", &field_names.join(", ")),
+                    ],
+                );
+            }
+            EnumValue::Struct { fields } => {
+                let field_names = fields.iter().map(|it| it.name.to_string()).to_vec();
+                render(
+                    s,
+                    r#"
+                    if let ${rust_class}::${variant} { ${field_names} } = __value {
+                "#,
+                    [
+                        ("rust_class", &class.rust_struct_path),
+                        ("variant", &variant.tag),
+                        ("field_names", &field_names.join(", ")),
+                    ],
+                );
+
+                for field in fields.iter() {
+                    let var = &field.name;
+                    let ty = &field.ty;
+
+                    render(
+                        s,
+                        r#"
+                        let ${var} = ${expr};
+                    "#,
+                        [
+                            ("var", &var),
+                            (
+                                "expr",
+                                &types::generate_to_native(ty, &var, client_replicated_types),
+                            ),
+                        ],
+                    );
+                }
+                render(
+                    s,
+                    r#"
+                        return Native${class} { tag: Native${class}::${variant}, value: Native${class}VariantContainer { ${variant}: Native${class}_${variant} { ${field_names} }} };
+                    }
+                "#,
+                    [
+                        ("variant", &variant.tag),
+                        ("class", &class.class_name),
+                        ("field_names", &field_names.join(", ")),
+                    ],
+                );
+            }
+        }
+    }
+
+    render(
+        s,
+        r#"
+                    panic!("unsupported enum: {:?}", __value)
                 }
             }
     "#,

@@ -19,6 +19,7 @@ pub extern "C" fn init_fyrox(app: NativeScriptedApp) {
     APP.set(Some(ScriptedApp::from_native(app)));
 }
 
+/// identifier of some entity allocated on scripting side and managed by scripting engine.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct NativeInstanceId {

@@ -55,6 +55,6 @@ pub fn generate_lite_bindings_cs(domain: &Domain) {
     fs::write(file, &s).unwrap();
     gen_common::fmt::fmt_file(file);
 
-    write_bindings_cs("FyroxLiteBindings", &s);
+    // write_bindings_cs("FyroxLiteBindings", &s);
 
 }

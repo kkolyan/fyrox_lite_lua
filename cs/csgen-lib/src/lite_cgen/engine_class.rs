@@ -21,8 +21,8 @@ pub(crate) fn generate_engine_class(
             .iter()
             .filter(|it| !matches!(it.ty, DataType::UserScriptGenericStub))
             .to_vec();
-
-        let generics = match (params_final.len() != method.signature.params.len()) {
+        
+        let generics = match method.is_generic() {
             true => "::<NativeHandle>",
             false => "",
         };

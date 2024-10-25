@@ -1,6 +1,6 @@
 use std::{fmt::Display, ops::Deref};
 
-use crate::{Class, ClassName, DataType, Domain, EnumValue, RustQualifiedName};
+use crate::{Class, ClassName, DataType, Domain, EnumValue, Method, RustQualifiedName};
 
 impl Display for DataType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -83,5 +83,23 @@ impl Display for RustQualifiedName {
 impl Display for ClassName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+impl Method {
+    pub fn is_generic(&self) -> bool {
+        self
+            .signature
+            .params
+            .iter()
+            .find(|it| {
+                matches!(
+                    it.ty,
+                    DataType::UserScript
+                        | DataType::UserScriptMessage
+                        | DataType::UserScriptGenericStub
+                )
+            })
+            .is_some()
     }
 }

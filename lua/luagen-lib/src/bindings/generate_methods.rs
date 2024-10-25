@@ -28,20 +28,10 @@ pub fn generate_methods(
             .filter(|it| it.ty != DataType::UserScriptGenericStub)
             .to_vec();
 
-        let generics = method
-            .signature
-            .params
-            .iter()
-            .find(|it| {
-                matches!(
-                    it.ty,
-                    DataType::UserScript
-                        | DataType::UserScriptMessage
-                        | DataType::UserScriptGenericStub
-                )
-            })
-            .map(|_| "::<TypedUserData<Traitor<ScriptObject>>>")
-            .unwrap_or("");
+        let generics = match method.is_generic() {
+            true => "::<TypedUserData<Traitor<ScriptObject>>>",
+            false => "",
+        };
 
         let input_names = params.iter().map(|it| it.name.as_str()).to_vec().join(", ");
 

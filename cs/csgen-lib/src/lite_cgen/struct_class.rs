@@ -61,12 +61,39 @@ fn generate_to_native(
     class: &StructClass,
     client_replicated_types: &HashSet<ClassName>,
 ) {
-    simple_from::generate_from(
+    let mut field_names = vec![];
+
+    render(
         s,
-        &class.rust_struct_path,
-        &format!("Native{}", &class.class_name),
-        client_replicated_types,
-        class.fields.iter().map(|it| (it.name.as_str(), &it.ty)),
+        r#"
+            impl From<${from}> for ${to} {
+                fn from(__value: ${from}) -> Self {
+    "#,
+        [("from", &class.rust_struct_path), ("to", &format!("Native{}", &class.class_name))],
+    );
+
+    for field in class.fields.iter() {
+        let name = &field.name;
+        let ty = &field.ty;
+        field_names.push(name.to_string());
+
+        render(s, "
+                    let ${name} = __value.${name};
+                    let ${name} = ${expr};
+        ", [
+            ("name", &name),
+            ("expr", &types::generate_to_native(&ty, &name, client_replicated_types)),
+        ]);
+    }
+
+    render(
+        s,
+        r#"
+                    Self { ${field_names} }
+                }
+            }
+    "#,
+        [("field_names", &field_names.join(", "))],
     );
 }
 
@@ -75,11 +102,36 @@ fn generate_from_native(
     class: &StructClass,
     client_replicated_types: &HashSet<ClassName>,
 ) {
-    simple_from::generate_from(
+    let mut field_names = vec![];
+
+    render(
         s,
-        &format!("Native{}", &class.class_name),
-        &class.rust_struct_path,
-        client_replicated_types,
-        class.fields.iter().map(|it| (it.name.as_str(), &it.ty)),
+        r#"
+            impl From<${from}> for ${to} {
+                fn from(__value: ${from}) -> Self {
+    "#,
+        [("from", &format!("Native{}", &class.class_name)), ("to", &class.rust_struct_path)],
+    );
+
+    for field in class.fields.iter() {
+        field_names.push(field.name.to_string());
+
+        render(s, "
+                    let ${name} = __value.${name};
+                    let ${name} = ${expr};
+        ", [
+            ("name", &field.name),
+            ("expr", &types::generate_from_native(&field.ty, &field.name, client_replicated_types)),
+        ]);
+    }
+
+    render(
+        s,
+        r#"
+                    Self { ${field_names} }
+                }
+            }
+    "#,
+        [("field_names", &field_names.join(", "))],
     );
 }
