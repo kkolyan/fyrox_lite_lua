@@ -9,7 +9,7 @@
 -----------------------------------------------------------
 
 ---@class InteractionGroups
----@field memberships integer
----@field filter integer
+---@field memberships number
+---@field filter number
 InteractionGroups_instance = {}
 

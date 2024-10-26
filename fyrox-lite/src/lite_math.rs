@@ -9,7 +9,7 @@ pub struct PodVector3 {
     pub z: f32,
 }
 #[lite_api(class=Vector2)]
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct PodVector2 {
     pub x: f32,
     pub y: f32,

@@ -29,7 +29,6 @@ impl FyroxUserData for fyrox_lite::lite_ui::LiteText {
             Ok(format!("{:?}", this.inner()))
         });
     }
-
     fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
         methods: &mut M,
     ) {
@@ -37,20 +36,17 @@ impl FyroxUserData for fyrox_lite::lite_ui::LiteText {
             "new",
             |lua, this, (state): (Traitor<fyrox_lite::lite_ui::TextBuilder>)| {
                 let state = state.inner().clone().into();
-
                 let ret = fyrox_lite::lite_ui::LiteText::new(state);
                 let ret = Traitor::new(fyrox_lite::lite_ui::LiteText::from(ret));
                 Ok(ret)
             },
         );
     }
-
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
         fields.add_field_method_set("text_async", |lua, this, value: mlua::String| {
             this.set_text_async(value.to_str()?.to_string());
             Ok(())
         });
     }
-
     fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {}
 }

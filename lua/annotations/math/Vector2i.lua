@@ -9,7 +9,7 @@
 -----------------------------------------------------------
 
 ---@class Vector2i
----@field x integer
----@field y integer
+---@field x number
+---@field y number
 Vector2i_instance = {}
 

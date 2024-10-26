@@ -1,5 +1,4 @@
 pub mod lite_plugin;
-pub mod lite_event;
 pub mod lite_log;
 pub mod lite_math;
 pub mod spi;
@@ -18,5 +17,6 @@ pub mod reflect_base_macro;
 pub mod script_object_residence;
 pub mod externalizable;
 pub(crate) mod resource_registry;
+pub mod lite_input;
 
 pub use crate::spi::LiteDataType;

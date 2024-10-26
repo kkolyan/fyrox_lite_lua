@@ -28,7 +28,6 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
         methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
             Ok(format!("{:?}", this.inner()))
         });
-
         methods.add_meta_method(
             mlua::MetaMethod::Eq.name(),
             |lua, this, args: TypedUserData<Traitor<Self>>| {
@@ -50,13 +49,11 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
             };
             Ok(ret)
         });
-
         methods.add_method_mut("destroy", |lua, this, (): ()| {
             let ret = this.destroy();
             let ret = ret;
             Ok(ret)
         });
-
         methods.add_method_mut(
             "send_hierarchical",
             |lua,
@@ -66,26 +63,21 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
                 mlua::Value,
             )| {
                 let routing = routing.borrow()?.inner().clone().into();
-
                 let payload = Traitor::new(send_wrapper::SendWrapper::new(unsafe {
                     std::mem::transmute::<mlua::Value<'_>, mlua::Value<'static>>(payload)
                 }));
-
                 let ret = this
                     .send_hierarchical::<TypedUserData<Traitor<ScriptObject>>>(routing, payload);
                 let ret = ret;
                 Ok(ret)
             },
         );
-
         methods.add_method_mut("subscribe_to", |lua, this, (): ()| {
             let _stub = Default::default();
-
             let ret = this.subscribe_to::<TypedUserData<Traitor<ScriptObject>>>(_stub);
             let ret = ret;
             Ok(ret)
         });
-
         methods.add_method_mut("find_collider_in_children", |lua, this, (): ()| {
             let ret = this.find_collider_in_children();
             let ret = if let Some(ret) = ret {
@@ -95,12 +87,9 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
             };
             Ok(ret)
         });
-
         methods.add_method_mut("add_script", |lua, this, (class_name): (mlua::String)| {
             let class_name = class_name.to_str()?.to_string();
-
             let _stub = Default::default();
-
             let ret = this.add_script::<TypedUserData<Traitor<ScriptObject>>>(class_name, _stub);
             let ret = match ret {
                 Ok(ret) => ret,
@@ -108,12 +97,9 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
             };
             Ok(ret)
         });
-
         methods.add_method_mut("find_script", |lua, this, (class_name): (mlua::String)| {
             let class_name = class_name.to_str()?.to_string();
-
             let _stub = Default::default();
-
             let ret = this.find_script::<TypedUserData<Traitor<ScriptObject>>>(class_name, _stub);
             let ret = match ret {
                 Ok(ret) => {
@@ -127,21 +113,17 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
             };
             Ok(ret)
         });
-
         methods.add_method_mut("tag_is", |lua, this, (tag): (mlua::String)| {
             let tag = tag.to_str()?.to_string();
-
             let ret = this.tag_is(tag);
             let ret = ret;
             Ok(ret)
         });
     }
-
     fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
         methods: &mut M,
     ) {
     }
-
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
         fields.add_field_method_get("name", |lua, this| {
             let value = this.get_name();
@@ -151,55 +133,46 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
                 None
             })
         });
-
         fields.add_field_method_get("alive", |lua, this| {
             let value = this.get_alive();
             Ok(value)
         });
-
         fields.add_field_method_get("global_position", |lua, this| {
             let value = this.get_global_position();
             Ok(Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(
                 value,
             )))
         });
-
         fields.add_field_method_get("local_position", |lua, this| {
             let value = this.get_local_position();
             Ok(Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(
                 value,
             )))
         });
-
         fields.add_field_method_get("local_rotation", |lua, this| {
             let value = this.get_local_rotation();
             Ok(Traitor::new(
                 fyrox_lite_math::lite_math::LiteQuaternion::from(value),
             ))
         });
-
         fields.add_field_method_get("valid", |lua, this| {
             let value = this.get_valid();
             Ok(value)
         });
-
         fields.add_field_method_get("parent", |lua, this| {
             let value = this.get_parent();
             Ok(Traitor::new(fyrox_lite::lite_node::LiteNode::from(value)))
         });
-
         fields.add_field_method_get("global_rotation", |lua, this| {
             let value = this.get_global_rotation();
             Ok(Traitor::new(
                 fyrox_lite_math::lite_math::LiteQuaternion::from(value),
             ))
         });
-
         fields.add_field_method_get("tag", |lua, this| {
             let value = this.get_tag();
             Ok(value)
         });
-
         fields.add_field_method_set(
             "local_position",
             |lua, this, value: TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector3>>| {
@@ -207,17 +180,14 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
                 Ok(())
             },
         );
-
         fields.add_field_method_set("local_rotation", |lua, this, value: TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteQuaternion>>| {
                     this.set_local_rotation(value.borrow()?.inner().clone().into());
                     Ok(())
                 });
-
         fields.add_field_method_set("tag", |lua, this, value: mlua::String| {
             this.set_tag(value.to_str()?.to_string());
             Ok(())
         });
     }
-
     fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {}
 }

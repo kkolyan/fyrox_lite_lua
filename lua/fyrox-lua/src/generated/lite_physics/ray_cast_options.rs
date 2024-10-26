@@ -21,27 +21,22 @@ use crate::{
     typed_userdata::TypedUserData,
     user_data_plus::{FyroxUserData, Traitor, UserDataClass},
 };
-
 impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteRayCastOptions> {
     fn into_lua(self, lua: &'lua mlua::Lua) -> mlua::Result<mlua::Value<'lua>> {
         Ok(mlua::Value::Table({
             let t = lua.create_table()?;
-
             t.set("ray_origin", {
                 let ray_origin = self.ray_origin.clone();
                 Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(ray_origin))
             })?;
-
             t.set("ray_direction", {
                 let ray_direction = self.ray_direction.clone();
                 Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(ray_direction))
             })?;
-
             t.set("max_len", {
                 let max_len = self.max_len.clone();
                 max_len
             })?;
-
             t.set("groups", {
                 let groups = self.groups.clone();
                 if let Some(groups) = groups {
@@ -52,17 +47,14 @@ impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteRayCast
                     None
                 }
             })?;
-
             t.set("sort_results", {
                 let sort_results = self.sort_results.clone();
                 sort_results
             })?;
-
             t
         }))
     }
 }
-
 impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteRayCastOptions> {
     fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> mlua::Result<Self> {
         let mlua::Value::Table(value) = value else {
@@ -71,22 +63,18 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteRayCast
                 value
             ));
         };
-
         let ray_origin = value
             .get::<_, TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector3>>>(
                 "ray_origin",
             )?;
         let ray_origin = ray_origin.borrow()?.inner().clone().into();
-
         let ray_direction = value
             .get::<_, TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector3>>>(
                 "ray_direction",
             )?;
         let ray_direction = ray_direction.borrow()?.inner().clone().into();
-
         let max_len = value.get::<_, f32>("max_len")?;
         let max_len = max_len;
-
         let groups = value
             .get::<_, Option<Traitor<fyrox_lite::lite_physics::LiteInteractionGroups>>>("groups")?;
         let groups = if let Some(groups) = groups {
@@ -94,10 +82,8 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteRayCast
         } else {
             None
         };
-
         let sort_results = value.get::<_, bool>("sort_results")?;
         let sort_results = sort_results;
-
         Ok(Traitor::new(fyrox_lite::lite_physics::LiteRayCastOptions {
             ray_origin,
             ray_direction,

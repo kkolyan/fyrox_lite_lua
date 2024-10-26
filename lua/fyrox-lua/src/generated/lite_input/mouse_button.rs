@@ -22,43 +22,31 @@ use crate::{
     user_data_plus::{FyroxUserData, Traitor, UserDataClass},
 };
 
-impl FyroxUserData for fyrox_lite::lite_event::MouseButton {
+impl FyroxUserData for fyrox_lite::lite_input::LiteMouseButton {
     const CLASS_NAME: &'static str = "MouseButton";
-
     fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
         methods: &mut M,
     ) {
-        methods.add_method_mut("Other", |lua, this, mut args: mlua::MultiValue| {
-            let Some(_1) = args.pop_front() else {
-                return Err(lua_error!("argument 1 (i32) missing"));
-            };
-            let _1 = <i32 as mlua::FromLua>::from_lua(_1, lua)?;
-            let _1 = _1;
-
-            let value = fyrox_lite::lite_event::MouseButton::Other(_1);
-            Ok(Traitor::new(value))
-        });
     }
-
     fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
         fields.add_field_method_get("Left", |lua, this| {
-            Ok(Traitor::new(fyrox_lite::lite_event::MouseButton::Left))
+            Ok(Traitor::new(fyrox_lite::lite_input::LiteMouseButton::Left))
         });
-
         fields.add_field_method_get("Right", |lua, this| {
-            Ok(Traitor::new(fyrox_lite::lite_event::MouseButton::Right))
+            Ok(Traitor::new(fyrox_lite::lite_input::LiteMouseButton::Right))
         });
-
         fields.add_field_method_get("Middle", |lua, this| {
-            Ok(Traitor::new(fyrox_lite::lite_event::MouseButton::Middle))
+            Ok(Traitor::new(
+                fyrox_lite::lite_input::LiteMouseButton::Middle,
+            ))
         });
-
         fields.add_field_method_get("Back", |lua, this| {
-            Ok(Traitor::new(fyrox_lite::lite_event::MouseButton::Back))
+            Ok(Traitor::new(fyrox_lite::lite_input::LiteMouseButton::Back))
         });
-
         fields.add_field_method_get("Forward", |lua, this| {
-            Ok(Traitor::new(fyrox_lite::lite_event::MouseButton::Forward))
+            Ok(Traitor::new(
+                fyrox_lite::lite_input::LiteMouseButton::Forward,
+            ))
         });
     }
 
@@ -70,53 +58,34 @@ impl FyroxUserData for fyrox_lite::lite_event::MouseButton {
 
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
         fields.add_field_method_get("Left", |lua, this| {
-            let fyrox_lite::lite_event::MouseButton::Left = this.inner() else {
+            let fyrox_lite::lite_input::LiteMouseButton::Left = this.inner() else {
                 return Ok(mlua::Value::Nil);
             };
             Ok(mlua::Value::Boolean(true))
         });
-
         fields.add_field_method_get("Right", |lua, this| {
-            let fyrox_lite::lite_event::MouseButton::Right = this.inner() else {
+            let fyrox_lite::lite_input::LiteMouseButton::Right = this.inner() else {
                 return Ok(mlua::Value::Nil);
             };
             Ok(mlua::Value::Boolean(true))
         });
-
         fields.add_field_method_get("Middle", |lua, this| {
-            let fyrox_lite::lite_event::MouseButton::Middle = this.inner() else {
+            let fyrox_lite::lite_input::LiteMouseButton::Middle = this.inner() else {
                 return Ok(mlua::Value::Nil);
             };
             Ok(mlua::Value::Boolean(true))
         });
-
         fields.add_field_method_get("Back", |lua, this| {
-            let fyrox_lite::lite_event::MouseButton::Back = this.inner() else {
+            let fyrox_lite::lite_input::LiteMouseButton::Back = this.inner() else {
                 return Ok(mlua::Value::Nil);
             };
             Ok(mlua::Value::Boolean(true))
         });
-
         fields.add_field_method_get("Forward", |lua, this| {
-            let fyrox_lite::lite_event::MouseButton::Forward = this.inner() else {
+            let fyrox_lite::lite_input::LiteMouseButton::Forward = this.inner() else {
                 return Ok(mlua::Value::Nil);
             };
             Ok(mlua::Value::Boolean(true))
-        });
-
-        fields.add_field_method_get("Other", |lua, this| {
-            let fyrox_lite::lite_event::MouseButton::Other(_1) = this.inner() else {
-                return Ok(mlua::Value::Nil);
-            };
-            let t = lua.create_table()?;
-
-            // Lua annotations is based on assumption that indexed table is homogenous array, so use string keys to allow heterogenous typing here.
-            t.set("_1", {
-                let _1 = _1.clone();
-                _1
-            })?;
-
-            Ok(mlua::Value::Table(t))
         });
     }
 }

@@ -29,7 +29,6 @@ impl FyroxUserData for fyrox_lite::lite_physics::LitePhysics {
             Ok(format!("{:?}", this.inner()))
         });
     }
-
     fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
         methods: &mut M,
     ) {
@@ -37,7 +36,6 @@ impl FyroxUserData for fyrox_lite::lite_physics::LitePhysics {
             "cast_ray",
             |lua, this, (opts): (Traitor<fyrox_lite::lite_physics::LiteRayCastOptions>)| {
                 let opts = opts.inner().clone().into();
-
                 let ret = fyrox_lite::lite_physics::LitePhysics::cast_ray(opts);
                 let ret = lua.create_table_from(
                     ret.into_iter()
@@ -51,45 +49,36 @@ impl FyroxUserData for fyrox_lite::lite_physics::LitePhysics {
             },
         );
     }
-
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {}
-
     fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
         fields.add_field_method_get("EXCLUDE_FIXED", |lua, this| {
             let value = fyrox_lite::lite_physics::LitePhysics::EXCLUDE_FIXED;
             Ok(value)
         });
-
         fields.add_field_method_get("EXCLUDE_KINEMATIC", |lua, this| {
             let value = fyrox_lite::lite_physics::LitePhysics::EXCLUDE_KINEMATIC;
             Ok(value)
         });
-
         fields.add_field_method_get("EXCLUDE_DYNAMIC", |lua, this| {
             let value = fyrox_lite::lite_physics::LitePhysics::EXCLUDE_DYNAMIC;
             Ok(value)
         });
-
         fields.add_field_method_get("EXCLUDE_SENSORS", |lua, this| {
             let value = fyrox_lite::lite_physics::LitePhysics::EXCLUDE_SENSORS;
             Ok(value)
         });
-
         fields.add_field_method_get("EXCLUDE_SOLIDS", |lua, this| {
             let value = fyrox_lite::lite_physics::LitePhysics::EXCLUDE_SOLIDS;
             Ok(value)
         });
-
         fields.add_field_method_get("ONLY_DYNAMIC", |lua, this| {
             let value = fyrox_lite::lite_physics::LitePhysics::ONLY_DYNAMIC;
             Ok(value)
         });
-
         fields.add_field_method_get("ONLY_KINEMATIC", |lua, this| {
             let value = fyrox_lite::lite_physics::LitePhysics::ONLY_KINEMATIC;
             Ok(value)
         });
-
         fields.add_field_method_get("ONLY_FIXED", |lua, this| {
             let value = fyrox_lite::lite_physics::LitePhysics::ONLY_FIXED;
             Ok(value)

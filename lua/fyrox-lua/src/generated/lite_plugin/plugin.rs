@@ -29,15 +29,12 @@ impl FyroxUserData for fyrox_lite::lite_plugin::LitePlugin {
             Ok(format!("{:?}", this.inner()))
         });
     }
-
     fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
         methods: &mut M,
     ) {
         methods.add_method_mut("get", |lua, this, (class_name): (mlua::String)| {
             let class_name = class_name.to_str()?.to_string();
-
             let _stub = Default::default();
-
             let ret = fyrox_lite::lite_plugin::LitePlugin::get::<
                 TypedUserData<Traitor<ScriptObject>>,
             >(class_name, _stub);
@@ -48,8 +45,6 @@ impl FyroxUserData for fyrox_lite::lite_plugin::LitePlugin {
             Ok(ret)
         });
     }
-
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {}
-
     fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {}
 }

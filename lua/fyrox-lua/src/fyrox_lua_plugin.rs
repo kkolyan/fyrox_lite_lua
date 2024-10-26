@@ -22,6 +22,7 @@ use fyrox_lite::wrapper_reflect;
 use mlua::Value;
 use std::cell::RefCell;
 use std::fmt::Debug;
+use fyrox_lite::lite_input::Input;
 
 #[derive(Visit, Reflect)]
 pub struct LuaPlugin {
@@ -107,6 +108,8 @@ impl Plugin for LuaPlugin {
     }
 
     fn init(&mut self, scene_path: Option<&str>, mut context: PluginContext) {
+        Input::init_thread_local_state();
+
         for script in self.scripts.borrow_mut().0.iter_mut() {
             invoke_callback(&mut script.data,&mut context, "init", || {
                 if let Some(scene_path) = scene_path {
@@ -135,6 +138,11 @@ impl Plugin for LuaPlugin {
             ));
             self.check_for_script_changes();
         }
+        Input::on_os_event(event);
+    }
+
+    fn post_update(&mut self, _context: &mut PluginContext) {
+        Input::post_fixed_update();
     }
 }
 

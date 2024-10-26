@@ -8,7 +8,6 @@ use fyrox::core::visitor::prelude::*;
 use fyrox::script::BaseScript;
 use fyrox::script::ScriptContext;
 use fyrox::script::ScriptTrait;
-use fyrox_lite::lite_event::to_lite;
 use fyrox_lite::reflect_base;
 use mlua::Value;
 use send_wrapper::SendWrapper;
@@ -50,18 +49,6 @@ impl ScriptTrait for ExternalScriptProxy {
             "on_deinit",
             || Ok(()),
         );
-    }
-
-    fn on_os_event(&mut self, event: &fyrox::event::Event<()>, ctx: &mut ScriptContext) {
-        if let Some(event) = to_lite(event.clone()) {
-            self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed);
-            invoke_callback(
-                &mut self.data,
-                ctx,
-                "on_os_event",
-                || Ok(Traitor::new(event.clone())),
-            );
-        }
     }
 
     fn on_update(&mut self, ctx: &mut ScriptContext) {

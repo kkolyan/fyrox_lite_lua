@@ -29,36 +29,28 @@ impl FyroxUserData for fyrox_lite::lite_log::LiteLog {
             Ok(format!("{:?}", this.inner()))
         });
     }
-
     fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
         methods: &mut M,
     ) {
         methods.add_method_mut("info", |lua, this, (msg): (mlua::String)| {
             let msg = msg.to_str()?.to_string();
-
             let ret = fyrox_lite::lite_log::LiteLog::info(msg);
             let ret = ret;
             Ok(ret)
         });
-
         methods.add_method_mut("warn", |lua, this, (msg): (mlua::String)| {
             let msg = msg.to_str()?.to_string();
-
             let ret = fyrox_lite::lite_log::LiteLog::warn(msg);
             let ret = ret;
             Ok(ret)
         });
-
         methods.add_method_mut("err", |lua, this, (msg): (mlua::String)| {
             let msg = msg.to_str()?.to_string();
-
             let ret = fyrox_lite::lite_log::LiteLog::err(msg);
             let ret = ret;
             Ok(ret)
         });
     }
-
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {}
-
     fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {}
 }

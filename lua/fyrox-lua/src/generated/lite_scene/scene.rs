@@ -29,20 +29,16 @@ impl FyroxUserData for fyrox_lite::lite_scene::LiteScene {
             Ok(format!("{:?}", this.inner()))
         });
     }
-
     fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
         methods: &mut M,
     ) {
         methods.add_method_mut("load_async", |lua, this, (scene_path): (mlua::String)| {
             let scene_path = scene_path.to_str()?.to_string();
-
             let ret = fyrox_lite::lite_scene::LiteScene::load_async(scene_path);
             let ret = ret;
             Ok(ret)
         });
     }
-
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {}
-
     fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {}
 }

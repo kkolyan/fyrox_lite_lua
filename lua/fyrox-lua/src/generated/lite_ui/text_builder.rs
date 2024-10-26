@@ -21,12 +21,10 @@ use crate::{
     typed_userdata::TypedUserData,
     user_data_plus::{FyroxUserData, Traitor, UserDataClass},
 };
-
 impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_ui::TextBuilder> {
     fn into_lua(self, lua: &'lua mlua::Lua) -> mlua::Result<mlua::Value<'lua>> {
         Ok(mlua::Value::Table({
             let t = lua.create_table()?;
-
             t.set("foregound", {
                 let foregound = self.foregound.clone();
                 if let Some(foregound) = foregound {
@@ -35,7 +33,6 @@ impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_ui::TextBuilder> {
                     None
                 }
             })?;
-
             t.set("font_size", {
                 let font_size = self.font_size.clone();
                 if let Some(font_size) = font_size {
@@ -44,12 +41,10 @@ impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_ui::TextBuilder> {
                     None
                 }
             })?;
-
             t
         }))
     }
 }
-
 impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_ui::TextBuilder> {
     fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> mlua::Result<Self> {
         let mlua::Value::Table(value) = value else {
@@ -58,7 +53,6 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_ui::TextBuilder> {
                 value
             ));
         };
-
         let foregound = value
             .get::<_, Option<TypedUserData<Traitor<fyrox_lite::lite_ui::Brush>>>>("foregound")?;
         let foregound = if let Some(foregound) = foregound {
@@ -66,14 +60,12 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_ui::TextBuilder> {
         } else {
             None
         };
-
         let font_size = value.get::<_, Option<f32>>("font_size")?;
         let font_size = if let Some(font_size) = font_size {
             Some(font_size)
         } else {
             None
         };
-
         Ok(Traitor::new(fyrox_lite::lite_ui::TextBuilder {
             foregound,
             font_size,

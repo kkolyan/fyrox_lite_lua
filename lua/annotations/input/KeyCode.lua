@@ -5,7 +5,7 @@
 ---@diagnostic disable: missing-return, lowercase-global, missing-fields
 
 -----------------------------------------------------------
------- fyrox_lite::lite_event::KeyCode
+------ fyrox_lite::lite_input::LiteKeyCode
 -----------------------------------------------------------
 
 ---@class KeyCode_static
@@ -68,82 +68,82 @@ KeyCode.IntlRo = {}
 KeyCode.IntlYen = {}
 
 ---@type KeyCode
-KeyCode.KeyA = {}
+KeyCode.A = {}
 
 ---@type KeyCode
-KeyCode.KeyB = {}
+KeyCode.B = {}
 
 ---@type KeyCode
-KeyCode.KeyC = {}
+KeyCode.C = {}
 
 ---@type KeyCode
-KeyCode.KeyD = {}
+KeyCode.D = {}
 
 ---@type KeyCode
-KeyCode.KeyE = {}
+KeyCode.E = {}
 
 ---@type KeyCode
-KeyCode.KeyF = {}
+KeyCode.F = {}
 
 ---@type KeyCode
-KeyCode.KeyG = {}
+KeyCode.G = {}
 
 ---@type KeyCode
-KeyCode.KeyH = {}
+KeyCode.H = {}
 
 ---@type KeyCode
-KeyCode.KeyI = {}
+KeyCode.I = {}
 
 ---@type KeyCode
-KeyCode.KeyJ = {}
+KeyCode.J = {}
 
 ---@type KeyCode
-KeyCode.KeyK = {}
+KeyCode.K = {}
 
 ---@type KeyCode
-KeyCode.KeyL = {}
+KeyCode.L = {}
 
 ---@type KeyCode
-KeyCode.KeyM = {}
+KeyCode.M = {}
 
 ---@type KeyCode
-KeyCode.KeyN = {}
+KeyCode.N = {}
 
 ---@type KeyCode
-KeyCode.KeyO = {}
+KeyCode.O = {}
 
 ---@type KeyCode
-KeyCode.KeyP = {}
+KeyCode.P = {}
 
 ---@type KeyCode
-KeyCode.KeyQ = {}
+KeyCode.Q = {}
 
 ---@type KeyCode
-KeyCode.KeyR = {}
+KeyCode.R = {}
 
 ---@type KeyCode
-KeyCode.KeyS = {}
+KeyCode.S = {}
 
 ---@type KeyCode
-KeyCode.KeyT = {}
+KeyCode.T = {}
 
 ---@type KeyCode
-KeyCode.KeyU = {}
+KeyCode.U = {}
 
 ---@type KeyCode
-KeyCode.KeyV = {}
+KeyCode.V = {}
 
 ---@type KeyCode
-KeyCode.KeyW = {}
+KeyCode.W = {}
 
 ---@type KeyCode
-KeyCode.KeyX = {}
+KeyCode.X = {}
 
 ---@type KeyCode
-KeyCode.KeyY = {}
+KeyCode.Y = {}
 
 ---@type KeyCode
-KeyCode.KeyZ = {}
+KeyCode.Z = {}
 
 ---@type KeyCode
 KeyCode.Minus = {}
@@ -613,32 +613,32 @@ KeyCode = {}
 ---@field IntlBackslash boolean
 ---@field IntlRo boolean
 ---@field IntlYen boolean
----@field KeyA boolean
----@field KeyB boolean
----@field KeyC boolean
----@field KeyD boolean
----@field KeyE boolean
----@field KeyF boolean
----@field KeyG boolean
----@field KeyH boolean
----@field KeyI boolean
----@field KeyJ boolean
----@field KeyK boolean
----@field KeyL boolean
----@field KeyM boolean
----@field KeyN boolean
----@field KeyO boolean
----@field KeyP boolean
----@field KeyQ boolean
----@field KeyR boolean
----@field KeyS boolean
----@field KeyT boolean
----@field KeyU boolean
----@field KeyV boolean
----@field KeyW boolean
----@field KeyX boolean
----@field KeyY boolean
----@field KeyZ boolean
+---@field A boolean
+---@field B boolean
+---@field C boolean
+---@field D boolean
+---@field E boolean
+---@field F boolean
+---@field G boolean
+---@field H boolean
+---@field I boolean
+---@field J boolean
+---@field K boolean
+---@field L boolean
+---@field M boolean
+---@field N boolean
+---@field O boolean
+---@field P boolean
+---@field Q boolean
+---@field R boolean
+---@field S boolean
+---@field T boolean
+---@field U boolean
+---@field V boolean
+---@field W boolean
+---@field X boolean
+---@field Y boolean
+---@field Z boolean
 ---@field Minus boolean
 ---@field Period boolean
 ---@field Quote boolean

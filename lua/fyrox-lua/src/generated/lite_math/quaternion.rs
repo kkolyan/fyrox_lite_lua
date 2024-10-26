@@ -28,33 +28,25 @@ impl FyroxUserData for fyrox_lite_math::lite_math::LiteQuaternion {
         methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
             Ok(format!("{:?}", this.inner()))
         });
-
         methods.add_method_mut(
             "mul_vec",
             |lua, this, (o): (TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector3>>)| {
                 let o = o.borrow()?.inner().clone().into();
-
                 let ret = this.mul_vec(o);
                 let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector3::from(ret));
                 Ok(ret)
             },
         );
-
         methods.add_method_mut(
                     "mul_quat",
                     |lua, this, (rot_delta): (TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteQuaternion>>)| {
-            
-
                         let rot_delta = rot_delta.borrow()?.inner().clone().into();
-                
-
                         let ret = this.mul_quat(rot_delta);
                         let ret = Traitor::new(fyrox_lite_math::lite_math::LiteQuaternion::from(ret));
                         Ok(ret)
                     },
                 );
     }
-
     fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
         methods: &mut M,
     ) {
@@ -67,15 +59,12 @@ impl FyroxUserData for fyrox_lite_math::lite_math::LiteQuaternion {
                 TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector3>>,
             )| {
                 let dir = dir.borrow()?.inner().clone().into();
-
                 let up = up.borrow()?.inner().clone().into();
-
                 let ret = fyrox_lite_math::lite_math::LiteQuaternion::face_towards(dir, up);
                 let ret = Traitor::new(fyrox_lite_math::lite_math::LiteQuaternion::from(ret));
                 Ok(ret)
             },
         );
-
         methods.add_method_mut(
             "from_axis_angle",
             |lua,
@@ -85,17 +74,13 @@ impl FyroxUserData for fyrox_lite_math::lite_math::LiteQuaternion {
                 f32,
             )| {
                 let axis = axis.borrow()?.inner().clone().into();
-
                 let angle = angle;
-
                 let ret = fyrox_lite_math::lite_math::LiteQuaternion::from_axis_angle(axis, angle);
                 let ret = Traitor::new(fyrox_lite_math::lite_math::LiteQuaternion::from(ret));
                 Ok(ret)
             },
         );
     }
-
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {}
-
     fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {}
 }

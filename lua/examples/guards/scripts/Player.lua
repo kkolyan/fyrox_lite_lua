@@ -10,14 +10,9 @@
 ---@field private reload_sec number
 ---@field private published boolean
 ---@field private collider Node
+---@field private aim_y number
 Player = script_class()
 
-local aim_y = 0
-local forward = false
-local back = false
-local left = false
-local right = false
-local fire = false
 
 FRACTION_PLAYER = 0
 
@@ -29,13 +24,13 @@ function Player:turn(x)
 end
 
 function Player:aim(y)
-    aim_y = aim_y + y * self.sensitivity;
+    self.aim_y = self.aim_y + y * self.sensitivity;
 
-    aim_y = math.max(-math.pi / 2.0, math.min(aim_y, math.pi / 2.0))
+    self.aim_y = math.max(-math.pi / 2.0, math.min(self.aim_y, math.pi / 2.0))
 
     self.camera.local_rotation = Quaternion:from_axis_angle(
         Vector3.X,
-        aim_y
+        self.aim_y
     );
 end
 
@@ -84,7 +79,7 @@ function Player:on_update(dt)
         Plugin:get("Game").player = self.node;
     end
 
-    if fire then
+    if Input:is_mouse_button(Input.MouseLeft) then
         if self.reload_sec <= 0.0 then
             self.reload_sec = self.reload_delay_sec;
             self:fire();
@@ -92,18 +87,22 @@ function Player:on_update(dt)
     end
 
     local move_delta = Vector3.ZERO;
-    if forward then
+
+    if Input:is_key(KeyCode.W) then
         move_delta.z = move_delta.z + 1.0
     end
-    if back then
+    if Input:is_key(KeyCode.S) then
         move_delta.z = move_delta.z - 1.0
     end
-    if left then
+    if Input:is_key(KeyCode.A) then
         move_delta.x = move_delta.x + 1.0
     end
-    if right then
+    if Input:is_key(KeyCode.D) then
         move_delta.x = move_delta.x - 1.0
     end
+
+    self:turn(-Input.mouse_move.x)
+    self:aim(Input.mouse_move.y)
 
     if move_delta:magnitude() > 0.001 then
         move_delta:normalize_inplace();
@@ -113,44 +112,4 @@ function Player:on_update(dt)
     local move_delta = self_rotation:mul_vec(move_delta);
     local force = move_delta:mul(self.power);
     self.node:as_rigid_body():apply_force(force);
-end
-
----@param event Event
-function Player:on_os_event(event)
-    if event.WindowEvent then
-        local event = event.WindowEvent.event
-        if event.KeyboardInput then
-            local event = event.KeyboardInput.event
-            local value = event.state.Pressed
-            if event.physical_key.Code then
-                local code = event.physical_key.Code._1
-                if code.KeyW then
-                    forward = value
-                end
-                if code.KeyS then
-                    back = value
-                end
-                if code.KeyA then
-                    left = value
-                end
-                if code.KeyD then
-                    right = value
-                end
-            end
-        end
-        if event.MouseInput then
-            local event = event.MouseInput
-            if event.button.Left then
-                fire = event.state.Pressed
-            end
-        end
-    end
-    if event.DeviceEvent then
-        local event = event.DeviceEvent.event
-        if event.MouseMotion then
-            local event = event.MouseMotion
-            self:turn(-event.delta.x);
-            self:aim(event.delta.y);
-        end
-    end
 end

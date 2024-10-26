@@ -21,27 +21,22 @@ use crate::{
     typed_userdata::TypedUserData,
     user_data_plus::{FyroxUserData, Traitor, UserDataClass},
 };
-
 impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteInteractionGroups> {
     fn into_lua(self, lua: &'lua mlua::Lua) -> mlua::Result<mlua::Value<'lua>> {
         Ok(mlua::Value::Table({
             let t = lua.create_table()?;
-
             t.set("memberships", {
                 let memberships = self.memberships.clone();
                 memberships
             })?;
-
             t.set("filter", {
                 let filter = self.filter.clone();
                 filter
             })?;
-
             t
         }))
     }
 }
-
 impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteInteractionGroups> {
     fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> mlua::Result<Self> {
         let mlua::Value::Table(value) = value else {
@@ -50,13 +45,10 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteInterac
                 value
             ));
         };
-
         let memberships = value.get::<_, i32>("memberships")?;
         let memberships = memberships;
-
         let filter = value.get::<_, i32>("filter")?;
         let filter = filter;
-
         Ok(Traitor::new(
             fyrox_lite::lite_physics::LiteInteractionGroups {
                 memberships,

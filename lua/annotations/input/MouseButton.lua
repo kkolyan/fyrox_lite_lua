@@ -5,28 +5,32 @@
 ---@diagnostic disable: missing-return, lowercase-global, missing-fields
 
 -----------------------------------------------------------
------- fyrox_lite::lite_event::KeyLocation
+------ fyrox_lite::lite_input::LiteMouseButton
 -----------------------------------------------------------
 
----@class KeyLocation_static
+---@class MouseButton_static
 
----@type KeyLocation
-KeyLocation.Standard = {}
+---@type MouseButton
+MouseButton.Left = {}
 
----@type KeyLocation
-KeyLocation.Left = {}
+---@type MouseButton
+MouseButton.Right = {}
 
----@type KeyLocation
-KeyLocation.Right = {}
+---@type MouseButton
+MouseButton.Middle = {}
 
----@type KeyLocation
-KeyLocation.Numpad = {}
-KeyLocation = {}
+---@type MouseButton
+MouseButton.Back = {}
 
----@class KeyLocation
----@field Standard boolean
+---@type MouseButton
+MouseButton.Forward = {}
+MouseButton = {}
+
+---@class MouseButton
 ---@field Left boolean
 ---@field Right boolean
----@field Numpad boolean
-KeyLocation_instance = {}
+---@field Middle boolean
+---@field Back boolean
+---@field Forward boolean
+MouseButton_instance = {}
 

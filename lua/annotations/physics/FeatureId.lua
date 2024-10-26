@@ -11,26 +11,26 @@
 ---@class FeatureId_static
 
 ---@class FeatureId_Vertex
----@field _1 integer
+---@field _1 number
 FeatureId_Vertex = {}
 
----@param _1 integer
+---@param _1 number
 ---@return FeatureId
 function FeatureId:Vertex(_1) end
 
 ---@class FeatureId_Edge
----@field _1 integer
+---@field _1 number
 FeatureId_Edge = {}
 
----@param _1 integer
+---@param _1 number
 ---@return FeatureId
 function FeatureId:Edge(_1) end
 
 ---@class FeatureId_Face
----@field _1 integer
+---@field _1 number
 FeatureId_Face = {}
 
----@param _1 integer
+---@param _1 number
 ---@return FeatureId
 function FeatureId:Face(_1) end
 

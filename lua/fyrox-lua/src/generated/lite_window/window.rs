@@ -29,14 +29,11 @@ impl FyroxUserData for fyrox_lite::lite_window::LiteWindow {
             Ok(format!("{:?}", this.inner()))
         });
     }
-
     fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
         methods: &mut M,
     ) {
     }
-
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {}
-
     fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
         fields.add_field_method_set("cursor_grab", |lua, this, value: TypedUserData<Traitor<fyrox_lite::lite_window::LiteCursorGrabMode>>| {
                     fyrox_lite::lite_window::LiteWindow::set_cursor_grab(value.borrow()?.inner().clone().into());

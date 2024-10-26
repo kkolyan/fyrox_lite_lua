@@ -81,456 +81,408 @@
       }
     },
     {
-      "Enum": {
-        "class_name": "Event",
-        "rust_struct_path": "fyrox_lite::lite_event::Event",
-        "variants": [
+      "Engine": {
+        "class_name": "Window",
+        "rust_struct_path": "fyrox_lite::lite_window::LiteWindow",
+        "methods": [
           {
-            "tag": "WindowEvent",
-            "value": {
-              "fields": [
+            "instance": false,
+            "method_name": "set_cursor_grab",
+            "signature": {
+              "params": [
                 {
-                  "name": "window_id",
-                  "ty": "I64"
-                },
-                {
-                  "name": "event",
+                  "name": "mode",
                   "ty": {
-                    "Object": "WindowEvent"
-                  }
+                    "Object": "CursorGrabMode"
+                  },
+                  "variadic": false
                 }
               ]
             }
-          },
-          {
-            "tag": "DeviceEvent",
-            "value": {
-              "fields": [
-                {
-                  "name": "event",
-                  "ty": {
-                    "Object": "DeviceEvent"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "tag": "Suspended"
-          },
-          {
-            "tag": "Resumed"
-          },
-          {
-            "tag": "AboutToWait"
-          },
-          {
-            "tag": "LoopExiting"
-          },
-          {
-            "tag": "MemoryWarning"
           }
         ]
       }
     },
     {
       "Enum": {
-        "class_name": "StartCause",
-        "rust_struct_path": "fyrox_lite::lite_event::StartCause",
+        "class_name": "CursorGrabMode",
+        "rust_struct_path": "fyrox_lite::lite_window::LiteCursorGrabMode",
         "variants": [
           {
-            "tag": "ResumeTimeReached"
+            "tag": "None"
           },
           {
-            "tag": "WaitCancelled"
+            "tag": "Confined"
           },
           {
-            "tag": "Poll"
-          },
-          {
-            "tag": "Init"
+            "tag": "Locked"
           }
         ]
       }
     },
     {
-      "Enum": {
-        "class_name": "WindowEvent",
-        "rust_struct_path": "fyrox_lite::lite_event::WindowEvent",
-        "variants": [
+      "Engine": {
+        "class_name": "Scene",
+        "rust_struct_path": "fyrox_lite::lite_scene::LiteScene",
+        "methods": [
           {
-            "tag": "ActivationTokenDone"
-          },
-          {
-            "tag": "Resized",
-            "value": {
-              "fields": [
+            "instance": false,
+            "method_name": "load_async",
+            "signature": {
+              "params": [
                 {
-                  "Object": "Vector2i"
+                  "name": "scene_path",
+                  "ty": "String",
+                  "variadic": false
                 }
               ]
             }
-          },
-          {
-            "tag": "Moved",
-            "value": {
-              "fields": [
-                {
-                  "Object": "Vector2i"
-                }
-              ]
-            }
-          },
-          {
-            "tag": "CloseRequested"
-          },
-          {
-            "tag": "Destroyed"
-          },
-          {
-            "tag": "DroppedFile",
-            "value": {
-              "fields": [
-                "String"
-              ]
-            }
-          },
-          {
-            "tag": "HoveredFile",
-            "value": {
-              "fields": [
-                "String"
-              ]
-            }
-          },
-          {
-            "tag": "HoveredFileCancelled"
-          },
-          {
-            "tag": "Focused",
-            "value": {
-              "fields": [
-                "Bool"
-              ]
-            }
-          },
-          {
-            "tag": "KeyboardInput",
-            "value": {
-              "fields": [
-                {
-                  "name": "event",
-                  "ty": {
-                    "Object": "KeyEvent"
-                  }
-                },
-                {
-                  "name": "is_synthetic",
-                  "ty": "Bool"
-                }
-              ]
-            }
-          },
-          {
-            "tag": "ModifiersChanged"
-          },
-          {
-            "tag": "Ime"
-          },
-          {
-            "tag": "CursorMoved",
-            "value": {
-              "fields": [
-                {
-                  "name": "position",
-                  "ty": {
-                    "Object": "Vector2i"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "tag": "CursorEntered"
-          },
-          {
-            "tag": "CursorLeft"
-          },
-          {
-            "tag": "MouseWheel",
-            "value": {
-              "fields": [
-                {
-                  "name": "delta",
-                  "ty": {
-                    "Object": "MouseScrollDelta"
-                  }
-                },
-                {
-                  "name": "phase",
-                  "ty": {
-                    "Object": "TouchPhase"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "tag": "MouseInput",
-            "value": {
-              "fields": [
-                {
-                  "name": "state",
-                  "ty": {
-                    "Object": "ElementState"
-                  }
-                },
-                {
-                  "name": "button",
-                  "ty": {
-                    "Object": "MouseButton"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "tag": "TouchpadMagnify",
-            "value": {
-              "fields": [
-                {
-                  "name": "delta",
-                  "ty": "F64"
-                },
-                {
-                  "name": "phase",
-                  "ty": {
-                    "Object": "TouchPhase"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "tag": "SmartMagnify"
-          },
-          {
-            "tag": "TouchpadRotate",
-            "value": {
-              "fields": [
-                {
-                  "name": "delta",
-                  "ty": "F32"
-                },
-                {
-                  "name": "phase",
-                  "ty": {
-                    "Object": "TouchPhase"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "tag": "TouchpadPressure",
-            "value": {
-              "fields": [
-                {
-                  "name": "pressure",
-                  "ty": "F32"
-                },
-                {
-                  "name": "stage",
-                  "ty": "I64"
-                }
-              ]
-            }
-          },
-          {
-            "tag": "AxisMotion",
-            "value": {
-              "fields": [
-                {
-                  "name": "axis",
-                  "ty": "I32"
-                },
-                {
-                  "name": "value",
-                  "ty": "F64"
-                }
-              ]
-            }
-          },
-          {
-            "tag": "Touch",
-            "value": {
-              "fields": [
-                {
-                  "Object": "Touch"
-                }
-              ]
-            }
-          },
-          {
-            "tag": "ScaleFactorChanged",
-            "value": {
-              "fields": [
-                {
-                  "name": "scale_factor",
-                  "ty": "F64"
-                },
-                {
-                  "name": "inner_size_writer",
-                  "ty": {
-                    "Object": "InnerSizeWriter"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "tag": "ThemeChanged"
-          },
-          {
-            "tag": "Occluded",
-            "value": {
-              "fields": [
-                "Bool"
-              ]
-            }
-          },
-          {
-            "tag": "RedrawRequested"
           }
         ]
       }
     },
     {
-      "Enum": {
-        "class_name": "DeviceEvent",
-        "rust_struct_path": "fyrox_lite::lite_event::DeviceEvent",
-        "variants": [
+      "Engine": {
+        "class_name": "Physics",
+        "rust_struct_path": "fyrox_lite::lite_physics::LitePhysics",
+        "methods": [
           {
-            "tag": "Added"
-          },
-          {
-            "tag": "Removed"
-          },
-          {
-            "tag": "MouseMotion",
-            "value": {
-              "fields": [
+            "instance": false,
+            "method_name": "cast_ray",
+            "signature": {
+              "params": [
                 {
-                  "name": "delta",
+                  "name": "opts",
                   "ty": {
-                    "Object": "Vector2"
-                  }
+                    "Object": "RayCastOptions"
+                  },
+                  "variadic": false
                 }
-              ]
+              ],
+              "return_ty": {
+                "Vec": {
+                  "Object": "Intersection"
+                }
+              }
             }
+          }
+        ],
+        "constants": [
+          {
+            "const_name": "EXCLUDE_FIXED",
+            "ty": "I32"
           },
           {
-            "tag": "MouseWheel",
-            "value": {
-              "fields": [
-                {
-                  "name": "delta",
-                  "ty": {
-                    "Object": "MouseScrollDelta"
-                  }
-                }
-              ]
-            }
+            "const_name": "EXCLUDE_KINEMATIC",
+            "ty": "I32"
           },
           {
-            "tag": "Motion",
-            "value": {
-              "fields": [
-                {
-                  "name": "axis",
-                  "ty": "I32"
-                },
-                {
-                  "name": "value",
-                  "ty": "F64"
-                }
-              ]
-            }
+            "const_name": "EXCLUDE_DYNAMIC",
+            "ty": "I32"
           },
           {
-            "tag": "Button",
-            "value": {
-              "fields": [
-                {
-                  "name": "button",
-                  "ty": "I32"
-                },
-                {
-                  "name": "state",
-                  "ty": {
-                    "Object": "ElementState"
-                  }
-                }
-              ]
-            }
+            "const_name": "EXCLUDE_SENSORS",
+            "ty": "I32"
           },
           {
-            "tag": "Key",
-            "value": {
-              "fields": [
-                {
-                  "Object": "RawKeyEvent"
-                }
-              ]
-            }
+            "const_name": "EXCLUDE_SOLIDS",
+            "ty": "I32"
+          },
+          {
+            "const_name": "ONLY_DYNAMIC",
+            "ty": "I32"
+          },
+          {
+            "const_name": "ONLY_KINEMATIC",
+            "ty": "I32"
+          },
+          {
+            "const_name": "ONLY_FIXED",
+            "ty": "I32"
           }
         ]
       }
     },
     {
       "Struct": {
-        "class_name": "RawKeyEvent",
-        "rust_struct_path": "fyrox_lite::lite_event::RawKeyEvent",
+        "class_name": "Intersection",
+        "rust_struct_path": "fyrox_lite::lite_physics::LiteIntersection",
         "fields": [
           {
-            "name": "physical_key",
+            "name": "collider",
             "ty": {
-              "Object": "PhysicalKey"
+              "Object": "Node"
             }
           },
           {
-            "name": "state",
+            "name": "normal",
             "ty": {
-              "Object": "ElementState"
+              "Object": "Vector3"
             }
+          },
+          {
+            "name": "position",
+            "ty": {
+              "Object": "Vector3"
+            }
+          },
+          {
+            "name": "feature",
+            "ty": {
+              "Object": "FeatureId"
+            }
+          },
+          {
+            "name": "toi",
+            "ty": "F32"
           }
         ]
       }
     },
     {
       "Enum": {
-        "class_name": "PhysicalKey",
-        "rust_struct_path": "fyrox_lite::lite_event::PhysicalKey",
+        "class_name": "FeatureId",
+        "rust_struct_path": "fyrox_lite::lite_physics::LiteFeatureId",
         "variants": [
           {
-            "tag": "Code",
+            "tag": "Vertex",
             "value": {
               "fields": [
-                {
-                  "Object": "KeyCode"
-                }
+                "I32"
               ]
             }
           },
           {
-            "tag": "Unidentified",
+            "tag": "Edge",
             "value": {
               "fields": [
+                "I32"
+              ]
+            }
+          },
+          {
+            "tag": "Face",
+            "value": {
+              "fields": [
+                "I32"
+              ]
+            }
+          },
+          {
+            "tag": "Unknown"
+          }
+        ]
+      }
+    },
+    {
+      "Struct": {
+        "class_name": "RayCastOptions",
+        "rust_struct_path": "fyrox_lite::lite_physics::LiteRayCastOptions",
+        "fields": [
+          {
+            "name": "ray_origin",
+            "ty": {
+              "Object": "Vector3"
+            }
+          },
+          {
+            "name": "ray_direction",
+            "ty": {
+              "Object": "Vector3"
+            }
+          },
+          {
+            "name": "max_len",
+            "ty": "F32"
+          },
+          {
+            "name": "groups",
+            "ty": {
+              "Option": {
+                "Object": "InteractionGroups"
+              }
+            }
+          },
+          {
+            "name": "sort_results",
+            "ty": "Bool"
+          }
+        ]
+      }
+    },
+    {
+      "Struct": {
+        "class_name": "InteractionGroups",
+        "rust_struct_path": "fyrox_lite::lite_physics::LiteInteractionGroups",
+        "fields": [
+          {
+            "name": "memberships",
+            "ty": "I32"
+          },
+          {
+            "name": "filter",
+            "ty": "I32"
+          }
+        ]
+      }
+    },
+    {
+      "Engine": {
+        "class_name": "RigidBody",
+        "rust_struct_path": "fyrox_lite::lite_physics::LiteRigidBody",
+        "methods": [
+          {
+            "instance": true,
+            "method_name": "apply_force",
+            "signature": {
+              "params": [
                 {
-                  "Object": "NativeKeyCode"
+                  "name": "force",
+                  "ty": {
+                    "Object": "Vector3"
+                  },
+                  "variadic": false
                 }
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "Engine": {
+        "class_name": "Input",
+        "rust_struct_path": "fyrox_lite::lite_input::Input",
+        "methods": [
+          {
+            "instance": false,
+            "method_name": "is_mouse_button_down",
+            "signature": {
+              "params": [
+                {
+                  "name": "button",
+                  "ty": "I32",
+                  "variadic": false
+                }
+              ],
+              "return_ty": "Bool"
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "is_mouse_button_up",
+            "signature": {
+              "params": [
+                {
+                  "name": "button",
+                  "ty": "I32",
+                  "variadic": false
+                }
+              ],
+              "return_ty": "Bool"
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "is_mouse_button",
+            "signature": {
+              "params": [
+                {
+                  "name": "button",
+                  "ty": "I32",
+                  "variadic": false
+                }
+              ],
+              "return_ty": "Bool"
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "is_key_down",
+            "signature": {
+              "params": [
+                {
+                  "name": "key",
+                  "ty": {
+                    "Object": "KeyCode"
+                  },
+                  "variadic": false
+                }
+              ],
+              "return_ty": "Bool"
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "is_key_up",
+            "signature": {
+              "params": [
+                {
+                  "name": "key",
+                  "ty": {
+                    "Object": "KeyCode"
+                  },
+                  "variadic": false
+                }
+              ],
+              "return_ty": "Bool"
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "is_key",
+            "signature": {
+              "params": [
+                {
+                  "name": "key",
+                  "ty": {
+                    "Object": "KeyCode"
+                  },
+                  "variadic": false
+                }
+              ],
+              "return_ty": "Bool"
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "get_mouse_move",
+            "signature": {
+              "return_ty": {
+                "Object": "Vector2"
+              }
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "get_mouse_scroll",
+            "signature": {
+              "return_ty": {
+                "Object": "Vector2"
+              }
+            }
+          }
+        ],
+        "constants": [
+          {
+            "const_name": "MouseLeft",
+            "ty": "I32"
+          },
+          {
+            "const_name": "MouseRight",
+            "ty": "I32"
+          },
+          {
+            "const_name": "MouseMiddle",
+            "ty": "I32"
+          },
+          {
+            "const_name": "MouseBack",
+            "ty": "I32"
+          },
+          {
+            "const_name": "MouseForward",
+            "ty": "I32"
           }
         ]
       }
@@ -538,7 +490,7 @@
     {
       "Enum": {
         "class_name": "KeyCode",
-        "rust_struct_path": "fyrox_lite::lite_event::KeyCode",
+        "rust_struct_path": "fyrox_lite::lite_input::LiteKeyCode",
         "variants": [
           {
             "tag": "Backquote"
@@ -598,82 +550,82 @@
             "tag": "IntlYen"
           },
           {
-            "tag": "KeyA"
+            "tag": "A"
           },
           {
-            "tag": "KeyB"
+            "tag": "B"
           },
           {
-            "tag": "KeyC"
+            "tag": "C"
           },
           {
-            "tag": "KeyD"
+            "tag": "D"
           },
           {
-            "tag": "KeyE"
+            "tag": "E"
           },
           {
-            "tag": "KeyF"
+            "tag": "F"
           },
           {
-            "tag": "KeyG"
+            "tag": "G"
           },
           {
-            "tag": "KeyH"
+            "tag": "H"
           },
           {
-            "tag": "KeyI"
+            "tag": "I"
           },
           {
-            "tag": "KeyJ"
+            "tag": "J"
           },
           {
-            "tag": "KeyK"
+            "tag": "K"
           },
           {
-            "tag": "KeyL"
+            "tag": "L"
           },
           {
-            "tag": "KeyM"
+            "tag": "M"
           },
           {
-            "tag": "KeyN"
+            "tag": "N"
           },
           {
-            "tag": "KeyO"
+            "tag": "O"
           },
           {
-            "tag": "KeyP"
+            "tag": "P"
           },
           {
-            "tag": "KeyQ"
+            "tag": "Q"
           },
           {
-            "tag": "KeyR"
+            "tag": "R"
           },
           {
-            "tag": "KeyS"
+            "tag": "S"
           },
           {
-            "tag": "KeyT"
+            "tag": "T"
           },
           {
-            "tag": "KeyU"
+            "tag": "U"
           },
           {
-            "tag": "KeyV"
+            "tag": "V"
           },
           {
-            "tag": "KeyW"
+            "tag": "W"
           },
           {
-            "tag": "KeyX"
+            "tag": "X"
           },
           {
-            "tag": "KeyY"
+            "tag": "Y"
           },
           {
-            "tag": "KeyZ"
+            "tag": "Z"
           },
           {
             "tag": "Minus"
@@ -1127,198 +1079,8 @@
     },
     {
       "Enum": {
-        "class_name": "NativeKeyCode",
-        "rust_struct_path": "fyrox_lite::lite_event::NativeKeyCode",
-        "variants": [
-          {
-            "tag": "Unidentified"
-          },
-          {
-            "tag": "Android",
-            "value": {
-              "fields": [
-                "I32"
-              ]
-            }
-          },
-          {
-            "tag": "MacOS",
-            "value": {
-              "fields": [
-                "I32"
-              ]
-            }
-          },
-          {
-            "tag": "Windows",
-            "value": {
-              "fields": [
-                "I32"
-              ]
-            }
-          },
-          {
-            "tag": "Xkb",
-            "value": {
-              "fields": [
-                "I32"
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "Struct": {
-        "class_name": "KeyEvent",
-        "rust_struct_path": "fyrox_lite::lite_event::KeyEvent",
-        "fields": [
-          {
-            "name": "physical_key",
-            "ty": {
-              "Object": "PhysicalKey"
-            }
-          },
-          {
-            "name": "state",
-            "ty": {
-              "Object": "ElementState"
-            }
-          },
-          {
-            "name": "repeat",
-            "ty": "Bool"
-          }
-        ]
-      }
-    },
-    {
-      "Enum": {
-        "class_name": "KeyLocation",
-        "rust_struct_path": "fyrox_lite::lite_event::KeyLocation",
-        "variants": [
-          {
-            "tag": "Standard"
-          },
-          {
-            "tag": "Left"
-          },
-          {
-            "tag": "Right"
-          },
-          {
-            "tag": "Numpad"
-          }
-        ]
-      }
-    },
-    {
-      "Enum": {
-        "class_name": "TouchPhase",
-        "rust_struct_path": "fyrox_lite::lite_event::TouchPhase",
-        "variants": [
-          {
-            "tag": "Started"
-          },
-          {
-            "tag": "Moved"
-          },
-          {
-            "tag": "Ended"
-          },
-          {
-            "tag": "Cancelled"
-          }
-        ]
-      }
-    },
-    {
-      "Struct": {
-        "class_name": "Touch",
-        "rust_struct_path": "fyrox_lite::lite_event::Touch",
-        "fields": [
-          {
-            "name": "phase",
-            "ty": {
-              "Object": "TouchPhase"
-            }
-          },
-          {
-            "name": "location",
-            "ty": {
-              "Object": "Vector2"
-            }
-          },
-          {
-            "name": "force",
-            "ty": {
-              "Option": {
-                "Object": "Force"
-              }
-            }
-          },
-          {
-            "name": "id",
-            "ty": "I64"
-          }
-        ]
-      }
-    },
-    {
-      "Enum": {
-        "class_name": "Force",
-        "rust_struct_path": "fyrox_lite::lite_event::Force",
-        "variants": [
-          {
-            "tag": "Calibrated",
-            "value": {
-              "fields": [
-                {
-                  "name": "force",
-                  "ty": "F64"
-                },
-                {
-                  "name": "max_possible_force",
-                  "ty": "F64"
-                },
-                {
-                  "name": "altitude_angle",
-                  "ty": {
-                    "Option": "F64"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "tag": "Normalized",
-            "value": {
-              "fields": [
-                "F64"
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "Enum": {
-        "class_name": "ElementState",
-        "rust_struct_path": "fyrox_lite::lite_event::ElementState",
-        "variants": [
-          {
-            "tag": "Pressed"
-          },
-          {
-            "tag": "Released"
-          }
-        ]
-      }
-    },
-    {
-      "Enum": {
         "class_name": "MouseButton",
-        "rust_struct_path": "fyrox_lite::lite_event::MouseButton",
+        "rust_struct_path": "fyrox_lite::lite_input::LiteMouseButton",
         "variants": [
           {
             "tag": "Left"
@@ -1334,335 +1096,6 @@
           },
           {
             "tag": "Forward"
-          },
-          {
-            "tag": "Other",
-            "value": {
-              "fields": [
-                "I32"
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "Enum": {
-        "class_name": "MouseScrollDelta",
-        "rust_struct_path": "fyrox_lite::lite_event::MouseScrollDelta",
-        "variants": [
-          {
-            "tag": "LineDelta",
-            "value": {
-              "fields": [
-                {
-                  "Object": "Vector2"
-                }
-              ]
-            }
-          },
-          {
-            "tag": "PixelDelta",
-            "value": {
-              "fields": [
-                {
-                  "Object": "Vector2"
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "Engine": {
-        "class_name": "InnerSizeWriter",
-        "rust_struct_path": "fyrox_lite::lite_event::InnerSizeWriter",
-        "methods": [
-          {
-            "instance": true,
-            "method_name": "request_inner_size",
-            "signature": {
-              "params": [
-                {
-                  "name": "new_inner_size",
-                  "ty": {
-                    "Object": "Vector2i"
-                  },
-                  "variadic": false
-                }
-              ],
-              "return_ty": "Bool"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "Engine": {
-        "class_name": "Window",
-        "rust_struct_path": "fyrox_lite::lite_window::LiteWindow",
-        "methods": [
-          {
-            "instance": false,
-            "method_name": "set_cursor_grab",
-            "signature": {
-              "params": [
-                {
-                  "name": "mode",
-                  "ty": {
-                    "Object": "CursorGrabMode"
-                  },
-                  "variadic": false
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "Enum": {
-        "class_name": "CursorGrabMode",
-        "rust_struct_path": "fyrox_lite::lite_window::LiteCursorGrabMode",
-        "variants": [
-          {
-            "tag": "None"
-          },
-          {
-            "tag": "Confined"
-          },
-          {
-            "tag": "Locked"
-          }
-        ]
-      }
-    },
-    {
-      "Engine": {
-        "class_name": "Scene",
-        "rust_struct_path": "fyrox_lite::lite_scene::LiteScene",
-        "methods": [
-          {
-            "instance": false,
-            "method_name": "load_async",
-            "signature": {
-              "params": [
-                {
-                  "name": "scene_path",
-                  "ty": "String",
-                  "variadic": false
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "Engine": {
-        "class_name": "Physics",
-        "rust_struct_path": "fyrox_lite::lite_physics::LitePhysics",
-        "methods": [
-          {
-            "instance": false,
-            "method_name": "cast_ray",
-            "signature": {
-              "params": [
-                {
-                  "name": "opts",
-                  "ty": {
-                    "Object": "RayCastOptions"
-                  },
-                  "variadic": false
-                }
-              ],
-              "return_ty": {
-                "Vec": {
-                  "Object": "Intersection"
-                }
-              }
-            }
-          }
-        ],
-        "constants": [
-          {
-            "const_name": "EXCLUDE_FIXED",
-            "ty": "I32"
-          },
-          {
-            "const_name": "EXCLUDE_KINEMATIC",
-            "ty": "I32"
-          },
-          {
-            "const_name": "EXCLUDE_DYNAMIC",
-            "ty": "I32"
-          },
-          {
-            "const_name": "EXCLUDE_SENSORS",
-            "ty": "I32"
-          },
-          {
-            "const_name": "EXCLUDE_SOLIDS",
-            "ty": "I32"
-          },
-          {
-            "const_name": "ONLY_DYNAMIC",
-            "ty": "I32"
-          },
-          {
-            "const_name": "ONLY_KINEMATIC",
-            "ty": "I32"
-          },
-          {
-            "const_name": "ONLY_FIXED",
-            "ty": "I32"
-          }
-        ]
-      }
-    },
-    {
-      "Struct": {
-        "class_name": "Intersection",
-        "rust_struct_path": "fyrox_lite::lite_physics::LiteIntersection",
-        "fields": [
-          {
-            "name": "collider",
-            "ty": {
-              "Object": "Node"
-            }
-          },
-          {
-            "name": "normal",
-            "ty": {
-              "Object": "Vector3"
-            }
-          },
-          {
-            "name": "position",
-            "ty": {
-              "Object": "Vector3"
-            }
-          },
-          {
-            "name": "feature",
-            "ty": {
-              "Object": "FeatureId"
-            }
-          },
-          {
-            "name": "toi",
-            "ty": "F32"
-          }
-        ]
-      }
-    },
-    {
-      "Enum": {
-        "class_name": "FeatureId",
-        "rust_struct_path": "fyrox_lite::lite_physics::LiteFeatureId",
-        "variants": [
-          {
-            "tag": "Vertex",
-            "value": {
-              "fields": [
-                "I32"
-              ]
-            }
-          },
-          {
-            "tag": "Edge",
-            "value": {
-              "fields": [
-                "I32"
-              ]
-            }
-          },
-          {
-            "tag": "Face",
-            "value": {
-              "fields": [
-                "I32"
-              ]
-            }
-          },
-          {
-            "tag": "Unknown"
-          }
-        ]
-      }
-    },
-    {
-      "Struct": {
-        "class_name": "RayCastOptions",
-        "rust_struct_path": "fyrox_lite::lite_physics::LiteRayCastOptions",
-        "fields": [
-          {
-            "name": "ray_origin",
-            "ty": {
-              "Object": "Vector3"
-            }
-          },
-          {
-            "name": "ray_direction",
-            "ty": {
-              "Object": "Vector3"
-            }
-          },
-          {
-            "name": "max_len",
-            "ty": "F32"
-          },
-          {
-            "name": "groups",
-            "ty": {
-              "Option": {
-                "Object": "InteractionGroups"
-              }
-            }
-          },
-          {
-            "name": "sort_results",
-            "ty": "Bool"
-          }
-        ]
-      }
-    },
-    {
-      "Struct": {
-        "class_name": "InteractionGroups",
-        "rust_struct_path": "fyrox_lite::lite_physics::LiteInteractionGroups",
-        "fields": [
-          {
-            "name": "memberships",
-            "ty": "I32"
-          },
-          {
-            "name": "filter",
-            "ty": "I32"
-          }
-        ]
-      }
-    },
-    {
-      "Engine": {
-        "class_name": "RigidBody",
-        "rust_struct_path": "fyrox_lite::lite_physics::LiteRigidBody",
-        "methods": [
-          {
-            "instance": true,
-            "method_name": "apply_force",
-            "signature": {
-              "params": [
-                {
-                  "name": "force",
-                  "ty": {
-                    "Object": "Vector3"
-                  },
-                  "variadic": false
-                }
-              ]
-            }
           }
         ]
       }

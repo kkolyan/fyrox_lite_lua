@@ -9,14 +9,14 @@
 -----------------------------------------------------------
 
 ---@class Physics_static
----@field EXCLUDE_FIXED integer
----@field EXCLUDE_KINEMATIC integer
----@field EXCLUDE_DYNAMIC integer
----@field EXCLUDE_SENSORS integer
----@field EXCLUDE_SOLIDS integer
----@field ONLY_DYNAMIC integer
----@field ONLY_KINEMATIC integer
----@field ONLY_FIXED integer
+---@field EXCLUDE_FIXED number
+---@field EXCLUDE_KINEMATIC number
+---@field EXCLUDE_DYNAMIC number
+---@field EXCLUDE_SENSORS number
+---@field EXCLUDE_SOLIDS number
+---@field ONLY_DYNAMIC number
+---@field ONLY_KINEMATIC number
+---@field ONLY_FIXED number
 Physics = {}
 
 ---@class Physics

@@ -26,6 +26,7 @@ pub fn generate_c_bindings_lite(domain: &Domain) -> String {
             #![allow(non_camel_case_types)]
             #![allow(non_upper_case_globals)]
             #![allow(non_snake_case)]
+            #![allow(clippy::redundant_locals)]
             use std::fmt::Display;
             use fyrox_lite::spi::UserScript;
             use fyrox_lite::externalizable::Externalizable;
