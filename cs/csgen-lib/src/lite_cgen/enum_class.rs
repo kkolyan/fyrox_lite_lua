@@ -15,7 +15,13 @@ pub(crate) fn generate_enum(
     s: &mut String,
     class: &EnumClass,
     client_replicated_types: &HashSet<ClassName>,
+    generated_structs: &mut HashSet<String>,
 ) {
+    generated_structs.insert(format!("Native{}", class.class_name));
+    generated_structs.insert(format!("Native{}_array", class.class_name));
+    generated_structs.insert(format!("Native{}_option", class.class_name));
+    generated_structs.insert(format!("Native{}_result", class.class_name));
+
     let has_fields = class
         .variants
         .iter()
@@ -73,7 +79,7 @@ pub(crate) fn generate_enum(
             [("class", &class.class_name)],
         );
 
-        generate_variant_container_fields(s, class);
+        generate_variant_container_fields(s, class, generated_structs);
 
         render(
             s,
@@ -82,6 +88,7 @@ pub(crate) fn generate_enum(
         "#,
             [],
         );
+        generated_structs.insert(format!("Native{}VariantContainer", class.class_name));
     }
 
     generate_variants(s, class, client_replicated_types);
@@ -197,7 +204,7 @@ fn generate_struct_variant_fields(
     }
 }
 
-fn generate_variant_container_fields(s: &mut String, class: &EnumClass) {
+fn generate_variant_container_fields(s: &mut String, class: &EnumClass, generated_structs: &mut HashSet<String>,) {
     for variant in class.variants.iter() {
         if matches!(variant.value, EnumValue::Unit) {
             continue;
@@ -209,6 +216,7 @@ fn generate_variant_container_fields(s: &mut String, class: &EnumClass) {
         "#,
             [("name", &variant.tag), ("class", &class.class_name)],
         );
+        generated_structs.insert(format!("Native{}_{}", class.class_name, variant.tag));
     }
 }
 

@@ -10,7 +10,12 @@ pub(crate) fn generate_struct(
     s: &mut String,
     class: &StructClass,
     client_replicated_types: &HashSet<ClassName>,
+    generated_structs: &mut HashSet<String>,
 ) {
+    generated_structs.insert(format!("Native{}", class.class_name));
+    generated_structs.insert(format!("Native{}_array", class.class_name));
+    generated_structs.insert(format!("Native{}_option", class.class_name));
+    generated_structs.insert(format!("Native{}_result", class.class_name));
     render(
         s,
         r#"

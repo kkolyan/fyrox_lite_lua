@@ -10,6 +10,7 @@ pub(crate) fn generate_engine_class(
     s: &mut String,
     class: &EngineClass,
     client_replicated_types: &HashSet<ClassName>,
+    _generated_structs: &mut HashSet<String>,
 ) {
     for method in class.methods.iter() {
         let mut input_args = vec![];

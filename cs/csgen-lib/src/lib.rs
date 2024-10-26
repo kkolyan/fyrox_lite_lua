@@ -5,14 +5,15 @@ use lite_model::Domain;
 use proc_macro2::TokenStream;
 use syn::{parse2, File};
 use to_vec::ToVec;
+use crate::lite_cgen::CBindingsLite;
 
 pub mod rust_decl_to_cs;
 pub mod lite_cgen;
 
-fn write_bindings_cs(class: &str, s: &str) {
-    let file = parse2::<File>(TokenStream::from_str(s).unwrap()).unwrap();
+fn generate_and_write_bindings_cs(class: &str, s: CBindingsLite) {
+    let file = parse2::<File>(TokenStream::from_str(&s.code_rs).unwrap()).unwrap();
 
-    let code = rust_decl_to_cs::rust_decl_to_c(&file);
+    let code = rust_decl_to_cs::rust_decl_to_c(&file, &s.generated_structs);
 
     let mut s = String::new();
     render(
@@ -46,15 +47,17 @@ fn write_bindings_cs(class: &str, s: &str) {
 pub fn generate_manual_bindings_cs() {
     let s = fs::read_to_string("cs/fyrox-c/src/bindings_manual.rs").unwrap();
 
-    write_bindings_cs("FyroxManualBindings", &s);
+    generate_and_write_bindings_cs("FyroxManualBindings", CBindingsLite {
+        code_rs: s,
+        generated_structs: Default::default(),
+    });
 }
 
 pub fn generate_lite_bindings_cs(domain: &Domain) {
     let s = lite_cgen::generate_c_bindings_lite(domain);
     let file = "cs/fyrox-c/src/bindings_lite.rs";
-    fs::write(file, &s).unwrap();
+    fs::write(file, &s.code_rs).unwrap();
     gen_common::fmt::fmt_file(file);
 
-    // write_bindings_cs("FyroxLiteBindings", &s);
-
+    generate_and_write_bindings_cs("FyroxLiteBindings", s);
 }
