@@ -9,7 +9,7 @@
 -----------------------------------------------------------
 
 ---@class TextBuilder
----@field foregound Brush?
+---@field foreground Brush?
 ---@field font_size number?
 TextBuilder_instance = {}
 

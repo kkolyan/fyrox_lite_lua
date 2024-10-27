@@ -5,12 +5,11 @@
 ---@diagnostic disable: missing-return, lowercase-global, missing-fields
 
 -----------------------------------------------------------
------- fyrox_lite::lite_ui::Brush
+------ fyrox_lite::lite_ui::RadialGradient
 -----------------------------------------------------------
 
----@class Brush
----@field solid_color Color?
----@field linear_gradient LinearGradient?
----@field radial_gradient RadialGradient?
-Brush_instance = {}
+---@class RadialGradient
+---@field center Vector2
+---@field stops GradientPoint[]
+RadialGradient_instance = {}
 

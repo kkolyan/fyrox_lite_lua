@@ -1,5 +1,3 @@
-namespace App01;
-using App01;
 using System.Runtime.InteropServices;
 public partial class FyroxLiteBindings {
     
@@ -31,32 +29,12 @@ public partial class FyroxLiteBindings {
     }
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct NativeFeatureId {
+        public NativeFeatureKind kind;
+        public int id;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe struct NativeFeatureKind {
         public ubyte tag;
-        public NativeFeatureIdVariantContainer value;
-    }
-    [StructLayout(LayoutKind.Explicit)]
-    public unsafe struct NativeFeatureIdVariantContainer {
-        
-        [FieldOffset(0)]
-        public NativeFeatureId_Vertex Vertex;
-        
-        [FieldOffset(0)]
-        public NativeFeatureId_Edge Edge;
-        
-        [FieldOffset(0)]
-        public NativeFeatureId_Face Face;
-    }
-    [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeFeatureId_Vertex {
-        public int _0;
-    }
-    [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeFeatureId_Edge {
-        public int _0;
-    }
-    [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeFeatureId_Face {
-        public int _0;
     }
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct NativeRayCastOptions {
@@ -103,38 +81,23 @@ public partial class FyroxLiteBindings {
     public static partial NativeHandle fyrox_lite_Text_new(NativeTextBuilder state);
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct NativeTextBuilder {
-        public NativeBrush_option foregound;
+        public NativeBrush_option foreground;
         public f32_option font_size;
     }
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct NativeBrush {
-        public ubyte tag;
-        public NativeBrushVariantContainer value;
-    }
-    [StructLayout(LayoutKind.Explicit)]
-    public unsafe struct NativeBrushVariantContainer {
-        
-        [FieldOffset(0)]
-        public NativeBrush_Solid Solid;
-        
-        [FieldOffset(0)]
-        public NativeBrush_LinearGradient LinearGradient;
-        
-        [FieldOffset(0)]
-        public NativeBrush_RadialGradient RadialGradient;
+        public NativeHandle_option solid_color;
+        public NativeLinearGradient_option linear_gradient;
+        public NativeRadialGradient_option radial_gradient;
     }
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeBrush_Solid {
-        public NativeHandle _0;
-    }
-    [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeBrush_LinearGradient {
+    public unsafe struct NativeLinearGradient {
         public NativeVector2 from;
         public NativeVector2 to;
         public NativeGradientPoint_array stops;
     }
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeBrush_RadialGradient {
+    public unsafe struct NativeRadialGradient {
         public NativeVector2 center;
         public NativeGradientPoint_array stops;
     }

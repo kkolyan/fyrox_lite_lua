@@ -15,7 +15,9 @@ function Game:init(scene_path)
 
 	self.hud = Text:new({
 		font_size = 40,
-		foreground = Brush:Solid(Color.BLACK)
+		foreground = {
+			solid_color = Color.BLACK
+		}
 	})
 	self.beacons = {}
 end

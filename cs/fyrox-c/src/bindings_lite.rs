@@ -195,8 +195,8 @@ impl From<fyrox_lite::lite_physics::LiteIntersection> for NativeIntersection {
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct NativeFeatureId {
-    pub tag: u8,
-    pub value: NativeFeatureIdVariantContainer,
+    pub kind: NativeFeatureKind,
+    pub id: i32,
 }
 native_utils!(
     NativeFeatureId,
@@ -206,94 +206,84 @@ native_utils!(
 );
 impl From<NativeFeatureId> for fyrox_lite::lite_physics::LiteFeatureId {
     fn from(__value: NativeFeatureId) -> Self {
-        if __value.tag == NativeFeatureId::Vertex {
-            let _0 = unsafe { __value.value.Vertex._0 };
-            let _0 = _0;
-            return Self::Vertex(_0);
+        let kind = __value.kind;
+        let kind = kind.into();
+        let id = __value.id;
+        let id = id;
+        Self { kind, id }
+    }
+}
+impl From<fyrox_lite::lite_physics::LiteFeatureId> for NativeFeatureId {
+    fn from(__value: fyrox_lite::lite_physics::LiteFeatureId) -> Self {
+        let kind = __value.kind;
+        let kind = kind.into();
+        let id = __value.id;
+        let id = id;
+        Self { kind, id }
+    }
+}
+
+// fyrox_lite::lite_physics::LiteFeatureKind
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeFeatureKind {
+    pub tag: u8,
+}
+native_utils!(
+    NativeFeatureKind,
+    NativeFeatureKind_array,
+    NativeFeatureKind_option,
+    NativeFeatureKind_result
+);
+impl From<NativeFeatureKind> for fyrox_lite::lite_physics::LiteFeatureKind {
+    fn from(__value: NativeFeatureKind) -> Self {
+        if __value.tag == NativeFeatureKind::Vertex {
+            return Self::Vertex;
         }
-        if __value.tag == NativeFeatureId::Edge {
-            let _0 = unsafe { __value.value.Edge._0 };
-            let _0 = _0;
-            return Self::Edge(_0);
+        if __value.tag == NativeFeatureKind::Edge {
+            return Self::Edge;
         }
-        if __value.tag == NativeFeatureId::Face {
-            let _0 = unsafe { __value.value.Face._0 };
-            let _0 = _0;
-            return Self::Face(_0);
+        if __value.tag == NativeFeatureKind::Face {
+            return Self::Face;
         }
-        if __value.tag == NativeFeatureId::Unknown {
+        if __value.tag == NativeFeatureKind::Unknown {
             return Self::Unknown;
         }
         panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
     }
 }
-impl From<fyrox_lite::lite_physics::LiteFeatureId> for NativeFeatureId {
-    fn from(__value: fyrox_lite::lite_physics::LiteFeatureId) -> Self {
-        if let fyrox_lite::lite_physics::LiteFeatureId::Vertex(_0) = __value {
-            let _0 = _0;
-            return NativeFeatureId {
-                tag: NativeFeatureId::Vertex,
-                value: NativeFeatureIdVariantContainer {
-                    Vertex: NativeFeatureId_Vertex { _0 },
-                },
+impl From<fyrox_lite::lite_physics::LiteFeatureKind> for NativeFeatureKind {
+    fn from(__value: fyrox_lite::lite_physics::LiteFeatureKind) -> Self {
+        if let fyrox_lite::lite_physics::LiteFeatureKind::Vertex = __value {
+            return NativeFeatureKind {
+                tag: NativeFeatureKind::Vertex,
             };
         }
-        if let fyrox_lite::lite_physics::LiteFeatureId::Edge(_0) = __value {
-            let _0 = _0;
-            return NativeFeatureId {
-                tag: NativeFeatureId::Edge,
-                value: NativeFeatureIdVariantContainer {
-                    Edge: NativeFeatureId_Edge { _0 },
-                },
+        if let fyrox_lite::lite_physics::LiteFeatureKind::Edge = __value {
+            return NativeFeatureKind {
+                tag: NativeFeatureKind::Edge,
             };
         }
-        if let fyrox_lite::lite_physics::LiteFeatureId::Face(_0) = __value {
-            let _0 = _0;
-            return NativeFeatureId {
-                tag: NativeFeatureId::Face,
-                value: NativeFeatureIdVariantContainer {
-                    Face: NativeFeatureId_Face { _0 },
-                },
+        if let fyrox_lite::lite_physics::LiteFeatureKind::Face = __value {
+            return NativeFeatureKind {
+                tag: NativeFeatureKind::Face,
             };
         }
-        if let fyrox_lite::lite_physics::LiteFeatureId::Unknown = __value {
-            return NativeFeatureId {
-                tag: NativeFeatureId::Unknown,
-                value: unsafe { std::mem::zeroed() },
+        if let fyrox_lite::lite_physics::LiteFeatureKind::Unknown = __value {
+            return NativeFeatureKind {
+                tag: NativeFeatureKind::Unknown,
             };
         }
         panic!("unsupported enum: {:?}", __value)
     }
 }
 
-impl NativeFeatureId {
+impl NativeFeatureKind {
     pub const Vertex: u8 = 0;
     pub const Edge: u8 = 1;
     pub const Face: u8 = 2;
     pub const Unknown: u8 = 3;
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeFeatureIdVariantContainer {
-    pub Vertex: NativeFeatureId_Vertex,
-    pub Edge: NativeFeatureId_Edge,
-    pub Face: NativeFeatureId_Face,
-}
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeFeatureId_Vertex {
-    pub _0: i32,
-}
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeFeatureId_Edge {
-    pub _0: i32,
-}
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeFeatureId_Face {
-    pub _0: i32,
 }
 
 // fyrox_lite::lite_physics::LiteRayCastOptions
@@ -2337,7 +2327,7 @@ pub extern "C" fn fyrox_lite_Text_new(state: NativeTextBuilder) -> NativeHandle 
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct NativeTextBuilder {
-    pub foregound: NativeBrush_option,
+    pub foreground: NativeBrush_option,
     pub font_size: f32_option,
 }
 native_utils!(
@@ -2348,11 +2338,11 @@ native_utils!(
 );
 impl From<NativeTextBuilder> for fyrox_lite::lite_ui::TextBuilder {
     fn from(__value: NativeTextBuilder) -> Self {
-        let foregound = __value.foregound;
-        let foregound = if foregound.present {
+        let foreground = __value.foreground;
+        let foreground = if foreground.present {
             Some({
-                let foregound = foregound.value;
-                foregound.into()
+                let foreground = foreground.value;
+                foreground.into()
             })
         } else {
             None
@@ -2367,17 +2357,17 @@ impl From<NativeTextBuilder> for fyrox_lite::lite_ui::TextBuilder {
             None
         };
         Self {
-            foregound,
+            foreground,
             font_size,
         }
     }
 }
 impl From<fyrox_lite::lite_ui::TextBuilder> for NativeTextBuilder {
     fn from(__value: fyrox_lite::lite_ui::TextBuilder) -> Self {
-        let foregound = __value.foregound;
-        let foregound =
-            <NativeBrush as NativeType>::to_native_option(if let Some(foregound) = foregound {
-                Some(foregound.into())
+        let foreground = __value.foreground;
+        let foreground =
+            <NativeBrush as NativeType>::to_native_option(if let Some(foreground) = foreground {
+                Some(foreground.into())
             } else {
                 None
             });
@@ -2388,7 +2378,7 @@ impl From<fyrox_lite::lite_ui::TextBuilder> for NativeTextBuilder {
             None
         });
         Self {
-            foregound,
+            foreground,
             font_size,
         }
     }
@@ -2399,8 +2389,9 @@ impl From<fyrox_lite::lite_ui::TextBuilder> for NativeTextBuilder {
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct NativeBrush {
-    pub tag: u8,
-    pub value: NativeBrushVariantContainer,
+    pub solid_color: NativeHandle_option,
+    pub linear_gradient: NativeLinearGradient_option,
+    pub radial_gradient: NativeRadialGradient_option,
 }
 native_utils!(
     NativeBrush,
@@ -2410,112 +2401,161 @@ native_utils!(
 );
 impl From<NativeBrush> for fyrox_lite::lite_ui::Brush {
     fn from(__value: NativeBrush) -> Self {
-        if __value.tag == NativeBrush::Solid {
-            let _0 = unsafe { __value.value.Solid._0 };
-            let _0 = Externalizable::from_external(_0.as_u128());
-            return Self::Solid(_0);
+        let solid_color = __value.solid_color;
+        let solid_color = if solid_color.present {
+            Some({
+                let solid_color = solid_color.value;
+                Externalizable::from_external(solid_color.as_u128())
+            })
+        } else {
+            None
+        };
+        let linear_gradient = __value.linear_gradient;
+        let linear_gradient = if linear_gradient.present {
+            Some({
+                let linear_gradient = linear_gradient.value;
+                linear_gradient.into()
+            })
+        } else {
+            None
+        };
+        let radial_gradient = __value.radial_gradient;
+        let radial_gradient = if radial_gradient.present {
+            Some({
+                let radial_gradient = radial_gradient.value;
+                radial_gradient.into()
+            })
+        } else {
+            None
+        };
+        Self {
+            solid_color,
+            linear_gradient,
+            radial_gradient,
         }
-        if __value.tag == NativeBrush::LinearGradient {
-            let from = unsafe { __value.value.LinearGradient.from };
-            let from = from.into();
-            let to = unsafe { __value.value.LinearGradient.to };
-            let to = to.into();
-            let stops = unsafe { __value.value.LinearGradient.stops };
-            let stops = <NativeGradientPoint as NativeType>::from_native_array(stops)
-                .into_iter()
-                .map(|stops| stops.into())
-                .collect::<Vec<_>>();
-            return Self::LinearGradient { from, to, stops };
-        }
-        if __value.tag == NativeBrush::RadialGradient {
-            let center = unsafe { __value.value.RadialGradient.center };
-            let center = center.into();
-            let stops = unsafe { __value.value.RadialGradient.stops };
-            let stops = <NativeGradientPoint as NativeType>::from_native_array(stops)
-                .into_iter()
-                .map(|stops| stops.into())
-                .collect::<Vec<_>>();
-            return Self::RadialGradient { center, stops };
-        }
-        panic!("unsupported enum tag: NativeBrush::{}", __value.tag)
     }
 }
 impl From<fyrox_lite::lite_ui::Brush> for NativeBrush {
     fn from(__value: fyrox_lite::lite_ui::Brush) -> Self {
-        if let fyrox_lite::lite_ui::Brush::Solid(_0) = __value {
-            let _0 = NativeHandle::from_u128(Externalizable::to_external(&_0));
-            return NativeBrush {
-                tag: NativeBrush::Solid,
-                value: NativeBrushVariantContainer {
-                    Solid: NativeBrush_Solid { _0 },
-                },
-            };
+        let solid_color = __value.solid_color;
+        let solid_color = <NativeHandle as NativeType>::to_native_option(
+            if let Some(solid_color) = solid_color {
+                Some(NativeHandle::from_u128(Externalizable::to_external(
+                    &solid_color,
+                )))
+            } else {
+                None
+            },
+        );
+        let linear_gradient = __value.linear_gradient;
+        let linear_gradient = <NativeLinearGradient as NativeType>::to_native_option(
+            if let Some(linear_gradient) = linear_gradient {
+                Some(linear_gradient.into())
+            } else {
+                None
+            },
+        );
+        let radial_gradient = __value.radial_gradient;
+        let radial_gradient = <NativeRadialGradient as NativeType>::to_native_option(
+            if let Some(radial_gradient) = radial_gradient {
+                Some(radial_gradient.into())
+            } else {
+                None
+            },
+        );
+        Self {
+            solid_color,
+            linear_gradient,
+            radial_gradient,
         }
-        if let fyrox_lite::lite_ui::Brush::LinearGradient { from, to, stops } = __value {
-            let from = from.into();
-            let to = to.into();
-            let stops = <NativeGradientPoint as NativeType>::to_native_array(
-                stops
-                    .into_iter()
-                    .map(|stops| stops.into())
-                    .collect::<Vec<_>>(),
-            );
-            return NativeBrush {
-                tag: NativeBrush::LinearGradient,
-                value: NativeBrushVariantContainer {
-                    LinearGradient: NativeBrush_LinearGradient { from, to, stops },
-                },
-            };
-        }
-        if let fyrox_lite::lite_ui::Brush::RadialGradient { center, stops } = __value {
-            let center = center.into();
-            let stops = <NativeGradientPoint as NativeType>::to_native_array(
-                stops
-                    .into_iter()
-                    .map(|stops| stops.into())
-                    .collect::<Vec<_>>(),
-            );
-            return NativeBrush {
-                tag: NativeBrush::RadialGradient,
-                value: NativeBrushVariantContainer {
-                    RadialGradient: NativeBrush_RadialGradient { center, stops },
-                },
-            };
-        }
-        panic!("unsupported enum: {:?}", __value)
     }
 }
 
-impl NativeBrush {
-    pub const Solid: u8 = 0;
-    pub const LinearGradient: u8 = 1;
-    pub const RadialGradient: u8 = 2;
-}
+// fyrox_lite::lite_ui::LinearGradient
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub union NativeBrushVariantContainer {
-    pub Solid: NativeBrush_Solid,
-    pub LinearGradient: NativeBrush_LinearGradient,
-    pub RadialGradient: NativeBrush_RadialGradient,
-}
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeBrush_Solid {
-    pub _0: NativeHandle,
-}
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeBrush_LinearGradient {
+pub struct NativeLinearGradient {
     pub from: NativeVector2,
     pub to: NativeVector2,
     pub stops: NativeGradientPoint_array,
 }
+native_utils!(
+    NativeLinearGradient,
+    NativeLinearGradient_array,
+    NativeLinearGradient_option,
+    NativeLinearGradient_result
+);
+impl From<NativeLinearGradient> for fyrox_lite::lite_ui::LinearGradient {
+    fn from(__value: NativeLinearGradient) -> Self {
+        let from = __value.from;
+        let from = from.into();
+        let to = __value.to;
+        let to = to.into();
+        let stops = __value.stops;
+        let stops = <NativeGradientPoint as NativeType>::from_native_array(stops)
+            .into_iter()
+            .map(|stops| stops.into())
+            .collect::<Vec<_>>();
+        Self { from, to, stops }
+    }
+}
+impl From<fyrox_lite::lite_ui::LinearGradient> for NativeLinearGradient {
+    fn from(__value: fyrox_lite::lite_ui::LinearGradient) -> Self {
+        let from = __value.from;
+        let from = from.into();
+        let to = __value.to;
+        let to = to.into();
+        let stops = __value.stops;
+        let stops = <NativeGradientPoint as NativeType>::to_native_array(
+            stops
+                .into_iter()
+                .map(|stops| stops.into())
+                .collect::<Vec<_>>(),
+        );
+        Self { from, to, stops }
+    }
+}
+
+// fyrox_lite::lite_ui::RadialGradient
+
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct NativeBrush_RadialGradient {
+pub struct NativeRadialGradient {
     pub center: NativeVector2,
     pub stops: NativeGradientPoint_array,
+}
+native_utils!(
+    NativeRadialGradient,
+    NativeRadialGradient_array,
+    NativeRadialGradient_option,
+    NativeRadialGradient_result
+);
+impl From<NativeRadialGradient> for fyrox_lite::lite_ui::RadialGradient {
+    fn from(__value: NativeRadialGradient) -> Self {
+        let center = __value.center;
+        let center = center.into();
+        let stops = __value.stops;
+        let stops = <NativeGradientPoint as NativeType>::from_native_array(stops)
+            .into_iter()
+            .map(|stops| stops.into())
+            .collect::<Vec<_>>();
+        Self { center, stops }
+    }
+}
+impl From<fyrox_lite::lite_ui::RadialGradient> for NativeRadialGradient {
+    fn from(__value: fyrox_lite::lite_ui::RadialGradient) -> Self {
+        let center = __value.center;
+        let center = center.into();
+        let stops = __value.stops;
+        let stops = <NativeGradientPoint as NativeType>::to_native_array(
+            stops
+                .into_iter()
+                .map(|stops| stops.into())
+                .collect::<Vec<_>>(),
+        );
+        Self { center, stops }
+    }
 }
 
 // fyrox_lite::lite_ui::Color

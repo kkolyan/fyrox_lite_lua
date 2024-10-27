@@ -5,12 +5,28 @@
 ---@diagnostic disable: missing-return, lowercase-global, missing-fields
 
 -----------------------------------------------------------
------- fyrox_lite::lite_ui::Brush
+------ fyrox_lite::lite_physics::LiteFeatureKind
 -----------------------------------------------------------
 
----@class Brush
----@field solid_color Color?
----@field linear_gradient LinearGradient?
----@field radial_gradient RadialGradient?
-Brush_instance = {}
+---@class FeatureKind_static
+
+---@type FeatureKind
+FeatureKind.Vertex = {}
+
+---@type FeatureKind
+FeatureKind.Edge = {}
+
+---@type FeatureKind
+FeatureKind.Face = {}
+
+---@type FeatureKind
+FeatureKind.Unknown = {}
+FeatureKind = {}
+
+---@class FeatureKind
+---@field Vertex boolean
+---@field Edge boolean
+---@field Face boolean
+---@field Unknown boolean
+FeatureKind_instance = {}
 

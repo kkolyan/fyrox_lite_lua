@@ -240,33 +240,36 @@
       }
     },
     {
-      "Enum": {
+      "Struct": {
         "class_name": "FeatureId",
         "rust_struct_path": "fyrox_lite::lite_physics::LiteFeatureId",
+        "fields": [
+          {
+            "name": "kind",
+            "ty": {
+              "Object": "FeatureKind"
+            }
+          },
+          {
+            "name": "id",
+            "ty": "I32"
+          }
+        ]
+      }
+    },
+    {
+      "Enum": {
+        "class_name": "FeatureKind",
+        "rust_struct_path": "fyrox_lite::lite_physics::LiteFeatureKind",
         "variants": [
           {
-            "tag": "Vertex",
-            "value": {
-              "fields": [
-                "I32"
-              ]
-            }
+            "tag": "Vertex"
           },
           {
-            "tag": "Edge",
-            "value": {
-              "fields": [
-                "I32"
-              ]
-            }
+            "tag": "Edge"
           },
           {
-            "tag": "Face",
-            "value": {
-              "fields": [
-                "I32"
-              ]
-            }
+            "tag": "Face"
           },
           {
             "tag": "Unknown"
@@ -1151,7 +1154,7 @@
         "rust_struct_path": "fyrox_lite::lite_ui::TextBuilder",
         "fields": [
           {
-            "name": "foregound",
+            "name": "foreground",
             "ty": {
               "Option": {
                 "Object": "Brush"
@@ -1168,66 +1171,82 @@
       }
     },
     {
-      "Enum": {
+      "Struct": {
         "class_name": "Brush",
         "rust_struct_path": "fyrox_lite::lite_ui::Brush",
-        "variants": [
+        "fields": [
           {
-            "tag": "Solid",
-            "value": {
-              "fields": [
-                {
-                  "Object": "Color"
-                }
-              ]
+            "name": "solid_color",
+            "ty": {
+              "Option": {
+                "Object": "Color"
+              }
             }
           },
           {
-            "tag": "LinearGradient",
-            "value": {
-              "fields": [
-                {
-                  "name": "from",
-                  "ty": {
-                    "Object": "Vector2"
-                  }
-                },
-                {
-                  "name": "to",
-                  "ty": {
-                    "Object": "Vector2"
-                  }
-                },
-                {
-                  "name": "stops",
-                  "ty": {
-                    "Vec": {
-                      "Object": "GradientPoint"
-                    }
-                  }
-                }
-              ]
+            "name": "linear_gradient",
+            "ty": {
+              "Option": {
+                "Object": "LinearGradient"
+              }
             }
           },
           {
-            "tag": "RadialGradient",
-            "value": {
-              "fields": [
-                {
-                  "name": "center",
-                  "ty": {
-                    "Object": "Vector2"
-                  }
-                },
-                {
-                  "name": "stops",
-                  "ty": {
-                    "Vec": {
-                      "Object": "GradientPoint"
-                    }
-                  }
-                }
-              ]
+            "name": "radial_gradient",
+            "ty": {
+              "Option": {
+                "Object": "RadialGradient"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "Struct": {
+        "class_name": "LinearGradient",
+        "rust_struct_path": "fyrox_lite::lite_ui::LinearGradient",
+        "fields": [
+          {
+            "name": "from",
+            "ty": {
+              "Object": "Vector2"
+            }
+          },
+          {
+            "name": "to",
+            "ty": {
+              "Object": "Vector2"
+            }
+          },
+          {
+            "name": "stops",
+            "ty": {
+              "Vec": {
+                "Object": "GradientPoint"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "Struct": {
+        "class_name": "RadialGradient",
+        "rust_struct_path": "fyrox_lite::lite_ui::RadialGradient",
+        "fields": [
+          {
+            "name": "center",
+            "ty": {
+              "Object": "Vector2"
+            }
+          },
+          {
+            "name": "stops",
+            "ty": {
+              "Vec": {
+                "Object": "GradientPoint"
+              }
             }
           }
         ]

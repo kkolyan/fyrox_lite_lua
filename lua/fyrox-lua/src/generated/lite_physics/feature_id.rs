@@ -21,98 +21,38 @@ use crate::{
     typed_userdata::TypedUserData,
     user_data_plus::{FyroxUserData, Traitor, UserDataClass},
 };
-
-impl FyroxUserData for fyrox_lite::lite_physics::LiteFeatureId {
-    const CLASS_NAME: &'static str = "FeatureId";
-    fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
-        methods: &mut M,
-    ) {
-        methods.add_method_mut("Vertex", |lua, this, mut args: mlua::MultiValue| {
-            let Some(_1) = args.pop_front() else {
-                return Err(lua_error!("argument 1 (i32) missing"));
-            };
-            let _1 = <i32 as mlua::FromLua>::from_lua(_1, lua)?;
-            let _1 = _1;
-            let value = fyrox_lite::lite_physics::LiteFeatureId::Vertex(_1);
-            Ok(Traitor::new(value))
-        });
-
-        methods.add_method_mut("Edge", |lua, this, mut args: mlua::MultiValue| {
-            let Some(_1) = args.pop_front() else {
-                return Err(lua_error!("argument 1 (i32) missing"));
-            };
-            let _1 = <i32 as mlua::FromLua>::from_lua(_1, lua)?;
-            let _1 = _1;
-            let value = fyrox_lite::lite_physics::LiteFeatureId::Edge(_1);
-            Ok(Traitor::new(value))
-        });
-
-        methods.add_method_mut("Face", |lua, this, mut args: mlua::MultiValue| {
-            let Some(_1) = args.pop_front() else {
-                return Err(lua_error!("argument 1 (i32) missing"));
-            };
-            let _1 = <i32 as mlua::FromLua>::from_lua(_1, lua)?;
-            let _1 = _1;
-            let value = fyrox_lite::lite_physics::LiteFeatureId::Face(_1);
-            Ok(Traitor::new(value))
-        });
-    }
-    fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
-        fields.add_field_method_get("Unknown", |lua, this| {
-            Ok(Traitor::new(
-                fyrox_lite::lite_physics::LiteFeatureId::Unknown,
-            ))
-        });
-    }
-
-    fn add_instance_methods<'lua, M: mlua::UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
-        methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
-            Ok(format!("{:?}", this.inner()))
-        });
-    }
-
-    fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
-        fields.add_field_method_get("Vertex", |lua, this| {
-            let fyrox_lite::lite_physics::LiteFeatureId::Vertex(_1) = this.inner() else {
-                return Ok(mlua::Value::Nil);
-            };
+impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteFeatureId> {
+    fn into_lua(self, lua: &'lua mlua::Lua) -> mlua::Result<mlua::Value<'lua>> {
+        Ok(mlua::Value::Table({
             let t = lua.create_table()?;
-            // Lua annotations is based on assumption that indexed table is homogenous array, so use string keys to allow heterogenous typing here.
-            t.set("_1", {
-                let _1 = _1.clone();
-                _1
+            t.set("kind", {
+                let kind = self.kind.clone();
+                Traitor::new(fyrox_lite::lite_physics::LiteFeatureKind::from(kind))
             })?;
-            Ok(mlua::Value::Table(t))
-        });
-        fields.add_field_method_get("Edge", |lua, this| {
-            let fyrox_lite::lite_physics::LiteFeatureId::Edge(_1) = this.inner() else {
-                return Ok(mlua::Value::Nil);
-            };
-            let t = lua.create_table()?;
-            // Lua annotations is based on assumption that indexed table is homogenous array, so use string keys to allow heterogenous typing here.
-            t.set("_1", {
-                let _1 = _1.clone();
-                _1
+            t.set("id", {
+                let id = self.id.clone();
+                id
             })?;
-            Ok(mlua::Value::Table(t))
-        });
-        fields.add_field_method_get("Face", |lua, this| {
-            let fyrox_lite::lite_physics::LiteFeatureId::Face(_1) = this.inner() else {
-                return Ok(mlua::Value::Nil);
-            };
-            let t = lua.create_table()?;
-            // Lua annotations is based on assumption that indexed table is homogenous array, so use string keys to allow heterogenous typing here.
-            t.set("_1", {
-                let _1 = _1.clone();
-                _1
-            })?;
-            Ok(mlua::Value::Table(t))
-        });
-        fields.add_field_method_get("Unknown", |lua, this| {
-            let fyrox_lite::lite_physics::LiteFeatureId::Unknown = this.inner() else {
-                return Ok(mlua::Value::Nil);
-            };
-            Ok(mlua::Value::Boolean(true))
-        });
+            t
+        }))
+    }
+}
+impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteFeatureId> {
+    fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> mlua::Result<Self> {
+        let mlua::Value::Table(value) = value else {
+            return Err(lua_error!(
+                "cannot extract FeatureId from {:?}. expected table.",
+                value
+            ));
+        };
+        let kind = value
+            .get::<_, TypedUserData<Traitor<fyrox_lite::lite_physics::LiteFeatureKind>>>("kind")?;
+        let kind = kind.borrow()?.inner().clone().into();
+        let id = value.get::<_, i32>("id")?;
+        let id = id;
+        Ok(Traitor::new(fyrox_lite::lite_physics::LiteFeatureId {
+            kind,
+            id,
+        }))
     }
 }

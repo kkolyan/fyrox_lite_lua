@@ -68,9 +68,9 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_physics::LiteInterse
                 "position",
             )?;
         let position = position.borrow()?.inner().clone().into();
-        let feature = value
-            .get::<_, TypedUserData<Traitor<fyrox_lite::lite_physics::LiteFeatureId>>>("feature")?;
-        let feature = feature.borrow()?.inner().clone().into();
+        let feature =
+            value.get::<_, Traitor<fyrox_lite::lite_physics::LiteFeatureId>>("feature")?;
+        let feature = feature.inner().clone().into();
         let toi = value.get::<_, f32>("toi")?;
         let toi = toi;
         Ok(Traitor::new(fyrox_lite::lite_physics::LiteIntersection {

@@ -1,6 +1,4 @@
-namespace App01;
 using System.Runtime.InteropServices;
-using App01;
 public partial class FyroxManualBindings {
     
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
@@ -34,34 +32,24 @@ public partial class FyroxManualBindings {
     }
     [StructLayout(LayoutKind.Explicit)]
     public unsafe struct NativeValue {
-        
         [FieldOffset(0)]
         public bool @bool;
-        
         [FieldOffset(0)]
         public float f32;
-        
         [FieldOffset(0)]
         public double f64;
-        
         [FieldOffset(0)]
         public short i16;
-        
         [FieldOffset(0)]
         public int i32;
-        
         [FieldOffset(0)]
         public long i64;
-        
         [FieldOffset(0)]
         public NativeString String;
-        
         [FieldOffset(0)]
         public NativeHandle Handle;
-        
         [FieldOffset(0)]
         public NativeVector3 Vector3;
-        
         [FieldOffset(0)]
         public NativeQuaternion Quaternion;
     }

@@ -25,10 +25,10 @@ impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_ui::TextBuilder> {
     fn into_lua(self, lua: &'lua mlua::Lua) -> mlua::Result<mlua::Value<'lua>> {
         Ok(mlua::Value::Table({
             let t = lua.create_table()?;
-            t.set("foregound", {
-                let foregound = self.foregound.clone();
-                if let Some(foregound) = foregound {
-                    Some(Traitor::new(fyrox_lite::lite_ui::Brush::from(foregound)))
+            t.set("foreground", {
+                let foreground = self.foreground.clone();
+                if let Some(foreground) = foreground {
+                    Some(Traitor::new(fyrox_lite::lite_ui::Brush::from(foreground)))
                 } else {
                     None
                 }
@@ -53,10 +53,10 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_ui::TextBuilder> {
                 value
             ));
         };
-        let foregound = value
-            .get::<_, Option<TypedUserData<Traitor<fyrox_lite::lite_ui::Brush>>>>("foregound")?;
-        let foregound = if let Some(foregound) = foregound {
-            Some(foregound.borrow()?.inner().clone().into())
+        let foreground =
+            value.get::<_, Option<Traitor<fyrox_lite::lite_ui::Brush>>>("foreground")?;
+        let foreground = if let Some(foreground) = foreground {
+            Some(foreground.inner().clone().into())
         } else {
             None
         };
@@ -67,7 +67,7 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_ui::TextBuilder> {
             None
         };
         Ok(Traitor::new(fyrox_lite::lite_ui::TextBuilder {
-            foregound,
+            foreground,
             font_size,
         }))
     }

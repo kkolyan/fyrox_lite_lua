@@ -78,11 +78,11 @@ impl From<&LiteIntersection> for Intersection {
             collider: value.collider.inner(),
             normal: value.normal.into(),
             position: Vector3::from(value.position).into(),
-            feature: match value.feature {
-                LiteFeatureId::Vertex(it) => FeatureId::Vertex(it as u32),
-                LiteFeatureId::Edge(it) => FeatureId::Edge(it as u32),
-                LiteFeatureId::Face(it) => FeatureId::Face(it as u32),
-                LiteFeatureId::Unknown => FeatureId::Unknown,
+            feature: match value.feature.kind {
+                LiteFeatureKind::Vertex => FeatureId::Vertex(value.feature.id as u32),
+                LiteFeatureKind::Edge => FeatureId::Edge(value.feature.id as u32),
+                LiteFeatureKind::Face => FeatureId::Face(value.feature.id as u32),
+                LiteFeatureKind::Unknown => FeatureId::Unknown,
             },
             toi: value.toi,
         }
@@ -101,10 +101,10 @@ impl From<&Intersection> for LiteIntersection {
             )),
             toi: value.toi,
             feature: match value.feature {
-                FeatureId::Vertex(it) => LiteFeatureId::Vertex(it as i32),
-                FeatureId::Edge(it) => LiteFeatureId::Edge(it as i32),
-                FeatureId::Face(it) => LiteFeatureId::Face(it as i32),
-                FeatureId::Unknown => LiteFeatureId::Unknown,
+                FeatureId::Vertex(it) => LiteFeatureId { kind: LiteFeatureKind::Vertex, id: it as i32 },
+                FeatureId::Edge(it) => LiteFeatureId { kind: LiteFeatureKind::Edge, id: it as i32 },
+                FeatureId::Face(it) => LiteFeatureId { kind: LiteFeatureKind::Face, id: it as i32 },
+                FeatureId::Unknown => LiteFeatureId {kind: LiteFeatureKind::Unknown, id: 0 },
             },
         }
     }
@@ -159,13 +159,20 @@ pub struct LiteIntersection {
 /// Shape-dependent identifier.
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 #[lite_api(class=FeatureId)]
-pub enum LiteFeatureId {
+pub struct LiteFeatureId {
+    pub kind: LiteFeatureKind,
+    pub id: i32,
+}
+
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
+#[lite_api(class=FeatureKind)]
+pub enum LiteFeatureKind {
     /// Shape-dependent identifier of a vertex.
-    Vertex(i32),
+    Vertex,
     /// Shape-dependent identifier of an edge.
-    Edge(i32),
+    Edge,
     /// Shape-dependent identifier of a face.
-    Face(i32),
+    Face,
     /// Unknown identifier.
     Unknown,
 }
