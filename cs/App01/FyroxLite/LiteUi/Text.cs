@@ -1,13 +1,14 @@
-using FyroxLite.LiteWindow;
 using FyroxLite.LiteInput;
-using FyroxLite.LiteMath;
 using FyroxLite.LiteLog;
-using FyroxLite.LitePrefab;
-using FyroxLite.LiteUi;
-using FyroxLite.LitePlugin;
-using FyroxLite.LitePhysics;
+using FyroxLite.LiteMath;
 using FyroxLite.LiteNode;
+using FyroxLite.LitePhysics;
+using FyroxLite.LitePlugin;
+using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
+using FyroxLite.LiteUi;
+using FyroxLite.LiteWindow;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 namespace FyroxLite.LiteUi;
 
@@ -22,8 +23,6 @@ public readonly partial struct Text
             fixed (Text* self = &this) fyrox_lite_lite_ui_LiteText_SetTextAsync(self, text);
         }
     }
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_ui_LiteText_SetTextAsync(Text* self, string text);
 
     public static Text New(TextBuilder state)
     {
@@ -31,6 +30,8 @@ public readonly partial struct Text
             return fyrox_lite_lite_ui_LiteText_New(state);
         }
     }
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial void fyrox_lite_lite_ui_LiteText_SetTextAsync(Text* self, string text);
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial Text fyrox_lite_lite_ui_LiteText_New(TextBuilder state);
 }

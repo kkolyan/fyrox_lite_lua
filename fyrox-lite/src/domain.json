@@ -2692,7 +2692,9 @@
             "method_name": "get_name",
             "signature": {
               "return_ty": {
-                "Option": "String"
+                "Result": {
+                  "ok": "String"
+                }
               }
             }
           },

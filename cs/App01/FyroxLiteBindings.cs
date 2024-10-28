@@ -130,7 +130,7 @@ public partial class FyroxLiteBindings {
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     public static partial NativeHandle_option fyrox_lite_Node_as_rigid_body(NativeHandle __this);
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    public static partial NativeString_option fyrox_lite_Node_get_name(NativeHandle __this);
+    public static partial NativeString_result fyrox_lite_Node_get_name(NativeHandle __this);
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     public static partial bool fyrox_lite_Node_get_alive(NativeHandle __this);
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]

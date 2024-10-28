@@ -27,7 +27,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
                 render(&mut s, r#"
                 //public const ${type} ${name} = ${value};
                 "#, [
-                    ("type", &api_types::type_rs2cs(&constant.ty)),
+                    ("type", &api_types::type_rs2cs(&constant.ty).to_facade()),
                     ("name", &constant.const_name),
                     ("value", &expr)
                 ]);
@@ -38,7 +38,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
         render(&mut s, r#"
                 public const ${type} ${name} = ${value};
                 "#, [
-            ("type", &api_types::type_rs2cs(&constant.ty)),
+            ("type", &api_types::type_rs2cs(&constant.ty).to_facade()),
             ("name", &constant.const_name),
             ("value", &value)
         ]);
@@ -49,7 +49,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
         let input_params = method.signature.params.iter()
             .filter(|it| !matches!(&it.ty, DataType::ClassName))
             .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
-            .map(|param| format!("{} {}", api_types::type_rs2cs(&param.ty), param.name))
+            .map(|param| format!("{} {}", api_types::type_rs2cs(&param.ty).to_facade(), param.name))
             .to_vec();
         let output_params = method.signature.params.iter()
             .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
@@ -57,10 +57,6 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
                 DataType::ClassName => format!("typeof(T).Name"),
                 it => param.name.clone(),
             })
-            .to_vec();
-        let native_input_params = method.signature.params.iter()
-            .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
-            .map(|param| format!("{} {}", api_types::type_rs2cs(&param.ty), param.name))
             .to_vec();
         render(&mut s, r#"
 
@@ -72,7 +68,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
                 }
         "#, [
             ("static", &if !method.instance { "static " } else { "" }),
-            ("return_ty", &method.signature.return_ty.as_ref().map(api_types::type_rs2cs).unwrap_or("void".to_string())),
+            ("return_ty", &method.signature.return_ty.as_ref().map(|it| api_types::type_rs2cs(it).to_facade()).unwrap_or("void".to_string())),
             ("name", &method.method_name.to_case(Case::Pascal)),
             ("input_params", &input_params.join(",")),
             ("output_params", &output_params.join(",")),
@@ -82,17 +78,23 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
             ("this", &if method.instance { "self, " } else { "" }),
             ("fix", &if method.instance { format!("fixed ({}* self = &this) ", class.class_name) } else { "".to_owned() }),
         ]);
-
+    }
+    for method in class.methods.iter() {
+        let native_input_params = method.signature.params.iter()
+            .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
+            .map(|param| format!("{} {}", api_types::type_rs2cs(&param.ty).to_blittable(), param.name))
+            .to_vec();
         render(&mut s, r#"
                 [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
                 private static unsafe partial ${return_ty} ${rust_path_escaped}_${name}(${this}${native_input_params});
         "#, [
-            ("return_ty", &method.signature.return_ty.as_ref().map(api_types::type_rs2cs).unwrap_or("void".to_string())),
+            ("return_ty", &method.signature.return_ty.as_ref().map(|it| api_types::type_rs2cs(it).to_blittable()).unwrap_or("void".to_string())),
             ("name", &method.method_name.to_case(Case::Pascal)),
             ("native_input_params", &native_input_params.join(",")),
             ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
             ("this", &if method.instance {format!("{}* self, ", class.class_name)} else {"".to_string()}),
         ]);
+        
     }
 
     render(&mut s, r#"

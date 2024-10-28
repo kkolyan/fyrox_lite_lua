@@ -1,13 +1,14 @@
-using FyroxLite.LiteWindow;
 using FyroxLite.LiteInput;
-using FyroxLite.LiteMath;
 using FyroxLite.LiteLog;
-using FyroxLite.LitePrefab;
-using FyroxLite.LiteUi;
-using FyroxLite.LitePlugin;
-using FyroxLite.LitePhysics;
+using FyroxLite.LiteMath;
 using FyroxLite.LiteNode;
+using FyroxLite.LitePhysics;
+using FyroxLite.LitePlugin;
+using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
+using FyroxLite.LiteUi;
+using FyroxLite.LiteWindow;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 namespace FyroxLite.LitePlugin;
 
@@ -23,5 +24,5 @@ public readonly partial struct Plugin
         }
     }
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial T fyrox_lite_lite_plugin_LitePlugin_Get(string class_name);
+    private static unsafe partial UserScript_result fyrox_lite_lite_plugin_LitePlugin_Get(string class_name);
 }

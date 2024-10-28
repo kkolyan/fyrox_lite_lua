@@ -2698,16 +2698,14 @@ pub extern "C" fn fyrox_lite_Node_as_rigid_body(__this: NativeHandle) -> NativeH
         });
     __result
 }
-pub extern "C" fn fyrox_lite_Node_get_name(__this: NativeHandle) -> NativeString_option {
+pub extern "C" fn fyrox_lite_Node_get_name(__this: NativeHandle) -> NativeString_result {
     let mut __this: fyrox_lite::lite_node::LiteNode =
         Externalizable::from_external(__this.as_u128());
     let __result = __this.get_name();
-    let __result =
-        <NativeString as NativeType>::to_native_option(if let Some(__result) = __result {
-            Some(<u8 as NativeType>::to_native_array(__result.into_bytes()))
-        } else {
-            None
-        });
+    let __result = <NativeString as NativeType>::to_native_result(match __result {
+        Ok(__result) => Ok(<u8 as NativeType>::to_native_array(__result.into_bytes())),
+        Err(err) => Err(err),
+    });
     __result
 }
 pub extern "C" fn fyrox_lite_Node_get_alive(__this: NativeHandle) -> bool {
