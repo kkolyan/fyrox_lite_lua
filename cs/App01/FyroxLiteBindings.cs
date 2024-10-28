@@ -71,10 +71,6 @@ public partial class FyroxLiteBindings {
     public unsafe struct NativeKeyCode {
         public ubyte tag;
     }
-    [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeMouseButton {
-        public ubyte tag;
-    }
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     public static partial void fyrox_lite_Text_set_text_async(NativeHandle __this, NativeString text);
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]

@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
 use lite_model::{
-    ClassName, Constant, DataType, EngineClass, Method, Param, RustQualifiedName, Signature,
+    ClassName, Constant, ConstantValue, DataType, EngineClass, Literal, Method, Param, RustQualifiedName, Signature
 };
 use proc_macro2::Span;
 use quote::ToTokens;
-use syn::{parse_quote_spanned, spanned::Spanned, Ident, TraitBoundModifier, TypeParamBound};
+use syn::{parse_quote_spanned, spanned::Spanned, Expr, Ident, TraitBoundModifier, TypeParamBound};
 
 use crate::{extract_ty::extract_ty, lite_api_attr::LiteApiAttr};
 
@@ -213,6 +213,7 @@ pub fn extract_engine_class_and_inject_assertions(
                             continue 'items;
                         }
                     },
+                    value: parse_constant_value(&it.expr),
                 });
             }
             _ => {
@@ -236,5 +237,20 @@ pub fn extract_engine_class_and_inject_assertions(
                 features: attr.features,
             },
         )
+    })
+}
+
+
+fn parse_constant_value(it: &Expr) -> ConstantValue {
+    ConstantValue::Literal(match it {
+        Expr::Lit(it) => match &it.lit {
+            syn::Lit::Str(it) => Literal::String(it.value()),
+            syn::Lit::Byte(it) => Literal::Byte(it.value()),
+            syn::Lit::Int(it) => Literal::Number(it.base10_digits().to_string()),
+            syn::Lit::Float(it) => Literal::Number(it.base10_digits().to_string()),
+            syn::Lit::Bool(it) => Literal::Bool(it.value),
+            it => return ConstantValue::ComplexExpression(it.to_token_stream().to_string()),
+        }
+        it => return ConstantValue::ComplexExpression(it.to_token_stream().to_string()),
     })
 }

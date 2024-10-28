@@ -21,8 +21,6 @@ pub fn register_classes(lua: &mlua::Lua) {
 
     fyrox_lite::lite_input::LiteKeyCode::register_class(lua);
 
-    fyrox_lite::lite_input::LiteMouseButton::register_class(lua);
-
     fyrox_lite::lite_ui::LiteUiNode::register_class(lua);
 
     fyrox_lite::lite_ui::LiteText::register_class(lua);

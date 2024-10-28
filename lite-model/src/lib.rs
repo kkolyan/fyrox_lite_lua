@@ -72,6 +72,21 @@ pub struct Param {
 pub struct Constant {
     pub const_name: String,
     pub ty: DataType,
+    pub value: ConstantValue,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub enum ConstantValue {
+    Literal(Literal),
+    ComplexExpression(String),
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub enum Literal {
+    Bool(bool),
+    Byte(u8),
+    Number(String),
+    String(String),
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]

@@ -719,28 +719,6 @@ impl TryFrom<KeyCode> for LiteKeyCode {
     }
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
-#[lite_api(class=MouseButton)]
-pub enum LiteMouseButton {
-    Left,
-    Right,
-    Middle,
-    Back,
-    Forward,
-}
-
-impl From<LiteMouseButton> for MouseButton {
-    fn from(value: LiteMouseButton) -> Self {
-        match value {
-            LiteMouseButton::Left => MouseButton::Left,
-            LiteMouseButton::Right => MouseButton::Right,
-            LiteMouseButton::Middle => MouseButton::Middle,
-            LiteMouseButton::Back => MouseButton::Back,
-            LiteMouseButton::Forward => MouseButton::Forward,
-        }
-    }
-}
-
 impl Input {
 
     /// should be called after fixed frame update

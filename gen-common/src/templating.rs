@@ -51,7 +51,7 @@ pub fn render<const N: usize>(
             "missing placeholder for {}",
             name
         );
-        s = s.replace(placeholder, format!("{}", value).trim_end());
+        s = s.replace(placeholder, &format!("{}", value));
     }
     s = s.trim_end().to_string();
     // s += "\n";

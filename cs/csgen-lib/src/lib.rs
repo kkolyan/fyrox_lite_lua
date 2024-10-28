@@ -9,6 +9,7 @@ use crate::lite_cgen::CBindingsLite;
 
 pub mod rust_decl_to_cs;
 pub mod lite_cgen;
+pub mod lite_csgen;
 
 fn generate_and_write_bindings_cs(class: &str, s: CBindingsLite) {
     let file = parse2::<File>(TokenStream::from_str(&s.code_rs).unwrap()).unwrap();
