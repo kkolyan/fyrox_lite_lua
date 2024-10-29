@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Collections;
@@ -21,27 +22,64 @@ public readonly partial struct Log
     public static void Info(string msg)
     {
         unsafe {
-            fyrox_lite_lite_log_LiteLog_Info(msg);
+            var _msg = msg;
+            fyrox_lite_lite_log_LiteLog_Info(_msg);
         }
     }
 
     public static void Warn(string msg)
     {
         unsafe {
-            fyrox_lite_lite_log_LiteLog_Warn(msg);
+            var _msg = msg;
+            fyrox_lite_lite_log_LiteLog_Warn(_msg);
         }
     }
 
     public static void Err(string msg)
     {
         unsafe {
-            fyrox_lite_lite_log_LiteLog_Err(msg);
+            var _msg = msg;
+            fyrox_lite_lite_log_LiteLog_Err(_msg);
         }
     }
+    
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial void fyrox_lite_lite_log_LiteLog_Info(string msg);
+    
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial void fyrox_lite_lite_log_LiteLog_Warn(string msg);
+    
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial void fyrox_lite_lite_log_LiteLog_Err(string msg);
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct Log_optional
+{
+    internal Log Value;
+    internal bool HasValue;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Log? ToFacade(in Log_optional value)
+    {
+        if (value.HasValue)
+        {
+            var __item = value.Value;
+            var __item_to_facade = __item;
+            return __item_to_facade;
+        }
+        return null;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Log_optional FromFacade(in Log? value)
+    {
+        if (value == null)
+        {
+            return new Log_optional { Value = default, HasValue = false };
+        }
+        var __item = value;
+        var __item_from_facade = __item;
+        return new Log_optional { Value = __item_from_facade.Value, HasValue = true };
+    }
 }

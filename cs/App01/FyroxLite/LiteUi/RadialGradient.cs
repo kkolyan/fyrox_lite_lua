@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Collections;
@@ -21,9 +22,9 @@ public struct RadialGradient
         get => _center;
         set => _center = value;
     }
-    public GradientPointIterator Stops {
-        get => GradientPointIterator.ToFacade(_stops);
-        set => _stops = GradientPointIterator.FromFacade(value);
+    public List<GradientPoint> Stops {
+        get => GradientPoint_slice.ToFacade(_stops);
+        set => _stops = GradientPoint_slice.FromFacade(value);
     }
 //===============================================================
 // private fields for all properties (not only mapped),
@@ -31,73 +32,106 @@ public struct RadialGradient
 // I hope, NativeAOT will optimize out this.
 //===============================================================
     private Vector2 _center;
-    private GradientPointIterator _stops;
+    private GradientPoint_slice _stops;
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct RadialGradient_optional {
+internal struct RadialGradient_optional
+{
     internal RadialGradient Value;
     internal bool HasValue;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static RadialGradient? ToFacade(in RadialGradient_optional value) => value.HasValue ? value.Value : null;
+    public static RadialGradient? ToFacade(in RadialGradient_optional value)
+    {
+        if (value.HasValue)
+        {
+            var __item = value.Value;
+            var __item_to_facade = __item;
+            return __item_to_facade;
+        }
+        return null;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static RadialGradient_optional FromFacade(in RadialGradient? value) => new RadialGradient_optional { Value = value ?? default, HasValue = value.HasValue };
+    public static RadialGradient_optional FromFacade(in RadialGradient? value)
+    {
+        if (value == null)
+        {
+            return new RadialGradient_optional { Value = default, HasValue = false };
+        }
+        var __item = value;
+        var __item_from_facade = __item;
+        return new RadialGradient_optional { Value = __item_from_facade.Value, HasValue = true };
+    }
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct RadialGradient_slice
+{
+    private unsafe RadialGradient* begin;
+    private int length;
+    internal List<RadialGradient> Fetched;
+
+    internal static unsafe void Fetch(ref RadialGradient_slice self)
+    {
+        var fetched = new List<RadialGradient>();
+        for (int i = 0; i < self.length; i++)
+        {
+            var __item = *(self.begin + i);
+            var __item_to_facade = __item;
+            fetched.Add(__item_to_facade);
+        }
+        self.Fetched = fetched;
+    }
+
+    internal static unsafe List<RadialGradient> ToFacade(in RadialGradient_slice self)
+    {
+        var fetched = new List<RadialGradient>();
+        for (int i = 0; i < self.length; i++)
+        {
+            var __item = *(self.begin + i);
+            var __item_to_facade = __item;
+            fetched.Add(__item_to_facade);
+        }
+        return fetched;
+    }
+
+    internal static RadialGradient_slice FromFacade(in List<RadialGradient> self)
+    {
+        // __item
+        throw new Exception("slice serialization not implemented yet");
+    }
+
 }
 
 [StructLayout(LayoutKind.Explicit)]
-internal struct RadialGradient_result {
+internal struct RadialGradient_result
+{
     [FieldOffset(0)]
-    internal int ok;
+    internal int Ok;
 
     [FieldOffset(sizeof(int))]
-    internal RadialGradient value;
+    internal RadialGradient Value;
 
     [FieldOffset(sizeof(int))]
-    internal string err;
-}
+    internal string Err;
 
-// it iterates over the unmanaged memory (Vec allocated by Rust and stored for the length of a frame in the arena).
-// if user attempts to iterate this iterator after backing data is disposed,
-// the methods throws exception (hash is used to check if the backing data is still alive to make it
-// possible to throw exceptions instead of SIGSEGV-ing)
-[StructLayout(LayoutKind.Sequential)]
-public struct RadialGradientIterator : IEnumerator<RadialGradient> {
-    // hash is a random number,  allocated in unmanaged memory next to the items with the same lifetime.
-    // arena (Vec<(Hash,Vec<RadialGradient>)>) is zeroed at the end of every frame.
-    private unsafe int* hash;
-    private unsafe RadialGradient* items;
-    private int length;
-    private int position;
-    private int expectedHash;
-
-    public RadialGradient Current
+    internal static unsafe RadialGradient ToFacade(in RadialGradient_result self)
     {
-        get
+        if (self.Ok != 0)
         {
-            unsafe {
-              if (*hash != expectedHash) {
-                 throw new Exception("iterator is not valid anymore (it's valid only for one frame)");
-              }
-              return *(items + position);
-            }
+            var __item = self.Value;
+            var __item_to_facade = __item;
+            return __item_to_facade;
         }
+        throw new Exception(self.Err);
     }
 
-    public bool MoveNext() {
-        if (position < length - 2) {
-            position ++;
-            return true;
-        }
-        return false;
-    }
-
-    public void Dispose()
+    internal static RadialGradient_result FromFacade(in RadialGradient self)
     {
+        var __item = self;
+        var __item_from_facade = __item;
+        return new RadialGradient_result {Ok = 1, Value = __item_from_facade};
     }
-
-    public void Reset() => position = 0;
-
-    object? IEnumerator.Current => Current;
 }

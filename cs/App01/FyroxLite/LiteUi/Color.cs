@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Collections;
@@ -157,4 +158,35 @@ public readonly partial struct Color
     //public const Color LIGHT_GRAY = color_to_lite (fyrox :: core :: color :: Color :: LIGHT_GRAY);
     //public const Color GAINSBORO = color_to_lite (fyrox :: core :: color :: Color :: GAINSBORO);
     //public const Color WHITE_SMOKE = color_to_lite (fyrox :: core :: color :: Color :: WHITE_SMOKE);
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct Color_optional
+{
+    internal Color Value;
+    internal bool HasValue;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Color? ToFacade(in Color_optional value)
+    {
+        if (value.HasValue)
+        {
+            var __item = value.Value;
+            var __item_to_facade = __item;
+            return __item_to_facade;
+        }
+        return null;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Color_optional FromFacade(in Color? value)
+    {
+        if (value == null)
+        {
+            return new Color_optional { Value = default, HasValue = false };
+        }
+        var __item = value;
+        var __item_from_facade = __item;
+        return new Color_optional { Value = __item_from_facade.Value, HasValue = true };
+    }
 }

@@ -8,46 +8,36 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Collections;
-
 namespace FyroxLite.LitePhysics;
 
 // fyrox_lite::lite_physics::LiteRayCastOptions
 [StructLayout(LayoutKind.Sequential)]
 public struct RayCastOptions
 {
-    public Vector3 RayOrigin
-    {
+    public Vector3 RayOrigin {
         get => _ray_origin;
         set => _ray_origin = value;
     }
-
-    public Vector3 RayDirection
-    {
+    public Vector3 RayDirection {
         get => _ray_direction;
         set => _ray_direction = value;
     }
-
-    public float MaxLen
-    {
+    public float MaxLen {
         get => _max_len;
         set => _max_len = value;
     }
-
-    public InteractionGroups? Groups
-    {
+    public InteractionGroups? Groups {
         get => InteractionGroups_optional.ToFacade(_groups);
         set => _groups = InteractionGroups_optional.FromFacade(value);
     }
-
-    public bool SortResults
-    {
+    public bool SortResults {
         get => _sort_results;
         set => _sort_results = value;
     }
-
 //===============================================================
 // private fields for all properties (not only mapped),
 // because it makes ABI much more readable.
@@ -67,70 +57,96 @@ internal struct RayCastOptions_optional
     internal bool HasValue;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static RayCastOptions? ToFacade(in RayCastOptions_optional value) => value.HasValue ? value.Value : null;
+    public static RayCastOptions? ToFacade(in RayCastOptions_optional value)
+    {
+        if (value.HasValue)
+        {
+            var __item = value.Value;
+            var __item_to_facade = __item;
+            return __item_to_facade;
+        }
+        return null;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static RayCastOptions_optional FromFacade(in RayCastOptions? value) => new RayCastOptions_optional
-        { Value = value ?? default, HasValue = value.HasValue };
+    public static RayCastOptions_optional FromFacade(in RayCastOptions? value)
+    {
+        if (value == null)
+        {
+            return new RayCastOptions_optional { Value = default, HasValue = false };
+        }
+        var __item = value;
+        var __item_from_facade = __item;
+        return new RayCastOptions_optional { Value = __item_from_facade.Value, HasValue = true };
+    }
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct RayCastOptions_slice
+{
+    private unsafe RayCastOptions* begin;
+    private int length;
+    internal List<RayCastOptions> Fetched;
+
+    internal static unsafe void Fetch(ref RayCastOptions_slice self)
+    {
+        var fetched = new List<RayCastOptions>();
+        for (int i = 0; i < self.length; i++)
+        {
+            var __item = *(self.begin + i);
+            var __item_to_facade = __item;
+            fetched.Add(__item_to_facade);
+        }
+        self.Fetched = fetched;
+    }
+
+    internal static unsafe List<RayCastOptions> ToFacade(in RayCastOptions_slice self)
+    {
+        var fetched = new List<RayCastOptions>();
+        for (int i = 0; i < self.length; i++)
+        {
+            var __item = *(self.begin + i);
+            var __item_to_facade = __item;
+            fetched.Add(__item_to_facade);
+        }
+        return fetched;
+    }
+
+    internal static RayCastOptions_slice FromFacade(in List<RayCastOptions> self)
+    {
+        // __item
+        throw new Exception("slice serialization not implemented yet");
+    }
+
 }
 
 [StructLayout(LayoutKind.Explicit)]
 internal struct RayCastOptions_result
 {
-    [FieldOffset(0)] internal int ok;
+    [FieldOffset(0)]
+    internal int Ok;
 
-    [FieldOffset(sizeof(int))] internal RayCastOptions value;
+    [FieldOffset(sizeof(int))]
+    internal RayCastOptions Value;
 
-    [FieldOffset(sizeof(int))] internal string err;
-}
+    [FieldOffset(sizeof(int))]
+    internal string Err;
 
-// it iterates over the unmanaged memory (Vec allocated by Rust and stored for the length of a frame in the arena).
-// if user attempts to iterate this iterator after backing data is disposed,
-// the methods throws exception (hash is used to check if the backing data is still alive to make it
-// possible to throw exceptions instead of SIGSEGV-ing)
-[StructLayout(LayoutKind.Sequential)]
-public struct RayCastOptionsIterator : IEnumerator<RayCastOptions>
-{
-    // hash is a random number,  allocated in unmanaged memory next to the items with the same lifetime.
-    // arena (Vec<(Hash,Vec<RayCastOptions>)>) is zeroed at the end of every frame.
-    private unsafe int* hash;
-    private unsafe RayCastOptions* items;
-    private int length;
-    private int position;
-    private int expectedHash;
-
-    public RayCastOptions Current
+    internal static unsafe RayCastOptions ToFacade(in RayCastOptions_result self)
     {
-        get
+        if (self.Ok != 0)
         {
-            unsafe
-            {
-                if (*hash != expectedHash)
-                {
-                    throw new Exception("iterator is not valid anymore (it's valid only for one frame)");
-                }
-
-                return *(items + position);
-            }
+            var __item = self.Value;
+            var __item_to_facade = __item;
+            return __item_to_facade;
         }
+        throw new Exception(self.Err);
     }
 
-    public bool MoveNext()
+    internal static RayCastOptions_result FromFacade(in RayCastOptions self)
     {
-        if (position < length - 2)
-        {
-            position++;
-            return true;
-        }
-
-        return false;
+        var __item = self;
+        var __item_from_facade = __item;
+        return new RayCastOptions_result {Ok = 1, Value = __item_from_facade};
     }
-
-    public void Dispose()
-    {
-    }
-
-    public void Reset() => position = 0;
-
-    object? IEnumerator.Current => Current;
 }

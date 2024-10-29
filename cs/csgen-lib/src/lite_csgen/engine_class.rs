@@ -4,7 +4,8 @@ use gen_common::code_model::{ModContent, Module};
 use gen_common::context::GenerationContext;
 use gen_common::templating::render;
 use lite_model::{ConstantValue, DataType, EngineClass, Literal};
-use crate::lite_csgen::api_types;
+use crate::lite_csgen::{api_types, wrappers};
+use crate::lite_csgen::api_types::TypeMarshalling;
 
 pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) -> Module {
     let mut s = String::new();
@@ -45,7 +46,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
     }
 
     for method in class.methods.iter() {
-        let generics = method.signature.params.iter().any(|it| matches!(&it.ty, DataType::ClassName));
+        let has_class_name_arg = method.signature.params.iter().any(|it| matches!(&it.ty, DataType::ClassName));
         let input_params = method.signature.params.iter()
             .filter(|it| !matches!(&it.ty, DataType::ClassName))
             .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
@@ -55,29 +56,73 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
             .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
             .map(|param| match &param.ty {
                 DataType::ClassName => format!("typeof(T).Name"),
-                it => param.name.clone(),
+                it => format!("_{}", param.name),
             })
             .to_vec();
-        render(&mut s, r#"
 
-                public ${static}${return_ty} ${name}${generics}(${input_params})
+        let mut converted_params = String::new();
+        for param in method.signature.params.iter() {
+            if matches!(&param.ty, DataType::ClassName | DataType::UserScriptGenericStub | DataType::Buffer(_)) {
+                continue;
+            }
+            if let TypeMarshalling::Mapped { blittable, .. } = api_types::type_rs2cs(&param.ty) {
+                render(&mut converted_params, r#"
+                        var _${name} = ${blittable}.FromFacade(${name});
+                        "#, [("name", &param.name), ("blittable", &blittable)]);
+            } else {
+                render(&mut converted_params, r#"
+                        var _${name} = ${name};
+                        "#, [("name", &param.name)]);
+            }
+        }
+
+        if let Some(return_ty) = &method.signature.return_ty {
+            let return_ty = api_types::type_rs2cs(return_ty);
+            render(&mut s, r#"
+
+                public ${static}${return_ty} ${name}${generics}(${input_params})${generic_where}
                 {
                     unsafe {
-                        ${fix}${return_stmnt}${rust_path_escaped}_${name}(${this}${output_params});
+                        ${converted_params}
+                        var __ret = ${rust_path_escaped}_${name}(${this}${output_params});
+                        return ${ret_expr}${generic_cast};
                     }
                 }
         "#, [
-            ("static", &if !method.instance { "static " } else { "" }),
-            ("return_ty", &method.signature.return_ty.as_ref().map(|it| api_types::type_rs2cs(it).to_facade()).unwrap_or("void".to_string())),
-            ("name", &method.method_name.to_case(Case::Pascal)),
-            ("input_params", &input_params.join(",")),
-            ("output_params", &output_params.join(",")),
-            ("return_stmnt", &if method.signature.return_ty.is_some() { "return " } else { "" }),
-            ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
-            ("generics", &if generics { "<T>" } else { "" }),
-            ("this", &if method.instance { "self, " } else { "" }),
-            ("fix", &if method.instance { format!("fixed ({}* self = &this) ", class.class_name) } else { "".to_owned() }),
-        ]);
+                ("static", &if !method.instance { "static " } else { "" }),
+                ("return_ty", &if has_class_name_arg { return_ty.to_facade_generic() } else { return_ty.to_facade() }),
+                ("ret_expr", &if return_ty.is_mapped() { format!("{}.ToFacade(__ret)", return_ty.to_blittable()) } else { "__ret".to_string() }),
+                ("generic_cast", &if has_class_name_arg {" as T"} else {""}),
+                ("generic_where", &if has_class_name_arg {" where T : class"} else {""}),
+                ("name", &method.method_name.to_case(Case::Pascal)),
+                ("input_params", &input_params.join(", ")),
+                ("output_params", &output_params.join(", ")),
+                ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
+                ("generics", &if has_class_name_arg { "<T>" } else { "" }),
+                ("this", &if method.instance { if output_params.is_empty() { "this" } else { "this, " } } else { "" }),
+                ("converted_params", &converted_params.trim_start()),
+            ]);
+        } else {
+            render(&mut s, r#"
+
+                public ${static}void ${name}${generics}(${input_params})
+                {
+                    unsafe {
+                        ${converted_params}
+                        ${rust_path_escaped}_${name}(${this}${output_params});
+                    }
+                }
+        "#, [
+                ("static", &if !method.instance { "static " } else { "" }),
+                ("name", &method.method_name.to_case(Case::Pascal)),
+                ("input_params", &input_params.join(", ")),
+                ("output_params", &output_params.join(", ")),
+                ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
+                ("generics", &if has_class_name_arg { "<T>" } else { "" }),
+                ("this", &if method.instance { if output_params.is_empty() { "this" } else { "this, " } } else { "" }),
+                ("converted_params", &converted_params.trim_start()),
+            ]);
+        }
     }
     for method in class.methods.iter() {
         let native_input_params = method.signature.params.iter()
@@ -91,16 +136,17 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
         "#, [
             ("return_ty", &method.signature.return_ty.as_ref().map(|it| api_types::type_rs2cs(it).to_blittable()).unwrap_or("void".to_string())),
             ("name", &method.method_name.to_case(Case::Pascal)),
-            ("native_input_params", &native_input_params.join(",")),
+            ("native_input_params", &native_input_params.join(", ")),
             ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
-            ("this", &if method.instance {format!("{}* self, ", class.class_name)} else {"".to_string()}),
+            ("this", &if method.instance { format!("{} {}", class.class_name, if native_input_params.is_empty() { "self" } else { "self, " }) } else { "".to_string() }),
         ]);
-        
     }
 
     render(&mut s, r#"
             }
     "#, []);
+
+    wrappers::generate_optional(&mut s, &DataType::Object(class.class_name.clone()));
 
     Module::code(&class.class_name, s)
 }

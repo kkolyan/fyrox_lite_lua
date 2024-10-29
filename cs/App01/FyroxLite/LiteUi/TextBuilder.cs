@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Collections;
@@ -35,69 +36,102 @@ public struct TextBuilder
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct TextBuilder_optional {
+internal struct TextBuilder_optional
+{
     internal TextBuilder Value;
     internal bool HasValue;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TextBuilder? ToFacade(in TextBuilder_optional value) => value.HasValue ? value.Value : null;
+    public static TextBuilder? ToFacade(in TextBuilder_optional value)
+    {
+        if (value.HasValue)
+        {
+            var __item = value.Value;
+            var __item_to_facade = __item;
+            return __item_to_facade;
+        }
+        return null;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TextBuilder_optional FromFacade(in TextBuilder? value) => new TextBuilder_optional { Value = value ?? default, HasValue = value.HasValue };
+    public static TextBuilder_optional FromFacade(in TextBuilder? value)
+    {
+        if (value == null)
+        {
+            return new TextBuilder_optional { Value = default, HasValue = false };
+        }
+        var __item = value;
+        var __item_from_facade = __item;
+        return new TextBuilder_optional { Value = __item_from_facade.Value, HasValue = true };
+    }
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct TextBuilder_slice
+{
+    private unsafe TextBuilder* begin;
+    private int length;
+    internal List<TextBuilder> Fetched;
+
+    internal static unsafe void Fetch(ref TextBuilder_slice self)
+    {
+        var fetched = new List<TextBuilder>();
+        for (int i = 0; i < self.length; i++)
+        {
+            var __item = *(self.begin + i);
+            var __item_to_facade = __item;
+            fetched.Add(__item_to_facade);
+        }
+        self.Fetched = fetched;
+    }
+
+    internal static unsafe List<TextBuilder> ToFacade(in TextBuilder_slice self)
+    {
+        var fetched = new List<TextBuilder>();
+        for (int i = 0; i < self.length; i++)
+        {
+            var __item = *(self.begin + i);
+            var __item_to_facade = __item;
+            fetched.Add(__item_to_facade);
+        }
+        return fetched;
+    }
+
+    internal static TextBuilder_slice FromFacade(in List<TextBuilder> self)
+    {
+        // __item
+        throw new Exception("slice serialization not implemented yet");
+    }
+
 }
 
 [StructLayout(LayoutKind.Explicit)]
-internal struct TextBuilder_result {
+internal struct TextBuilder_result
+{
     [FieldOffset(0)]
-    internal int ok;
+    internal int Ok;
 
     [FieldOffset(sizeof(int))]
-    internal TextBuilder value;
+    internal TextBuilder Value;
 
     [FieldOffset(sizeof(int))]
-    internal string err;
-}
+    internal string Err;
 
-// it iterates over the unmanaged memory (Vec allocated by Rust and stored for the length of a frame in the arena).
-// if user attempts to iterate this iterator after backing data is disposed,
-// the methods throws exception (hash is used to check if the backing data is still alive to make it
-// possible to throw exceptions instead of SIGSEGV-ing)
-[StructLayout(LayoutKind.Sequential)]
-public struct TextBuilderIterator : IEnumerator<TextBuilder> {
-    // hash is a random number,  allocated in unmanaged memory next to the items with the same lifetime.
-    // arena (Vec<(Hash,Vec<TextBuilder>)>) is zeroed at the end of every frame.
-    private unsafe int* hash;
-    private unsafe TextBuilder* items;
-    private int length;
-    private int position;
-    private int expectedHash;
-
-    public TextBuilder Current
+    internal static unsafe TextBuilder ToFacade(in TextBuilder_result self)
     {
-        get
+        if (self.Ok != 0)
         {
-            unsafe {
-              if (*hash != expectedHash) {
-                 throw new Exception("iterator is not valid anymore (it's valid only for one frame)");
-              }
-              return *(items + position);
-            }
+            var __item = self.Value;
+            var __item_to_facade = __item;
+            return __item_to_facade;
         }
+        throw new Exception(self.Err);
     }
 
-    public bool MoveNext() {
-        if (position < length - 2) {
-            position ++;
-            return true;
-        }
-        return false;
-    }
-
-    public void Dispose()
+    internal static TextBuilder_result FromFacade(in TextBuilder self)
     {
+        var __item = self;
+        var __item_from_facade = __item;
+        return new TextBuilder_result {Ok = 1, Value = __item_from_facade};
     }
-
-    public void Reset() => position = 0;
-
-    object? IEnumerator.Current => Current;
 }

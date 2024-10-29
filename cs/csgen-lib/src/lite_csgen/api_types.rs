@@ -20,21 +20,27 @@ pub fn type_rs2cs(ty: &DataType) -> TypeMarshalling {
             // 1. return iterator, that also contains seem hash to check the rust-side arena-allocated collection is alive every iteration
             // 2. add "fetch" method that recursively called on every returned value and fetch collection inside
             // 3. consider analog that accepts managed array pointer as argument and returns number of added items
-            // combination of 2+3 seems Unity way. 
-            "{}Iterator",
-            "{}Iterator",
+            // combination of 2+3 seems Unity way.
+            "List<{}>",
+            "{}_slice",
             &type_rs2cs(it.deref()),
         ),
         DataType::UserScript => TypeMarshalling::Mapped {
-            facade: "T".to_string(),
+            facade: "object".to_string(),
+            facade_generic: "T".to_string(),
             blittable: "UserScript".to_string(),
         },
         DataType::UserScriptMessage => TypeMarshalling::Mapped {
             facade: "object".to_string(),
+            facade_generic: "T".to_string(),
             blittable: "UserScriptMessage".to_string(),
         },
         DataType::UserScriptGenericStub => panic!("WTF, UserScriptGenericStub should be filtered out"),
-        DataType::Buffer(_) => panic!("WTF, Buffer should be filtered out"),
+        DataType::Buffer(it) => TypeMarshalling::templated(
+            "List<{}>",
+            "{}_slice",
+            &type_rs2cs(it.deref()),
+        ),
         DataType::Object(it) => TypeMarshalling::Blittable(it.to_string()),
         DataType::Option(it) => TypeMarshalling::templated(
             "{}?",
@@ -54,6 +60,7 @@ pub enum TypeMarshalling {
     Blittable(String),
     Mapped {
         facade: String,
+        facade_generic: String,
         blittable: String,
     }
 }
@@ -80,7 +87,11 @@ pub enum TypeMarshalling {
 
 impl TypeMarshalling {
     pub fn templated(facade_template: &str, blittable_template: &str, base_type: &TypeMarshalling) -> Self {
-        Self::Mapped { facade: facade_template.replace("{}", &base_type.to_facade()), blittable: blittable_template.replace("{}", &base_type.to_blittable()) }
+        Self::Mapped {
+            facade: facade_template.replace("{}", &base_type.to_facade()),
+            facade_generic: facade_template.replace("{}", &base_type.to_facade_generic()),
+            blittable: blittable_template.replace("{}", &base_type.to_blittable())
+        }
     }
 
     pub fn to_blittable(&self) -> String {
@@ -90,10 +101,24 @@ impl TypeMarshalling {
         }
     }
 
+    pub fn is_mapped(&self) -> bool {
+        match self {
+            TypeMarshalling::Blittable(_) => false,
+            TypeMarshalling::Mapped { .. } => true,
+        }
+    }
+
     pub fn to_facade(&self) -> String {
         match self {
             TypeMarshalling::Blittable(it) => it.to_string(),
             TypeMarshalling::Mapped { facade,.. } => facade.to_string(),
+        }
+    }
+
+    pub fn to_facade_generic(&self) -> String {
+        match self {
+            TypeMarshalling::Blittable(it) => it.to_string(),
+            TypeMarshalling::Mapped { facade_generic,.. } => facade_generic.to_string(),
         }
     }
 }
