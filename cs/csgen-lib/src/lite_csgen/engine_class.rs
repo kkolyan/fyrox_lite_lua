@@ -85,6 +85,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
             .map(|param| format!("{} {}", api_types::type_rs2cs(&param.ty).to_blittable(), param.name))
             .to_vec();
         render(&mut s, r#"
+                
                 [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
                 private static unsafe partial ${return_ty} ${rust_path_escaped}_${name}(${this}${native_input_params});
         "#, [

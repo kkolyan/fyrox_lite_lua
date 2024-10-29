@@ -17,12 +17,12 @@ pub fn type_rs2cs(ty: &DataType) -> TypeMarshalling {
         DataType::ClassName => TypeMarshalling::Blittable(format!("string")),
         DataType::Vec(it) => TypeMarshalling::templated(
             // TODO there is two options to design it;
-            // 1. return iterator, that also contains seme hash to check the rust-side arena-allocated collection is alive every iteration
+            // 1. return iterator, that also contains seem hash to check the rust-side arena-allocated collection is alive every iteration
             // 2. add "fetch" method that recursively called on every returned value and fetch collection inside
             // 3. consider analog that accepts managed array pointer as argument and returns number of added items
             // combination of 2+3 seems Unity way. 
-            "List<{}>",
-            "{}_array",
+            "{}Iterator",
+            "{}Iterator",
             &type_rs2cs(it.deref()),
         ),
         DataType::UserScript => TypeMarshalling::Mapped {
@@ -34,6 +34,7 @@ pub fn type_rs2cs(ty: &DataType) -> TypeMarshalling {
             blittable: "UserScriptMessage".to_string(),
         },
         DataType::UserScriptGenericStub => panic!("WTF, UserScriptGenericStub should be filtered out"),
+        DataType::Buffer(_) => panic!("WTF, Buffer should be filtered out"),
         DataType::Object(it) => TypeMarshalling::Blittable(it.to_string()),
         DataType::Option(it) => TypeMarshalling::templated(
             "{}?",

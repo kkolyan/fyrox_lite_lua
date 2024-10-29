@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::mem;
 
 use crate::{
@@ -8,6 +9,7 @@ use crate::{
 use fyrox_lite::{script_context::with_script_context, spi::UserScript, LiteDataType};
 use mlua::{UserDataRef, Value};
 use send_wrapper::SendWrapper;
+use fyrox_lite::spi::Buffer;
 
 impl<'a> UserScript for TypedUserData<'a, Traitor<ScriptObject>> {
     type Plugin = LuaPlugin;
@@ -19,6 +21,9 @@ impl<'a> UserScript for TypedUserData<'a, Traitor<ScriptObject>> {
     type UserScriptMessage = Traitor<SendWrapper<Value<'static>>>;
 
     type UserScriptGenericStub = ();
+
+    type Buffer<T: LiteDataType + 'static> = Vec<T>;
+
 
     fn extract_from(
         proxy: &mut Self::ProxyScript,

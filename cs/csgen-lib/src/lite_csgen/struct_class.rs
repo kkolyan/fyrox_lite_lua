@@ -35,6 +35,7 @@ pub(crate) fn generate_bindings(class: &StructClass, ctx: &GenerationContext) ->
 
 
     render(&mut s, r#"
+            
             [StructLayout(LayoutKind.Sequential)]
             internal struct ${class}_optional {
                 internal ${class} Value;
@@ -49,16 +50,67 @@ pub(crate) fn generate_bindings(class: &StructClass, ctx: &GenerationContext) ->
     "#, [("class", &class.class_name)]);
 
     render(&mut s, r#"
+            
             [StructLayout(LayoutKind.Explicit)]
             internal struct ${class}_result {
                 [FieldOffset(0)]
                 internal ${bool_type} ok;
+
                 [FieldOffset(sizeof(${bool_type}))]
                 internal ${class} value;
+
                 [FieldOffset(sizeof(${bool_type}))]
                 internal string err;
             }
     "#, [("class", &class.class_name), ("bool_type", &"int")]);
+
+    render(&mut s, r#"
+            
+            // it iterates over the unmanaged memory (Vec allocated by Rust and stored for the length of a frame in the arena).
+            // if user attempts to iterate this iterator after backing data is disposed,
+            // the methods throws exception (hash is used to check if the backing data is still alive to make it
+            // possible to throw exceptions instead of SIGSEGV-ing)
+            [StructLayout(LayoutKind.Sequential)]
+            public struct ${class}Iterator : IEnumerator<${class}> {
+                // hash is a random number,  allocated in unmanaged memory next to the items with the same lifetime.
+                // arena (Vec<(Hash,Vec<${class}>)>) is zeroed at the end of every frame.
+                private unsafe int* hash;
+                private unsafe ${class}* items;
+                private int length;
+                private int position;
+                private int expectedHash;
+
+                public ${class} Current
+                {
+                    get
+                    {
+                        unsafe {
+                          if (*hash != expectedHash) {
+                             throw new Exception("iterator is not valid anymore (it's valid only for one frame)");
+                          }
+                          return *(items + position);
+                        }
+                    }
+                }
+
+                public bool MoveNext()
+                {
+                    if (position < length - 2) {
+                        position ++;
+                        return true;
+                    }
+                    return false;
+                }
+
+                public void Dispose()
+                {
+                }
+
+                public void Reset() => position = 0;
+
+                object? IEnumerator.Current => Current;
+            }
+    "#, [("class", &class.class_name)]);
 
     Module::code(&class.class_name, s)
 }

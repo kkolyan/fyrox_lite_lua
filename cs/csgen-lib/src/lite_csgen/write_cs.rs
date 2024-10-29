@@ -55,6 +55,7 @@ fn write_cs_mod(m: &Module, ns: &str, parent_dir: &str, nss: &Vec<String>)  {
             }
             s += format!("using System.Runtime.CompilerServices;\n").as_str();
             s += format!("using System.Runtime.InteropServices;\n").as_str();
+            s += format!("using System.Collections;\n").as_str();
             s += format!("namespace {};\n", ns).as_str();
             s += code.as_str();
             fs::write(&file, s).unwrap();

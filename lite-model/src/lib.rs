@@ -166,6 +166,8 @@ pub enum DataType {
     UserScript,
     /// fixed type (unknown for Lite) for send_hierarchical/subscribe_to/on_message (we can't make it generic outside of Rust)
     UserScriptMessage,
+    /// a container to return a number of items from engine to scripts
+    Buffer(Box<DataType>),
     /// stub argument to call UserScript-type parameterized methods
     UserScriptGenericStub,
     Object(ClassName),

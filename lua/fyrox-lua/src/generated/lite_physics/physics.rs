@@ -36,7 +36,10 @@ impl FyroxUserData for fyrox_lite::lite_physics::LitePhysics {
             "cast_ray",
             |lua, this, (opts): (Traitor<fyrox_lite::lite_physics::LiteRayCastOptions>)| {
                 let opts = opts.inner().clone().into();
-                let ret = fyrox_lite::lite_physics::LitePhysics::cast_ray(opts);
+                let results = Vec::new();
+                let ret = fyrox_lite::lite_physics::LitePhysics::cast_ray::<
+                    TypedUserData<Traitor<ScriptObject>>,
+                >(opts, results);
                 let ret = lua.create_table_from(
                     ret.into_iter()
                         .map(|it| {

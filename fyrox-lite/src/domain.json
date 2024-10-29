@@ -157,10 +157,19 @@
                     "Object": "RayCastOptions"
                   },
                   "variadic": false
+                },
+                {
+                  "name": "results",
+                  "ty": {
+                    "Buffer": {
+                      "Object": "Intersection"
+                    }
+                  },
+                  "variadic": false
                 }
               ],
               "return_ty": {
-                "Vec": {
+                "Buffer": {
                   "Object": "Intersection"
                 }
               }
@@ -2691,6 +2700,13 @@
             "instance": true,
             "method_name": "get_name",
             "signature": {
+              "params": [
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub",
+                  "variadic": false
+                }
+              ],
               "return_ty": {
                 "Result": {
                   "ok": "String"

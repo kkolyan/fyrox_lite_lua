@@ -51,13 +51,14 @@ impl LiteNode {
         })
     }
 
-    pub fn get_name(&self) -> Option<String> {
+    pub fn get_name<T: UserScript>(&self, _stub: T::UserScriptGenericStub) -> Result<String, T::LangSpecificError> {
         with_script_context(|ctx| {
             ctx.scene
                 .as_ref()
                 .expect("scene unavailable")
                 .graph
                 .try_get(self.handle)
+                .ok_or_else(|| T::create_error("node doesn't exist"))
                 .map(|it| it.name_owned())
         })
     }

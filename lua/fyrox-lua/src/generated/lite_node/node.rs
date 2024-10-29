@@ -49,6 +49,15 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
             };
             Ok(ret)
         });
+        methods.add_method_mut("get_name", |lua, this, (): ()| {
+            let _stub = Default::default();
+            let ret = this.get_name::<TypedUserData<Traitor<ScriptObject>>>(_stub);
+            let ret = match ret {
+                Ok(ret) => ret,
+                Err(err) => return Err(err),
+            };
+            Ok(ret)
+        });
         methods.add_method_mut("destroy", |lua, this, (): ()| {
             let ret = this.destroy();
             let ret = ret;
@@ -125,14 +134,6 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
     ) {
     }
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
-        fields.add_field_method_get("name", |lua, this| {
-            let value = this.get_name();
-            Ok(if let Some(value) = value {
-                Some(value)
-            } else {
-                None
-            })
-        });
         fields.add_field_method_get("alive", |lua, this| {
             let value = this.get_alive();
             Ok(value)

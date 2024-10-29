@@ -10,6 +10,7 @@ using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Collections;
 namespace FyroxLite.LiteLog;
 
 // fyrox_lite::lite_log::LiteLog

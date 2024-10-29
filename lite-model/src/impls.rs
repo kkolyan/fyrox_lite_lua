@@ -22,6 +22,7 @@ impl Display for DataType {
             DataType::Object(it) => write!(f, "{}", it.0),
             DataType::Option(it) => write!(f, "Option<{}>", it.deref()),
             DataType::Result { ok } => write!(f, "Result<{}>", ok.deref()),
+            DataType::Buffer(it) => write!(f, "Buffer<{}>", it.deref()),
         }
     }
 }
@@ -92,14 +93,14 @@ impl Method {
             .signature
             .params
             .iter()
-            .find(|it| {
+            .any(|it| {
                 matches!(
                     it.ty,
                     DataType::UserScript
                         | DataType::UserScriptMessage
                         | DataType::UserScriptGenericStub
+                        | DataType::Buffer(_)
                 )
             })
-            .is_some()
     }
 }

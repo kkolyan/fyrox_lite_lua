@@ -10,6 +10,7 @@ using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Collections;
 namespace FyroxLite.LitePhysics;
 
 // fyrox_lite::lite_physics::LiteRigidBody

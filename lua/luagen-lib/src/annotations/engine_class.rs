@@ -82,6 +82,7 @@ pub fn methods(s: &mut String, class: &EngineClass, instance: bool) {
             .params
             .iter()
             .filter(|it| !matches!(it.ty, DataType::UserScriptGenericStub))
+            .filter(|it| !matches!(it.ty, DataType::Buffer(_)))
             .to_vec();
         let arg_names = params
             .iter()

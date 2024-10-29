@@ -10,6 +10,7 @@ using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Collections;
 namespace FyroxLite.LitePhysics;
 
 // fyrox_lite::lite_physics::LitePhysics
@@ -25,12 +26,12 @@ public readonly partial struct Physics
     //public const int ONLY_KINEMATIC = LitePhysics :: EXCLUDE_DYNAMIC | LitePhysics :: EXCLUDE_FIXED;
     //public const int ONLY_FIXED = LitePhysics :: EXCLUDE_DYNAMIC | LitePhysics :: EXCLUDE_KINEMATIC;
 
-    public static List<Intersection> CastRay(RayCastOptions opts)
+    public static IntersectionIterator CastRay(RayCastOptions opts)
     {
         unsafe {
             return fyrox_lite_lite_physics_LitePhysics_CastRay(opts);
         }
     }
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Intersection_array fyrox_lite_lite_physics_LitePhysics_CastRay(RayCastOptions opts);
+    private static unsafe partial IntersectionIterator fyrox_lite_lite_physics_LitePhysics_CastRay(RayCastOptions opts);
 }

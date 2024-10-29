@@ -2,14 +2,14 @@ use std::collections::HashMap;
 
 use lite_model::DataType;
 use quote::ToTokens;
-use syn::{GenericArgument, Ident};
+use syn::{GenericArgument, Ident, PathArguments, Type};
 
 pub fn extract_ty_path(
     qself: Option<&syn::QSelf>,
     path: &syn::Path,
     span: impl ToTokens,
     generic_params: Option<&HashMap<&Ident, DataType>>,
-) -> syn::Result<lite_model::DataType> {
+) -> syn::Result<DataType> {
     if qself.is_some() {
         return Err(syn::Error::new_spanned(
             span,
@@ -24,6 +24,27 @@ pub fn extract_ty_path(
                 }
                 if ident == "UserScriptGenericStub" {
                     return Ok(DataType::UserScriptGenericStub);
+                }
+                if ident == "Buffer" {
+                    match &path.segments.last().unwrap().arguments {
+                        PathArguments::None => panic!("path args expected here"),
+                        PathArguments::AngleBracketed(args) => {
+                            assert_eq!(1, args.args.len());
+                            match args.args.last().unwrap() {
+                                GenericArgument::Type(arg) => {
+                                    match arg {
+                                        Type::Path(arg) => {
+                                            let arg = extract_ty_path(arg.qself.as_ref(), &arg.path, arg, generic_params)?;
+                                            return Ok(DataType::Buffer(Box::new(arg)));
+                                        }
+                                        _ => panic!("path type path args expected here"),
+                                    }
+                                }
+                                _ => panic!("type path args expected here"),
+                            }
+                        }
+                        PathArguments::Parenthesized(_) => panic!("Parenthesized path arguments are not supported here"),
+                    }
                 }
             }
             UserScriptBasedType::Itself => {

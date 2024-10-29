@@ -12,7 +12,6 @@
 Node = {}
 
 ---@class Node
----@field name string?
 ---@field alive boolean
 ---@field global_position Vector3
 ---@field local_position Vector3
@@ -25,6 +24,9 @@ Node_instance = {}
 
 ---@return RigidBody?
 function Node_instance:as_rigid_body() end
+
+---@return string
+function Node_instance:get_name() end
 
 function Node_instance:destroy() end
 

@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use lite_model::{DataType, EngineClass, Method};
+use lite_model::{DataType, EngineClass, Method, Param};
 use to_vec::ToVec;
 
 use gen_common::{
@@ -25,7 +25,7 @@ pub fn generate_methods(
             .signature
             .params
             .iter()
-            .filter(|it| it.ty != DataType::UserScriptGenericStub)
+            .filter(|it| !matches!(it.ty, DataType::UserScriptGenericStub))
             .to_vec();
 
         let generics = match method.is_generic() {
@@ -33,7 +33,11 @@ pub fn generate_methods(
             false => "",
         };
 
-        let input_names = params.iter().map(|it| it.name.as_str()).to_vec().join(", ");
+        let input_names = params.iter()
+            .filter(|it| !matches!(it.ty, DataType::Buffer(_)))
+            .map(|it| it.name.as_str())
+            .to_vec()
+            .join(", ");
 
         let output_names = method
             .signature
@@ -45,6 +49,7 @@ pub fn generate_methods(
 
         let param_types = params
             .iter()
+            .filter(|it| !matches!(it.ty, DataType::Buffer(_)))
             .map(|it| type_to_mlua(&it.ty, ctx))
             .to_vec()
             .join(", ");
@@ -64,14 +69,24 @@ pub fn generate_methods(
         );
 
         for param in method.signature.params.iter() {
-            let expression = mlua_to_rust_expr(&param.name, &param.ty, ctx);
-            render(
-                s,
-                r#"
+            if let DataType::Buffer(ty) = &param.ty {
+                render(
+                    s,
+                    r#"
+                        let ${param_name} = Vec::new();
+                "#,
+                    [("param_name", &param.name), ],
+                );
+            } else {
+                let expression = mlua_to_rust_expr(&param.name, &param.ty, ctx);
+                render(
+                    s,
+                    r#"
                         let ${param_name} = ${expression};
                 "#,
-                [("param_name", &param.name), ("expression", &expression)],
-            );
+                    [("param_name", &param.name), ("expression", &expression)],
+                );
+            }
         }
 
         let target = match instance {
