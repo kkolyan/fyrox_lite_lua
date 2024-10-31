@@ -1,6 +1,4 @@
-use std::fmt::Display;
 use std::ops::Deref;
-use gen_common::templating::render_string;
 use lite_model::DataType;
 
 pub fn type_rs2cs(ty: &DataType) -> TypeMarshalling {
@@ -48,7 +46,7 @@ pub fn type_rs2cs(ty: &DataType) -> TypeMarshalling {
             &type_rs2cs(it.deref()),
         ),
         // err will throw exception
-        DataType::Result { ok,.. } => TypeMarshalling::templated(
+        DataType::Result { ok, .. } => TypeMarshalling::templated(
             "{}",
             "{}_result",
             &type_rs2cs(ok.deref()),
@@ -62,7 +60,7 @@ pub enum TypeMarshalling {
         facade: String,
         facade_generic: String,
         blittable: String,
-    }
+    },
 }
 // pub fn conversion_to_blittable(ty: &DataType, var: &str) -> String {
 //     match ty {
@@ -90,14 +88,14 @@ impl TypeMarshalling {
         Self::Mapped {
             facade: facade_template.replace("{}", &base_type.to_facade()),
             facade_generic: facade_template.replace("{}", &base_type.to_facade_generic()),
-            blittable: blittable_template.replace("{}", &base_type.to_blittable())
+            blittable: blittable_template.replace("{}", &base_type.to_blittable()),
         }
     }
 
     pub fn to_blittable(&self) -> String {
         match self {
             TypeMarshalling::Blittable(it) => it.to_string(),
-            TypeMarshalling::Mapped { blittable,.. } => blittable.to_string(),
+            TypeMarshalling::Mapped { blittable, .. } => blittable.to_string(),
         }
     }
 
@@ -111,14 +109,14 @@ impl TypeMarshalling {
     pub fn to_facade(&self) -> String {
         match self {
             TypeMarshalling::Blittable(it) => it.to_string(),
-            TypeMarshalling::Mapped { facade,.. } => facade.to_string(),
+            TypeMarshalling::Mapped { facade, .. } => facade.to_string(),
         }
     }
 
     pub fn to_facade_generic(&self) -> String {
         match self {
             TypeMarshalling::Blittable(it) => it.to_string(),
-            TypeMarshalling::Mapped { facade_generic,.. } => facade_generic.to_string(),
+            TypeMarshalling::Mapped { facade_generic, .. } => facade_generic.to_string(),
         }
     }
 }

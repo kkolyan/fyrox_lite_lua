@@ -71,7 +71,13 @@ internal struct InteractionGroups_slice
 {
     private unsafe InteractionGroups* begin;
     private int length;
-    internal List<InteractionGroups> Fetched;
+    internal List<InteractionGroups>? Fetched;
+
+    internal unsafe InteractionGroups_slice(InteractionGroups* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
 
     internal static unsafe void Fetch(ref InteractionGroups_slice self)
     {

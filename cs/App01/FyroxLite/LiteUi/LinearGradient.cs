@@ -76,7 +76,13 @@ internal struct LinearGradient_slice
 {
     private unsafe LinearGradient* begin;
     private int length;
-    internal List<LinearGradient> Fetched;
+    internal List<LinearGradient>? Fetched;
+
+    internal unsafe LinearGradient_slice(LinearGradient* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
 
     internal static unsafe void Fetch(ref LinearGradient_slice self)
     {

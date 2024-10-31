@@ -23,12 +23,12 @@ public readonly partial struct RigidBody
     {
         unsafe {
             var _force = force;
-            fyrox_lite_lite_physics_LiteRigidBody_ApplyForce(this, _force);
+            fyrox_lite_lite_physics_LiteRigidBody_ApplyForce(this, &_force);
         }
     }
-    
+
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_physics_LiteRigidBody_ApplyForce(RigidBody self, Vector3 force);
+    private static unsafe partial void fyrox_lite_lite_physics_LiteRigidBody_ApplyForce(RigidBody self, Vector3* force);
 }
 
 [StructLayout(LayoutKind.Sequential)]

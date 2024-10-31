@@ -71,7 +71,13 @@ internal struct GradientPoint_slice
 {
     private unsafe GradientPoint* begin;
     private int length;
-    internal List<GradientPoint> Fetched;
+    internal List<GradientPoint>? Fetched;
+
+    internal unsafe GradientPoint_slice(GradientPoint* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
 
     internal static unsafe void Fetch(ref GradientPoint_slice self)
     {

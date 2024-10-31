@@ -24,13 +24,13 @@ public readonly partial struct Prefab
         unsafe {
             var _position = position;
             var _orientation = orientation;
-            var __ret = fyrox_lite_lite_prefab_LitePrefab_InstantiateAt(this, _position, _orientation);
+            var __ret = fyrox_lite_lite_prefab_LitePrefab_InstantiateAt(this, &_position, &_orientation);
             return __ret;
         }
     }
-    
+
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Node fyrox_lite_lite_prefab_LitePrefab_InstantiateAt(Prefab self, Vector3 position, Quaternion orientation);
+    private static unsafe partial Node fyrox_lite_lite_prefab_LitePrefab_InstantiateAt(Prefab self, Vector3* position, Quaternion* orientation);
 }
 
 [StructLayout(LayoutKind.Sequential)]

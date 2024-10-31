@@ -95,28 +95,28 @@ public readonly partial struct Input
             return __ret;
         }
     }
-    
+
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial bool fyrox_lite_lite_input_Input_IsMouseButtonDown(int button);
-    
+
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial bool fyrox_lite_lite_input_Input_IsMouseButtonUp(int button);
-    
+
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial bool fyrox_lite_lite_input_Input_IsMouseButton(int button);
-    
+
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial bool fyrox_lite_lite_input_Input_IsKeyDown(KeyCode key);
-    
+
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial bool fyrox_lite_lite_input_Input_IsKeyUp(KeyCode key);
-    
+
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial bool fyrox_lite_lite_input_Input_IsKey(KeyCode key);
-    
+
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial Vector2 fyrox_lite_lite_input_Input_GetMouseMove();
-    
+
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial Vector2 fyrox_lite_lite_input_Input_GetMouseScroll();
 }

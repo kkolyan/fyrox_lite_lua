@@ -81,7 +81,13 @@ internal struct Quaternion_slice
 {
     private unsafe Quaternion* begin;
     private int length;
-    internal List<Quaternion> Fetched;
+    internal List<Quaternion>? Fetched;
+
+    internal unsafe Quaternion_slice(Quaternion* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
 
     internal static unsafe void Fetch(ref Quaternion_slice self)
     {

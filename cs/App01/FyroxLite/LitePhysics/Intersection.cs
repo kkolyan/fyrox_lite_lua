@@ -86,7 +86,13 @@ internal struct Intersection_slice
 {
     private unsafe Intersection* begin;
     private int length;
-    internal List<Intersection> Fetched;
+    internal List<Intersection>? Fetched;
+
+    internal unsafe Intersection_slice(Intersection* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
 
     internal static unsafe void Fetch(ref Intersection_slice self)
     {

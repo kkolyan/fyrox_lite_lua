@@ -76,7 +76,13 @@ internal struct Brush_slice
 {
     private unsafe Brush* begin;
     private int length;
-    internal List<Brush> Fetched;
+    internal List<Brush>? Fetched;
+
+    internal unsafe Brush_slice(Brush* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
 
     internal static unsafe void Fetch(ref Brush_slice self)
     {

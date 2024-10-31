@@ -71,7 +71,13 @@ internal struct TextBuilder_slice
 {
     private unsafe TextBuilder* begin;
     private int length;
-    internal List<TextBuilder> Fetched;
+    internal List<TextBuilder>? Fetched;
+
+    internal unsafe TextBuilder_slice(TextBuilder* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
 
     internal static unsafe void Fetch(ref TextBuilder_slice self)
     {

@@ -71,7 +71,13 @@ internal struct Vector2i_slice
 {
     private unsafe Vector2i* begin;
     private int length;
-    internal List<Vector2i> Fetched;
+    internal List<Vector2i>? Fetched;
+
+    internal unsafe Vector2i_slice(Vector2i* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
 
     internal static unsafe void Fetch(ref Vector2i_slice self)
     {

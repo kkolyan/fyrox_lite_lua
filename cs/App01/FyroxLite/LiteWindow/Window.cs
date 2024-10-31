@@ -26,7 +26,7 @@ public readonly partial struct Window
             fyrox_lite_lite_window_LiteWindow_SetCursorGrab(_mode);
         }
     }
-    
+
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial void fyrox_lite_lite_window_LiteWindow_SetCursorGrab(CursorGrabMode mode);
 }

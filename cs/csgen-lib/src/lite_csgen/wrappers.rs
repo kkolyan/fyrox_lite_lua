@@ -99,7 +99,13 @@ pub fn generate_slice(mut s: &mut String, wrapped_type: &DataType) {
             {
                 private unsafe ${blittable}* begin;
                 private int length;
-                internal List<${facade}> Fetched;
+                internal List<${facade}>? Fetched;
+
+                internal unsafe ${blittable}_slice(${blittable}* begin, int length)
+                {
+                    this.begin = begin;
+                    this.length = length;
+                }
 
                 internal static unsafe void Fetch(ref ${blittable}_slice self)
                 {

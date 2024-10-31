@@ -26,7 +26,7 @@ public readonly partial struct Scene
             fyrox_lite_lite_scene_LiteScene_LoadAsync(_scene_path);
         }
     }
-    
+
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial void fyrox_lite_lite_scene_LiteScene_LoadAsync(string scene_path);
 }

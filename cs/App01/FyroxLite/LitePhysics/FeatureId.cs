@@ -71,7 +71,13 @@ internal struct FeatureId_slice
 {
     private unsafe FeatureId* begin;
     private int length;
-    internal List<FeatureId> Fetched;
+    internal List<FeatureId>? Fetched;
+
+    internal unsafe FeatureId_slice(FeatureId* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
 
     internal static unsafe void Fetch(ref FeatureId_slice self)
     {

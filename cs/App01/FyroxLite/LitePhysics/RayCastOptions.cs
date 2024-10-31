@@ -86,7 +86,13 @@ internal struct RayCastOptions_slice
 {
     private unsafe RayCastOptions* begin;
     private int length;
-    internal List<RayCastOptions> Fetched;
+    internal List<RayCastOptions>? Fetched;
+
+    internal unsafe RayCastOptions_slice(RayCastOptions* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
 
     internal static unsafe void Fetch(ref RayCastOptions_slice self)
     {

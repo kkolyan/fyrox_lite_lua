@@ -71,7 +71,13 @@ internal struct RadialGradient_slice
 {
     private unsafe RadialGradient* begin;
     private int length;
-    internal List<RadialGradient> Fetched;
+    internal List<RadialGradient>? Fetched;
+
+    internal unsafe RadialGradient_slice(RadialGradient* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
 
     internal static unsafe void Fetch(ref RadialGradient_slice self)
     {
