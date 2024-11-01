@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,9 +17,8 @@ namespace FyroxLite.LiteInput;
 
 // fyrox_lite::lite_input::Input
 [StructLayout(LayoutKind.Sequential)]
-public readonly partial static class Input
+public static partial class Input
 {
-    private readonly NativeHandle handle;
     public const int MouseLeft = 0;
     public const int MouseRight = 1;
     public const int MouseMiddle = 2;
@@ -84,7 +84,7 @@ public readonly partial static class Input
         {
             unsafe {
                 var __ret = fyrox_lite_lite_input_Input_get_mouse_move();
-                return __ret;
+                return NativeVector2.ToFacade(__ret);
             }
         }
     }
@@ -94,7 +94,7 @@ public readonly partial static class Input
         {
             unsafe {
                 var __ret = fyrox_lite_lite_input_Input_get_mouse_scroll();
-                return __ret;
+                return NativeVector2.ToFacade(__ret);
             }
         }
     }
@@ -118,8 +118,8 @@ public readonly partial static class Input
     private static unsafe partial bool fyrox_lite_lite_input_Input_is_key(KeyCode key);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Vector2 fyrox_lite_lite_input_Input_get_mouse_move();
+    private static unsafe partial NativeVector2 fyrox_lite_lite_input_Input_get_mouse_move();
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Vector2 fyrox_lite_lite_input_Input_get_mouse_scroll();
+    private static unsafe partial NativeVector2 fyrox_lite_lite_input_Input_get_mouse_scroll();
 }

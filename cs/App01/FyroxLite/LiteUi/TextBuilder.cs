@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,7 +17,7 @@ namespace FyroxLite.LiteUi;
 
 // fyrox_lite::lite_ui::TextBuilder
 [StructLayout(LayoutKind.Sequential)]
-public struct TextBuilder
+public partial struct TextBuilder
 {
     public Brush? Foreground {
         get => Brush_optional.ToFacade(_foreground);
@@ -60,35 +61,22 @@ internal struct TextBuilder_optional
         {
             return new TextBuilder_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new TextBuilder_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new TextBuilder_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct TextBuilder_slice
 {
-    private unsafe TextBuilder* begin;
-    private int length;
-    internal List<TextBuilder>? Fetched;
+    internal unsafe TextBuilder* begin;
+    internal int length;
 
     internal unsafe TextBuilder_slice(TextBuilder* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref TextBuilder_slice self)
-    {
-        var fetched = new List<TextBuilder>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<TextBuilder> ToFacade(in TextBuilder_slice self)

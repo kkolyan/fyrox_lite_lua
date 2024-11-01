@@ -21,8 +21,10 @@ fn generate_and_write_bindings_cs(class: &str, s: CBindingsLite) {
         &mut s,
         r#"
             using System.Runtime.InteropServices;
+            using FyroxLite;
+            using FyroxLite.LiteMath;
 
-            public partial class ${class} {
+            internal partial class ${class} {
                 ${code}
             }
     "#,

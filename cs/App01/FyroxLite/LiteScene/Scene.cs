@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,9 +17,8 @@ namespace FyroxLite.LiteScene;
 
 // fyrox_lite::lite_scene::LiteScene
 [StructLayout(LayoutKind.Sequential)]
-public readonly partial static class Scene
+public static partial class Scene
 {
-    private readonly NativeHandle handle;
 
     public static void LoadAsync(string scene_path)
     {

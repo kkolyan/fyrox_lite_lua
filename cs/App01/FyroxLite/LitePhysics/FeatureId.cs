@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,7 +17,7 @@ namespace FyroxLite.LitePhysics;
 
 // fyrox_lite::lite_physics::LiteFeatureId
 [StructLayout(LayoutKind.Sequential)]
-public struct FeatureId
+public partial struct FeatureId
 {
     public FeatureKind Kind {
         get => _kind;
@@ -60,35 +61,22 @@ internal struct FeatureId_optional
         {
             return new FeatureId_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new FeatureId_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new FeatureId_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct FeatureId_slice
 {
-    private unsafe FeatureId* begin;
-    private int length;
-    internal List<FeatureId>? Fetched;
+    internal unsafe FeatureId* begin;
+    internal int length;
 
     internal unsafe FeatureId_slice(FeatureId* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref FeatureId_slice self)
-    {
-        var fetched = new List<FeatureId>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<FeatureId> ToFacade(in FeatureId_slice self)

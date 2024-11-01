@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,9 +17,8 @@ namespace FyroxLite.LiteLog;
 
 // fyrox_lite::lite_log::LiteLog
 [StructLayout(LayoutKind.Sequential)]
-public readonly partial static class Log
+public static partial class Log
 {
-    private readonly NativeHandle handle;
 
     public static void Info(string msg)
     {

@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,7 +17,7 @@ namespace FyroxLite.LiteUi;
 
 // fyrox_lite::lite_ui::GradientPoint
 [StructLayout(LayoutKind.Sequential)]
-public struct GradientPoint
+public partial struct GradientPoint
 {
     public float Stop {
         get => _stop;
@@ -60,35 +61,22 @@ internal struct GradientPoint_optional
         {
             return new GradientPoint_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new GradientPoint_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new GradientPoint_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct GradientPoint_slice
 {
-    private unsafe GradientPoint* begin;
-    private int length;
-    internal List<GradientPoint>? Fetched;
+    internal unsafe GradientPoint* begin;
+    internal int length;
 
     internal unsafe GradientPoint_slice(GradientPoint* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref GradientPoint_slice self)
-    {
-        var fetched = new List<GradientPoint>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<GradientPoint> ToFacade(in GradientPoint_slice self)

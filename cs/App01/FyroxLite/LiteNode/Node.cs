@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -62,7 +63,7 @@ public readonly partial struct Node
         {
             unsafe {
                 var __ret = fyrox_lite_lite_node_LiteNode_get_global_position(this);
-                return __ret;
+                return NativeVector3.ToFacade(__ret);
             }
         }
     }
@@ -72,13 +73,13 @@ public readonly partial struct Node
         {
             unsafe {
                 var __ret = fyrox_lite_lite_node_LiteNode_get_local_position(this);
-                return __ret;
+                return NativeVector3.ToFacade(__ret);
             }
         }
         set
         {
             unsafe {
-                var _value = value;
+                var _value = NativeVector3.FromFacade(value);
                 fyrox_lite_lite_node_LiteNode_set_local_position(this, &_value);
             }
         }
@@ -89,13 +90,13 @@ public readonly partial struct Node
         {
             unsafe {
                 var __ret = fyrox_lite_lite_node_LiteNode_get_local_rotation(this);
-                return __ret;
+                return NativeQuaternion.ToFacade(__ret);
             }
         }
         set
         {
             unsafe {
-                var _value = value;
+                var _value = NativeQuaternion.FromFacade(value);
                 fyrox_lite_lite_node_LiteNode_set_local_rotation(this, &_value);
             }
         }
@@ -151,7 +152,7 @@ public readonly partial struct Node
     {
         unsafe {
             
-            var __ret = fyrox_lite_lite_node_LiteNode_add_script(this, typeof(T).Name);
+            var __ret = fyrox_lite_lite_node_LiteNode_add_script(this, NativeString.FromFacade(typeof(T).Name));
             return UserScript_result.ToFacade(__ret) as T;
         }
     }
@@ -160,7 +161,7 @@ public readonly partial struct Node
     {
         unsafe {
             
-            var __ret = fyrox_lite_lite_node_LiteNode_find_script(this, typeof(T).Name);
+            var __ret = fyrox_lite_lite_node_LiteNode_find_script(this, NativeString.FromFacade(typeof(T).Name));
             return UserScript_optional_result.ToFacade(__ret) as T;
         }
     }
@@ -170,7 +171,7 @@ public readonly partial struct Node
         {
             unsafe {
                 var __ret = fyrox_lite_lite_node_LiteNode_get_global_rotation(this);
-                return __ret;
+                return NativeQuaternion.ToFacade(__ret);
             }
         }
     }
@@ -214,22 +215,22 @@ public readonly partial struct Node
     private static unsafe partial void fyrox_lite_lite_node_LiteNode_destroy(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Vector3 fyrox_lite_lite_node_LiteNode_get_global_position(Node self);
+    private static unsafe partial NativeVector3 fyrox_lite_lite_node_LiteNode_get_global_position(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Vector3 fyrox_lite_lite_node_LiteNode_get_local_position(Node self);
+    private static unsafe partial NativeVector3 fyrox_lite_lite_node_LiteNode_get_local_position(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Quaternion fyrox_lite_lite_node_LiteNode_get_local_rotation(Node self);
+    private static unsafe partial NativeQuaternion fyrox_lite_lite_node_LiteNode_get_local_rotation(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial void fyrox_lite_lite_node_LiteNode_send_hierarchical(Node self, RoutingStrategy routing, UserScriptMessage payload);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_node_LiteNode_set_local_position(Node self, Vector3* new_pos);
+    private static unsafe partial void fyrox_lite_lite_node_LiteNode_set_local_position(Node self, NativeVector3* new_pos);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_node_LiteNode_set_local_rotation(Node self, Quaternion* value);
+    private static unsafe partial void fyrox_lite_lite_node_LiteNode_set_local_rotation(Node self, NativeQuaternion* value);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial void fyrox_lite_lite_node_LiteNode_subscribe_to(Node self);
@@ -250,7 +251,7 @@ public readonly partial struct Node
     private static unsafe partial UserScript_optional_result fyrox_lite_lite_node_LiteNode_find_script(Node self, NativeString class_name);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Quaternion fyrox_lite_lite_node_LiteNode_get_global_rotation(Node self);
+    private static unsafe partial NativeQuaternion fyrox_lite_lite_node_LiteNode_get_global_rotation(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial bool fyrox_lite_lite_node_LiteNode_tag_is(Node self, NativeString tag);
@@ -287,8 +288,8 @@ internal struct Node_optional
         {
             return new Node_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new Node_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new Node_optional { value = __item_from_facade, has_value = 1 };
     }
 }

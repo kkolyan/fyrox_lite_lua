@@ -117,9 +117,9 @@ pub(crate) fn generate_optional(s: &mut String, rust: &mut RustEmitter, wrapped_
                     {
                         return new ${blittable}_optional { value = default, has_value = 0 };
                     }
-                    var __item = value;
+                    var __item = value${unwrap};
                     var __item_from_facade = ${item_from_facade};
-                    return new ${blittable}_optional { value = __item_from_facade${unwrap}, has_value = 1 };
+                    return new ${blittable}_optional { value = __item_from_facade, has_value = 1 };
                 }
             }
     "#, [
@@ -127,7 +127,7 @@ pub(crate) fn generate_optional(s: &mut String, rust: &mut RustEmitter, wrapped_
         ("facade", &marshalling.to_facade()),
         ("item_to_facade", &if marshalling.is_mapped() {format!("{}.ToFacade(__item)", marshalling.to_blittable())} else {"__item".to_string()}),
         ("item_from_facade", &if marshalling.is_mapped() {format!("{}.FromFacade(__item)", marshalling.to_blittable())} else {"__item".to_string()}),
-        ("unwrap", &if marshalling.to_facade() == "object" {""} else {".Value"}),
+        ("unwrap", &if marshalling.to_facade() == "object" || marshalling.to_facade() == "string" {""} else {".Value"}),
     ]);
     rust.emit_statement(render_string(r#"
             #[repr(C)]
@@ -168,26 +168,13 @@ pub fn generate_slice(mut s: &mut String, rust: &mut RustEmitter, wrapped_type: 
             [StructLayout(LayoutKind.Sequential)]
             internal struct ${blittable}_slice
             {
-                private unsafe ${blittable}* begin;
-                private int length;
-                internal List<${facade}>? Fetched;
+                internal unsafe ${blittable}* begin;
+                internal int length;
 
                 internal unsafe ${blittable}_slice(${blittable}* begin, int length)
                 {
                     this.begin = begin;
                     this.length = length;
-                }
-
-                internal static unsafe void Fetch(ref ${blittable}_slice self)
-                {
-                    var fetched = new List<${facade}>();
-                    for (int i = 0; i < self.length; i++)
-                    {
-                        var __item = *(self.begin + i);
-                        var __item_to_facade = ${item_to_facade};
-                        fetched.Add(__item_to_facade);
-                    }
-                    self.Fetched = fetched;
                 }
 
                 internal static unsafe List<${facade}> ToFacade(in ${blittable}_slice self)

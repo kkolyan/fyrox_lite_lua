@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,15 +17,15 @@ namespace FyroxLite.LiteUi;
 
 // fyrox_lite::lite_ui::LinearGradient
 [StructLayout(LayoutKind.Sequential)]
-public struct LinearGradient
+public partial struct LinearGradient
 {
     public Vector2 From {
-        get => _from;
-        set => _from = value;
+        get => NativeVector2.ToFacade(_from);
+        set => _from = NativeVector2.FromFacade(value);
     }
     public Vector2 To {
-        get => _to;
-        set => _to = value;
+        get => NativeVector2.ToFacade(_to);
+        set => _to = NativeVector2.FromFacade(value);
     }
     public List<GradientPoint> Stops {
         get => GradientPoint_slice.ToFacade(_stops);
@@ -35,8 +36,8 @@ public struct LinearGradient
 // because it makes ABI much more readable.
 // I hope, NativeAOT will optimize out this.
 //===============================================================
-    private Vector2 _from;
-    private Vector2 _to;
+    private NativeVector2 _from;
+    private NativeVector2 _to;
     private GradientPoint_slice _stops;
 }
 
@@ -65,35 +66,22 @@ internal struct LinearGradient_optional
         {
             return new LinearGradient_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new LinearGradient_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new LinearGradient_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct LinearGradient_slice
 {
-    private unsafe LinearGradient* begin;
-    private int length;
-    internal List<LinearGradient>? Fetched;
+    internal unsafe LinearGradient* begin;
+    internal int length;
 
     internal unsafe LinearGradient_slice(LinearGradient* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref LinearGradient_slice self)
-    {
-        var fetched = new List<LinearGradient>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<LinearGradient> ToFacade(in LinearGradient_slice self)

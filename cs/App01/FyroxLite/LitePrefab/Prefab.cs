@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -23,15 +24,15 @@ public readonly partial struct Prefab
     public Node InstantiateAt(Vector3 position, Quaternion orientation)
     {
         unsafe {
-            var _position = position;
-            var _orientation = orientation;
+            var _position = NativeVector3.FromFacade(position);
+            var _orientation = NativeQuaternion.FromFacade(orientation);
             var __ret = fyrox_lite_lite_prefab_LitePrefab_instantiate_at(this, &_position, &_orientation);
             return __ret;
         }
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Node fyrox_lite_lite_prefab_LitePrefab_instantiate_at(Prefab self, Vector3* position, Quaternion* orientation);
+    private static unsafe partial Node fyrox_lite_lite_prefab_LitePrefab_instantiate_at(Prefab self, NativeVector3* position, NativeQuaternion* orientation);
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -59,8 +60,8 @@ internal struct Prefab_optional
         {
             return new Prefab_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new Prefab_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new Prefab_optional { value = __item_from_facade, has_value = 1 };
     }
 }

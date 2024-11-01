@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,15 +17,14 @@ namespace FyroxLite.LitePlugin;
 
 // fyrox_lite::lite_plugin::LitePlugin
 [StructLayout(LayoutKind.Sequential)]
-public readonly partial static class Plugin
+public static partial class Plugin
 {
-    private readonly NativeHandle handle;
 
     public static T Get<T>() where T : class
     {
         unsafe {
             
-            var __ret = fyrox_lite_lite_plugin_LitePlugin_get(typeof(T).Name);
+            var __ret = fyrox_lite_lite_plugin_LitePlugin_get(NativeString.FromFacade(typeof(T).Name));
             return UserScript_result.ToFacade(__ret) as T;
         }
     }

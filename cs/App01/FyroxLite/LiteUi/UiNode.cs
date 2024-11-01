@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,7 +17,6 @@ namespace FyroxLite.LiteUi;
 
 // fyrox_lite::lite_ui::LiteUiNode
 [StructLayout(LayoutKind.Sequential)]
-public readonly partial static class UiNode
+public static partial class UiNode
 {
-    private readonly NativeHandle handle;
 }

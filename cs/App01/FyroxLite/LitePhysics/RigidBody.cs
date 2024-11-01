@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -23,13 +24,13 @@ public readonly partial struct RigidBody
     public void ApplyForce(Vector3 force)
     {
         unsafe {
-            var _force = force;
+            var _force = NativeVector3.FromFacade(force);
             fyrox_lite_lite_physics_LiteRigidBody_apply_force(this, &_force);
         }
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_physics_LiteRigidBody_apply_force(RigidBody self, Vector3* force);
+    private static unsafe partial void fyrox_lite_lite_physics_LiteRigidBody_apply_force(RigidBody self, NativeVector3* force);
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -57,8 +58,8 @@ internal struct RigidBody_optional
         {
             return new RigidBody_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new RigidBody_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new RigidBody_optional { value = __item_from_facade, has_value = 1 };
     }
 }

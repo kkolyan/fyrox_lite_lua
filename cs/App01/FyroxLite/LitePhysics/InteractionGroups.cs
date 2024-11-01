@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,7 +17,7 @@ namespace FyroxLite.LitePhysics;
 
 // fyrox_lite::lite_physics::LiteInteractionGroups
 [StructLayout(LayoutKind.Sequential)]
-public struct InteractionGroups
+public partial struct InteractionGroups
 {
     public int Memberships {
         get => _memberships;
@@ -60,35 +61,22 @@ internal struct InteractionGroups_optional
         {
             return new InteractionGroups_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new InteractionGroups_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new InteractionGroups_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct InteractionGroups_slice
 {
-    private unsafe InteractionGroups* begin;
-    private int length;
-    internal List<InteractionGroups>? Fetched;
+    internal unsafe InteractionGroups* begin;
+    internal int length;
 
     internal unsafe InteractionGroups_slice(InteractionGroups* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref InteractionGroups_slice self)
-    {
-        var fetched = new List<InteractionGroups>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<InteractionGroups> ToFacade(in InteractionGroups_slice self)

@@ -113,7 +113,7 @@ fn convert_function(s: &mut String, item: &syn::ItemFn, custom_type_names: &Hash
         r#"
 
                 [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-                public static partial ${fn};
+                internal static partial ${fn};
         "#,
         [("fn", &format!("{} {}({})", ret, name, &args.join(", ")))],
     );
@@ -145,7 +145,7 @@ fn convert_functor_def(s: &mut String, item: &syn::ItemType, custom_type_names: 
             s,
             r#"
 
-                public delegate ${fn};
+                internal delegate ${fn};
             "#,
             [("fn", &format!("{} {}({})", ret, name, &args.join(", ")))],
         );
@@ -164,7 +164,7 @@ fn convert_enum(s: &mut String, item: &syn::ItemEnum, _custom_type_names: &HashM
             s,
             r#"
 
-                public enum ${name} {
+                internal enum ${name} {
             "#,
             [("name", &name)],
         );
@@ -208,7 +208,7 @@ fn convert_struct(s: &mut String, item: &syn::ItemStruct, custom_type_names: &Ha
             r#"
 
                 [StructLayout(LayoutKind.Sequential)]
-                public unsafe struct ${name} {
+                internal unsafe struct ${name} {
             "#,
             [("name", &name)],
         );
@@ -217,7 +217,7 @@ fn convert_struct(s: &mut String, item: &syn::ItemStruct, custom_type_names: &Ha
             render(
                 s,
                 "
-                    public ${type} ${name};
+                    internal ${type} ${name};
                 ",
                 [
                     ("name", field.ident.as_ref().unwrap()),
@@ -248,7 +248,7 @@ fn convert_union(s: &mut String, item: &syn::ItemUnion, custom_type_names: &Hash
             r#"
 
                 [StructLayout(LayoutKind.Explicit)]
-                public unsafe struct ${name} {
+                internal unsafe struct ${name} {
             "#,
             [("name", &name)],
         );
@@ -259,7 +259,7 @@ fn convert_union(s: &mut String, item: &syn::ItemUnion, custom_type_names: &Hash
                 "
 
                     [FieldOffset(0)]
-                    public ${type} ${name};
+                    internal ${type} ${name};
                     ",
                 [
                     ("name", &escape_keywords(field.ident.as_ref().unwrap().to_string().as_str())),

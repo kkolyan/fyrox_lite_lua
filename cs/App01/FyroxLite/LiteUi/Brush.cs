@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,7 +17,7 @@ namespace FyroxLite.LiteUi;
 
 // fyrox_lite::lite_ui::Brush
 [StructLayout(LayoutKind.Sequential)]
-public struct Brush
+public partial struct Brush
 {
     public Color? SolidColor {
         get => Color_optional.ToFacade(_solid_color);
@@ -65,35 +66,22 @@ internal struct Brush_optional
         {
             return new Brush_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new Brush_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new Brush_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct Brush_slice
 {
-    private unsafe Brush* begin;
-    private int length;
-    internal List<Brush>? Fetched;
+    internal unsafe Brush* begin;
+    internal int length;
 
     internal unsafe Brush_slice(Brush* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref Brush_slice self)
-    {
-        var fetched = new List<Brush>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<Brush> ToFacade(in Brush_slice self)

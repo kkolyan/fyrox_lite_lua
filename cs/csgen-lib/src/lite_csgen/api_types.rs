@@ -1,7 +1,7 @@
 use std::fmt::Display;
 use std::ops::Deref;
 use gen_common::context::GenerationContext;
-use lite_model::DataType;
+use lite_model::{ClassName, DataType};
 
 pub fn type_cs(ty: &DataType) -> CsType {
     match ty {
@@ -12,7 +12,7 @@ pub fn type_cs(ty: &DataType) -> CsType {
         DataType::I32 => CsType::Blittable(format!("int")),
         DataType::I64 => CsType::Blittable(format!("long")),
         DataType::F32 => CsType::Blittable(format!("float")),
-        DataType::F64 => CsType::Blittable(format!("dobule")),
+        DataType::F64 => CsType::Blittable(format!("double")),
         DataType::String => CsType::Mapped {
             facade: "string".to_string(),
             facade_generic: "string".to_string(),
@@ -40,7 +40,12 @@ pub fn type_cs(ty: &DataType) -> CsType {
             blittable: "UserScriptMessage".to_string(),
         },
         DataType::UserScriptGenericStub => panic!("WTF, UserScriptGenericStub should be filtered out"),
-        DataType::Object(it) => CsType::Blittable(it.to_string()),
+        DataType::Object(it) => {
+            if is_implemented_externally(it) {
+                return CsType::templated("{}", "Native{}", &CsType::Blittable(it.to_string()))
+            }
+            CsType::Blittable(it.to_string())
+        },
         DataType::Option(it) => CsType::templated(
             "{}?",
             "{}_optional",
@@ -54,6 +59,11 @@ pub fn type_cs(ty: &DataType) -> CsType {
         ),
     }
 }
+
+pub fn is_implemented_externally(class_name: &ClassName) -> bool {
+    class_name.0 == "Vector3" || class_name.0 == "Vector2" || class_name.0 == "Quaternion"
+}
+
 pub fn type_rs(ty: &DataType, ctx: &GenerationContext) -> RsType {
     match ty {
         DataType::UnresolvedClass(it) => panic!("Unresolved class: {}", it),

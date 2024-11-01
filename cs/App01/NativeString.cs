@@ -3,45 +3,40 @@ using System.Text;
 
 namespace FyroxLite;
 
-public partial struct NativeString
+internal partial struct NativeString
 {
-    
-    private unsafe byte* begin;
-    private int length;
-    internal List<byte>? Fetched;
+    private byte_slice data;
 
-    internal unsafe byte_slice(byte* begin, int length)
+    internal NativeString(byte_slice data)
     {
-        this.begin = begin;
-        this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref byte_slice self)
-    {
-        var fetched = new List<byte>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
+        this.data = data;
     }
 
     internal static unsafe string ToFacade(in NativeString self)
     {
-        return Encoding.UTF8.GetString(self.begin, self.length);
+        return Encoding.UTF8.GetString(self.data.begin, self.data.length);
     }
+    
+    [ThreadStatic]
+    private static byte[]? _buffer;
 
-    internal static byte_slice FromFacade(in string self)
+    internal static NativeString FromFacade(in string self)
     {
-        var bytes = Encoding.UTF8.GetBytes();
-        Marshal.AllocHGlobal()
-        // __item
-        throw new Exception("slice serialization not implemented yet");
+        _buffer ??= new byte[1024 * 1024];
+        
+        var bytes = Encoding.UTF8.GetBytes(self, 0, self.Length, _buffer, 0);
+        
+        unsafe
+        {
+            fixed (byte* buffer_ptr = _buffer)
+            {
+                var native_slice = fyrox_lite_upload_data(new byte_slice(buffer_ptr, bytes));
+                return new NativeString(native_slice);
+            }
+        }
     }
     
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial byte_slice fyrox_lite_lite_physics_LitePhysics_cast_ray(int length);
+    private static unsafe partial byte_slice fyrox_lite_upload_data(byte_slice managed);
     
 }

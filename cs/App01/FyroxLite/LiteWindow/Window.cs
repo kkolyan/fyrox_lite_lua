@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,9 +17,8 @@ namespace FyroxLite.LiteWindow;
 
 // fyrox_lite::lite_window::LiteWindow
 [StructLayout(LayoutKind.Sequential)]
-public readonly partial static class Window
+public static partial class Window
 {
-    private readonly NativeHandle handle;
     public static CursorGrabMode CursorGrab
     {
         set

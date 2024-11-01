@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,11 +17,11 @@ namespace FyroxLite.LiteUi;
 
 // fyrox_lite::lite_ui::RadialGradient
 [StructLayout(LayoutKind.Sequential)]
-public struct RadialGradient
+public partial struct RadialGradient
 {
     public Vector2 Center {
-        get => _center;
-        set => _center = value;
+        get => NativeVector2.ToFacade(_center);
+        set => _center = NativeVector2.FromFacade(value);
     }
     public List<GradientPoint> Stops {
         get => GradientPoint_slice.ToFacade(_stops);
@@ -31,7 +32,7 @@ public struct RadialGradient
 // because it makes ABI much more readable.
 // I hope, NativeAOT will optimize out this.
 //===============================================================
-    private Vector2 _center;
+    private NativeVector2 _center;
     private GradientPoint_slice _stops;
 }
 
@@ -60,35 +61,22 @@ internal struct RadialGradient_optional
         {
             return new RadialGradient_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new RadialGradient_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new RadialGradient_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct RadialGradient_slice
 {
-    private unsafe RadialGradient* begin;
-    private int length;
-    internal List<RadialGradient>? Fetched;
+    internal unsafe RadialGradient* begin;
+    internal int length;
 
     internal unsafe RadialGradient_slice(RadialGradient* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref RadialGradient_slice self)
-    {
-        var fetched = new List<RadialGradient>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<RadialGradient> ToFacade(in RadialGradient_slice self)

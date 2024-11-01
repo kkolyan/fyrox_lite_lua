@@ -1,22 +1,24 @@
 using System.Runtime.InteropServices;
-public partial class FyroxManualBindings {
+using FyroxLite;
+using FyroxLite.LiteMath;
+internal partial class FyroxManualBindings {
     
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    public static partial void init_fyrox(NativeScriptedApp app);
+    internal static partial void init_fyrox(NativeScriptedApp app);
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeInstanceId {
-        public int value;
+    internal unsafe struct NativeInstanceId {
+        internal int value;
     }
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeClassId {
-        public int value;
+    internal unsafe struct NativeClassId {
+        internal int value;
     }
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeScriptProperty {
-        public byte* name;
-        public NativeValueType ty;
+    internal unsafe struct NativeScriptProperty {
+        internal byte* name;
+        internal NativeValueType ty;
     }
-    public enum NativeValueType {
+    internal enum NativeValueType {
         @bool,
         f32,
         f64,
@@ -31,86 +33,86 @@ public partial class FyroxManualBindings {
         Quaternion,
     }
     [StructLayout(LayoutKind.Explicit)]
-    public unsafe struct NativeValue {
+    internal unsafe struct NativeValue {
         [FieldOffset(0)]
-        public bool @bool;
+        internal bool @bool;
         [FieldOffset(0)]
-        public float f32;
+        internal float f32;
         [FieldOffset(0)]
-        public double f64;
+        internal double f64;
         [FieldOffset(0)]
-        public short i16;
+        internal short i16;
         [FieldOffset(0)]
-        public int i32;
+        internal int i32;
         [FieldOffset(0)]
-        public long i64;
+        internal long i64;
         [FieldOffset(0)]
-        public NativeString String;
+        internal NativeString String;
         [FieldOffset(0)]
-        public NativeHandle Handle;
+        internal NativeHandle Handle;
         [FieldOffset(0)]
-        public NativeVector3 Vector3;
+        internal NativeVector3 Vector3;
         [FieldOffset(0)]
-        public NativeQuaternion Quaternion;
+        internal NativeQuaternion Quaternion;
     }
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeHandle {
-        public ulong high;
-        public ulong low;
+    internal unsafe struct NativeHandle {
+        internal ulong high;
+        internal ulong low;
     }
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeScriptMetadata {
-        public NativeClassId id;
-        public byte* uuid;
-        public NativeScriptKind kind;
-        public byte* name;
-        public byte* parent;
-        public bool has_on_init;
-        public bool has_on_start;
-        public bool has_on_deinit;
-        public bool has_on_os_event;
-        public bool has_on_update;
-        public bool has_on_message;
-        public NativeScriptProperty* properties;
-        public ushort properties_len;
+    internal unsafe struct NativeScriptMetadata {
+        internal NativeClassId id;
+        internal byte* uuid;
+        internal NativeScriptKind kind;
+        internal byte* name;
+        internal byte* parent;
+        internal bool has_on_init;
+        internal bool has_on_start;
+        internal bool has_on_deinit;
+        internal bool has_on_os_event;
+        internal bool has_on_update;
+        internal bool has_on_message;
+        internal NativeScriptProperty* properties;
+        internal ushort properties_len;
     }
-    public enum NativeScriptKind {
+    internal enum NativeScriptKind {
         Node,
         Global,
     }
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeScriptedApp {
-        public NativeScriptMetadata* scripts;
-        public ushort scripts_len;
-        public NativeScriptAppFunctions functions;
+    internal unsafe struct NativeScriptedApp {
+        internal NativeScriptMetadata* scripts;
+        internal ushort scripts_len;
+        internal NativeScriptAppFunctions functions;
     }
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct NativeScriptAppFunctions {
-        public IntPtr on_init;
-        public IntPtr on_start;
-        public IntPtr on_deinit;
-        public IntPtr on_os_event;
-        public IntPtr on_update;
-        public IntPtr on_message;
-        public IntPtr on_game_init;
-        public IntPtr on_game_update;
-        public IntPtr on_game_on_os_event;
-        public IntPtr create_script_instance;
-        public IntPtr set_property;
+    internal unsafe struct NativeScriptAppFunctions {
+        internal IntPtr on_init;
+        internal IntPtr on_start;
+        internal IntPtr on_deinit;
+        internal IntPtr on_os_event;
+        internal IntPtr on_update;
+        internal IntPtr on_message;
+        internal IntPtr on_game_init;
+        internal IntPtr on_game_update;
+        internal IntPtr on_game_on_os_event;
+        internal IntPtr create_script_instance;
+        internal IntPtr set_property;
     }
-    public delegate void NodeOnUpdate(NativeInstanceId thiz, float dt);
-    public delegate void NodeOnInit(NativeInstanceId thiz);
-    public delegate void NodeOnDeinit(NativeInstanceId thiz);
-    public delegate void NodeOnStart(NativeInstanceId thiz);
-    public delegate void NodeOnOsEvent(NativeInstanceId thiz);
-    public delegate void NodeOnMessage(NativeInstanceId thiz);
-    public delegate void GameOnInit(NativeInstanceId thiz);
-    public delegate void GameOnUpdate(NativeInstanceId thiz);
-    public delegate void GameOnOsEvent(NativeInstanceId thiz);
-    public delegate NativeInstanceId CreateScriptInstance(NativeClassId thiz);
-    public delegate void SetProperty(NativeInstanceId thiz, ushort property, NativeValue value);
+    internal delegate void NodeOnUpdate(NativeInstanceId thiz, float dt);
+    internal delegate void NodeOnInit(NativeInstanceId thiz);
+    internal delegate void NodeOnDeinit(NativeInstanceId thiz);
+    internal delegate void NodeOnStart(NativeInstanceId thiz);
+    internal delegate void NodeOnOsEvent(NativeInstanceId thiz);
+    internal delegate void NodeOnMessage(NativeInstanceId thiz);
+    internal delegate void GameOnInit(NativeInstanceId thiz);
+    internal delegate void GameOnUpdate(NativeInstanceId thiz);
+    internal delegate void GameOnOsEvent(NativeInstanceId thiz);
+    internal delegate NativeInstanceId CreateScriptInstance(NativeClassId thiz);
+    internal delegate void SetProperty(NativeInstanceId thiz, ushort property, NativeValue value);
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct UserScriptMessage {
-        public long id;
+    internal unsafe struct UserScriptMessage {
+        internal long id;
     }
 }

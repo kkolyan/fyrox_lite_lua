@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -71,8 +72,8 @@ internal struct Text_optional
         {
             return new Text_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new Text_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new Text_optional { value = __item_from_facade, has_value = 1 };
     }
 }

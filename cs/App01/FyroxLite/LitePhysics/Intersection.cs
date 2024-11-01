@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,19 +17,19 @@ namespace FyroxLite.LitePhysics;
 
 // fyrox_lite::lite_physics::LiteIntersection
 [StructLayout(LayoutKind.Sequential)]
-public struct Intersection
+public partial struct Intersection
 {
     public Node Collider {
         get => _collider;
         set => _collider = value;
     }
     public Vector3 Normal {
-        get => _normal;
-        set => _normal = value;
+        get => NativeVector3.ToFacade(_normal);
+        set => _normal = NativeVector3.FromFacade(value);
     }
     public Vector3 Position {
-        get => _position;
-        set => _position = value;
+        get => NativeVector3.ToFacade(_position);
+        set => _position = NativeVector3.FromFacade(value);
     }
     public FeatureId Feature {
         get => _feature;
@@ -44,8 +45,8 @@ public struct Intersection
 // I hope, NativeAOT will optimize out this.
 //===============================================================
     private Node _collider;
-    private Vector3 _normal;
-    private Vector3 _position;
+    private NativeVector3 _normal;
+    private NativeVector3 _position;
     private FeatureId _feature;
     private float _toi;
 }
@@ -75,35 +76,22 @@ internal struct Intersection_optional
         {
             return new Intersection_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new Intersection_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new Intersection_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct Intersection_slice
 {
-    private unsafe Intersection* begin;
-    private int length;
-    internal List<Intersection>? Fetched;
+    internal unsafe Intersection* begin;
+    internal int length;
 
     internal unsafe Intersection_slice(Intersection* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref Intersection_slice self)
-    {
-        var fetched = new List<Intersection>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<Intersection> ToFacade(in Intersection_slice self)

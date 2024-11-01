@@ -16,7 +16,7 @@ impl From<String> for u8_slice {
     }
 }
 
-pub extern "C" fn fyrox_lite_upload_data(data: u8_slice) -> NativeString {
+pub extern "C" fn fyrox_lite_upload_data(data: u8_slice) -> u8_slice {
     let len = data.len as i32;
     let data = Vec::from(data);
     let ptr = Arena::allocate_vec(data);

@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,15 +17,15 @@ namespace FyroxLite.LitePhysics;
 
 // fyrox_lite::lite_physics::LiteRayCastOptions
 [StructLayout(LayoutKind.Sequential)]
-public struct RayCastOptions
+public partial struct RayCastOptions
 {
     public Vector3 RayOrigin {
-        get => _ray_origin;
-        set => _ray_origin = value;
+        get => NativeVector3.ToFacade(_ray_origin);
+        set => _ray_origin = NativeVector3.FromFacade(value);
     }
     public Vector3 RayDirection {
-        get => _ray_direction;
-        set => _ray_direction = value;
+        get => NativeVector3.ToFacade(_ray_direction);
+        set => _ray_direction = NativeVector3.FromFacade(value);
     }
     public float MaxLen {
         get => _max_len;
@@ -43,8 +44,8 @@ public struct RayCastOptions
 // because it makes ABI much more readable.
 // I hope, NativeAOT will optimize out this.
 //===============================================================
-    private Vector3 _ray_origin;
-    private Vector3 _ray_direction;
+    private NativeVector3 _ray_origin;
+    private NativeVector3 _ray_direction;
     private float _max_len;
     private InteractionGroups_optional _groups;
     private bool _sort_results;
@@ -75,35 +76,22 @@ internal struct RayCastOptions_optional
         {
             return new RayCastOptions_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new RayCastOptions_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new RayCastOptions_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct RayCastOptions_slice
 {
-    private unsafe RayCastOptions* begin;
-    private int length;
-    internal List<RayCastOptions>? Fetched;
+    internal unsafe RayCastOptions* begin;
+    internal int length;
 
     internal unsafe RayCastOptions_slice(RayCastOptions* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref RayCastOptions_slice self)
-    {
-        var fetched = new List<RayCastOptions>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<RayCastOptions> ToFacade(in RayCastOptions_slice self)

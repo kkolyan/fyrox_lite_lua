@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -16,9 +17,8 @@ namespace FyroxLite.LitePhysics;
 
 // fyrox_lite::lite_physics::LitePhysics
 [StructLayout(LayoutKind.Sequential)]
-public readonly partial static class Physics
+public static partial class Physics
 {
-    private readonly NativeHandle handle;
     //public const int EXCLUDE_FIXED = 1 << 1;
     //public const int EXCLUDE_KINEMATIC = 1 << 2;
     //public const int EXCLUDE_DYNAMIC = 1 << 3;

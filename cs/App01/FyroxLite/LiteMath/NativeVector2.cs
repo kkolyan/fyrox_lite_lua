@@ -15,117 +15,104 @@ using System.Runtime.InteropServices;
 using System.Collections;
 namespace FyroxLite.LiteMath;
 
-// fyrox_lite::lite_math::PodVector2i
+// fyrox_lite::lite_math::PodVector2
 [StructLayout(LayoutKind.Sequential)]
-public partial struct Vector2i
+internal partial struct NativeVector2
 {
-    public long X {
-        get => _x;
-        set => _x = value;
-    }
-    public long Y {
-        get => _y;
-        set => _y = value;
-    }
-//===============================================================
-// private fields for all properties (not only mapped),
-// because it makes ABI much more readable.
-// I hope, NativeAOT will optimize out this.
-//===============================================================
-    private long _x;
-    private long _y;
+    private float _x;
+    private float _y;
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct Vector2i_optional
+internal struct NativeVector2_optional
 {
-    private Vector2i value;
+    private NativeVector2 value;
     private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2i? ToFacade(in Vector2i_optional value)
+    public static Vector2? ToFacade(in NativeVector2_optional value)
     {
         if (value.has_value != 0)
         {
             var __item = value.value;
-            var __item_to_facade = __item;
+            var __item_to_facade = NativeVector2.ToFacade(__item);
             return __item_to_facade;
         }
         return null;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2i_optional FromFacade(in Vector2i? value)
+    public static NativeVector2_optional FromFacade(in Vector2? value)
     {
         if (value == null)
         {
-            return new Vector2i_optional { value = default, has_value = 0 };
+            return new NativeVector2_optional { value = default, has_value = 0 };
         }
         var __item = value.Value;
-        var __item_from_facade = __item;
-        return new Vector2i_optional { value = __item_from_facade, has_value = 1 };
+        var __item_from_facade = NativeVector2.FromFacade(__item);
+        return new NativeVector2_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct Vector2i_slice
+internal struct NativeVector2_slice
 {
-    internal unsafe Vector2i* begin;
+    internal unsafe NativeVector2* begin;
     internal int length;
 
-    internal unsafe Vector2i_slice(Vector2i* begin, int length)
+    internal unsafe NativeVector2_slice(NativeVector2* begin, int length)
     {
         this.begin = begin;
         this.length = length;
     }
 
-    internal static unsafe List<Vector2i> ToFacade(in Vector2i_slice self)
+    internal static unsafe List<Vector2> ToFacade(in NativeVector2_slice self)
     {
-        var fetched = new List<Vector2i>();
+        var fetched = new List<Vector2>();
         for (int i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
-            var __item_to_facade = __item;
+            var __item_to_facade = NativeVector2.ToFacade(__item);
             fetched.Add(__item_to_facade);
         }
         return fetched;
     }
 
-    internal static Vector2i_slice FromFacade(in List<Vector2i> self)
+    internal static NativeVector2_slice FromFacade(in List<Vector2> self)
     {
-        // __item
+        // NativeVector2.FromFacade(__item)
         throw new Exception("slice serialization not implemented yet");
     }
 
 }
 
 [StructLayout(LayoutKind.Explicit)]
-internal struct Vector2i_result
+internal struct NativeVector2_result
 {
     [FieldOffset(0)]
     private int ok;
 
     [FieldOffset(sizeof(int))]
-    private Vector2i value;
+    private NativeVector2 value;
 
     [FieldOffset(sizeof(int))]
     private string err;
 
-    internal static unsafe Vector2i ToFacade(in Vector2i_result self)
+    internal static unsafe Vector2 ToFacade(in NativeVector2_result self)
     {
         if (self.ok != 0)
         {
             var __item = self.value;
-            var __item_to_facade = __item;
+            var __item_to_facade = NativeVector2.ToFacade(__item);
             return __item_to_facade;
         }
         throw new Exception(self.err);
     }
 
-    internal static Vector2i_result FromFacade(in Vector2i self)
+    internal static NativeVector2_result FromFacade(in Vector2 self)
     {
         var __item = self;
-        var __item_from_facade = __item;
-        return new Vector2i_result {ok = 1, value = __item_from_facade};
+        var __item_from_facade = NativeVector2.FromFacade(__item);
+        return new NativeVector2_result {ok = 1, value = __item_from_facade};
     }
 }

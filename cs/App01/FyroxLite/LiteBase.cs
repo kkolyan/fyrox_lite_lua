@@ -8,6 +8,7 @@ using FyroxLite.LitePrefab;
 using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
+using System.Numerics;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -71,35 +72,22 @@ internal struct bool_optional
         {
             return new bool_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new bool_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new bool_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct bool_slice
 {
-    private unsafe bool* begin;
-    private int length;
-    internal List<bool>? Fetched;
+    internal unsafe bool* begin;
+    internal int length;
 
     internal unsafe bool_slice(bool* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref bool_slice self)
-    {
-        var fetched = new List<bool>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<bool> ToFacade(in bool_slice self)
@@ -178,35 +166,22 @@ internal struct byte_optional
         {
             return new byte_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new byte_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new byte_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct byte_slice
 {
-    private unsafe byte* begin;
-    private int length;
-    internal List<byte>? Fetched;
+    internal unsafe byte* begin;
+    internal int length;
 
     internal unsafe byte_slice(byte* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref byte_slice self)
-    {
-        var fetched = new List<byte>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<byte> ToFacade(in byte_slice self)
@@ -285,35 +260,22 @@ internal struct int_optional
         {
             return new int_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new int_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new int_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct int_slice
 {
-    private unsafe int* begin;
-    private int length;
-    internal List<int>? Fetched;
+    internal unsafe int* begin;
+    internal int length;
 
     internal unsafe int_slice(int* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref int_slice self)
-    {
-        var fetched = new List<int>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<int> ToFacade(in int_slice self)
@@ -392,35 +354,22 @@ internal struct long_optional
         {
             return new long_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new long_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new long_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct long_slice
 {
-    private unsafe long* begin;
-    private int length;
-    internal List<long>? Fetched;
+    internal unsafe long* begin;
+    internal int length;
 
     internal unsafe long_slice(long* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref long_slice self)
-    {
-        var fetched = new List<long>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<long> ToFacade(in long_slice self)
@@ -499,35 +448,22 @@ internal struct float_optional
         {
             return new float_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new float_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new float_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct float_slice
 {
-    private unsafe float* begin;
-    private int length;
-    internal List<float>? Fetched;
+    internal unsafe float* begin;
+    internal int length;
 
     internal unsafe float_slice(float* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref float_slice self)
-    {
-        var fetched = new List<float>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<float> ToFacade(in float_slice self)
@@ -551,18 +487,18 @@ internal struct float_slice
 }
 
 [StructLayout(LayoutKind.Explicit)]
-internal struct dobule_result
+internal struct double_result
 {
     [FieldOffset(0)]
     private int ok;
 
     [FieldOffset(sizeof(int))]
-    private dobule value;
+    private double value;
 
     [FieldOffset(sizeof(int))]
     private string err;
 
-    internal static unsafe dobule ToFacade(in dobule_result self)
+    internal static unsafe double ToFacade(in double_result self)
     {
         if (self.ok != 0)
         {
@@ -573,22 +509,22 @@ internal struct dobule_result
         throw new Exception(self.err);
     }
 
-    internal static dobule_result FromFacade(in dobule self)
+    internal static double_result FromFacade(in double self)
     {
         var __item = self;
         var __item_from_facade = __item;
-        return new dobule_result {ok = 1, value = __item_from_facade};
+        return new double_result {ok = 1, value = __item_from_facade};
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct dobule_optional
+internal struct double_optional
 {
-    private dobule value;
+    private double value;
     private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static dobule? ToFacade(in dobule_optional value)
+    public static double? ToFacade(in double_optional value)
     {
         if (value.has_value != 0)
         {
@@ -600,46 +536,33 @@ internal struct dobule_optional
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static dobule_optional FromFacade(in dobule? value)
+    public static double_optional FromFacade(in double? value)
     {
         if (value == null)
         {
-            return new dobule_optional { value = default, has_value = 0 };
+            return new double_optional { value = default, has_value = 0 };
         }
-        var __item = value;
+        var __item = value.Value;
         var __item_from_facade = __item;
-        return new dobule_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new double_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct dobule_slice
+internal struct double_slice
 {
-    private unsafe dobule* begin;
-    private int length;
-    internal List<dobule>? Fetched;
+    internal unsafe double* begin;
+    internal int length;
 
-    internal unsafe dobule_slice(dobule* begin, int length)
+    internal unsafe double_slice(double* begin, int length)
     {
         this.begin = begin;
         this.length = length;
     }
 
-    internal static unsafe void Fetch(ref dobule_slice self)
+    internal static unsafe List<double> ToFacade(in double_slice self)
     {
-        var fetched = new List<dobule>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = __item;
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
-    }
-
-    internal static unsafe List<dobule> ToFacade(in dobule_slice self)
-    {
-        var fetched = new List<dobule>();
+        var fetched = new List<double>();
         for (int i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -649,7 +572,7 @@ internal struct dobule_slice
         return fetched;
     }
 
-    internal static dobule_slice FromFacade(in List<dobule> self)
+    internal static double_slice FromFacade(in List<double> self)
     {
         // __item
         throw new Exception("slice serialization not implemented yet");
@@ -715,33 +638,20 @@ internal struct NativeString_optional
         }
         var __item = value;
         var __item_from_facade = NativeString.FromFacade(__item);
-        return new NativeString_optional { value = __item_from_facade.Value, has_value = 1 };
+        return new NativeString_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct NativeString_slice
 {
-    private unsafe NativeString* begin;
-    private int length;
-    internal List<string>? Fetched;
+    internal unsafe NativeString* begin;
+    internal int length;
 
     internal unsafe NativeString_slice(NativeString* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref NativeString_slice self)
-    {
-        var fetched = new List<string>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = NativeString.ToFacade(__item);
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<string> ToFacade(in NativeString_slice self)
@@ -829,26 +739,13 @@ internal struct UserScript_optional
 [StructLayout(LayoutKind.Sequential)]
 internal struct UserScript_slice
 {
-    private unsafe UserScript* begin;
-    private int length;
-    internal List<object>? Fetched;
+    internal unsafe UserScript* begin;
+    internal int length;
 
     internal unsafe UserScript_slice(UserScript* begin, int length)
     {
         this.begin = begin;
         this.length = length;
-    }
-
-    internal static unsafe void Fetch(ref UserScript_slice self)
-    {
-        var fetched = new List<object>();
-        for (int i = 0; i < self.length; i++)
-        {
-            var __item = *(self.begin + i);
-            var __item_to_facade = UserScript.ToFacade(__item);
-            fetched.Add(__item_to_facade);
-        }
-        self.Fetched = fetched;
     }
 
     internal static unsafe List<object> ToFacade(in UserScript_slice self)
