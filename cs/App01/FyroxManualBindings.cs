@@ -109,4 +109,8 @@ public partial class FyroxManualBindings {
     public delegate void GameOnOsEvent(NativeInstanceId thiz);
     public delegate NativeInstanceId CreateScriptInstance(NativeClassId thiz);
     public delegate void SetProperty(NativeInstanceId thiz, ushort property, NativeValue value);
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe struct UserScriptMessage {
+        public long id;
+    }
 }

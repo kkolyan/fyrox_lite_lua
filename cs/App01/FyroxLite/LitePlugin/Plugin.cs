@@ -29,7 +29,7 @@ public readonly partial struct Plugin
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial UserScript_result fyrox_lite_lite_plugin_LitePlugin_get(string class_name);
+    private static unsafe partial UserScript_result fyrox_lite_lite_plugin_LitePlugin_get(NativeString class_name);
 }
 
 [StructLayout(LayoutKind.Sequential)]

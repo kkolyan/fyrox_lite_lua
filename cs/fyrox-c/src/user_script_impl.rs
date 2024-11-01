@@ -7,11 +7,13 @@ impl UserScript for NativeHandle {
 
     type ProxyScript = ExternalScriptProxy;
 
-    type LangSpecificError = String;
+    type LangSpecificError = crate::LangSpecificError;
 
-    type UserScriptMessage = NativeInstanceId;
+    type UserScriptMessage = crate::UserScriptMessage;
 
     type UserScriptGenericStub = ();
+    
+    type Buffer<T: LiteDataType + 'static> = Vec<T>;
 
     fn extract_from(
         proxy: &mut Self::ProxyScript,

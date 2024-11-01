@@ -4,7 +4,7 @@ use to_vec::ToVec;
 use gen_common::code_model::{ModContent, Module};
 use gen_common::context::GenerationContext;
 use gen_common::templating::{render, render_string};
-use lite_model::{ConstantValue, DataType, EngineClass, Literal, Method};
+use lite_model::{ConstantValue, DataType, EngineClass, Literal, Method, StructClass};
 use crate::lite_csgen::{api_types, wrappers};
 use crate::lite_csgen::api_types::CsType;
 use crate::lite_csgen::gen_rs::RustEmitter;
@@ -17,6 +17,17 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
             public readonly partial struct ${class}
             {
     "#, [("class", &class.class_name), ("rust_path", &class.rust_struct_path)]);
+
+    rust.emit_statement(render_string(
+        "
+            #[repr(C)]
+            #[derive(Clone, Copy)]
+            pub struct ${class} {
+
+            }
+        ", [("class", &api_types::type_rs(&DataType::Object(class.class_name.clone()), ctx).to_native())]));
+
+    rust.emit_statement(generate_rust_conversions(class, ctx));
 
     for constant in class.constants.iter() {
         let value = match &constant.value {
@@ -99,6 +110,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
                 ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
                 ("this", &if method.instance { format!("{} {}", class.class_name, if native_input_params.is_empty() { "self" } else { "self, " }) } else { "".to_string() }),
             ]);
+            generate_rust_entry_point_buffer(rust, class, method, ctx);
         } else {
             render(&mut s, r#"
 
@@ -111,6 +123,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
                 ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
                 ("this", &if method.instance { format!("{} {}", class.class_name, if native_input_params.is_empty() { "self" } else { "self, " }) } else { "".to_string() }),
             ]);
+            generate_rust_entry_point(rust, class, method, ctx);
         }
     }
 
@@ -370,4 +383,147 @@ fn generate_method(
             ("converted_params", &converted_params.trim_start()),
         ]);
     }
+}
+fn generate_rust_conversions(class: &EngineClass, ctx: &GenerationContext) -> String {
+    let mut rs = String::new();
+    let ty = DataType::Object(class.class_name.clone());
+
+
+    render(&mut rs, r#"
+
+            impl From<${class_lite}> for ${class_native} {
+                fn from(__value: ${class_lite}) -> Self {
+                    todo!()
+                }
+            }
+
+            impl From<${class_native}> for ${class_lite} {
+                fn from(__value: ${class_native}) -> Self {
+                    todo!()
+                }
+            }
+    "#, [
+        ("class_native", &api_types::type_rs(&ty, ctx).to_native()),
+        ("class_lite", &api_types::type_rs(&ty, ctx).to_lite()),
+    ]);
+    rs
+}
+
+fn generate_rust_entry_point(rust: &mut RustEmitter, class: &EngineClass, method: &Method, ctx: &GenerationContext) {
+    let rs_type = api_types::type_rs(&DataType::Object(class.class_name.clone()), ctx);
+
+    let mut output_params = String::new();
+    let mut input_params = String::new();
+    let mut conversions = String::new();
+
+    let this = format!("this: {},
+                ",
+        rs_type.to_native(),
+    );
+
+    for param in method.signature.params.iter() {
+        if matches!(param.ty, DataType::UserScriptGenericStub) {
+            output_params += "(),";
+            continue;
+        }
+        render(&mut conversions, r#"
+                let ${name} = ${name}.into();
+        "#, [("name", &param.name)]);
+        output_params += param.name.as_str();
+        output_params += ",";
+        input_params += format!("{}: {},", param.name, api_types::type_rs(&param.ty, ctx).to_native()).as_str();
+    }
+
+    let mut rs = String::new();
+    render(&mut rs, r#"
+            pub extern "C" fn ${rust_path_escaped}_${name}(
+                ${this}${input_params}
+            ) -> ${return_ty} {
+                ${conversions}
+                let ret = ${receiver}${name}${generics}(${output_params});
+                ret.into()
+            }
+            "#, [
+        ("generics", &if method.is_generic() { "::<crate::UserScriptImpl>" } else { "" }),
+        ("return_ty", &method.signature.return_ty.as_ref().map(|it| api_types::type_rs(it, ctx).to_native()).unwrap_or("()".to_string())),
+        ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
+        ("name", &method.method_name),
+        ("output_params", &output_params),
+        ("input_params", &input_params),
+        ("conversions", &conversions),
+        (
+            "this",
+            &if method.instance {
+                this
+            } else { "".to_string() }
+        ),
+        (
+            "receiver",
+            &if method.instance {
+                format!("{}::from(this).", rs_type.to_lite())
+            } else { format!("{}::", rs_type.to_lite()) }
+        ),
+    ]);
+
+    rust.emit_statement(rs);
+}
+
+fn generate_rust_entry_point_buffer(rust: &mut RustEmitter, class: &EngineClass, method: &Method, ctx: &GenerationContext) {
+    let rs_type = api_types::type_rs(&DataType::Object(class.class_name.clone()), ctx);
+
+    let mut output_params = String::new();
+    let mut input_params = String::new();
+    let mut conversions = String::new();
+
+    let this = format!("this: {},
+                ",
+                       rs_type.to_native(),
+    );
+
+    for param in method.signature.params.iter() {
+        if matches!(param.ty, DataType::UserScriptGenericStub) {
+            output_params += "(),";
+            continue;
+        }
+        render(&mut conversions, r#"
+                let ${name} = ${name}.into();
+        "#, [("name", &param.name)]);
+        output_params += param.name.as_str();
+        output_params += ",";
+        input_params += format!("{}: {},", param.name, api_types::type_rs(&param.ty, ctx).to_native()).as_str();
+    }
+
+    let mut rs = String::new();
+    render(&mut rs, r#"
+            pub extern "C" fn ${rust_path_escaped}_${name}(
+                ${this}${input_params}
+            ) -> i32 {
+                let ${buffer_name} = Vec::new();
+                ${conversions}
+                let ret = ${receiver}${name}${generics}(${output_params});
+                ret.into()
+            }
+            "#, [
+        ("generics", &if method.is_generic() { "::<crate::UserScriptImpl>" } else { "" }),
+        ("return_ty", &method.signature.return_ty.as_ref().map(|it| api_types::type_rs(it, ctx).to_native()).unwrap_or("()".to_string())),
+        ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
+        ("name", &method.method_name),
+        ("output_params", &output_params),
+        ("input_params", &input_params),
+        ("conversions", &conversions),
+        (
+            "this",
+            &if method.instance {
+                this
+            } else { "".to_string() }
+        ),
+        (
+            "receiver",
+            &if method.instance {
+                format!("{}::from(this).", rs_type.to_lite())
+            } else { format!("{}::", rs_type.to_lite()) }
+        ),
+    ]);
+
+    rust.emit_statement(rs);
 }

@@ -4,14 +4,12 @@ use std::{
 };
 
 use fyrox::core::{algebra::iter, pool::Handle};
-use fyrox_lite::{
-    lite_math::{PodQuaternion, PodVector3},
-    spi::UserScript,
-};
+use fyrox_lite::{lite_math::{PodQuaternion, PodVector3}, spi::UserScript, LiteDataType};
 
 use crate::{
     bindings_lite::{NativeQuaternion, NativeVector3}, native_utils, scripted_app::{ScriptedApp, APP}
 };
+use crate::c_lang::CCompatibleLang;
 
 #[no_mangle]
 ///@owner_class FyroxCApi
@@ -212,3 +210,11 @@ pub type GameOnOsEvent = extern "C" fn(thiz: NativeInstanceId);
 
 pub type CreateScriptInstance = extern "C" fn(thiz: NativeClassId) -> NativeInstanceId;
 pub type SetProperty = extern "C" fn(thiz: NativeInstanceId, property: u16, value: NativeValue);
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct UserScriptMessage {
+    pub id: i64,
+}
+
+impl LiteDataType for UserScriptMessage {}

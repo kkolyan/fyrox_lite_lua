@@ -47,33 +47,33 @@ internal struct float_optional
 }
 
 [StructLayout(LayoutKind.Explicit)]
-internal struct string_result
+internal struct NativeString_result
 {
     [FieldOffset(0)]
     private int ok;
 
     [FieldOffset(sizeof(int))]
-    private string value;
+    private NativeString value;
 
     [FieldOffset(sizeof(int))]
     private string err;
 
-    internal static unsafe string ToFacade(in string_result self)
+    internal static unsafe string ToFacade(in NativeString_result self)
     {
         if (self.ok != 0)
         {
             var __item = self.value;
-            var __item_to_facade = __item;
+            var __item_to_facade = NativeString.ToFacade(__item);
             return __item_to_facade;
         }
         throw new Exception(self.err);
     }
 
-    internal static string_result FromFacade(in string self)
+    internal static NativeString_result FromFacade(in string self)
     {
         var __item = self;
-        var __item_from_facade = __item;
-        return new string_result {ok = 1, value = __item_from_facade};
+        var __item_from_facade = NativeString.FromFacade(__item);
+        return new NativeString_result {ok = 1, value = __item_from_facade};
     }
 }
 

@@ -1,11 +1,11 @@
 use std::fmt::Display;
 use gen_common::context::GenerationContext;
 use gen_common::templating::{render, render_string};
-use lite_model::{DataType, StructClass};
+use lite_model::{DataType};
 use crate::lite_csgen::api_types;
 use crate::lite_csgen::gen_rs::RustEmitter;
 
-pub(crate) fn generate_result(s: &mut String, rust: &RustEmitter, wrapped_type: &DataType) {
+pub(crate) fn generate_result(s: &mut String, rust: &mut RustEmitter, wrapped_type: &DataType, ctx: &GenerationContext) {
     let marshalling = api_types::type_cs(wrapped_type);
 
     render(s, r#"
@@ -47,6 +47,45 @@ pub(crate) fn generate_result(s: &mut String, rust: &RustEmitter, wrapped_type: 
         ("item_to_facade", &if marshalling.is_mapped() {format!("{}.ToFacade(__item)", marshalling.to_blittable())} else {"__item".to_string()}),
         ("item_from_facade", &if marshalling.is_mapped() {format!("{}.FromFacade(__item)", marshalling.to_blittable())} else {"__item".to_string()}),
     ]);
+    rust.emit_statement(render_string(r#"
+            #[repr(C)]
+            #[derive(Clone, Copy)]
+            pub struct ${class_native}_result {
+                pub ok: i32,
+                pub value: ${class_native}_result_value,
+            }
+
+            #[repr(C)]
+            #[derive(Clone, Copy)]
+            pub union ${class_native}_result_value {
+                ok: ${class_native},
+                err: NativeString,
+            }
+
+            impl From<Result<${class_lite}, crate::LangSpecificError>> for ${class_native}_result {
+                fn from(value: Result<${class_lite}, crate::LangSpecificError>) -> Self {
+                    match value {
+                        Ok(it) => Self { ok: 1, value: ${class_native}_result_value { ok: it.into() } },
+                        Err(err) => Self { ok: 0, value: ${class_native}_result_value { err: err.into() } },
+                    }
+                }
+            }
+
+            impl From<${class_native}_result> for Result<${class_lite}, crate::LangSpecificError> {
+                fn from(value: ${class_native}_result) -> Self {
+                    unsafe {
+                        if value.ok != 0 {
+                            Ok(value.value.ok.into())
+                        } else {
+                            Err(value.value.err.into())
+                        }
+                    }
+                }
+            }
+    "#, [
+        ("class_native", &api_types::type_rs(wrapped_type, ctx).to_native()),
+        ("class_lite", &api_types::type_rs(wrapped_type, ctx).to_lite()),
+    ]));
 }
 
 pub(crate) fn generate_optional(s: &mut String, rust: &mut RustEmitter, wrapped_type: &DataType, ctx: &GenerationContext) {
@@ -92,8 +131,9 @@ pub(crate) fn generate_optional(s: &mut String, rust: &mut RustEmitter, wrapped_
     ]);
     rust.emit_statement(render_string(r#"
             #[repr(C)]
+            #[derive(Clone, Copy)]
             pub struct ${class_native}_optional {
-                pub value: ${class_lite},
+                pub value: ${class_native},
                 pub has_value: i32,
             }
 
@@ -118,10 +158,10 @@ pub(crate) fn generate_optional(s: &mut String, rust: &mut RustEmitter, wrapped_
     "#, [
         ("class_native", &api_types::type_rs(wrapped_type, ctx).to_native()),
         ("class_lite", &api_types::type_rs(wrapped_type, ctx).to_lite()),
-    ]))
+    ]));
 }
 
-pub fn generate_slice(mut s: &mut String, rust: &RustEmitter, wrapped_type: &DataType) {
+pub fn generate_slice(mut s: &mut String, rust: &mut RustEmitter, wrapped_type: &DataType, ctx: &GenerationContext) {
     let marshalling = api_types::type_cs(wrapped_type);
     render(&mut s, r#"
 
@@ -175,4 +215,37 @@ pub fn generate_slice(mut s: &mut String, rust: &RustEmitter, wrapped_type: &Dat
         ("item_to_facade", &if marshalling.is_mapped() {format!("{}.ToFacade(__item)", marshalling.to_blittable())} else {"__item".to_string()}),
         ("item_from_facade", &if marshalling.is_mapped() {format!("{}.FromFacade(__item)", marshalling.to_blittable())} else {"__item".to_string()}),
     ]);
+    rust.emit_statement(render_string(r#"
+            #[repr(C)]
+            #[derive(Clone, Copy)]
+            pub struct ${class_native}_slice {
+                pub begin: *mut ${class_native},
+                pub len: i32,
+            }
+
+            impl From<Vec<${class_lite}>> for ${class_native}_slice {
+                fn from(value: Vec<${class_lite}>) -> Self {
+                    let len = value.len() as i32;
+                    let native_vec: Vec<${class_native}> = value.into_iter().map(|it| it.into()).collect();
+                    let begin = crate::Arena::allocate_vec(native_vec);
+                    Self { begin, len }
+                }
+            }
+
+            impl From<${class_native}_slice> for Vec<${class_lite}> {
+                fn from(value: ${class_native}_slice) -> Self {
+                    let mut vec = Vec::new();
+                    unsafe {
+                        for i in 0..value.len {
+                            let v = *value.begin.add(i as usize);
+                            vec.push(v.into());
+                        }
+                    }
+                    vec
+                }
+            }
+    "#, [
+        ("class_native", &api_types::type_rs(wrapped_type, ctx).to_native()),
+        ("class_lite", &api_types::type_rs(wrapped_type, ctx).to_lite()),
+    ]));
 }

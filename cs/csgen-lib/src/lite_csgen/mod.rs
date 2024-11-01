@@ -52,9 +52,9 @@ pub fn generate_cs_facade(domain: &Domain) -> (HierarchicalCodeBase, RustEmitter
 fn generate_base(rust: &mut RustEmitter, ctx: &GenerationContext) -> Module {
     let mut s = String::new();
     wrappers::generate_optional(&mut s, rust, &DataType::F32, ctx);
-    wrappers::generate_result(&mut s, rust, &DataType::String);
+    wrappers::generate_result(&mut s, rust, &DataType::String, ctx);
     wrappers::generate_optional(&mut s, rust, &DataType::UserScript, ctx);
-    wrappers::generate_result(&mut s, rust, &DataType::UserScript);
-    wrappers::generate_result(&mut s, rust, &DataType::Option(Box::new(DataType::UserScript)));
+    wrappers::generate_result(&mut s, rust, &DataType::UserScript, ctx);
+    wrappers::generate_result(&mut s, rust, &DataType::Option(Box::new(DataType::UserScript)), ctx);
     Module::code("LiteBase", s)
 }

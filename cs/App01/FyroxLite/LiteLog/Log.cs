@@ -22,7 +22,7 @@ public readonly partial struct Log
     public static void Info(string msg)
     {
         unsafe {
-            var _msg = msg;
+            var _msg = NativeString.FromFacade(msg);
             fyrox_lite_lite_log_LiteLog_info(_msg);
         }
     }
@@ -30,7 +30,7 @@ public readonly partial struct Log
     public static void Warn(string msg)
     {
         unsafe {
-            var _msg = msg;
+            var _msg = NativeString.FromFacade(msg);
             fyrox_lite_lite_log_LiteLog_warn(_msg);
         }
     }
@@ -38,19 +38,19 @@ public readonly partial struct Log
     public static void Err(string msg)
     {
         unsafe {
-            var _msg = msg;
+            var _msg = NativeString.FromFacade(msg);
             fyrox_lite_lite_log_LiteLog_err(_msg);
         }
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_log_LiteLog_info(string msg);
+    private static unsafe partial void fyrox_lite_lite_log_LiteLog_info(NativeString msg);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_log_LiteLog_warn(string msg);
+    private static unsafe partial void fyrox_lite_lite_log_LiteLog_warn(NativeString msg);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_log_LiteLog_err(string msg);
+    private static unsafe partial void fyrox_lite_lite_log_LiteLog_err(NativeString msg);
 }
 
 [StructLayout(LayoutKind.Sequential)]

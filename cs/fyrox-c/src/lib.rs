@@ -11,3 +11,12 @@ pub(crate) mod native_utils;
 pub(crate) mod packed_script;
 pub(crate) mod scripted_app;
 pub(crate) mod user_script_impl;
+pub(crate) mod buffer;
+mod string;
+
+pub(crate) use arena::Arena;
+use crate::bindings_manual::{NativeHandle, UserScriptMessage};
+
+pub(crate) type LangSpecificError = String;
+pub(crate) type UserScriptMessageImpl = UserScriptMessage;
+pub(crate) type UserScriptImpl = NativeHandle;

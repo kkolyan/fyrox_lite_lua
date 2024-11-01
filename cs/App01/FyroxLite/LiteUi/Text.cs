@@ -23,7 +23,7 @@ public readonly partial struct Text
         set
         {
             unsafe {
-                var _value = value;
+                var _value = NativeString.FromFacade(value);
                 fyrox_lite_lite_ui_LiteText_set_text_async(this, _value);
             }
         }
@@ -39,7 +39,7 @@ public readonly partial struct Text
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_ui_LiteText_set_text_async(Text self, string text);
+    private static unsafe partial void fyrox_lite_lite_ui_LiteText_set_text_async(Text self, NativeString text);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial Text fyrox_lite_lite_ui_LiteText_new(TextBuilder* state);

@@ -13,8 +13,12 @@ pub fn type_cs(ty: &DataType) -> CsType {
         DataType::I64 => CsType::Blittable(format!("long")),
         DataType::F32 => CsType::Blittable(format!("float")),
         DataType::F64 => CsType::Blittable(format!("dobule")),
-        DataType::String => CsType::Blittable(format!("string")),
-        DataType::ClassName => CsType::Blittable(format!("string")),
+        DataType::String => CsType::Mapped {
+            facade: "string".to_string(),
+            facade_generic: "string".to_string(),
+            blittable: "NativeString".to_string(),
+        },
+        DataType::ClassName => type_cs(&DataType::String),
         DataType::Vec(it) => CsType::templated(
             // TODO there is two options to design it;
             // 1. return iterator, that also contains seem hash to check the rust-side arena-allocated collection is alive every iteration
@@ -65,8 +69,8 @@ pub fn type_rs(ty: &DataType, ctx: &GenerationContext) -> RsType {
         DataType::I64 => RsType::Basic(format!("i64")),
         DataType::F32 => RsType::Basic(format!("f32")),
         DataType::F64 => RsType::Basic(format!("f64")),
-        DataType::String => RsType::Basic(format!("String")),
-        DataType::ClassName => todo!(),
+        DataType::String => RsType::Mapped {native: "NativeString".to_string(), lite: "String".to_string()},
+        DataType::ClassName => type_rs(&DataType::String, ctx),
         DataType::Vec(it) => RsType::templated(
             // TODO there is two options to design it;
             // 1. return iterator, that also contains seem hash to check the rust-side arena-allocated collection is alive every iteration
@@ -78,8 +82,8 @@ pub fn type_rs(ty: &DataType, ctx: &GenerationContext) -> RsType {
             &type_rs(it.deref(), ctx),
         ),
         DataType::UserScript => RsType::Mapped {
-            lite: "UserScript!!!".to_string(),
-            native: "UserScript".to_string(),
+            lite: "crate::UserScriptImpl".to_string(),
+            native: "NativeHandle".to_string(),
         },
         DataType::UserScriptMessage => RsType::Basic("UserScriptMessage".to_string()),
         DataType::UserScriptGenericStub => panic!("WTF, UserScriptGenericStub should be filtered out"),
