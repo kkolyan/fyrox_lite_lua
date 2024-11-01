@@ -18,12 +18,14 @@ namespace FyroxLite.LiteUi;
 [StructLayout(LayoutKind.Sequential)]
 public readonly partial struct Text
 {
-
-    public void SetTextAsync(string text)
+    public string TextAsync
     {
-        unsafe {
-            var _text = text;
-            fyrox_lite_lite_ui_LiteText_SetTextAsync(this, _text);
+        set
+        {
+            unsafe {
+                var _value = value;
+                fyrox_lite_lite_ui_LiteText_set_text_async(this, _value);
+            }
         }
     }
 
@@ -31,16 +33,16 @@ public readonly partial struct Text
     {
         unsafe {
             var _state = state;
-            var __ret = fyrox_lite_lite_ui_LiteText_New(&_state);
+            var __ret = fyrox_lite_lite_ui_LiteText_new(&_state);
             return __ret;
         }
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_ui_LiteText_SetTextAsync(Text self, string text);
+    private static unsafe partial void fyrox_lite_lite_ui_LiteText_set_text_async(Text self, string text);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Text fyrox_lite_lite_ui_LiteText_New(TextBuilder* state);
+    private static unsafe partial Text fyrox_lite_lite_ui_LiteText_new(TextBuilder* state);
 }
 
 [StructLayout(LayoutKind.Sequential)]

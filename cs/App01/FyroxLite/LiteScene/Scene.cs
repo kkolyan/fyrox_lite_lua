@@ -23,12 +23,12 @@ public readonly partial struct Scene
     {
         unsafe {
             var _scene_path = scene_path;
-            fyrox_lite_lite_scene_LiteScene_LoadAsync(_scene_path);
+            fyrox_lite_lite_scene_LiteScene_load_async(_scene_path);
         }
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_scene_LiteScene_LoadAsync(string scene_path);
+    private static unsafe partial void fyrox_lite_lite_scene_LiteScene_load_async(string scene_path);
 }
 
 [StructLayout(LayoutKind.Sequential)]

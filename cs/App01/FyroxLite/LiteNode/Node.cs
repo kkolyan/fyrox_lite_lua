@@ -23,26 +23,28 @@ public readonly partial struct Node
     {
         unsafe {
             
-            var __ret = fyrox_lite_lite_node_LiteNode_AsRigidBody(this);
+            var __ret = fyrox_lite_lite_node_LiteNode_as_rigid_body(this);
             return RigidBody_optional.ToFacade(__ret);
         }
     }
-
-    public string GetName()
+    public string Name
     {
-        unsafe {
-            
-            var __ret = fyrox_lite_lite_node_LiteNode_GetName(this);
-            return string_result.ToFacade(__ret);
+        get
+        {
+            unsafe {
+                var __ret = fyrox_lite_lite_node_LiteNode_get_name(this);
+                return string_result.ToFacade(__ret);
+            }
         }
     }
-
-    public bool GetAlive()
+    public bool Alive
     {
-        unsafe {
-            
-            var __ret = fyrox_lite_lite_node_LiteNode_GetAlive(this);
-            return __ret;
+        get
+        {
+            unsafe {
+                var __ret = fyrox_lite_lite_node_LiteNode_get_alive(this);
+                return __ret;
+            }
         }
     }
 
@@ -50,34 +52,51 @@ public readonly partial struct Node
     {
         unsafe {
             
-            fyrox_lite_lite_node_LiteNode_Destroy(this);
+            fyrox_lite_lite_node_LiteNode_destroy(this);
         }
     }
-
-    public Vector3 GetGlobalPosition()
+    public Vector3 GlobalPosition
     {
-        unsafe {
-            
-            var __ret = fyrox_lite_lite_node_LiteNode_GetGlobalPosition(this);
-            return __ret;
+        get
+        {
+            unsafe {
+                var __ret = fyrox_lite_lite_node_LiteNode_get_global_position(this);
+                return __ret;
+            }
         }
     }
-
-    public Vector3 GetLocalPosition()
+    public Vector3 LocalPosition
     {
-        unsafe {
-            
-            var __ret = fyrox_lite_lite_node_LiteNode_GetLocalPosition(this);
-            return __ret;
+        get
+        {
+            unsafe {
+                var __ret = fyrox_lite_lite_node_LiteNode_get_local_position(this);
+                return __ret;
+            }
+        }
+        set
+        {
+            unsafe {
+                var _value = value;
+                fyrox_lite_lite_node_LiteNode_set_local_position(this, &_value);
+            }
         }
     }
-
-    public Quaternion GetLocalRotation()
+    public Quaternion LocalRotation
     {
-        unsafe {
-            
-            var __ret = fyrox_lite_lite_node_LiteNode_GetLocalRotation(this);
-            return __ret;
+        get
+        {
+            unsafe {
+                var __ret = fyrox_lite_lite_node_LiteNode_get_local_rotation(this);
+                return __ret;
+            }
+        }
+        set
+        {
+            unsafe {
+                var _value = value;
+                fyrox_lite_lite_node_LiteNode_set_local_rotation(this, &_value);
+            }
         }
     }
 
@@ -86,23 +105,7 @@ public readonly partial struct Node
         unsafe {
             var _routing = routing;
             var _payload = UserScriptMessage.FromFacade(payload);
-            fyrox_lite_lite_node_LiteNode_SendHierarchical(this, _routing, _payload);
-        }
-    }
-
-    public void SetLocalPosition(Vector3 new_pos)
-    {
-        unsafe {
-            var _new_pos = new_pos;
-            fyrox_lite_lite_node_LiteNode_SetLocalPosition(this, &_new_pos);
-        }
-    }
-
-    public void SetLocalRotation(Quaternion value)
-    {
-        unsafe {
-            var _value = value;
-            fyrox_lite_lite_node_LiteNode_SetLocalRotation(this, &_value);
+            fyrox_lite_lite_node_LiteNode_send_hierarchical(this, _routing, _payload);
         }
     }
 
@@ -110,7 +113,7 @@ public readonly partial struct Node
     {
         unsafe {
             
-            fyrox_lite_lite_node_LiteNode_SubscribeTo(this);
+            fyrox_lite_lite_node_LiteNode_subscribe_to(this);
         }
     }
 
@@ -118,26 +121,28 @@ public readonly partial struct Node
     {
         unsafe {
             
-            var __ret = fyrox_lite_lite_node_LiteNode_FindColliderInChildren(this);
+            var __ret = fyrox_lite_lite_node_LiteNode_find_collider_in_children(this);
             return Node_optional.ToFacade(__ret);
         }
     }
-
-    public bool GetValid()
+    public bool Valid
     {
-        unsafe {
-            
-            var __ret = fyrox_lite_lite_node_LiteNode_GetValid(this);
-            return __ret;
+        get
+        {
+            unsafe {
+                var __ret = fyrox_lite_lite_node_LiteNode_get_valid(this);
+                return __ret;
+            }
         }
     }
-
-    public Node GetParent()
+    public Node Parent
     {
-        unsafe {
-            
-            var __ret = fyrox_lite_lite_node_LiteNode_GetParent(this);
-            return __ret;
+        get
+        {
+            unsafe {
+                var __ret = fyrox_lite_lite_node_LiteNode_get_parent(this);
+                return __ret;
+            }
         }
     }
 
@@ -145,7 +150,7 @@ public readonly partial struct Node
     {
         unsafe {
             
-            var __ret = fyrox_lite_lite_node_LiteNode_AddScript(this, typeof(T).Name);
+            var __ret = fyrox_lite_lite_node_LiteNode_add_script(this, typeof(T).Name);
             return UserScript_result.ToFacade(__ret) as T;
         }
     }
@@ -154,17 +159,18 @@ public readonly partial struct Node
     {
         unsafe {
             
-            var __ret = fyrox_lite_lite_node_LiteNode_FindScript(this, typeof(T).Name);
+            var __ret = fyrox_lite_lite_node_LiteNode_find_script(this, typeof(T).Name);
             return UserScript_optional_result.ToFacade(__ret) as T;
         }
     }
-
-    public Quaternion GetGlobalRotation()
+    public Quaternion GlobalRotation
     {
-        unsafe {
-            
-            var __ret = fyrox_lite_lite_node_LiteNode_GetGlobalRotation(this);
-            return __ret;
+        get
+        {
+            unsafe {
+                var __ret = fyrox_lite_lite_node_LiteNode_get_global_rotation(this);
+                return __ret;
+            }
         }
     }
 
@@ -172,87 +178,87 @@ public readonly partial struct Node
     {
         unsafe {
             var _tag = tag;
-            var __ret = fyrox_lite_lite_node_LiteNode_TagIs(this, _tag);
+            var __ret = fyrox_lite_lite_node_LiteNode_tag_is(this, _tag);
             return __ret;
         }
     }
-
-    public void SetTag(string tag)
+    public string Tag
     {
-        unsafe {
-            var _tag = tag;
-            fyrox_lite_lite_node_LiteNode_SetTag(this, _tag);
+        get
+        {
+            unsafe {
+                var __ret = fyrox_lite_lite_node_LiteNode_get_tag(this);
+                return __ret;
+            }
+        }
+        set
+        {
+            unsafe {
+                var _value = value;
+                fyrox_lite_lite_node_LiteNode_set_tag(this, _value);
+            }
         }
     }
 
-    public string GetTag()
-    {
-        unsafe {
-            
-            var __ret = fyrox_lite_lite_node_LiteNode_GetTag(this);
-            return __ret;
-        }
-    }
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial RigidBody_optional fyrox_lite_lite_node_LiteNode_as_rigid_body(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial RigidBody_optional fyrox_lite_lite_node_LiteNode_AsRigidBody(Node self);
+    private static unsafe partial string_result fyrox_lite_lite_node_LiteNode_get_name(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial string_result fyrox_lite_lite_node_LiteNode_GetName(Node self);
+    private static unsafe partial bool fyrox_lite_lite_node_LiteNode_get_alive(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial bool fyrox_lite_lite_node_LiteNode_GetAlive(Node self);
+    private static unsafe partial void fyrox_lite_lite_node_LiteNode_destroy(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_node_LiteNode_Destroy(Node self);
+    private static unsafe partial Vector3 fyrox_lite_lite_node_LiteNode_get_global_position(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Vector3 fyrox_lite_lite_node_LiteNode_GetGlobalPosition(Node self);
+    private static unsafe partial Vector3 fyrox_lite_lite_node_LiteNode_get_local_position(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Vector3 fyrox_lite_lite_node_LiteNode_GetLocalPosition(Node self);
+    private static unsafe partial Quaternion fyrox_lite_lite_node_LiteNode_get_local_rotation(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Quaternion fyrox_lite_lite_node_LiteNode_GetLocalRotation(Node self);
+    private static unsafe partial void fyrox_lite_lite_node_LiteNode_send_hierarchical(Node self, RoutingStrategy routing, UserScriptMessage payload);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_node_LiteNode_SendHierarchical(Node self, RoutingStrategy routing, UserScriptMessage payload);
+    private static unsafe partial void fyrox_lite_lite_node_LiteNode_set_local_position(Node self, Vector3* new_pos);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_node_LiteNode_SetLocalPosition(Node self, Vector3* new_pos);
+    private static unsafe partial void fyrox_lite_lite_node_LiteNode_set_local_rotation(Node self, Quaternion* value);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_node_LiteNode_SetLocalRotation(Node self, Quaternion* value);
+    private static unsafe partial void fyrox_lite_lite_node_LiteNode_subscribe_to(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_node_LiteNode_SubscribeTo(Node self);
+    private static unsafe partial Node_optional fyrox_lite_lite_node_LiteNode_find_collider_in_children(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Node_optional fyrox_lite_lite_node_LiteNode_FindColliderInChildren(Node self);
+    private static unsafe partial bool fyrox_lite_lite_node_LiteNode_get_valid(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial bool fyrox_lite_lite_node_LiteNode_GetValid(Node self);
+    private static unsafe partial Node fyrox_lite_lite_node_LiteNode_get_parent(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Node fyrox_lite_lite_node_LiteNode_GetParent(Node self);
+    private static unsafe partial UserScript_result fyrox_lite_lite_node_LiteNode_add_script(Node self, string class_name);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial UserScript_result fyrox_lite_lite_node_LiteNode_AddScript(Node self, string class_name);
+    private static unsafe partial UserScript_optional_result fyrox_lite_lite_node_LiteNode_find_script(Node self, string class_name);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial UserScript_optional_result fyrox_lite_lite_node_LiteNode_FindScript(Node self, string class_name);
+    private static unsafe partial Quaternion fyrox_lite_lite_node_LiteNode_get_global_rotation(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Quaternion fyrox_lite_lite_node_LiteNode_GetGlobalRotation(Node self);
+    private static unsafe partial bool fyrox_lite_lite_node_LiteNode_tag_is(Node self, string tag);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial bool fyrox_lite_lite_node_LiteNode_TagIs(Node self, string tag);
+    private static unsafe partial void fyrox_lite_lite_node_LiteNode_set_tag(Node self, string tag);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_node_LiteNode_SetTag(Node self, string tag);
-
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial string fyrox_lite_lite_node_LiteNode_GetTag(Node self);
+    private static unsafe partial string fyrox_lite_lite_node_LiteNode_get_tag(Node self);
 }
 
 [StructLayout(LayoutKind.Sequential)]

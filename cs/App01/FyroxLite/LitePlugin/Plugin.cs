@@ -23,13 +23,13 @@ public readonly partial struct Plugin
     {
         unsafe {
             
-            var __ret = fyrox_lite_lite_plugin_LitePlugin_Get(typeof(T).Name);
+            var __ret = fyrox_lite_lite_plugin_LitePlugin_get(typeof(T).Name);
             return UserScript_result.ToFacade(__ret) as T;
         }
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial UserScript_result fyrox_lite_lite_plugin_LitePlugin_Get(string class_name);
+    private static unsafe partial UserScript_result fyrox_lite_lite_plugin_LitePlugin_get(string class_name);
 }
 
 [StructLayout(LayoutKind.Sequential)]

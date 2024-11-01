@@ -18,17 +18,19 @@ namespace FyroxLite.LiteWindow;
 [StructLayout(LayoutKind.Sequential)]
 public readonly partial struct Window
 {
-
-    public static void SetCursorGrab(CursorGrabMode mode)
+    public static CursorGrabMode CursorGrab
     {
-        unsafe {
-            var _mode = mode;
-            fyrox_lite_lite_window_LiteWindow_SetCursorGrab(_mode);
+        set
+        {
+            unsafe {
+                var _value = value;
+                fyrox_lite_lite_window_LiteWindow_set_cursor_grab(_value);
+            }
         }
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_window_LiteWindow_SetCursorGrab(CursorGrabMode mode);
+    private static unsafe partial void fyrox_lite_lite_window_LiteWindow_set_cursor_grab(CursorGrabMode mode);
 }
 
 [StructLayout(LayoutKind.Sequential)]

@@ -35,13 +35,13 @@ public readonly partial struct Physics
         {
             var results_slice = new Intersection_slice(results_ptr, results.Length);
             var _opts = opts;
-            return fyrox_lite_lite_physics_LitePhysics_CastRay(&_opts, results_slice);
+            return fyrox_lite_lite_physics_LitePhysics_cast_ray(&_opts, results_slice);
         }
         }
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial int fyrox_lite_lite_physics_LitePhysics_CastRay(RayCastOptions* opts, Intersection_slice results);
+    private static unsafe partial int fyrox_lite_lite_physics_LitePhysics_cast_ray(RayCastOptions* opts, Intersection_slice results);
 }
 
 [StructLayout(LayoutKind.Sequential)]
