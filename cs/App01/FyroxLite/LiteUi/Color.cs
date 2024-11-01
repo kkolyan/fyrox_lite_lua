@@ -163,15 +163,15 @@ public readonly partial struct Color
 [StructLayout(LayoutKind.Sequential)]
 internal struct Color_optional
 {
-    internal Color Value;
-    internal bool HasValue;
+    private Color value;
+    private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Color? ToFacade(in Color_optional value)
     {
-        if (value.HasValue)
+        if (value.has_value != 0)
         {
-            var __item = value.Value;
+            var __item = value.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
@@ -183,10 +183,10 @@ internal struct Color_optional
     {
         if (value == null)
         {
-            return new Color_optional { Value = default, HasValue = false };
+            return new Color_optional { value = default, has_value = 0 };
         }
         var __item = value;
         var __item_from_facade = __item;
-        return new Color_optional { Value = __item_from_facade.Value, HasValue = true };
+        return new Color_optional { value = __item_from_facade.Value, has_value = 1 };
     }
 }

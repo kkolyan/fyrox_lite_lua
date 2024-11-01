@@ -48,15 +48,15 @@ public readonly partial struct Text
 [StructLayout(LayoutKind.Sequential)]
 internal struct Text_optional
 {
-    internal Text Value;
-    internal bool HasValue;
+    private Text value;
+    private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Text? ToFacade(in Text_optional value)
     {
-        if (value.HasValue)
+        if (value.has_value != 0)
         {
-            var __item = value.Value;
+            var __item = value.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
@@ -68,10 +68,10 @@ internal struct Text_optional
     {
         if (value == null)
         {
-            return new Text_optional { Value = default, HasValue = false };
+            return new Text_optional { value = default, has_value = 0 };
         }
         var __item = value;
         var __item_from_facade = __item;
-        return new Text_optional { Value = __item_from_facade.Value, HasValue = true };
+        return new Text_optional { value = __item_from_facade.Value, has_value = 1 };
     }
 }

@@ -1,5 +1,5 @@
 pub(crate) mod arena;
-pub(crate) mod bindings_lite;
+pub(crate) mod bindings_lite_2;
 pub(crate) mod bindings_manual;
 pub(crate) mod c_lang;
 pub(crate) mod c_script_metadata;

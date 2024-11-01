@@ -38,15 +38,15 @@ public struct Vector2i
 [StructLayout(LayoutKind.Sequential)]
 internal struct Vector2i_optional
 {
-    internal Vector2i Value;
-    internal bool HasValue;
+    private Vector2i value;
+    private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2i? ToFacade(in Vector2i_optional value)
     {
-        if (value.HasValue)
+        if (value.has_value != 0)
         {
-            var __item = value.Value;
+            var __item = value.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
@@ -58,11 +58,11 @@ internal struct Vector2i_optional
     {
         if (value == null)
         {
-            return new Vector2i_optional { Value = default, HasValue = false };
+            return new Vector2i_optional { value = default, has_value = 0 };
         }
         var __item = value;
         var __item_from_facade = __item;
-        return new Vector2i_optional { Value = __item_from_facade.Value, HasValue = true };
+        return new Vector2i_optional { value = __item_from_facade.Value, has_value = 1 };
     }
 }
 
@@ -115,29 +115,29 @@ internal struct Vector2i_slice
 internal struct Vector2i_result
 {
     [FieldOffset(0)]
-    internal int Ok;
+    private int ok;
 
     [FieldOffset(sizeof(int))]
-    internal Vector2i Value;
+    private Vector2i value;
 
     [FieldOffset(sizeof(int))]
-    internal string Err;
+    private string err;
 
     internal static unsafe Vector2i ToFacade(in Vector2i_result self)
     {
-        if (self.Ok != 0)
+        if (self.ok != 0)
         {
-            var __item = self.Value;
+            var __item = self.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.Err);
+        throw new Exception(self.err);
     }
 
     internal static Vector2i_result FromFacade(in Vector2i self)
     {
         var __item = self;
         var __item_from_facade = __item;
-        return new Vector2i_result {Ok = 1, Value = __item_from_facade};
+        return new Vector2i_result {ok = 1, value = __item_from_facade};
     }
 }

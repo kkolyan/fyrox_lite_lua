@@ -6,9 +6,10 @@ use gen_common::context::GenerationContext;
 use gen_common::templating::{render, render_string};
 use lite_model::{ConstantValue, DataType, EngineClass, Literal, Method};
 use crate::lite_csgen::{api_types, wrappers};
-use crate::lite_csgen::api_types::TypeMarshalling;
+use crate::lite_csgen::api_types::CsType;
+use crate::lite_csgen::gen_rs::RustEmitter;
 
-pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) -> Module {
+pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, rust: &mut RustEmitter) -> Module {
     let mut s = String::new();
     render(&mut s, r#"
             // ${rust_path}
@@ -29,7 +30,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
                 render(&mut s, r#"
                 //public const ${type} ${name} = ${value};
                 "#, [
-                    ("type", &api_types::type_rs2cs(&constant.ty).to_facade()),
+                    ("type", &api_types::type_cs(&constant.ty).to_facade()),
                     ("name", &constant.const_name),
                     ("value", &expr)
                 ]);
@@ -40,7 +41,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
         render(&mut s, r#"
                 public const ${type} ${name} = ${value};
                 "#, [
-            ("type", &api_types::type_rs2cs(&constant.ty).to_facade()),
+            ("type", &api_types::type_cs(&constant.ty).to_facade()),
             ("name", &constant.const_name),
             ("value", &value)
         ]);
@@ -81,7 +82,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
             .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
             .map(|param| format!(
                 "{}{} {}",
-                api_types::type_rs2cs(&param.ty).to_blittable(),
+                api_types::type_cs(&param.ty).to_blittable(),
                 if ctx.is_struct(&param.ty) { "*" } else { "" },
                 param.name
             ))
@@ -104,7 +105,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
                 [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
                 private static unsafe partial ${return_ty} ${rust_path_escaped}_${name}(${this}${native_input_params});
             "#, [
-                ("return_ty", &method.signature.return_ty.as_ref().map(|it| api_types::type_rs2cs(it).to_blittable()).unwrap_or("void".to_string())),
+                ("return_ty", &method.signature.return_ty.as_ref().map(|it| api_types::type_cs(it).to_blittable()).unwrap_or("void".to_string())),
                 ("name", &method.method_name),
                 ("native_input_params", &native_input_params.join(", ")),
                 ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
@@ -117,7 +118,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext) ->
             }
     "#, []);
 
-    wrappers::generate_optional(&mut s, &DataType::Object(class.class_name.clone()));
+    wrappers::generate_optional(&mut s, rust, &DataType::Object(class.class_name.clone()), ctx);
 
     Module::code(&class.class_name, s)
 }
@@ -171,7 +172,7 @@ fn generate_property(s: &mut String, class: &EngineClass, getter: Option<Getter>
     assert_eq!(prop_name.len(), 1);
     let prop_name = prop_name.into_iter().next().unwrap();
 
-    let ty_marshalling = api_types::type_rs2cs(prop_type);
+    let ty_marshalling = api_types::type_cs(prop_type);
 
     render(s, r#"
                 public ${static}${property_type} ${property_name}
@@ -200,7 +201,7 @@ fn generate_property(s: &mut String, class: &EngineClass, getter: Option<Getter>
         ]);
     }
     if let Some(Setter { .. }) = setter.as_ref() {
-        let conversion = if let TypeMarshalling::Mapped { blittable, .. } = api_types::type_rs2cs(prop_type) {
+        let conversion = if let CsType::Mapped { blittable, .. } = api_types::type_cs(prop_type) {
             render_string(r#"var _value = ${blittable}.FromFacade(value)"#, [("blittable", &blittable)])
         } else {
             render_string(r#"var _value = value"#, [])
@@ -237,7 +238,7 @@ fn generate_method(
     let input_params = method.signature.params.iter()
         .filter(|it| !matches!(&it.ty, DataType::ClassName))
         .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
-        .map(|param| format!("{} {}", api_types::type_rs2cs(&param.ty).to_facade(), param.name))
+        .map(|param| format!("{} {}", api_types::type_cs(&param.ty).to_facade(), param.name))
         .to_vec();
     let output_params = method.signature.params.iter()
         .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
@@ -252,7 +253,7 @@ fn generate_method(
         if matches!(&param.ty, DataType::ClassName | DataType::UserScriptGenericStub | DataType::Buffer(_)) {
             continue;
         }
-        if let TypeMarshalling::Mapped { blittable, .. } = api_types::type_rs2cs(&param.ty) {
+        if let CsType::Mapped { blittable, .. } = api_types::type_cs(&param.ty) {
             render(&mut converted_params, r#"
                         var _${name} = ${blittable}.FromFacade(${name});
                 "#, [("name", &param.name), ("blittable", &blittable)]);
@@ -268,7 +269,7 @@ fn generate_method(
             let buffer_param = method.signature.params.iter()
                 .find(|it| matches!(&it.ty, DataType::Buffer(_)))
                 .unwrap();
-            let buffer_ty_marshalling = api_types::type_rs2cs(buffer_item_ty);
+            let buffer_ty_marshalling = api_types::type_cs(buffer_item_ty);
             if buffer_ty_marshalling.is_mapped() {
                 panic!("buffer type should be blittable");
             }
@@ -277,8 +278,8 @@ fn generate_method(
                 .filter(|it| !matches!(&it.ty, DataType::ClassName))
                 .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
                 .map(|param| match &param.ty {
-                    DataType::Buffer(ty) => format!("{}[] {}", api_types::type_rs2cs(ty).to_blittable(), param.name),
-                    ty => format!("{} {}", api_types::type_rs2cs(ty).to_facade(), param.name),
+                    DataType::Buffer(ty) => format!("{}[] {}", api_types::type_cs(ty).to_blittable(), param.name),
+                    ty => format!("{} {}", api_types::type_cs(ty).to_facade(), param.name),
                 })
                 .to_vec();
 
@@ -320,7 +321,7 @@ fn generate_method(
                 ("converted_params", &converted_params.trim_start()),
             ]);
         } else {
-            let return_ty = api_types::type_rs2cs(return_ty);
+            let return_ty = api_types::type_cs(return_ty);
             render(s, r#"
 
                 public ${static}${return_ty} ${name}${generics}(${input_params})${generic_where}

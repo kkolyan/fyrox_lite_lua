@@ -34,15 +34,15 @@ public readonly partial struct RigidBody
 [StructLayout(LayoutKind.Sequential)]
 internal struct RigidBody_optional
 {
-    internal RigidBody Value;
-    internal bool HasValue;
+    private RigidBody value;
+    private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static RigidBody? ToFacade(in RigidBody_optional value)
     {
-        if (value.HasValue)
+        if (value.has_value != 0)
         {
-            var __item = value.Value;
+            var __item = value.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
@@ -54,10 +54,10 @@ internal struct RigidBody_optional
     {
         if (value == null)
         {
-            return new RigidBody_optional { Value = default, HasValue = false };
+            return new RigidBody_optional { value = default, has_value = 0 };
         }
         var __item = value;
         var __item_from_facade = __item;
-        return new RigidBody_optional { Value = __item_from_facade.Value, HasValue = true };
+        return new RigidBody_optional { value = __item_from_facade.Value, has_value = 1 };
     }
 }

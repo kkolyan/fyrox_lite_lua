@@ -36,15 +36,15 @@ public readonly partial struct Prefab
 [StructLayout(LayoutKind.Sequential)]
 internal struct Prefab_optional
 {
-    internal Prefab Value;
-    internal bool HasValue;
+    private Prefab value;
+    private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Prefab? ToFacade(in Prefab_optional value)
     {
-        if (value.HasValue)
+        if (value.has_value != 0)
         {
-            var __item = value.Value;
+            var __item = value.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
@@ -56,10 +56,10 @@ internal struct Prefab_optional
     {
         if (value == null)
         {
-            return new Prefab_optional { Value = default, HasValue = false };
+            return new Prefab_optional { value = default, has_value = 0 };
         }
         var __item = value;
         var __item_from_facade = __item;
-        return new Prefab_optional { Value = __item_from_facade.Value, HasValue = true };
+        return new Prefab_optional { value = __item_from_facade.Value, has_value = 1 };
     }
 }

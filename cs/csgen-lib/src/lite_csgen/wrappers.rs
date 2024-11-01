@@ -1,10 +1,12 @@
 use std::fmt::Display;
-use gen_common::templating::render;
+use gen_common::context::GenerationContext;
+use gen_common::templating::{render, render_string};
 use lite_model::{DataType, StructClass};
 use crate::lite_csgen::api_types;
+use crate::lite_csgen::gen_rs::RustEmitter;
 
-pub(crate) fn generate_result(s: &mut String, wrapped_type: &DataType) {
-    let marshalling = api_types::type_rs2cs(wrapped_type);
+pub(crate) fn generate_result(s: &mut String, rust: &RustEmitter, wrapped_type: &DataType) {
+    let marshalling = api_types::type_cs(wrapped_type);
 
     render(s, r#"
 
@@ -12,30 +14,30 @@ pub(crate) fn generate_result(s: &mut String, wrapped_type: &DataType) {
             internal struct ${blittable}_result
             {
                 [FieldOffset(0)]
-                internal ${bool_type} Ok;
+                private ${bool_type} ok;
 
                 [FieldOffset(sizeof(${bool_type}))]
-                internal ${blittable} Value;
+                private ${blittable} value;
 
                 [FieldOffset(sizeof(${bool_type}))]
-                internal string Err;
+                private string err;
 
                 internal static unsafe ${facade} ToFacade(in ${blittable}_result self)
                 {
-                    if (self.Ok != 0)
+                    if (self.ok != 0)
                     {
-                        var __item = self.Value;
+                        var __item = self.value;
                         var __item_to_facade = ${item_to_facade};
                         return __item_to_facade;
                     }
-                    throw new Exception(self.Err);
+                    throw new Exception(self.err);
                 }
 
                 internal static ${blittable}_result FromFacade(in ${facade} self)
                 {
                     var __item = self;
                     var __item_from_facade = ${item_from_facade};
-                    return new ${blittable}_result {Ok = 1, Value = __item_from_facade};
+                    return new ${blittable}_result {ok = 1, value = __item_from_facade};
                 }
             }
     "#, [
@@ -47,22 +49,22 @@ pub(crate) fn generate_result(s: &mut String, wrapped_type: &DataType) {
     ]);
 }
 
-pub(crate) fn generate_optional(s: &mut String, wrapped_type: &DataType) {
-    let marshalling = api_types::type_rs2cs(wrapped_type);
+pub(crate) fn generate_optional(s: &mut String, rust: &mut RustEmitter, wrapped_type: &DataType, ctx: &GenerationContext) {
+    let marshalling = api_types::type_cs(wrapped_type);
     render(s, r#"
 
             [StructLayout(LayoutKind.Sequential)]
             internal struct ${blittable}_optional
             {
-                internal ${blittable} Value;
-                internal bool HasValue;
+                private ${blittable} value;
+                private int has_value;
 
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 public static ${facade}? ToFacade(in ${blittable}_optional value)
                 {
-                    if (value.HasValue)
+                    if (value.has_value != 0)
                     {
-                        var __item = value.Value;
+                        var __item = value.value;
                         var __item_to_facade = ${item_to_facade};
                         return __item_to_facade;
                     }
@@ -74,11 +76,11 @@ pub(crate) fn generate_optional(s: &mut String, wrapped_type: &DataType) {
                 {
                     if (value == null)
                     {
-                        return new ${blittable}_optional { Value = default, HasValue = false };
+                        return new ${blittable}_optional { value = default, has_value = 0 };
                     }
                     var __item = value;
                     var __item_from_facade = ${item_from_facade};
-                    return new ${blittable}_optional { Value = __item_from_facade${unwrap}, HasValue = true };
+                    return new ${blittable}_optional { value = __item_from_facade${unwrap}, has_value = 1 };
                 }
             }
     "#, [
@@ -88,10 +90,39 @@ pub(crate) fn generate_optional(s: &mut String, wrapped_type: &DataType) {
         ("item_from_facade", &if marshalling.is_mapped() {format!("{}.FromFacade(__item)", marshalling.to_blittable())} else {"__item".to_string()}),
         ("unwrap", &if marshalling.to_facade() == "object" {""} else {".Value"}),
     ]);
+    rust.emit_statement(render_string(r#"
+            #[repr(C)]
+            pub struct ${class_native}_optional {
+                pub value: ${class_lite},
+                pub has_value: i32,
+            }
+
+            impl From<Option<${class_lite}>> for ${class_native}_optional {
+                fn from(value: Option<${class_lite}>) -> Self {
+                    match value {
+                        Some(it) => Self { value: it.into(), has_value: 1 },
+                        None => Self { value: unsafe { std::mem::zeroed() }, has_value: 0 },
+                    }
+                }
+            }
+
+            impl From<${class_native}_optional> for Option<${class_lite}> {
+                fn from(value: ${class_native}_optional) -> Self {
+                    if value.has_value != 0 {
+                        Some(value.value.into())
+                    } else {
+                        None
+                    }
+                }
+            }
+    "#, [
+        ("class_native", &api_types::type_rs(wrapped_type, ctx).to_native()),
+        ("class_lite", &api_types::type_rs(wrapped_type, ctx).to_lite()),
+    ]))
 }
 
-pub fn generate_slice(mut s: &mut String, wrapped_type: &DataType) {
-    let marshalling = api_types::type_rs2cs(wrapped_type);
+pub fn generate_slice(mut s: &mut String, rust: &RustEmitter, wrapped_type: &DataType) {
+    let marshalling = api_types::type_cs(wrapped_type);
     render(&mut s, r#"
 
             [StructLayout(LayoutKind.Sequential)]

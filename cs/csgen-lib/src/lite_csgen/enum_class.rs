@@ -2,8 +2,9 @@ use gen_common::code_model::Module;
 use gen_common::context::GenerationContext;
 use gen_common::templating::render;
 use lite_model::EnumClass;
+use crate::lite_csgen::gen_rs::RustEmitter;
 
-pub(crate) fn generate_bindings(class: &EnumClass, ctx: &GenerationContext) -> Module {
+pub(crate) fn generate_bindings(class: &EnumClass, ctx: &GenerationContext, x: &mut RustEmitter) -> Module {
     let mut s = String::new();
     render(&mut s, r#"
             // ${rust_path}

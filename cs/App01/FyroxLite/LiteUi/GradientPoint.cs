@@ -38,15 +38,15 @@ public struct GradientPoint
 [StructLayout(LayoutKind.Sequential)]
 internal struct GradientPoint_optional
 {
-    internal GradientPoint Value;
-    internal bool HasValue;
+    private GradientPoint value;
+    private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static GradientPoint? ToFacade(in GradientPoint_optional value)
     {
-        if (value.HasValue)
+        if (value.has_value != 0)
         {
-            var __item = value.Value;
+            var __item = value.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
@@ -58,11 +58,11 @@ internal struct GradientPoint_optional
     {
         if (value == null)
         {
-            return new GradientPoint_optional { Value = default, HasValue = false };
+            return new GradientPoint_optional { value = default, has_value = 0 };
         }
         var __item = value;
         var __item_from_facade = __item;
-        return new GradientPoint_optional { Value = __item_from_facade.Value, HasValue = true };
+        return new GradientPoint_optional { value = __item_from_facade.Value, has_value = 1 };
     }
 }
 
@@ -115,29 +115,29 @@ internal struct GradientPoint_slice
 internal struct GradientPoint_result
 {
     [FieldOffset(0)]
-    internal int Ok;
+    private int ok;
 
     [FieldOffset(sizeof(int))]
-    internal GradientPoint Value;
+    private GradientPoint value;
 
     [FieldOffset(sizeof(int))]
-    internal string Err;
+    private string err;
 
     internal static unsafe GradientPoint ToFacade(in GradientPoint_result self)
     {
-        if (self.Ok != 0)
+        if (self.ok != 0)
         {
-            var __item = self.Value;
+            var __item = self.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.Err);
+        throw new Exception(self.err);
     }
 
     internal static GradientPoint_result FromFacade(in GradientPoint self)
     {
         var __item = self;
         var __item_from_facade = __item;
-        return new GradientPoint_result {Ok = 1, Value = __item_from_facade};
+        return new GradientPoint_result {ok = 1, value = __item_from_facade};
     }
 }

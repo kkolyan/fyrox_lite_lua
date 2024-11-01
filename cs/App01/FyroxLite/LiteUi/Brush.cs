@@ -43,15 +43,15 @@ public struct Brush
 [StructLayout(LayoutKind.Sequential)]
 internal struct Brush_optional
 {
-    internal Brush Value;
-    internal bool HasValue;
+    private Brush value;
+    private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Brush? ToFacade(in Brush_optional value)
     {
-        if (value.HasValue)
+        if (value.has_value != 0)
         {
-            var __item = value.Value;
+            var __item = value.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
@@ -63,11 +63,11 @@ internal struct Brush_optional
     {
         if (value == null)
         {
-            return new Brush_optional { Value = default, HasValue = false };
+            return new Brush_optional { value = default, has_value = 0 };
         }
         var __item = value;
         var __item_from_facade = __item;
-        return new Brush_optional { Value = __item_from_facade.Value, HasValue = true };
+        return new Brush_optional { value = __item_from_facade.Value, has_value = 1 };
     }
 }
 
@@ -120,29 +120,29 @@ internal struct Brush_slice
 internal struct Brush_result
 {
     [FieldOffset(0)]
-    internal int Ok;
+    private int ok;
 
     [FieldOffset(sizeof(int))]
-    internal Brush Value;
+    private Brush value;
 
     [FieldOffset(sizeof(int))]
-    internal string Err;
+    private string err;
 
     internal static unsafe Brush ToFacade(in Brush_result self)
     {
-        if (self.Ok != 0)
+        if (self.ok != 0)
         {
-            var __item = self.Value;
+            var __item = self.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.Err);
+        throw new Exception(self.err);
     }
 
     internal static Brush_result FromFacade(in Brush self)
     {
         var __item = self;
         var __item_from_facade = __item;
-        return new Brush_result {Ok = 1, Value = __item_from_facade};
+        return new Brush_result {ok = 1, value = __item_from_facade};
     }
 }

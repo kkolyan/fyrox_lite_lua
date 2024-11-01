@@ -126,15 +126,15 @@ public readonly partial struct Input
 [StructLayout(LayoutKind.Sequential)]
 internal struct Input_optional
 {
-    internal Input Value;
-    internal bool HasValue;
+    private Input value;
+    private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Input? ToFacade(in Input_optional value)
     {
-        if (value.HasValue)
+        if (value.has_value != 0)
         {
-            var __item = value.Value;
+            var __item = value.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
@@ -146,10 +146,10 @@ internal struct Input_optional
     {
         if (value == null)
         {
-            return new Input_optional { Value = default, HasValue = false };
+            return new Input_optional { value = default, has_value = 0 };
         }
         var __item = value;
         var __item_from_facade = __item;
-        return new Input_optional { Value = __item_from_facade.Value, HasValue = true };
+        return new Input_optional { value = __item_from_facade.Value, has_value = 1 };
     }
 }

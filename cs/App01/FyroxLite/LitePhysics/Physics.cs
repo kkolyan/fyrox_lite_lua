@@ -47,15 +47,15 @@ public readonly partial struct Physics
 [StructLayout(LayoutKind.Sequential)]
 internal struct Physics_optional
 {
-    internal Physics Value;
-    internal bool HasValue;
+    private Physics value;
+    private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Physics? ToFacade(in Physics_optional value)
     {
-        if (value.HasValue)
+        if (value.has_value != 0)
         {
-            var __item = value.Value;
+            var __item = value.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
@@ -67,10 +67,10 @@ internal struct Physics_optional
     {
         if (value == null)
         {
-            return new Physics_optional { Value = default, HasValue = false };
+            return new Physics_optional { value = default, has_value = 0 };
         }
         var __item = value;
         var __item_from_facade = __item;
-        return new Physics_optional { Value = __item_from_facade.Value, HasValue = true };
+        return new Physics_optional { value = __item_from_facade.Value, has_value = 1 };
     }
 }

@@ -34,15 +34,15 @@ public readonly partial struct Scene
 [StructLayout(LayoutKind.Sequential)]
 internal struct Scene_optional
 {
-    internal Scene Value;
-    internal bool HasValue;
+    private Scene value;
+    private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Scene? ToFacade(in Scene_optional value)
     {
-        if (value.HasValue)
+        if (value.has_value != 0)
         {
-            var __item = value.Value;
+            var __item = value.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
@@ -54,10 +54,10 @@ internal struct Scene_optional
     {
         if (value == null)
         {
-            return new Scene_optional { Value = default, HasValue = false };
+            return new Scene_optional { value = default, has_value = 0 };
         }
         var __item = value;
         var __item_from_facade = __item;
-        return new Scene_optional { Value = __item_from_facade.Value, HasValue = true };
+        return new Scene_optional { value = __item_from_facade.Value, has_value = 1 };
     }
 }

@@ -53,15 +53,15 @@ public struct Intersection
 [StructLayout(LayoutKind.Sequential)]
 internal struct Intersection_optional
 {
-    internal Intersection Value;
-    internal bool HasValue;
+    private Intersection value;
+    private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Intersection? ToFacade(in Intersection_optional value)
     {
-        if (value.HasValue)
+        if (value.has_value != 0)
         {
-            var __item = value.Value;
+            var __item = value.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
@@ -73,11 +73,11 @@ internal struct Intersection_optional
     {
         if (value == null)
         {
-            return new Intersection_optional { Value = default, HasValue = false };
+            return new Intersection_optional { value = default, has_value = 0 };
         }
         var __item = value;
         var __item_from_facade = __item;
-        return new Intersection_optional { Value = __item_from_facade.Value, HasValue = true };
+        return new Intersection_optional { value = __item_from_facade.Value, has_value = 1 };
     }
 }
 
@@ -130,29 +130,29 @@ internal struct Intersection_slice
 internal struct Intersection_result
 {
     [FieldOffset(0)]
-    internal int Ok;
+    private int ok;
 
     [FieldOffset(sizeof(int))]
-    internal Intersection Value;
+    private Intersection value;
 
     [FieldOffset(sizeof(int))]
-    internal string Err;
+    private string err;
 
     internal static unsafe Intersection ToFacade(in Intersection_result self)
     {
-        if (self.Ok != 0)
+        if (self.ok != 0)
         {
-            var __item = self.Value;
+            var __item = self.value;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.Err);
+        throw new Exception(self.err);
     }
 
     internal static Intersection_result FromFacade(in Intersection self)
     {
         var __item = self;
         var __item_from_facade = __item;
-        return new Intersection_result {Ok = 1, Value = __item_from_facade};
+        return new Intersection_result {ok = 1, value = __item_from_facade};
     }
 }
