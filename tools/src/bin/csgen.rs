@@ -15,6 +15,7 @@ fn main() {
             #![allow(non_snake_case)]
             #![allow(clippy::redundant_locals)]
             use crate::bindings_manual::*;
+            use fyrox_lite::externalizable::Externalizable;
             {}
     ", rust.code);
 

@@ -16,8 +16,9 @@ namespace FyroxLite.LiteLog;
 
 // fyrox_lite::lite_log::LiteLog
 [StructLayout(LayoutKind.Sequential)]
-public readonly partial struct Log
+public readonly partial static class Log
 {
+    private readonly NativeHandle handle;
 
     public static void Info(string msg)
     {
@@ -51,35 +52,4 @@ public readonly partial struct Log
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial void fyrox_lite_lite_log_LiteLog_err(NativeString msg);
-}
-
-[StructLayout(LayoutKind.Sequential)]
-internal struct Log_optional
-{
-    private Log value;
-    private int has_value;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Log? ToFacade(in Log_optional value)
-    {
-        if (value.has_value != 0)
-        {
-            var __item = value.value;
-            var __item_to_facade = __item;
-            return __item_to_facade;
-        }
-        return null;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Log_optional FromFacade(in Log? value)
-    {
-        if (value == null)
-        {
-            return new Log_optional { value = default, has_value = 0 };
-        }
-        var __item = value;
-        var __item_from_facade = __item;
-        return new Log_optional { value = __item_from_facade.Value, has_value = 1 };
-    }
 }

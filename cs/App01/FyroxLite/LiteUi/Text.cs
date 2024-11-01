@@ -18,6 +18,7 @@ namespace FyroxLite.LiteUi;
 [StructLayout(LayoutKind.Sequential)]
 public readonly partial struct Text
 {
+    private readonly NativeHandle handle;
     public string TextAsync
     {
         set

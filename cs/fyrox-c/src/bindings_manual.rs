@@ -5,11 +5,9 @@ use std::{
 
 use fyrox::core::{algebra::iter, pool::Handle};
 use fyrox_lite::{lite_math::{PodQuaternion, PodVector3}, spi::UserScript, LiteDataType};
-
-use crate::{
-    bindings_lite::{NativeQuaternion, NativeVector3}, native_utils, scripted_app::{ScriptedApp, APP}
-};
+use crate::bindings_lite_2::{u8_slice, NativeQuaternion, NativeVector3};
 use crate::c_lang::CCompatibleLang;
+use crate::scripted_app::{ScriptedApp, APP};
 
 #[no_mangle]
 ///@owner_class FyroxCApi
@@ -55,45 +53,45 @@ pub enum NativeValueType {
     Quaternion,
 }
 
-native_utils!(u8, u8_array, u8_option, u8_result);
-native_utils!(bool, bool_array, bool_option, bool_result);
-native_utils!(f32, f32_array, f32_option, f32_result);
-native_utils!(f64, f64_array, f64_option, f64_result);
-native_utils!(i16, i16_array, i16_option, i16_result);
-native_utils!(i32, i32_array, i32_option, i32_result);
-native_utils!(i64, i64_array, i64_option, i64_result);
-native_utils!(
-    u8_array,
-    NativeString_array,
-    NativeString_option,
-    NativeString_result
-);
-native_utils!(
-    NativeHandle,
-    NativeHandle_array,
-    NativeHandle_option,
-    NativeHandle_result
-);
-native_utils!(
-    NativeInstanceId,
-    NativeInstanceId_array,
-    NativeInstanceId_option,
-    NativeInstanceId_result
-);
-native_utils!(
-    NativeInstanceId_option,
-    NativeInstanceId_option_array,
-    NativeInstanceId_option_option,
-    NativeInstanceId_option_result
-);
-native_utils!(
-    NativeHandle_option,
-    NativeHandle_option_array,
-    NativeHandle_option_option,
-    NativeHandle_option_result
-);
+// native_utils!(u8, u8_array, u8_option, u8_result);
+// native_utils!(bool, bool_array, bool_option, bool_result);
+// native_utils!(f32, f32_array, f32_option, f32_result);
+// native_utils!(f64, f64_array, f64_option, f64_result);
+// native_utils!(i16, i16_array, i16_option, i16_result);
+// native_utils!(i32, i32_array, i32_option, i32_result);
+// native_utils!(i64, i64_array, i64_option, i64_result);
+// native_utils!(
+//     u8_array,
+//     NativeString_array,
+//     NativeString_option,
+//     NativeString_result
+// );
+// native_utils!(
+//     NativeHandle,
+//     NativeHandle_array,
+//     NativeHandle_option,
+//     NativeHandle_result
+// );
+// native_utils!(
+//     NativeInstanceId,
+//     NativeInstanceId_array,
+//     NativeInstanceId_option,
+//     NativeInstanceId_result
+// );
+// native_utils!(
+//     NativeInstanceId_option,
+//     NativeInstanceId_option_array,
+//     NativeInstanceId_option_option,
+//     NativeInstanceId_option_result
+// );
+// native_utils!(
+//     NativeHandle_option,
+//     NativeHandle_option_array,
+//     NativeHandle_option_option,
+//     NativeHandle_option_result
+// );
 
-pub type NativeString = <u8 as NativeType>::Array;
+pub type NativeString = u8_slice;
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -112,12 +110,12 @@ pub union NativeValue {
 }
 
 pub trait NativeType: Sized {
-    type Array;
+    type Slice;
     type Option;
     type Result;
 
-    fn to_native_array(v: Vec<Self>) -> Self::Array;
-    fn from_native_array(v: Self::Array) -> Vec<Self>;
+    fn to_native_array(v: Vec<Self>) -> Self::Slice;
+    fn from_native_array(v: Self::Slice) -> Vec<Self>;
 
     fn to_native_option(v: Option<Self>) -> Self::Option;
     fn from_native_option(v: Self::Option) -> Option<Self>;

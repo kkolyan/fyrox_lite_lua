@@ -16,8 +16,9 @@ namespace FyroxLite.LitePlugin;
 
 // fyrox_lite::lite_plugin::LitePlugin
 [StructLayout(LayoutKind.Sequential)]
-public readonly partial struct Plugin
+public readonly partial static class Plugin
 {
+    private readonly NativeHandle handle;
 
     public static T Get<T>() where T : class
     {
@@ -30,35 +31,4 @@ public readonly partial struct Plugin
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial UserScript_result fyrox_lite_lite_plugin_LitePlugin_get(NativeString class_name);
-}
-
-[StructLayout(LayoutKind.Sequential)]
-internal struct Plugin_optional
-{
-    private Plugin value;
-    private int has_value;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Plugin? ToFacade(in Plugin_optional value)
-    {
-        if (value.has_value != 0)
-        {
-            var __item = value.value;
-            var __item_to_facade = __item;
-            return __item_to_facade;
-        }
-        return null;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Plugin_optional FromFacade(in Plugin? value)
-    {
-        if (value == null)
-        {
-            return new Plugin_optional { value = default, has_value = 0 };
-        }
-        var __item = value;
-        var __item_from_facade = __item;
-        return new Plugin_optional { value = __item_from_facade.Value, has_value = 1 };
-    }
 }

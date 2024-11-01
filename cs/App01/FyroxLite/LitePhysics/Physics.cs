@@ -16,8 +16,9 @@ namespace FyroxLite.LitePhysics;
 
 // fyrox_lite::lite_physics::LitePhysics
 [StructLayout(LayoutKind.Sequential)]
-public readonly partial struct Physics
+public readonly partial static class Physics
 {
+    private readonly NativeHandle handle;
     //public const int EXCLUDE_FIXED = 1 << 1;
     //public const int EXCLUDE_KINEMATIC = 1 << 2;
     //public const int EXCLUDE_DYNAMIC = 1 << 3;
@@ -38,35 +39,4 @@ public readonly partial struct Physics
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial Intersection_slice fyrox_lite_lite_physics_LitePhysics_cast_ray(RayCastOptions* opts);
-}
-
-[StructLayout(LayoutKind.Sequential)]
-internal struct Physics_optional
-{
-    private Physics value;
-    private int has_value;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Physics? ToFacade(in Physics_optional value)
-    {
-        if (value.has_value != 0)
-        {
-            var __item = value.value;
-            var __item_to_facade = __item;
-            return __item_to_facade;
-        }
-        return null;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Physics_optional FromFacade(in Physics? value)
-    {
-        if (value == null)
-        {
-            return new Physics_optional { value = default, has_value = 0 };
-        }
-        var __item = value;
-        var __item_from_facade = __item;
-        return new Physics_optional { value = __item_from_facade.Value, has_value = 1 };
-    }
 }

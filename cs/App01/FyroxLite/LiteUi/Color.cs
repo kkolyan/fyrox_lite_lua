@@ -18,6 +18,7 @@ namespace FyroxLite.LiteUi;
 [StructLayout(LayoutKind.Sequential)]
 public readonly partial struct Color
 {
+    private readonly NativeHandle handle;
     //public const Color WHITE = color_to_lite (fyrox :: core :: color :: Color :: WHITE);
     //public const Color BLACK = color_to_lite (fyrox :: core :: color :: Color :: BLACK);
     //public const Color RED = color_to_lite (fyrox :: core :: color :: Color :: RED);

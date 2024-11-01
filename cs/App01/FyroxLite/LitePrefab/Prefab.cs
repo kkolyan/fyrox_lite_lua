@@ -18,6 +18,7 @@ namespace FyroxLite.LitePrefab;
 [StructLayout(LayoutKind.Sequential)]
 public readonly partial struct Prefab
 {
+    private readonly NativeHandle handle;
 
     public Node InstantiateAt(Vector3 position, Quaternion orientation)
     {

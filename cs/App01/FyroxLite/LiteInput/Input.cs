@@ -16,8 +16,9 @@ namespace FyroxLite.LiteInput;
 
 // fyrox_lite::lite_input::Input
 [StructLayout(LayoutKind.Sequential)]
-public readonly partial struct Input
+public readonly partial static class Input
 {
+    private readonly NativeHandle handle;
     public const int MouseLeft = 0;
     public const int MouseRight = 1;
     public const int MouseMiddle = 2;
@@ -121,35 +122,4 @@ public readonly partial struct Input
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial Vector2 fyrox_lite_lite_input_Input_get_mouse_scroll();
-}
-
-[StructLayout(LayoutKind.Sequential)]
-internal struct Input_optional
-{
-    private Input value;
-    private int has_value;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Input? ToFacade(in Input_optional value)
-    {
-        if (value.has_value != 0)
-        {
-            var __item = value.value;
-            var __item_to_facade = __item;
-            return __item_to_facade;
-        }
-        return null;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Input_optional FromFacade(in Input? value)
-    {
-        if (value == null)
-        {
-            return new Input_optional { value = default, has_value = 0 };
-        }
-        var __item = value;
-        var __item_from_facade = __item;
-        return new Input_optional { value = __item_from_facade.Value, has_value = 1 };
-    }
 }

@@ -4,30 +4,58 @@ use to_vec::ToVec;
 use gen_common::code_model::{ModContent, Module};
 use gen_common::context::GenerationContext;
 use gen_common::templating::{render, render_string};
-use lite_model::{ConstantValue, DataType, EngineClass, Literal, Method, StructClass};
+use lite_model::{Class, ClassName, ConstantValue, DataType, EngineClass, Literal, Method, StructClass};
 use crate::lite_csgen::{api_types, wrappers};
 use crate::lite_csgen::api_types::CsType;
 use crate::lite_csgen::gen_rs::RustEmitter;
 
+fn contains_type(ty: &DataType, class_name: &ClassName) -> bool {
+    match ty {
+        DataType::Vec(it) => contains_type(it, class_name),
+        DataType::Object(it) => *it == *class_name,
+        DataType::Option(it) => contains_type(it, class_name),
+        DataType::Result { ok, .. } => contains_type(ok, class_name),
+        _ => false,
+    }
+}
+
 pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, rust: &mut RustEmitter) -> Module {
+    let static_class = !class.methods.iter().any(|it| it.instance) && !ctx.domain.classes.iter().any(|it| {
+        match it {
+            Class::Engine(it) => {
+                let methods_can_create = it.methods.iter().any(|it| match &it.signature.return_ty {
+                    Some(it) => contains_type(it, &class.class_name),
+                    _ => false
+                });
+                let constants_has = it.constants.iter().any(|it| contains_type(&it.ty, &class.class_name));
+                methods_can_create || constants_has
+            },
+            _ => false,
+        }
+    });
     let mut s = String::new();
     render(&mut s, r#"
             // ${rust_path}
             [StructLayout(LayoutKind.Sequential)]
-            public readonly partial struct ${class}
+            public readonly partial ${def_type} ${class}
             {
-    "#, [("class", &class.class_name), ("rust_path", &class.rust_struct_path)]);
+                private readonly NativeHandle handle;
+    "#, [
+        ("class", &class.class_name),
+        ("rust_path", &class.rust_struct_path),
+        ("def_type", &if static_class { "static class" } else { "struct" }),
+    ]);
 
     rust.emit_statement(render_string(
         "
             #[repr(C)]
             #[derive(Clone, Copy)]
             pub struct ${class} {
-
+                pub handle: NativeHandle
             }
         ", [("class", &api_types::type_rs(&DataType::Object(class.class_name.clone()), ctx).to_native())]));
 
-    rust.emit_statement(generate_rust_conversions(class, ctx));
+    rust.emit_statement(generate_rust_conversions(class, static_class, ctx));
 
     for constant in class.constants.iter() {
         let value = match &constant.value {
@@ -117,7 +145,9 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
             }
     "#, []);
 
-    wrappers::generate_optional(&mut s, rust, &DataType::Object(class.class_name.clone()), ctx);
+    if !static_class {
+        wrappers::generate_optional(&mut s, rust, &DataType::Object(class.class_name.clone()), ctx);
+    }
 
     Module::code(&class.class_name, s)
 }
@@ -313,28 +343,29 @@ fn generate_method(
         ]);
     }
 }
-fn generate_rust_conversions(class: &EngineClass, ctx: &GenerationContext) -> String {
+fn generate_rust_conversions(class: &EngineClass, static_class: bool, ctx: &GenerationContext) -> String {
     let mut rs = String::new();
     let ty = DataType::Object(class.class_name.clone());
 
-
-    render(&mut rs, r#"
+    if !static_class {
+        render(&mut rs, r#"
 
             impl From<${class_lite}> for ${class_native} {
-                fn from(__value: ${class_lite}) -> Self {
-                    todo!()
+                fn from(value: ${class_lite}) -> Self {
+                    Self { handle: NativeHandle::from_u128(value.to_external()) }
                 }
             }
 
             impl From<${class_native}> for ${class_lite} {
-                fn from(__value: ${class_native}) -> Self {
-                    todo!()
+                fn from(value: ${class_native}) -> Self {
+                    Self::from_external(value.handle.as_u128())
                 }
             }
     "#, [
-        ("class_native", &api_types::type_rs(&ty, ctx).to_native()),
-        ("class_lite", &api_types::type_rs(&ty, ctx).to_lite()),
-    ]);
+            ("class_native", &api_types::type_rs(&ty, ctx).to_native()),
+            ("class_lite", &api_types::type_rs(&ty, ctx).to_lite()),
+        ]);
+    }
     rs
 }
 
@@ -347,7 +378,7 @@ fn generate_rust_entry_point(rust: &mut RustEmitter, class: &EngineClass, method
 
     let this = format!("this: {},
                 ",
-        rs_type.to_native(),
+                       rs_type.to_native(),
     );
 
     for param in method.signature.params.iter() {

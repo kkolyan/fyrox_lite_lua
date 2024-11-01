@@ -18,6 +18,7 @@ namespace FyroxLite.LitePhysics;
 [StructLayout(LayoutKind.Sequential)]
 public readonly partial struct RigidBody
 {
+    private readonly NativeHandle handle;
 
     public void ApplyForce(Vector3 force)
     {

@@ -18,6 +18,7 @@ namespace FyroxLite.LiteNode;
 [StructLayout(LayoutKind.Sequential)]
 public readonly partial struct Node
 {
+    private readonly NativeHandle handle;
 
     public RigidBody? AsRigidBody()
     {
