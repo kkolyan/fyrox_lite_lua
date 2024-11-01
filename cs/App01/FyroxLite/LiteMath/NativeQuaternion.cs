@@ -57,7 +57,7 @@ internal struct NativeQuaternion_optional
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct NativeQuaternion_slice
+internal partial struct NativeQuaternion_slice
 {
     internal unsafe NativeQuaternion* begin;
     internal int length;
@@ -71,7 +71,8 @@ internal struct NativeQuaternion_slice
     internal static unsafe List<Quaternion> ToFacade(in NativeQuaternion_slice self)
     {
         var fetched = new List<Quaternion>();
-        for (int i = 0; i < self.length; i++)
+        
+        for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
             var __item_to_facade = NativeQuaternion.ToFacade(__item);
@@ -80,12 +81,36 @@ internal struct NativeQuaternion_slice
         return fetched;
     }
 
+    [ThreadStatic]
+    private static NativeQuaternion[]? _uploadBuffer;
+
     internal static NativeQuaternion_slice FromFacade(in List<Quaternion> self)
     {
-        // NativeQuaternion.FromFacade(__item)
-        throw new Exception("slice serialization not implemented yet");
+        _uploadBuffer ??= new NativeQuaternion[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new NativeQuaternion[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = NativeQuaternion.FromFacade(__item);
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (NativeQuaternion* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_fyrox_lite_lite_math_PodQuaternion_slice(new NativeQuaternion_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
     }
 
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial NativeQuaternion_slice fyrox_lite_upload_fyrox_lite_lite_math_PodQuaternion_slice(NativeQuaternion_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]

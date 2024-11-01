@@ -15,10 +15,3 @@ impl From<String> for u8_slice {
         u8_slice::from(vec)
     }
 }
-
-pub extern "C" fn fyrox_lite_upload_data(data: u8_slice) -> u8_slice {
-    let len = data.len as i32;
-    let data = Vec::from(data);
-    let ptr = Arena::allocate_vec(data);
-    u8_slice { begin: ptr, len }
-}

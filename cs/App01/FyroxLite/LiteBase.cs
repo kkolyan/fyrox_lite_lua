@@ -79,7 +79,7 @@ internal struct bool_optional
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct bool_slice
+internal partial struct bool_slice
 {
     internal unsafe bool* begin;
     internal int length;
@@ -93,7 +93,8 @@ internal struct bool_slice
     internal static unsafe List<bool> ToFacade(in bool_slice self)
     {
         var fetched = new List<bool>();
-        for (int i = 0; i < self.length; i++)
+        
+        for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
             var __item_to_facade = __item;
@@ -102,12 +103,36 @@ internal struct bool_slice
         return fetched;
     }
 
+    [ThreadStatic]
+    private static bool[]? _uploadBuffer;
+
     internal static bool_slice FromFacade(in List<bool> self)
     {
-        // __item
-        throw new Exception("slice serialization not implemented yet");
+        _uploadBuffer ??= new bool[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new bool[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = __item;
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (bool* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_bool_slice(new bool_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
     }
 
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial bool_slice fyrox_lite_upload_bool_slice(bool_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -173,7 +198,7 @@ internal struct byte_optional
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct byte_slice
+internal partial struct byte_slice
 {
     internal unsafe byte* begin;
     internal int length;
@@ -187,7 +212,8 @@ internal struct byte_slice
     internal static unsafe List<byte> ToFacade(in byte_slice self)
     {
         var fetched = new List<byte>();
-        for (int i = 0; i < self.length; i++)
+        
+        for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
             var __item_to_facade = __item;
@@ -196,12 +222,36 @@ internal struct byte_slice
         return fetched;
     }
 
+    [ThreadStatic]
+    private static byte[]? _uploadBuffer;
+
     internal static byte_slice FromFacade(in List<byte> self)
     {
-        // __item
-        throw new Exception("slice serialization not implemented yet");
+        _uploadBuffer ??= new byte[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new byte[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = __item;
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (byte* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_u8_slice(new byte_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
     }
 
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial byte_slice fyrox_lite_upload_u8_slice(byte_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -267,7 +317,7 @@ internal struct int_optional
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct int_slice
+internal partial struct int_slice
 {
     internal unsafe int* begin;
     internal int length;
@@ -281,7 +331,8 @@ internal struct int_slice
     internal static unsafe List<int> ToFacade(in int_slice self)
     {
         var fetched = new List<int>();
-        for (int i = 0; i < self.length; i++)
+        
+        for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
             var __item_to_facade = __item;
@@ -290,12 +341,36 @@ internal struct int_slice
         return fetched;
     }
 
+    [ThreadStatic]
+    private static int[]? _uploadBuffer;
+
     internal static int_slice FromFacade(in List<int> self)
     {
-        // __item
-        throw new Exception("slice serialization not implemented yet");
+        _uploadBuffer ??= new int[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new int[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = __item;
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (int* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_i32_slice(new int_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
     }
 
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial int_slice fyrox_lite_upload_i32_slice(int_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -361,7 +436,7 @@ internal struct long_optional
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct long_slice
+internal partial struct long_slice
 {
     internal unsafe long* begin;
     internal int length;
@@ -375,7 +450,8 @@ internal struct long_slice
     internal static unsafe List<long> ToFacade(in long_slice self)
     {
         var fetched = new List<long>();
-        for (int i = 0; i < self.length; i++)
+        
+        for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
             var __item_to_facade = __item;
@@ -384,12 +460,36 @@ internal struct long_slice
         return fetched;
     }
 
+    [ThreadStatic]
+    private static long[]? _uploadBuffer;
+
     internal static long_slice FromFacade(in List<long> self)
     {
-        // __item
-        throw new Exception("slice serialization not implemented yet");
+        _uploadBuffer ??= new long[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new long[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = __item;
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (long* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_i64_slice(new long_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
     }
 
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial long_slice fyrox_lite_upload_i64_slice(long_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -455,7 +555,7 @@ internal struct float_optional
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct float_slice
+internal partial struct float_slice
 {
     internal unsafe float* begin;
     internal int length;
@@ -469,7 +569,8 @@ internal struct float_slice
     internal static unsafe List<float> ToFacade(in float_slice self)
     {
         var fetched = new List<float>();
-        for (int i = 0; i < self.length; i++)
+        
+        for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
             var __item_to_facade = __item;
@@ -478,12 +579,36 @@ internal struct float_slice
         return fetched;
     }
 
+    [ThreadStatic]
+    private static float[]? _uploadBuffer;
+
     internal static float_slice FromFacade(in List<float> self)
     {
-        // __item
-        throw new Exception("slice serialization not implemented yet");
+        _uploadBuffer ??= new float[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new float[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = __item;
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (float* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_f32_slice(new float_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
     }
 
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial float_slice fyrox_lite_upload_f32_slice(float_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -549,7 +674,7 @@ internal struct double_optional
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct double_slice
+internal partial struct double_slice
 {
     internal unsafe double* begin;
     internal int length;
@@ -563,7 +688,8 @@ internal struct double_slice
     internal static unsafe List<double> ToFacade(in double_slice self)
     {
         var fetched = new List<double>();
-        for (int i = 0; i < self.length; i++)
+        
+        for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
             var __item_to_facade = __item;
@@ -572,12 +698,36 @@ internal struct double_slice
         return fetched;
     }
 
+    [ThreadStatic]
+    private static double[]? _uploadBuffer;
+
     internal static double_slice FromFacade(in List<double> self)
     {
-        // __item
-        throw new Exception("slice serialization not implemented yet");
+        _uploadBuffer ??= new double[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new double[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = __item;
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (double* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_f64_slice(new double_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
     }
 
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial double_slice fyrox_lite_upload_f64_slice(double_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -643,7 +793,7 @@ internal struct NativeString_optional
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct NativeString_slice
+internal partial struct NativeString_slice
 {
     internal unsafe NativeString* begin;
     internal int length;
@@ -657,7 +807,8 @@ internal struct NativeString_slice
     internal static unsafe List<string> ToFacade(in NativeString_slice self)
     {
         var fetched = new List<string>();
-        for (int i = 0; i < self.length; i++)
+        
+        for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
             var __item_to_facade = NativeString.ToFacade(__item);
@@ -666,12 +817,36 @@ internal struct NativeString_slice
         return fetched;
     }
 
+    [ThreadStatic]
+    private static NativeString[]? _uploadBuffer;
+
     internal static NativeString_slice FromFacade(in List<string> self)
     {
-        // NativeString.FromFacade(__item)
-        throw new Exception("slice serialization not implemented yet");
+        _uploadBuffer ??= new NativeString[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new NativeString[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = NativeString.FromFacade(__item);
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (NativeString* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_String_slice(new NativeString_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
     }
 
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial NativeString_slice fyrox_lite_upload_String_slice(NativeString_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -737,7 +912,7 @@ internal struct UserScript_optional
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct UserScript_slice
+internal partial struct UserScript_slice
 {
     internal unsafe UserScript* begin;
     internal int length;
@@ -751,7 +926,8 @@ internal struct UserScript_slice
     internal static unsafe List<object> ToFacade(in UserScript_slice self)
     {
         var fetched = new List<object>();
-        for (int i = 0; i < self.length; i++)
+        
+        for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
             var __item_to_facade = UserScript.ToFacade(__item);
@@ -760,12 +936,36 @@ internal struct UserScript_slice
         return fetched;
     }
 
+    [ThreadStatic]
+    private static UserScript[]? _uploadBuffer;
+
     internal static UserScript_slice FromFacade(in List<object> self)
     {
-        // UserScript.FromFacade(__item)
-        throw new Exception("slice serialization not implemented yet");
+        _uploadBuffer ??= new UserScript[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new UserScript[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = UserScript.FromFacade(__item);
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (UserScript* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_crate_UserScriptImpl_slice(new UserScript_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
     }
 
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial UserScript_slice fyrox_lite_upload_crate_UserScriptImpl_slice(UserScript_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]

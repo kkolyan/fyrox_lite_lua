@@ -68,7 +68,7 @@ internal struct TextBuilder_optional
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct TextBuilder_slice
+internal partial struct TextBuilder_slice
 {
     internal unsafe TextBuilder* begin;
     internal int length;
@@ -82,7 +82,8 @@ internal struct TextBuilder_slice
     internal static unsafe List<TextBuilder> ToFacade(in TextBuilder_slice self)
     {
         var fetched = new List<TextBuilder>();
-        for (int i = 0; i < self.length; i++)
+        
+        for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
             var __item_to_facade = __item;
@@ -91,12 +92,36 @@ internal struct TextBuilder_slice
         return fetched;
     }
 
+    [ThreadStatic]
+    private static TextBuilder[]? _uploadBuffer;
+
     internal static TextBuilder_slice FromFacade(in List<TextBuilder> self)
     {
-        // __item
-        throw new Exception("slice serialization not implemented yet");
+        _uploadBuffer ??= new TextBuilder[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new TextBuilder[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = __item;
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (TextBuilder* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_fyrox_lite_lite_ui_TextBuilder_slice(new TextBuilder_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
     }
 
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial TextBuilder_slice fyrox_lite_upload_fyrox_lite_lite_ui_TextBuilder_slice(TextBuilder_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]

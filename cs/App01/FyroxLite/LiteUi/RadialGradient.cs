@@ -68,7 +68,7 @@ internal struct RadialGradient_optional
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct RadialGradient_slice
+internal partial struct RadialGradient_slice
 {
     internal unsafe RadialGradient* begin;
     internal int length;
@@ -82,7 +82,8 @@ internal struct RadialGradient_slice
     internal static unsafe List<RadialGradient> ToFacade(in RadialGradient_slice self)
     {
         var fetched = new List<RadialGradient>();
-        for (int i = 0; i < self.length; i++)
+        
+        for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
             var __item_to_facade = __item;
@@ -91,12 +92,36 @@ internal struct RadialGradient_slice
         return fetched;
     }
 
+    [ThreadStatic]
+    private static RadialGradient[]? _uploadBuffer;
+
     internal static RadialGradient_slice FromFacade(in List<RadialGradient> self)
     {
-        // __item
-        throw new Exception("slice serialization not implemented yet");
+        _uploadBuffer ??= new RadialGradient[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new RadialGradient[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = __item;
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (RadialGradient* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_fyrox_lite_lite_ui_RadialGradient_slice(new RadialGradient_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
     }
 
+    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial RadialGradient_slice fyrox_lite_upload_fyrox_lite_lite_ui_RadialGradient_slice(RadialGradient_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]

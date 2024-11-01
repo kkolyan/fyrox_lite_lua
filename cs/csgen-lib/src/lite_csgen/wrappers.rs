@@ -163,10 +163,11 @@ pub(crate) fn generate_optional(s: &mut String, rust: &mut RustEmitter, wrapped_
 
 pub fn generate_slice(mut s: &mut String, rust: &mut RustEmitter, wrapped_type: &DataType, ctx: &GenerationContext) {
     let marshalling = api_types::type_cs(wrapped_type);
+    let class_lite_escaped = api_types::type_rs(wrapped_type, ctx).to_lite().replace("::", "_");
     render(&mut s, r#"
 
             [StructLayout(LayoutKind.Sequential)]
-            internal struct ${blittable}_slice
+            internal partial struct ${blittable}_slice
             {
                 internal unsafe ${blittable}* begin;
                 internal int length;
@@ -180,7 +181,8 @@ pub fn generate_slice(mut s: &mut String, rust: &mut RustEmitter, wrapped_type: 
                 internal static unsafe List<${facade}> ToFacade(in ${blittable}_slice self)
                 {
                     var fetched = new List<${facade}>();
-                    for (int i = 0; i < self.length; i++)
+                    
+                    for (var i = 0; i < self.length; i++)
                     {
                         var __item = *(self.begin + i);
                         var __item_to_facade = ${item_to_facade};
@@ -189,16 +191,41 @@ pub fn generate_slice(mut s: &mut String, rust: &mut RustEmitter, wrapped_type: 
                     return fetched;
                 }
 
+                [ThreadStatic]
+                private static ${blittable}[]? _uploadBuffer;
+
                 internal static ${blittable}_slice FromFacade(in List<${facade}> self)
                 {
-                    // ${item_from_facade}
-                    throw new Exception("slice serialization not implemented yet");
+                    _uploadBuffer ??= new ${blittable}[1024];
+                    while (_uploadBuffer.Length < self.Count)
+                    {
+                        _uploadBuffer = new ${blittable}[_uploadBuffer.Length * 2];
+                    }
+
+                    for (var i = 0; i < self.Count; i++)
+                    {
+                        var __item = self[i];
+                        var __item_from_facade = ${item_from_facade};
+                        _uploadBuffer[i] = __item_from_facade;
+                    }
+
+                    unsafe
+                    {
+                        fixed (${blittable}* buffer_ptr = _uploadBuffer)
+                        {
+                            var native_slice = fyrox_lite_upload_${class_lite_escaped}_slice(new ${blittable}_slice(buffer_ptr, self.Count));
+                            return native_slice;
+                        }
+                    }
                 }
 
+                [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+                private static unsafe partial ${blittable}_slice fyrox_lite_upload_${class_lite_escaped}_slice(${blittable}_slice managed);
             }
     "#, [
         ("blittable", &marshalling.to_blittable()),
         ("facade", &marshalling.to_facade()),
+        ("class_lite_escaped", &class_lite_escaped),
         ("item_to_facade", &if marshalling.is_mapped() {format!("{}.ToFacade(__item)", marshalling.to_blittable())} else {"__item".to_string()}),
         ("item_from_facade", &if marshalling.is_mapped() {format!("{}.FromFacade(__item)", marshalling.to_blittable())} else {"__item".to_string()}),
     ]);
@@ -231,8 +258,16 @@ pub fn generate_slice(mut s: &mut String, rust: &mut RustEmitter, wrapped_type: 
                     vec
                 }
             }
+
+            pub extern "C" fn fyrox_lite_upload_${class_lite_escaped}_slice(data: ${class_native}_slice) -> ${class_native}_slice {
+                let len = data.len;
+                let data = Vec::from(data);
+                let ptr = Arena::allocate_vec(data);
+                ${class_native}_slice { begin: ptr, len }
+            }
     "#, [
         ("class_native", &api_types::type_rs(wrapped_type, ctx).to_native()),
         ("class_lite", &api_types::type_rs(wrapped_type, ctx).to_lite()),
+        ("class_lite_escaped", &class_lite_escaped),
     ]));
 }
