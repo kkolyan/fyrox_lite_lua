@@ -99,32 +99,18 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
             ))
             .to_vec();
 
-        if let Some(DataType::Buffer(buffer_ty)) = &method.signature.return_ty {
-            render(&mut s, r#"
-
-                [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-                private static unsafe partial int ${rust_path_escaped}_${name}(${this}${native_input_params});
-            "#, [
-                ("name", &method.method_name),
-                ("native_input_params", &native_input_params.join(", ")),
-                ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
-                ("this", &if method.instance { format!("{} {}", class.class_name, if native_input_params.is_empty() { "self" } else { "self, " }) } else { "".to_string() }),
-            ]);
-            generate_rust_entry_point_buffer(rust, class, method, ctx);
-        } else {
-            render(&mut s, r#"
+        render(&mut s, r#"
 
                 [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
                 private static unsafe partial ${return_ty} ${rust_path_escaped}_${name}(${this}${native_input_params});
-            "#, [
-                ("return_ty", &method.signature.return_ty.as_ref().map(|it| api_types::type_cs(it).to_blittable()).unwrap_or("void".to_string())),
-                ("name", &method.method_name),
-                ("native_input_params", &native_input_params.join(", ")),
-                ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
-                ("this", &if method.instance { format!("{} {}", class.class_name, if native_input_params.is_empty() { "self" } else { "self, " }) } else { "".to_string() }),
-            ]);
-            generate_rust_entry_point(rust, class, method, ctx);
-        }
+        "#, [
+            ("return_ty", &method.signature.return_ty.as_ref().map(|it| api_types::type_cs(it).to_blittable()).unwrap_or("void".to_string())),
+            ("name", &method.method_name),
+            ("native_input_params", &native_input_params.join(", ")),
+            ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
+            ("this", &if method.instance { format!("{} {}", class.class_name, if native_input_params.is_empty() { "self" } else { "self, " }) } else { "".to_string() }),
+        ]);
+        generate_rust_entry_point(rust, class, method, ctx);
     }
 
     render(&mut s, r#"
@@ -263,7 +249,7 @@ fn generate_method(
 
     let mut converted_params = String::new();
     for param in method.signature.params.iter() {
-        if matches!(&param.ty, DataType::ClassName | DataType::UserScriptGenericStub | DataType::Buffer(_)) {
+        if matches!(&param.ty, DataType::ClassName | DataType::UserScriptGenericStub) {
             continue;
         }
         if let CsType::Mapped { blittable, .. } = api_types::type_cs(&param.ty) {
@@ -278,64 +264,8 @@ fn generate_method(
     }
 
     if let Some(return_ty) = &method.signature.return_ty {
-        if let DataType::Buffer(buffer_item_ty) = return_ty {
-            let buffer_param = method.signature.params.iter()
-                .find(|it| matches!(&it.ty, DataType::Buffer(_)))
-                .unwrap();
-            let buffer_ty_marshalling = api_types::type_cs(buffer_item_ty);
-            if buffer_ty_marshalling.is_mapped() {
-                panic!("buffer type should be blittable");
-            }
-
-            let input_params = method.signature.params.iter()
-                .filter(|it| !matches!(&it.ty, DataType::ClassName))
-                .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
-                .map(|param| match &param.ty {
-                    DataType::Buffer(ty) => format!("{}[] {}", api_types::type_cs(ty).to_blittable(), param.name),
-                    ty => format!("{} {}", api_types::type_cs(ty).to_facade(), param.name),
-                })
-                .to_vec();
-
-            let output_params = method.signature.params.iter()
-                .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
-                .map(|param| match &param.ty {
-                    DataType::ClassName => format!("typeof(T).Name"),
-                    DataType::Buffer(_) => format!("{}_slice", param.name),
-                    ty => if ctx.is_struct(ty) { format!("&_{}", param.name) } else { format!("_{}", param.name) },
-                })
-                .to_vec();
-
-            render(s, r#"
-
-                public ${static}int ${name}${generics}(${input_params})${generic_where}
-                {
-                    unsafe
-                    {
-                    fixed (${buffer_type}* ${buffer_param}_ptr = ${buffer_param})
-                    {
-                        var ${buffer_param}_slice = new ${buffer_type}_slice(${buffer_param}_ptr, ${buffer_param}.Length);
-                        ${converted_params}
-                        return ${rust_path_escaped}_${rust_name}(${this}${output_params});
-                    }
-                    }
-                }
-                "#, [
-                ("buffer_type", &buffer_ty_marshalling.to_facade()),
-                ("buffer_param", &buffer_param.name),
-                ("static", &if !method.instance { "static " } else { "" }),
-                ("generic_where", &if has_class_name_arg { " where T : class" } else { "" }),
-                ("name", &method.method_name.to_case(Case::Pascal)),
-                ("rust_name", &method.method_name),
-                ("input_params", &input_params.join(", ")),
-                ("output_params", &output_params.join(", ")),
-                ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
-                ("generics", &if has_class_name_arg { "<T>" } else { "" }),
-                ("this", &if method.instance { if output_params.is_empty() { "this" } else { "this, " } } else { "" }),
-                ("converted_params", &converted_params.trim_start()),
-            ]);
-        } else {
-            let return_ty = api_types::type_cs(return_ty);
-            render(s, r#"
+        let return_ty = api_types::type_cs(return_ty);
+        render(s, r#"
 
                 public ${static}${return_ty} ${name}${generics}(${input_params})${generic_where}
                 {
@@ -345,22 +275,21 @@ fn generate_method(
                         return ${ret_expr}${generic_cast};
                     }
                 }
-                "#, [
-                ("static", &if !method.instance { "static " } else { "" }),
-                ("return_ty", &if has_class_name_arg { return_ty.to_facade_generic() } else { return_ty.to_facade() }),
-                ("ret_expr", &if return_ty.is_mapped() { format!("{}.ToFacade(__ret)", return_ty.to_blittable()) } else { "__ret".to_string() }),
-                ("generic_cast", &if has_class_name_arg { " as T" } else { "" }),
-                ("generic_where", &if has_class_name_arg { " where T : class" } else { "" }),
-                ("name", &method.method_name.to_case(Case::Pascal)),
-                ("rust_name", &method.method_name),
-                ("input_params", &input_params.join(", ")),
-                ("output_params", &output_params.join(", ")),
-                ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
-                ("generics", &if has_class_name_arg { "<T>" } else { "" }),
-                ("this", &if method.instance { if output_params.is_empty() { "this" } else { "this, " } } else { "" }),
-                ("converted_params", &converted_params.trim_start()),
-            ]);
-        }
+            "#, [
+            ("static", &if !method.instance { "static " } else { "" }),
+            ("return_ty", &if has_class_name_arg { return_ty.to_facade_generic() } else { return_ty.to_facade() }),
+            ("ret_expr", &if return_ty.is_mapped() { format!("{}.ToFacade(__ret)", return_ty.to_blittable()) } else { "__ret".to_string() }),
+            ("generic_cast", &if has_class_name_arg { " as T" } else { "" }),
+            ("generic_where", &if has_class_name_arg { " where T : class" } else { "" }),
+            ("name", &method.method_name.to_case(Case::Pascal)),
+            ("rust_name", &method.method_name),
+            ("input_params", &input_params.join(", ")),
+            ("output_params", &output_params.join(", ")),
+            ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
+            ("generics", &if has_class_name_arg { "<T>" } else { "" }),
+            ("this", &if method.instance { if output_params.is_empty() { "this" } else { "this, " } } else { "" }),
+            ("converted_params", &converted_params.trim_start()),
+        ]);
     } else {
         render(s, r#"
 

@@ -27,21 +27,17 @@ public readonly partial struct Physics
     //public const int ONLY_KINEMATIC = LitePhysics :: EXCLUDE_DYNAMIC | LitePhysics :: EXCLUDE_FIXED;
     //public const int ONLY_FIXED = LitePhysics :: EXCLUDE_DYNAMIC | LitePhysics :: EXCLUDE_KINEMATIC;
 
-    public static int CastRay(RayCastOptions opts, Intersection[] results)
+    public static List<Intersection> CastRay(RayCastOptions opts)
     {
-        unsafe
-        {
-        fixed (Intersection* results_ptr = results)
-        {
-            var results_slice = new Intersection_slice(results_ptr, results.Length);
+        unsafe {
             var _opts = opts;
-            return fyrox_lite_lite_physics_LitePhysics_cast_ray(&_opts, results_slice);
-        }
+            var __ret = fyrox_lite_lite_physics_LitePhysics_cast_ray(&_opts);
+            return Intersection_slice.ToFacade(__ret);
         }
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial int fyrox_lite_lite_physics_LitePhysics_cast_ray(RayCastOptions* opts, Intersection_slice results);
+    private static unsafe partial Intersection_slice fyrox_lite_lite_physics_LitePhysics_cast_ray(RayCastOptions* opts);
 }
 
 [StructLayout(LayoutKind.Sequential)]

@@ -40,7 +40,7 @@ impl FyroxUserData for fyrox_lite_math::lite_math::LiteQuaternion {
         methods.add_method_mut(
                     "mul_quat",
                     |lua, this, (rot_delta): (TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteQuaternion>>)| {
-                        let rot_delta = rot_delta.borrow()?.inner().clone().into();
+                    let rot_delta = rot_delta.borrow()?.inner().clone().into();
                         let ret = this.mul_quat(rot_delta);
                         let ret = Traitor::new(fyrox_lite_math::lite_math::LiteQuaternion::from(ret));
                         Ok(ret)

@@ -34,7 +34,6 @@ pub fn generate_methods(
         };
 
         let input_names = params.iter()
-            .filter(|it| !matches!(it.ty, DataType::Buffer(_)))
             .map(|it| it.name.as_str())
             .to_vec()
             .join(", ");
@@ -49,7 +48,6 @@ pub fn generate_methods(
 
         let param_types = params
             .iter()
-            .filter(|it| !matches!(it.ty, DataType::Buffer(_)))
             .map(|it| type_to_mlua(&it.ty, ctx))
             .to_vec()
             .join(", ");
@@ -69,24 +67,14 @@ pub fn generate_methods(
         );
 
         for param in method.signature.params.iter() {
-            if let DataType::Buffer(ty) = &param.ty {
-                render(
-                    s,
-                    r#"
-                        let ${param_name} = Vec::new();
-                "#,
-                    [("param_name", &param.name), ],
-                );
-            } else {
-                let expression = mlua_to_rust_expr(&param.name, &param.ty, ctx);
-                render(
-                    s,
-                    r#"
-                        let ${param_name} = ${expression};
-                "#,
-                    [("param_name", &param.name), ("expression", &expression)],
-                );
-            }
+            let expression = mlua_to_rust_expr(&param.name, &param.ty, ctx);
+            render(
+                s,
+                r#"
+                    let ${param_name} = ${expression};
+            "#,
+                [("param_name", &param.name), ("expression", &expression)],
+            );
         }
 
         let target = match instance {

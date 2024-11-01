@@ -14,7 +14,6 @@ use fyrox::{
 use lite_macro::lite_api;
 
 use crate::{externalizable::Externalizable, lite_math::PodVector3, lite_node::LiteNode, script_context::with_script_context};
-use crate::spi::{Buffer, UserScript};
 
 #[derive(Debug, Clone)]
 pub struct LitePhysics;
@@ -39,24 +38,25 @@ impl LitePhysics {
     /// (this will not exclude colliders not attached to any rigid-body).
     pub const ONLY_FIXED: i32 = LitePhysics::EXCLUDE_DYNAMIC | LitePhysics::EXCLUDE_KINEMATIC;
 
-    pub fn cast_ray<T: UserScript>(opts: LiteRayCastOptions, mut results: T::Buffer<LiteIntersection>) -> T::Buffer<LiteIntersection> {
+    pub fn cast_ray(opts: LiteRayCastOptions) -> Vec<LiteIntersection> {
         with_script_context(|ctx| {
+            let mut results = Vec::new();
             ctx.scene
                 .as_mut()
                 .expect("scene unavailable")
                 .graph
                 .physics
                 .cast_ray(opts.into(), &mut QueryResultsStorageWrapper(&mut results));
-        });
-        results
+            results
+        })
     }
 }
 
-struct QueryResultsStorageWrapper<'a, B: Buffer<LiteIntersection>>(&'a mut B);
+struct QueryResultsStorageWrapper<'a>(&'a mut Vec<LiteIntersection>);
 
-impl<'a, B: Buffer<LiteIntersection>> QueryResultsStorage for QueryResultsStorageWrapper<'a, B> {
+impl<'a> QueryResultsStorage for QueryResultsStorageWrapper<'a> {
     fn push(&mut self, intersection: Intersection) -> bool {
-        self.0.add(LiteIntersection::from(&intersection));
+        self.0.push(LiteIntersection::from(&intersection));
         true
     }
 

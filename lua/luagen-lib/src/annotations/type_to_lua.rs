@@ -19,7 +19,6 @@ pub fn type_rust_to_lua(ty: &DataType) -> String {
         DataType::UserScriptGenericStub => {
             panic!("UserScriptGenericStub is not allowed in this context")
         }
-        DataType::Buffer(item_ty) => format!("{}[]", type_rust_to_lua(item_ty)),
         DataType::Object(class_name) => class_name.to_string(),
         DataType::Option(item_ty) => format!("{}?", type_rust_to_lua(item_ty)),
         DataType::Result { ok } => type_rust_to_lua(ok),

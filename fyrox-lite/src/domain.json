@@ -157,19 +157,10 @@
                     "Object": "RayCastOptions"
                   },
                   "variadic": false
-                },
-                {
-                  "name": "results",
-                  "ty": {
-                    "Buffer": {
-                      "Object": "Intersection"
-                    }
-                  },
-                  "variadic": false
                 }
               ],
               "return_ty": {
-                "Buffer": {
+                "Vec": {
                   "Object": "Intersection"
                 }
               }

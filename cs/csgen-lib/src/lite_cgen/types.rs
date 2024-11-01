@@ -24,9 +24,6 @@ pub(crate) fn generate_ffi_type(
         DataType::UserScriptGenericStub => {
             panic!("UserScriptGenericStub should not be exposed in bindings")
         }
-        DataType::Buffer(_) => {
-            panic!("Buffer should not be exposed in bindings")
-        }
         DataType::Object(it) => match client_replicated_types.contains(it) {
             false => format!("NativeHandle"),
             true => format!("Native{}", it),
@@ -68,9 +65,6 @@ pub(crate) fn generate_to_native(
         DataType::UserScriptMessage => format!("{}", var),
         DataType::UserScriptGenericStub => {
             panic!("UserScriptGenericStub should not be exposed in bindings")
-        }
-        DataType::Buffer(_) => {
-            panic!("Buffer should not be exposed in bindings")
         }
         DataType::Object(it) => match client_replicated_types.contains(it) {
             true => format!("{}.into()", var),
@@ -132,7 +126,6 @@ pub(crate) fn generate_from_native(
         DataType::UserScript => format!("{}", var),
         DataType::UserScriptMessage => format!("{}", var),
         DataType::UserScriptGenericStub => format!("()"),
-        DataType::Buffer(_) => panic!("Buffer should not be here"),
         DataType::Object(it) => match client_replicated_types.contains(it) {
             true => format!("{}.into()", var),
             false => format!("Externalizable::from_external({}.as_u128())", var),

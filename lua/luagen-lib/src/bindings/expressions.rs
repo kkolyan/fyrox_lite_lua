@@ -26,7 +26,6 @@ pub fn mlua_to_rust_expr(param: &str, ty: &DataType, ctx: &GenerationContext) ->
             // we use Lua interpreter as long as we use the process, so its lifetime is effectively static.
             format!("Traitor::new(send_wrapper::SendWrapper::new(unsafe {{ std::mem::transmute::<mlua::Value<'_>, mlua::Value<'static>>({}) }} ))", param)
         }
-        DataType::Buffer(_) => panic!("Buffer is only for engine->script communication"),
         DataType::UserScriptGenericStub => "Default::default()".to_string(),
         DataType::Object(class_name) => {
             let mut class = ctx.domain.get_class(class_name).unwrap();
@@ -69,7 +68,6 @@ pub fn rust_expr_to_mlua(ctx: &GenerationContext, param: &str, ty: &DataType) ->
         DataType::UserScript => param.to_string(),
         DataType::UserScriptMessage => todo!(),
         DataType::UserScriptGenericStub => todo!(),
-        DataType::Buffer(item_ty) => rust_expr_to_mlua(ctx, param, &DataType::Vec(item_ty.clone())),
         DataType::Object(class_name) => {
             let mut class = ctx.domain.get_class(class_name).unwrap();
             if let Some(rn) = ctx.internal_to_external.get(class.rust_name()) {
@@ -108,7 +106,6 @@ pub fn type_to_mlua(ty: &DataType, ctx: &GenerationContext) -> String {
         DataType::UserScript => "TypedUserData<ScriptObject>".to_string(),
         DataType::UserScriptMessage => "mlua::Value".to_string(),
         DataType::UserScriptGenericStub => panic!("WTF, it should be filtered out before!"),
-        DataType::Buffer(_) => panic!("Buffer should be filtered out"),
         DataType::Object(it) => {
             let mut class = ctx.domain.get_class(it).unwrap();
             if let Some(ext) = ctx.internal_to_external.get(class.rust_name()) {

@@ -22,7 +22,6 @@ impl Display for DataType {
             DataType::Object(it) => write!(f, "{}", it.0),
             DataType::Option(it) => write!(f, "Option<{}>", it.deref()),
             DataType::Result { ok } => write!(f, "Result<{}>", ok.deref()),
-            DataType::Buffer(it) => write!(f, "Buffer<{}>", it.deref()),
         }
     }
 }
@@ -99,7 +98,6 @@ impl Method {
                     DataType::UserScript
                         | DataType::UserScriptMessage
                         | DataType::UserScriptGenericStub
-                        | DataType::Buffer(_)
                 )
             })
     }

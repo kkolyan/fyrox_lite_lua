@@ -54,7 +54,6 @@ fn resolve_type(ty: &DataType, classes: &HashMap<RustSymbol, DataType>) -> DataT
                 ty.clone()
             }
         },
-        DataType::Buffer(it) => DataType::Buffer(Box::new(resolve_type(it.deref(), classes))),
         DataType::Vec(it) => DataType::Vec(Box::new(resolve_type(it.deref(), classes))),
         DataType::Option(it) => DataType::Option(Box::new(resolve_type(it.deref(), classes))),
         DataType::Result { ok: it } => DataType::Result {

@@ -40,14 +40,6 @@ pub fn extract_engine_class_and_inject_assertions(
         match it {
             syn::ImplItem::Fn(func) => {
                 if let Some(method) = extract_fn(func, errors) {
-                    let buffer_param = method.signature.params.iter().find(|it| matches!(it.ty, DataType::Buffer(_))).map(|it| it.ty.clone());
-                    if buffer_param.is_some() && buffer_param != method.signature.return_ty {
-                        errors.push(syn::Error::new_spanned(
-                            &func.sig.output,
-                            r#"Fyrox Lite: methods with Buffer parameter should return this
-                            buffer parameter value. that's necessary to comply with Lite's "no borrowing" rule#)"#,
-                        ));
-                    }
                     methods.push(method);
                 }
             }

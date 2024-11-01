@@ -40,11 +40,6 @@ pub fn type_cs(ty: &DataType) -> CsType {
             blittable: "UserScriptMessage".to_string(),
         },
         DataType::UserScriptGenericStub => panic!("WTF, UserScriptGenericStub should be filtered out"),
-        DataType::Buffer(it) => CsType::templated(
-            "List<{}>",
-            "{}_slice",
-            &type_cs(it.deref()),
-        ),
         DataType::Object(it) => CsType::Blittable(it.to_string()),
         DataType::Option(it) => CsType::templated(
             "{}?",
@@ -87,11 +82,6 @@ pub fn type_rs(ty: &DataType, ctx: &GenerationContext) -> RsType {
         },
         DataType::UserScriptMessage => RsType::Basic("UserScriptMessage".to_string()),
         DataType::UserScriptGenericStub => panic!("WTF, UserScriptGenericStub should be filtered out"),
-        DataType::Buffer(it) => RsType::templated(
-            "Vec<{}>",
-            "{}_slice",
-            &type_rs(it.deref(), ctx),
-        ),
         DataType::Object(it) => RsType::Mapped {
             lite: ctx.domain.get_class(it).unwrap().rust_name().to_string(),
             native: format!("Native{}", it),
