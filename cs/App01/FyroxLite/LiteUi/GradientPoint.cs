@@ -9,6 +9,7 @@ using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Numerics;
+using System.Drawing;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -24,8 +25,8 @@ public partial struct GradientPoint
         set => _stop = value;
     }
     public Color Color {
-        get => _color;
-        set => _color = value;
+        get => NativeColor.ToFacade(_color);
+        set => _color = NativeColor.FromFacade(value);
     }
 //===============================================================
 // private fields for all properties (not only mapped),
@@ -33,7 +34,7 @@ public partial struct GradientPoint
 // I hope, NativeAOT will optimize out this.
 //===============================================================
     private float _stop;
-    private Color _color;
+    private NativeColor _color;
 }
 
 [StructLayout(LayoutKind.Sequential)]

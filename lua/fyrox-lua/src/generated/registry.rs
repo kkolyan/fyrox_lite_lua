@@ -25,8 +25,6 @@ pub fn register_classes(lua: &mlua::Lua) {
 
     fyrox_lite::lite_ui::LiteText::register_class(lua);
 
-    fyrox_lite::lite_ui::Color::register_class(lua);
-
     fyrox_lite::lite_plugin::LitePlugin::register_class(lua);
 
     fyrox_lite::lite_node::LiteNode::register_class(lua);
@@ -36,4 +34,6 @@ pub fn register_classes(lua: &mlua::Lua) {
     fyrox_lite_math::lite_math::LiteQuaternion::register_class(lua);
 
     fyrox_lite_math::lite_math::LiteVector3::register_class(lua);
+
+    fyrox_lite_color::lite_color::Color::register_class(lua);
 }

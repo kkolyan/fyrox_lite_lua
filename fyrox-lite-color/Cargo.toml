@@ -1,0 +1,10 @@
+[package]
+name = "fyrox-lite-color"
+description = "Optional package for language bindings. Useful if language doesn't have efficient enough type for a color"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fyrox-lite = { path = "../fyrox-lite" }
+fyrox-core = { workspace = true }
+lite-macro = { workspace = true }

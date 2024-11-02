@@ -28,7 +28,9 @@ impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_ui::Brush> {
             t.set("solid_color", {
                 let solid_color = self.solid_color.clone();
                 if let Some(solid_color) = solid_color {
-                    Some(Traitor::new(fyrox_lite::lite_ui::Color::from(solid_color)))
+                    Some(Traitor::new(fyrox_lite_color::lite_color::Color::from(
+                        solid_color,
+                    )))
                 } else {
                     None
                 }
@@ -65,8 +67,9 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_ui::Brush> {
                 value
             ));
         };
-        let solid_color = value
-            .get::<_, Option<TypedUserData<Traitor<fyrox_lite::lite_ui::Color>>>>("solid_color")?;
+        let solid_color = value.get::<_, Option<
+            TypedUserData<Traitor<fyrox_lite_color::lite_color::Color>>,
+        >>("solid_color")?;
         let solid_color = if let Some(solid_color) = solid_color {
             Some(solid_color.borrow()?.inner().clone().into())
         } else {

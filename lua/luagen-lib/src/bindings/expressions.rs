@@ -69,6 +69,7 @@ pub fn rust_expr_to_mlua(ctx: &GenerationContext, param: &str, ty: &DataType) ->
         DataType::UserScriptMessage => todo!(),
         DataType::UserScriptGenericStub => todo!(),
         DataType::Object(class_name) => {
+            println!("rust_expr_to_mlua {}", class_name);
             let mut class = ctx.domain.get_class(class_name).unwrap();
             if let Some(rn) = ctx.internal_to_external.get(class.rust_name()) {
                 class = ctx.domain.get_class(rn).unwrap();

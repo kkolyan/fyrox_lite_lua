@@ -5,7 +5,7 @@
 ---@diagnostic disable: missing-return, lowercase-global, missing-fields
 
 -----------------------------------------------------------
------- fyrox_lite::lite_ui::Color
+------ fyrox_lite_color::lite_color::Color
 -----------------------------------------------------------
 
 ---@class Color_static

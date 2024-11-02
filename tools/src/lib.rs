@@ -27,10 +27,14 @@ pub fn get_fyrox_lite_domain() -> Domain {
 pub fn get_combined_domain() -> Domain {
     let mut fyrox: Domain = get_fyrox_lite_domain();
     let math: Domain = parse_domain_metadata("fyrox-lite-math");
+    let color: Domain = parse_domain_metadata("fyrox-lite-color");
 
     // math "overrides" classes in fyrox by name
     fyrox.classes.retain_mut(|fyrox_class| {
-        let override_class = math.get_class(fyrox_class.class_name());
+        let override_class = None
+            .or_else(|| math.get_class(fyrox_class.class_name()))
+            .or_else(|| color.get_class(fyrox_class.class_name()))
+            ;
         if let Some(override_class) = override_class {
             println!(
                 "overriding {} by {}",
@@ -41,5 +45,5 @@ pub fn get_combined_domain() -> Domain {
         override_class.is_none()
     });
 
-    Domain::merge_all([fyrox, math])
+    Domain::merge_all([fyrox, math, color])
 }

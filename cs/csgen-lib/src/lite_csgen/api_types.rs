@@ -65,7 +65,10 @@ pub fn type_cs(ty: &DataType) -> CsType {
 }
 
 pub fn is_implemented_externally(class_name: &ClassName) -> bool {
-    class_name.0 == "Vector3" || class_name.0 == "Vector2" || class_name.0 == "Quaternion"
+    class_name.0 == "Vector3" 
+        || class_name.0 == "Vector2"
+        || class_name.0 == "Quaternion"
+        || class_name.0 == "Color"
 }
 
 pub fn type_rs(ty: &DataType, ctx: &GenerationContext) -> RsType {

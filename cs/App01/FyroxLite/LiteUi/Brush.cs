@@ -9,6 +9,7 @@ using FyroxLite.LiteScene;
 using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Numerics;
+using System.Drawing;
 using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -20,8 +21,8 @@ namespace FyroxLite.LiteUi;
 public partial struct Brush
 {
     public Color? SolidColor {
-        get => Color_optional.ToFacade(_solid_color);
-        set => _solid_color = Color_optional.FromFacade(value);
+        get => NativeColor_optional.ToFacade(_solid_color);
+        set => _solid_color = NativeColor_optional.FromFacade(value);
     }
     public LinearGradient? LinearGradient {
         get => LinearGradient_optional.ToFacade(_linear_gradient);
@@ -36,7 +37,7 @@ public partial struct Brush
 // because it makes ABI much more readable.
 // I hope, NativeAOT will optimize out this.
 //===============================================================
-    private Color_optional _solid_color;
+    private NativeColor_optional _solid_color;
     private LinearGradient_optional _linear_gradient;
     private RadialGradient_optional _radial_gradient;
 }

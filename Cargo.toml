@@ -9,11 +9,13 @@ members = [
 	"lite-macro",
 	"lite-macro-lib",
 	"fyrox-lite-math",
+	"fyrox-lite-color",
 	"lite-model",
 	"lite-parser",
 	"tools",
 	"cs/fyrox-c",
-	"cs/csgen-lib", "gen-common",
+	"cs/csgen-lib",
+	"gen-common",
 ]
 resolver = "2"
 exclude = ["mlua"]
@@ -24,6 +26,7 @@ fyrox-lua = { path = "lua/fyrox-lua"}
 csgen-lib = { path = "cs/csgen-lib" }
 fyrox-lite = {path = "fyrox-lite"}
 fyrox-lite-math = {path = "fyrox-lite-math"}
+fyrox-lite-color = {path = "fyrox-lite-color"}
 lite-model = { path = "lite-model" }
 lite-parser = { path = "lite-parser" }
 lite-macro = { path = "lite-macro" }

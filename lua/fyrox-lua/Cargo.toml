@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 fyrox-lite = { workspace = true }
 fyrox-lite-math = { workspace = true }
+fyrox-lite-color = { workspace = true }
 fyrox = { workspace = true }
 mlua = { workspace = true }
 send_wrapper = { workspace = true }

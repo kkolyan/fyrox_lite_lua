@@ -1311,6 +1311,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "fyrox-lite-color"
+version = "0.1.0"
+dependencies = [
+ "fyrox-core",
+ "fyrox-lite",
+ "lite-macro",
+]
+
+[[package]]
 name = "fyrox-lite-math"
 version = "0.1.0"
 dependencies = [
@@ -1327,6 +1336,7 @@ dependencies = [
  "extend",
  "fyrox",
  "fyrox-lite",
+ "fyrox-lite-color",
  "fyrox-lite-math",
  "mlua",
  "send_wrapper",

@@ -14,132 +14,133 @@ using FyroxLite.LiteBase;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Collections;
-namespace FyroxLite.LiteMath;
+namespace FyroxLite.LiteUi;
 
-// fyrox_lite::lite_math::PodVector3
+// fyrox_lite::lite_ui::Color
 [StructLayout(LayoutKind.Sequential)]
-internal partial struct NativeVector3
+internal partial struct NativeColor
 {
-    private float _x;
-    private float _y;
-    private float _z;
+    private byte _r;
+    private byte _g;
+    private byte _b;
+    private byte _a;
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct NativeVector3_optional
+internal struct NativeColor_optional
 {
-    private NativeVector3 value;
+    private NativeColor value;
     private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector3? ToFacade(in NativeVector3_optional value)
+    public static Color? ToFacade(in NativeColor_optional value)
     {
         if (value.has_value != 0)
         {
             var __item = value.value;
-            var __item_to_facade = NativeVector3.ToFacade(__item);
+            var __item_to_facade = NativeColor.ToFacade(__item);
             return __item_to_facade;
         }
         return null;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static NativeVector3_optional FromFacade(in Vector3? value)
+    public static NativeColor_optional FromFacade(in Color? value)
     {
         if (value == null)
         {
-            return new NativeVector3_optional { value = default, has_value = 0 };
+            return new NativeColor_optional { value = default, has_value = 0 };
         }
         var __item = value.Value;
-        var __item_from_facade = NativeVector3.FromFacade(__item);
-        return new NativeVector3_optional { value = __item_from_facade, has_value = 1 };
+        var __item_from_facade = NativeColor.FromFacade(__item);
+        return new NativeColor_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal partial struct NativeVector3_slice
+internal partial struct NativeColor_slice
 {
-    internal unsafe NativeVector3* begin;
+    internal unsafe NativeColor* begin;
     internal int length;
 
-    internal unsafe NativeVector3_slice(NativeVector3* begin, int length)
+    internal unsafe NativeColor_slice(NativeColor* begin, int length)
     {
         this.begin = begin;
         this.length = length;
     }
 
-    internal static unsafe List<Vector3> ToFacade(in NativeVector3_slice self)
+    internal static unsafe List<Color> ToFacade(in NativeColor_slice self)
     {
-        var fetched = new List<Vector3>();
+        var fetched = new List<Color>();
 
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
-            var __item_to_facade = NativeVector3.ToFacade(__item);
+            var __item_to_facade = NativeColor.ToFacade(__item);
             fetched.Add(__item_to_facade);
         }
         return fetched;
     }
 
     [ThreadStatic]
-    private static NativeVector3[]? _uploadBuffer;
+    private static NativeColor[]? _uploadBuffer;
 
-    internal static NativeVector3_slice FromFacade(in List<Vector3> self)
+    internal static NativeColor_slice FromFacade(in List<Color> self)
     {
-        _uploadBuffer ??= new NativeVector3[1024];
+        _uploadBuffer ??= new NativeColor[1024];
         while (_uploadBuffer.Length < self.Count)
         {
-            _uploadBuffer = new NativeVector3[_uploadBuffer.Length * 2];
+            _uploadBuffer = new NativeColor[_uploadBuffer.Length * 2];
         }
 
         for (var i = 0; i < self.Count; i++)
         {
             var __item = self[i];
-            var __item_from_facade = NativeVector3.FromFacade(__item);
+            var __item_from_facade = NativeColor.FromFacade(__item);
             _uploadBuffer[i] = __item_from_facade;
         }
 
         unsafe
         {
-            fixed (NativeVector3* buffer_ptr = _uploadBuffer)
+            fixed (NativeColor* buffer_ptr = _uploadBuffer)
             {
-                var native_slice = fyrox_lite_upload_fyrox_lite_lite_math_PodVector3_slice(new NativeVector3_slice(buffer_ptr, self.Count));
+                var native_slice = fyrox_lite_upload_fyrox_lite_lite_ui_Color_slice(new NativeColor_slice(buffer_ptr, self.Count));
                 return native_slice;
             }
         }
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial NativeVector3_slice fyrox_lite_upload_fyrox_lite_lite_math_PodVector3_slice(NativeVector3_slice managed);
+    private static unsafe partial NativeColor_slice fyrox_lite_upload_fyrox_lite_lite_ui_Color_slice(NativeColor_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
-internal struct NativeVector3_result
+internal struct NativeColor_result
 {
     [FieldOffset(0)]
     private int ok;
 
     [FieldOffset(sizeof(int))]
-    private NativeVector3 value;
+    private NativeColor value;
 
     [FieldOffset(sizeof(int))]
     private NativeString err;
 
-    internal static unsafe Vector3 ToFacade(in NativeVector3_result self)
+    internal static unsafe Color ToFacade(in NativeColor_result self)
     {
         if (self.ok != 0)
         {
             var __item = self.value;
-            var __item_to_facade = NativeVector3.ToFacade(__item);
+            var __item_to_facade = NativeColor.ToFacade(__item);
             return __item_to_facade;
         }
         throw new Exception(NativeString.ToFacade(self.err));
     }
 
-    internal static NativeVector3_result FromFacade(in Vector3 self)
+    internal static NativeColor_result FromFacade(in Color self)
     {
         var __item = self;
-        var __item_from_facade = NativeVector3.FromFacade(__item);
-        return new NativeVector3_result {ok = 1, value = __item_from_facade};
+        var __item_from_facade = NativeColor.FromFacade(__item);
+        return new NativeColor_result {ok = 1, value = __item_from_facade};
     }
 }
