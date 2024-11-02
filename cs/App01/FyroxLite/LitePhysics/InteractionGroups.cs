@@ -1,3 +1,7 @@
+// ReSharper disable InconsistentNaming
+// ReSharper disable RedundantUnsafeContext
+// ReSharper disable UnusedMember.Global
+// ReSharper disable RedundantUsingDirective
 using FyroxLite.LiteInput;
 using FyroxLite.LiteLog;
 using FyroxLite.LiteMath;

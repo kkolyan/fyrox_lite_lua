@@ -50,6 +50,10 @@ fn write_cs_mod(m: &Module, ns: &str, parent_dir: &str, nss: &Vec<String>)  {
                 .join("\n");
 
             let mut s = String::new();
+            s += "// ReSharper disable InconsistentNaming\n";
+            s += "// ReSharper disable RedundantUnsafeContext\n";
+            s += "// ReSharper disable UnusedMember.Global\n";
+            s += "// ReSharper disable RedundantUsingDirective\n";
             for ns in nss.iter() {
                 s += format!("using {};\n", ns).as_str();
             }
