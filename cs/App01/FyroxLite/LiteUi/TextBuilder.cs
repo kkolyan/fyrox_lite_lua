@@ -82,7 +82,7 @@ internal partial struct TextBuilder_slice
     internal static unsafe List<TextBuilder> ToFacade(in TextBuilder_slice self)
     {
         var fetched = new List<TextBuilder>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -134,7 +134,7 @@ internal struct TextBuilder_result
     private TextBuilder value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe TextBuilder ToFacade(in TextBuilder_result self)
     {
@@ -144,7 +144,7 @@ internal struct TextBuilder_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static TextBuilder_result FromFacade(in TextBuilder self)

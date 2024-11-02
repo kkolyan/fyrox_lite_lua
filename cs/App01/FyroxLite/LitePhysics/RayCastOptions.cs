@@ -36,8 +36,8 @@ public partial struct RayCastOptions
         set => _groups = InteractionGroups_optional.FromFacade(value);
     }
     public bool SortResults {
-        get => _sort_results;
-        set => _sort_results = value;
+        get => NativeBool.ToFacade(_sort_results);
+        set => _sort_results = NativeBool.FromFacade(value);
     }
 //===============================================================
 // private fields for all properties (not only mapped),
@@ -48,7 +48,7 @@ public partial struct RayCastOptions
     private NativeVector3 _ray_direction;
     private float _max_len;
     private InteractionGroups_optional _groups;
-    private bool _sort_results;
+    private NativeBool _sort_results;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -97,7 +97,7 @@ internal partial struct RayCastOptions_slice
     internal static unsafe List<RayCastOptions> ToFacade(in RayCastOptions_slice self)
     {
         var fetched = new List<RayCastOptions>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -149,7 +149,7 @@ internal struct RayCastOptions_result
     private RayCastOptions value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe RayCastOptions ToFacade(in RayCastOptions_result self)
     {
@@ -159,7 +159,7 @@ internal struct RayCastOptions_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static RayCastOptions_result FromFacade(in RayCastOptions self)

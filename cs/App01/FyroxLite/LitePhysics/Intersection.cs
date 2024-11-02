@@ -97,7 +97,7 @@ internal partial struct Intersection_slice
     internal static unsafe List<Intersection> ToFacade(in Intersection_slice self)
     {
         var fetched = new List<Intersection>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -149,7 +149,7 @@ internal struct Intersection_result
     private Intersection value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe Intersection ToFacade(in Intersection_result self)
     {
@@ -159,7 +159,7 @@ internal struct Intersection_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static Intersection_result FromFacade(in Intersection self)

@@ -7,7 +7,11 @@ pub fn type_cs(ty: &DataType) -> CsType {
     match ty {
         DataType::UnresolvedClass(it) => panic!("Unresolved class: {}", it),
         DataType::Unit => CsType::Blittable(format!("void")),
-        DataType::Bool => CsType::Blittable(format!("bool")),
+        DataType::Bool => CsType::Mapped {
+            facade: "bool".to_string(),
+            facade_generic: "bool".to_string(),
+            blittable: "NativeBool".to_string(),
+        },
         DataType::Byte => CsType::Blittable(format!("byte")),
         DataType::I32 => CsType::Blittable(format!("int")),
         DataType::I64 => CsType::Blittable(format!("long")),
@@ -68,7 +72,7 @@ pub fn type_rs(ty: &DataType, ctx: &GenerationContext) -> RsType {
     match ty {
         DataType::UnresolvedClass(it) => panic!("Unresolved class: {}", it),
         DataType::Unit => RsType::Basic(format!("())")),
-        DataType::Bool => RsType::Basic(format!("bool")),
+        DataType::Bool => RsType::Mapped { lite: "bool".to_string(), native: "NativeBool".to_string() },
         DataType::Byte => RsType::Basic(format!("u8")),
         DataType::I32 => RsType::Basic(format!("i32")),
         DataType::I64 => RsType::Basic(format!("i64")),

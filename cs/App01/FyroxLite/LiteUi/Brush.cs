@@ -87,7 +87,7 @@ internal partial struct Brush_slice
     internal static unsafe List<Brush> ToFacade(in Brush_slice self)
     {
         var fetched = new List<Brush>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -139,7 +139,7 @@ internal struct Brush_result
     private Brush value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe Brush ToFacade(in Brush_result self)
     {
@@ -149,7 +149,7 @@ internal struct Brush_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static Brush_result FromFacade(in Brush self)

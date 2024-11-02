@@ -71,7 +71,7 @@ internal partial struct NativeQuaternion_slice
     internal static unsafe List<Quaternion> ToFacade(in NativeQuaternion_slice self)
     {
         var fetched = new List<Quaternion>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -123,7 +123,7 @@ internal struct NativeQuaternion_result
     private NativeQuaternion value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe Quaternion ToFacade(in NativeQuaternion_result self)
     {
@@ -133,7 +133,7 @@ internal struct NativeQuaternion_result
             var __item_to_facade = NativeQuaternion.ToFacade(__item);
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static NativeQuaternion_result FromFacade(in Quaternion self)

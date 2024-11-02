@@ -216,3 +216,21 @@ pub struct UserScriptMessage {
 }
 
 impl LiteDataType for UserScriptMessage {}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct NativeBool {
+    pub value: i32,
+}
+
+impl From<bool> for NativeBool {
+    fn from(value: bool) -> Self {
+        NativeBool { value: if value { 1 } else { 0 } }
+    }
+}
+
+impl From<NativeBool> for bool {
+    fn from(value: NativeBool) -> Self {
+        value.value != 0
+    }
+}

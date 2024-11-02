@@ -45,7 +45,7 @@ public readonly partial struct Node
         {
             unsafe {
                 var __ret = fyrox_lite_lite_node_LiteNode_get_alive(this);
-                return __ret;
+                return NativeBool.ToFacade(__ret);
             }
         }
     }
@@ -133,7 +133,7 @@ public readonly partial struct Node
         {
             unsafe {
                 var __ret = fyrox_lite_lite_node_LiteNode_get_valid(this);
-                return __ret;
+                return NativeBool.ToFacade(__ret);
             }
         }
     }
@@ -181,7 +181,7 @@ public readonly partial struct Node
         unsafe {
             var _tag = NativeString.FromFacade(tag);
             var __ret = fyrox_lite_lite_node_LiteNode_tag_is(this, _tag);
-            return __ret;
+            return NativeBool.ToFacade(__ret);
         }
     }
     public string Tag
@@ -209,7 +209,7 @@ public readonly partial struct Node
     private static unsafe partial NativeString_result fyrox_lite_lite_node_LiteNode_get_name(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial bool fyrox_lite_lite_node_LiteNode_get_alive(Node self);
+    private static unsafe partial NativeBool fyrox_lite_lite_node_LiteNode_get_alive(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial void fyrox_lite_lite_node_LiteNode_destroy(Node self);
@@ -239,7 +239,7 @@ public readonly partial struct Node
     private static unsafe partial Node_optional fyrox_lite_lite_node_LiteNode_find_collider_in_children(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial bool fyrox_lite_lite_node_LiteNode_get_valid(Node self);
+    private static unsafe partial NativeBool fyrox_lite_lite_node_LiteNode_get_valid(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial Node fyrox_lite_lite_node_LiteNode_get_parent(Node self);
@@ -254,7 +254,7 @@ public readonly partial struct Node
     private static unsafe partial NativeQuaternion fyrox_lite_lite_node_LiteNode_get_global_rotation(Node self);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial bool fyrox_lite_lite_node_LiteNode_tag_is(Node self, NativeString tag);
+    private static unsafe partial NativeBool fyrox_lite_lite_node_LiteNode_tag_is(Node self, NativeString tag);
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial void fyrox_lite_lite_node_LiteNode_set_tag(Node self, NativeString tag);

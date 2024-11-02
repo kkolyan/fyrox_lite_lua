@@ -20,7 +20,7 @@ pub(crate) fn generate_result(s: &mut String, rust: &mut RustEmitter, wrapped_ty
                 private ${blittable} value;
 
                 [FieldOffset(sizeof(${bool_type}))]
-                private string err;
+                private NativeString err;
 
                 internal static unsafe ${facade} ToFacade(in ${blittable}_result self)
                 {
@@ -30,7 +30,7 @@ pub(crate) fn generate_result(s: &mut String, rust: &mut RustEmitter, wrapped_ty
                         var __item_to_facade = ${item_to_facade};
                         return __item_to_facade;
                     }
-                    throw new Exception(self.err);
+                    throw new Exception(NativeString.ToFacade(self.err));
                 }
 
                 internal static ${blittable}_result FromFacade(in ${facade} self)
@@ -181,7 +181,7 @@ pub fn generate_slice(mut s: &mut String, rust: &mut RustEmitter, wrapped_type: 
                 internal static unsafe List<${facade}> ToFacade(in ${blittable}_slice self)
                 {
                     var fetched = new List<${facade}>();
-                    
+
                     for (var i = 0; i < self.length; i++)
                     {
                         var __item = *(self.begin + i);
@@ -260,10 +260,15 @@ pub fn generate_slice(mut s: &mut String, rust: &mut RustEmitter, wrapped_type: 
             }
 
             pub extern "C" fn fyrox_lite_upload_${class_lite_escaped}_slice(data: ${class_native}_slice) -> ${class_native}_slice {
-                let len = data.len;
-                let data = Vec::from(data);
-                let ptr = Arena::allocate_vec(data);
-                ${class_native}_slice { begin: ptr, len }
+                let mut vec = Vec::new();
+                unsafe {
+                    for i in 0..data.len {
+                        let v = *data.begin.add(i as usize);
+                        vec.push(v);
+                    }
+                }
+                let ptr = crate::Arena::allocate_vec(vec);
+                ${class_native}_slice { begin: ptr, len: data.len }
             }
     "#, [
         ("class_native", &api_types::type_rs(wrapped_type, ctx).to_native()),

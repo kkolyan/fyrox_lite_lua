@@ -115,4 +115,8 @@ internal partial class FyroxManualBindings {
     internal unsafe struct UserScriptMessage {
         internal long id;
     }
+    [StructLayout(LayoutKind.Sequential)]
+    internal unsafe struct NativeBool {
+        internal int value;
+    }
 }

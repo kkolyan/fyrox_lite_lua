@@ -82,7 +82,7 @@ internal partial struct GradientPoint_slice
     internal static unsafe List<GradientPoint> ToFacade(in GradientPoint_slice self)
     {
         var fetched = new List<GradientPoint>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -134,7 +134,7 @@ internal struct GradientPoint_result
     private GradientPoint value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe GradientPoint ToFacade(in GradientPoint_result self)
     {
@@ -144,7 +144,7 @@ internal struct GradientPoint_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static GradientPoint_result FromFacade(in GradientPoint self)

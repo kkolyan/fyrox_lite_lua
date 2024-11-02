@@ -87,7 +87,7 @@ internal partial struct LinearGradient_slice
     internal static unsafe List<LinearGradient> ToFacade(in LinearGradient_slice self)
     {
         var fetched = new List<LinearGradient>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -139,7 +139,7 @@ internal struct LinearGradient_result
     private LinearGradient value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe LinearGradient ToFacade(in LinearGradient_result self)
     {
@@ -149,7 +149,7 @@ internal struct LinearGradient_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static LinearGradient_result FromFacade(in LinearGradient self)

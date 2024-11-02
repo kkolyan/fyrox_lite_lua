@@ -82,7 +82,7 @@ internal partial struct InteractionGroups_slice
     internal static unsafe List<InteractionGroups> ToFacade(in InteractionGroups_slice self)
     {
         var fetched = new List<InteractionGroups>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -134,7 +134,7 @@ internal struct InteractionGroups_result
     private InteractionGroups value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe InteractionGroups ToFacade(in InteractionGroups_result self)
     {
@@ -144,7 +144,7 @@ internal struct InteractionGroups_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static InteractionGroups_result FromFacade(in InteractionGroups self)

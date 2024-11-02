@@ -17,122 +17,122 @@ namespace FyroxLite;
 
 
 [StructLayout(LayoutKind.Explicit)]
-internal struct bool_result
+internal struct NativeBool_result
 {
     [FieldOffset(0)]
     private int ok;
 
     [FieldOffset(sizeof(int))]
-    private bool value;
+    private NativeBool value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
-    internal static unsafe bool ToFacade(in bool_result self)
+    internal static unsafe bool ToFacade(in NativeBool_result self)
     {
         if (self.ok != 0)
         {
             var __item = self.value;
-            var __item_to_facade = __item;
+            var __item_to_facade = NativeBool.ToFacade(__item);
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
-    internal static bool_result FromFacade(in bool self)
+    internal static NativeBool_result FromFacade(in bool self)
     {
         var __item = self;
-        var __item_from_facade = __item;
-        return new bool_result {ok = 1, value = __item_from_facade};
+        var __item_from_facade = NativeBool.FromFacade(__item);
+        return new NativeBool_result {ok = 1, value = __item_from_facade};
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct bool_optional
+internal struct NativeBool_optional
 {
-    private bool value;
+    private NativeBool value;
     private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool? ToFacade(in bool_optional value)
+    public static bool? ToFacade(in NativeBool_optional value)
     {
         if (value.has_value != 0)
         {
             var __item = value.value;
-            var __item_to_facade = __item;
+            var __item_to_facade = NativeBool.ToFacade(__item);
             return __item_to_facade;
         }
         return null;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool_optional FromFacade(in bool? value)
+    public static NativeBool_optional FromFacade(in bool? value)
     {
         if (value == null)
         {
-            return new bool_optional { value = default, has_value = 0 };
+            return new NativeBool_optional { value = default, has_value = 0 };
         }
         var __item = value.Value;
-        var __item_from_facade = __item;
-        return new bool_optional { value = __item_from_facade, has_value = 1 };
+        var __item_from_facade = NativeBool.FromFacade(__item);
+        return new NativeBool_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal partial struct bool_slice
+internal partial struct NativeBool_slice
 {
-    internal unsafe bool* begin;
+    internal unsafe NativeBool* begin;
     internal int length;
 
-    internal unsafe bool_slice(bool* begin, int length)
+    internal unsafe NativeBool_slice(NativeBool* begin, int length)
     {
         this.begin = begin;
         this.length = length;
     }
 
-    internal static unsafe List<bool> ToFacade(in bool_slice self)
+    internal static unsafe List<bool> ToFacade(in NativeBool_slice self)
     {
         var fetched = new List<bool>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
-            var __item_to_facade = __item;
+            var __item_to_facade = NativeBool.ToFacade(__item);
             fetched.Add(__item_to_facade);
         }
         return fetched;
     }
 
     [ThreadStatic]
-    private static bool[]? _uploadBuffer;
+    private static NativeBool[]? _uploadBuffer;
 
-    internal static bool_slice FromFacade(in List<bool> self)
+    internal static NativeBool_slice FromFacade(in List<bool> self)
     {
-        _uploadBuffer ??= new bool[1024];
+        _uploadBuffer ??= new NativeBool[1024];
         while (_uploadBuffer.Length < self.Count)
         {
-            _uploadBuffer = new bool[_uploadBuffer.Length * 2];
+            _uploadBuffer = new NativeBool[_uploadBuffer.Length * 2];
         }
 
         for (var i = 0; i < self.Count; i++)
         {
             var __item = self[i];
-            var __item_from_facade = __item;
+            var __item_from_facade = NativeBool.FromFacade(__item);
             _uploadBuffer[i] = __item_from_facade;
         }
 
         unsafe
         {
-            fixed (bool* buffer_ptr = _uploadBuffer)
+            fixed (NativeBool* buffer_ptr = _uploadBuffer)
             {
-                var native_slice = fyrox_lite_upload_bool_slice(new bool_slice(buffer_ptr, self.Count));
+                var native_slice = fyrox_lite_upload_bool_slice(new NativeBool_slice(buffer_ptr, self.Count));
                 return native_slice;
             }
         }
     }
 
     [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial bool_slice fyrox_lite_upload_bool_slice(bool_slice managed);
+    private static unsafe partial NativeBool_slice fyrox_lite_upload_bool_slice(NativeBool_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -145,7 +145,7 @@ internal struct byte_result
     private byte value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe byte ToFacade(in byte_result self)
     {
@@ -155,7 +155,7 @@ internal struct byte_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static byte_result FromFacade(in byte self)
@@ -212,7 +212,7 @@ internal partial struct byte_slice
     internal static unsafe List<byte> ToFacade(in byte_slice self)
     {
         var fetched = new List<byte>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -264,7 +264,7 @@ internal struct int_result
     private int value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe int ToFacade(in int_result self)
     {
@@ -274,7 +274,7 @@ internal struct int_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static int_result FromFacade(in int self)
@@ -331,7 +331,7 @@ internal partial struct int_slice
     internal static unsafe List<int> ToFacade(in int_slice self)
     {
         var fetched = new List<int>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -383,7 +383,7 @@ internal struct long_result
     private long value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe long ToFacade(in long_result self)
     {
@@ -393,7 +393,7 @@ internal struct long_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static long_result FromFacade(in long self)
@@ -450,7 +450,7 @@ internal partial struct long_slice
     internal static unsafe List<long> ToFacade(in long_slice self)
     {
         var fetched = new List<long>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -502,7 +502,7 @@ internal struct float_result
     private float value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe float ToFacade(in float_result self)
     {
@@ -512,7 +512,7 @@ internal struct float_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static float_result FromFacade(in float self)
@@ -569,7 +569,7 @@ internal partial struct float_slice
     internal static unsafe List<float> ToFacade(in float_slice self)
     {
         var fetched = new List<float>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -621,7 +621,7 @@ internal struct double_result
     private double value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe double ToFacade(in double_result self)
     {
@@ -631,7 +631,7 @@ internal struct double_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static double_result FromFacade(in double self)
@@ -688,7 +688,7 @@ internal partial struct double_slice
     internal static unsafe List<double> ToFacade(in double_slice self)
     {
         var fetched = new List<double>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -740,7 +740,7 @@ internal struct NativeString_result
     private NativeString value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe string ToFacade(in NativeString_result self)
     {
@@ -750,7 +750,7 @@ internal struct NativeString_result
             var __item_to_facade = NativeString.ToFacade(__item);
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static NativeString_result FromFacade(in string self)
@@ -807,7 +807,7 @@ internal partial struct NativeString_slice
     internal static unsafe List<string> ToFacade(in NativeString_slice self)
     {
         var fetched = new List<string>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -859,7 +859,7 @@ internal struct UserScript_result
     private UserScript value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe object ToFacade(in UserScript_result self)
     {
@@ -869,7 +869,7 @@ internal struct UserScript_result
             var __item_to_facade = UserScript.ToFacade(__item);
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static UserScript_result FromFacade(in object self)
@@ -926,7 +926,7 @@ internal partial struct UserScript_slice
     internal static unsafe List<object> ToFacade(in UserScript_slice self)
     {
         var fetched = new List<object>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -978,7 +978,7 @@ internal struct UserScript_optional_result
     private UserScript_optional value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe object? ToFacade(in UserScript_optional_result self)
     {
@@ -988,7 +988,7 @@ internal struct UserScript_optional_result
             var __item_to_facade = UserScript_optional.ToFacade(__item);
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static UserScript_optional_result FromFacade(in object? self)

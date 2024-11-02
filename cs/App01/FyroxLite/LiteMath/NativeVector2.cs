@@ -69,7 +69,7 @@ internal partial struct NativeVector2_slice
     internal static unsafe List<Vector2> ToFacade(in NativeVector2_slice self)
     {
         var fetched = new List<Vector2>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -121,7 +121,7 @@ internal struct NativeVector2_result
     private NativeVector2 value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe Vector2 ToFacade(in NativeVector2_result self)
     {
@@ -131,7 +131,7 @@ internal struct NativeVector2_result
             var __item_to_facade = NativeVector2.ToFacade(__item);
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static NativeVector2_result FromFacade(in Vector2 self)

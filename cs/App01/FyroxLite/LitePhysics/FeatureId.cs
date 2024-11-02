@@ -82,7 +82,7 @@ internal partial struct FeatureId_slice
     internal static unsafe List<FeatureId> ToFacade(in FeatureId_slice self)
     {
         var fetched = new List<FeatureId>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -134,7 +134,7 @@ internal struct FeatureId_result
     private FeatureId value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe FeatureId ToFacade(in FeatureId_result self)
     {
@@ -144,7 +144,7 @@ internal struct FeatureId_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static FeatureId_result FromFacade(in FeatureId self)

@@ -82,7 +82,7 @@ internal partial struct RadialGradient_slice
     internal static unsafe List<RadialGradient> ToFacade(in RadialGradient_slice self)
     {
         var fetched = new List<RadialGradient>();
-        
+
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
@@ -134,7 +134,7 @@ internal struct RadialGradient_result
     private RadialGradient value;
 
     [FieldOffset(sizeof(int))]
-    private string err;
+    private NativeString err;
 
     internal static unsafe RadialGradient ToFacade(in RadialGradient_result self)
     {
@@ -144,7 +144,7 @@ internal struct RadialGradient_result
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(self.err);
+        throw new Exception(NativeString.ToFacade(self.err));
     }
 
     internal static RadialGradient_result FromFacade(in RadialGradient self)
