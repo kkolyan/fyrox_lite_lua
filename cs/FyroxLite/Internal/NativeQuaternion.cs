@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace FyroxLite.LiteMath;
+namespace FyroxLite;
 
 internal partial struct NativeQuaternion
 {

@@ -2,7 +2,7 @@ using System.Drawing;
 
 // ReSharper disable InconsistentNaming
 
-namespace FyroxLite.LiteUi;
+namespace FyroxLite;
 
 internal partial struct NativeColor
 {

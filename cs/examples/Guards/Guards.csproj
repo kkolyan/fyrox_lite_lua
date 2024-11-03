@@ -8,5 +8,11 @@
         <PublishAot>true</PublishAot>
         <InvariantGlobalization>true</InvariantGlobalization>
     </PropertyGroup>
-
+    <ItemGroup>
+        <Reference Include="FyroxLite">
+<!--            <HintPath>$(ProjectDir)/.mono/assemblies/$(ApiConfiguration)/GodotSharp.dll</HintPath>-->
+            <HintPath>/Users/kkolyan/dev/rust/fyrox_lite/cs/FyroxLite/bin/Debug/net8.0/FyroxLite.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
 </Project>

@@ -34,7 +34,7 @@ fn collect_custom_type_names(file: &File, custom_type_names: &mut HashMap<String
         if let Item::Type(item) = item {
             match item.ty.deref() {
                 Type::BareFn(_) => {
-                    custom_type_names.insert(item.ident.to_string(), CustomTypeProps { is_delegate: true });       
+                    custom_type_names.insert(item.ident.to_string(), CustomTypeProps { is_delegate: true });
                 }
                 _ => {}
             }
@@ -73,8 +73,7 @@ fn convert_file(file: &File, custom_type_names: &HashMap<String, CustomTypeProps
         r#"
                 using System.Runtime.InteropServices;
                 using FyroxLite;
-                using FyroxLite.LiteMath;
-    
+
                 internal partial class ${class} {
                     ${code}
                 }

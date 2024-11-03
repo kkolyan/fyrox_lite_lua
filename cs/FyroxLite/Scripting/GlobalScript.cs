@@ -2,6 +2,11 @@ namespace FyroxLite;
 
 public interface GlobalScript
 {
-    void OnGlobalUpdate();
-    void OnGlobalInit();
+    void OnGlobalUpdate()
+    {
+    }
+
+    void OnGlobalInit()
+    {
+    }
 }

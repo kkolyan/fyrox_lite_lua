@@ -1,8 +1,10 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Drawing;
+using FyroxLite;
 
-public class Game : Plugin
+public class Game : GlobalScript
 {
     public Node Player { get; set; }
     public List<Vector3> Beacons { get; set; }
@@ -23,19 +25,16 @@ public class Game : Plugin
         Beacons = new List<Vector3>();
     }
 
-    // Update method for HUD display
-    public override void Update()
+    public void OnGlobalUpdate()
     {
         Hud.TextAsync = $"Wounds: {Wounds}\nKilled Guards: {Frags}";
     }
 
-    // Increment frags count
     public void IncFrags()
     {
         Frags += 1;
     }
 
-    // Increment wounds count
     public void IncWounds()
     {
         Wounds += 1;

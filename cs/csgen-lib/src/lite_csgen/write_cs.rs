@@ -18,9 +18,12 @@ fn collect_uses(mods: &[Module], parent_ns: &str, nss: &mut Vec<String>) {
     for m in mods {
         match &m.content {
             ModContent::Children(mods) => {
-                let ns = format!("{}.{}", parent_ns, m.name.to_case(Case::Pascal));
+                // let ns = format!("{}.{}", parent_ns, m.name.to_case(Case::Pascal));
+                let ns = format!("{}", parent_ns);
                 collect_uses(mods, ns.as_str(), nss);
-                nss.push(ns);
+                if !nss.contains(&ns) {
+                    nss.push(ns);
+                }
             }
             ModContent::Code(_) => {}
         }
@@ -40,7 +43,7 @@ fn write_cs_mod(m: &Module, ns: &str, parent_dir: &str, nss: &Vec<String>)  {
             let mod_name = m.name.to_case(Case::Pascal);
             let dir = format!("{}/{}", parent_dir, mod_name);
 
-            write_cs_mods(&dir, format!("{}.{}", ns, mod_name).as_str(), children, nss);
+            write_cs_mods(&dir, ns, children, nss);
         },
         ModContent::Code(code) => {
             let file = format!("{}/{}.cs", parent_dir, m.name.to_case(Case::Pascal));
@@ -60,7 +63,6 @@ fn write_cs_mod(m: &Module, ns: &str, parent_dir: &str, nss: &Vec<String>)  {
             }
             s += format!("using System.Numerics;\n").as_str();
             s += format!("using System.Drawing;\n").as_str();
-            s += format!("using FyroxLite.Internal;\n").as_str();
             s += format!("using System.Runtime.CompilerServices;\n").as_str();
             s += format!("using System.Runtime.InteropServices;\n").as_str();
             s += format!("using System.Collections;\n").as_str();

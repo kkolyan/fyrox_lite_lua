@@ -1,9 +1,10 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using FyroxLite;
 
 [Uuid("9f8183d3-2a4a-4951-a6e6-5fbc9c479e2e")]
-public class Guard : Script
+public class Guard : NodeScript
 {
     private float ReloadingSeconds;
     public float ReloadDelaySeconds;
@@ -57,7 +58,7 @@ public class Guard : Script
         {
             RayOrigin = playerPos,
             RayDirection = Vector3.Normalize(sightVector),
-            MaxLength = sightVector.Length(),
+            MaxLen = sightVector.Length(),
             SortResults = true
         };
 
@@ -112,7 +113,7 @@ public class Guard : Script
         }
     }
 
-    public override void OnInit()
+    public void OnInit()
     {
         Collider = Game.NotNil(Node.FindColliderInChildren(), "Guard collider missing");
         if (Collider == null)
@@ -121,12 +122,12 @@ public class Guard : Script
         }
     }
 
-    public override void OnStart()
+    public void OnStart()
     {
         Node.SubscribeTo();
     }
 
-    public override void OnUpdate(float dt)
+    public void OnUpdate(float dt)
     {
         if (ReloadingSeconds > 0.0f)
         {
@@ -139,20 +140,13 @@ public class Guard : Script
         }
     }
 
-    public override void OnMessage(Message message)
+    public void OnMessage(object message)
     {
-        if (message.Type == Bullet.HitMessage && message.Fraction != FRACTION_GUARDS)
+        if (message is BulletHitMessage hit && hit.Fraction != FRACTION_GUARDS)
         {
             Node.Destroy();
             Plugin.Get<Game>().IncFrags();
             Console.WriteLine("Guard killed!");
         }
-    }
-
-    private T NotNil<T>(T obj, string msg) where T : class
-    {
-        if (obj != null)
-            return obj;
-        throw new Exception(msg);
     }
 }

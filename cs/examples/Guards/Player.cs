@@ -1,145 +1,128 @@
 using System;
 using System.Numerics;
+using FyroxLite;
 
-[Uuid("c5671d19-9f1a-4286-8486-add4ebaadaec")]
-public class Player : Script
+public class Player : NodeScript
 {
-    public float Sensitivity { get; set; }
-    public Node Camera { get; set; }
-    public float Power { get; set; }
-    public Prefab Bullet { get; set; }
-    public float InitialBulletVelocity { get; set; }
-    public float ShootingRange { get; set; }
-    public float ReloadDelaySec { get; set; }
-
-    private float reloadSec = 0;
-    private bool published = false;
+    public float sensitivity;
+    public Node camera;
+    public float power;
+    public Prefab bullet;
+    public float initialBulletVelocity;
+    public float shootingRange;
+    public float reloadDelaySec;
+    private float reloadSec;
+    private bool published;
     private Node collider;
-    private static float aimY = 0;
-    private static bool forward = false;
-    private static bool back = false;
-    private static bool left = false;
-    private static bool right = false;
-    private static bool fire = false;
+    private float aimY;
 
     private const int FRACTION_PLAYER = 0;
 
     public void Turn(float x)
     {
-        Quaternion rotDelta = Quaternion.CreateFromAxisAngle(Vector3.UnitY, Sensitivity * x);
-        node.LocalRotation = node.LocalRotation * rotDelta;
+        Quaternion rotDelta = Quaternion.FromAxisAngle(Vector3.Up, sensitivity * x);
+        Node rotationNode = GetNode<Node>(".."); // Assuming the Player is a child of the rotation node
+        rotationNode.Rotation = rotationNode.Rotation * rotDelta;
     }
 
     public void Aim(float y)
     {
-        aimY += y * Sensitivity;
-        aimY = Math.Clamp(aimY, -(float)Math.PI / 2.0f, (float)Math.PI / 2.0f);
-
-        Camera.LocalRotation = Quaternion.CreateFromAxisAngle(Vector3.UnitX, aimY);
+        aimY += y * sensitivity;
+        aimY = Mathf.Clamp(aimY, -Mathf.Pi / 2.0f, Mathf.Pi / 2.0f);
+        camera.Rotation = Quaternion.FromAxisAngle(Vector3.Right, aimY);
     }
 
     public void Fire()
     {
-        Vector3 cameraPos = Camera.GlobalPosition;
-        Quaternion bulletOrientation = Camera.GlobalRotation;
+        Vector3 cameraPos = camera.GlobalPosition;
+        Quaternion bulletOrientation = camera.GlobalRotation;
 
-        Bullet.Spawn(new BulletSeed
+        Bullet.Spawn(new BulletSpawnParams
         {
-            Prefab = Bullet,
-            Origin = cameraPos,
-            Direction = Vector3.Transform(Vector3.UnitZ, bulletOrientation),
-            InitialVelocity = InitialBulletVelocity,
-            AuthorCollider = collider,
-            Range = ShootingRange,
-            Fraction = FRACTION_PLAYER
+            prefab = bullet,
+            origin = cameraPos,
+            direction = bulletOrientation * Vector3.Forward,
+            initialVelocity = initialBulletVelocity,
+            authorCollider = collider,
+            range = shootingRange,
+            fraction = FRACTION_PLAYER,
         });
     }
 
-    public override void OnInit()
+    public override void _Ready()
     {
-        Window.CursorGrab = CursorGrabMode.Confined;
-        collider = node.FindColliderInChildren() ?? throw new Exception("Player collider missing");
-    }
-
-    public override void OnStart()
-    {
-        node.SubscribeTo();
-    }
-
-    public override void OnMessage(Message message)
-    {
-        if (message.Type == Bullet.HitMessage && message.Fraction != FRACTION_PLAYER)
+        Input.SetMouseMode(Input.MouseMode.Captured);
+        collider = GetNode<Node>("..").GetChild(0); // Update the path as necessary
+        if (collider == null)
         {
-            Plugin.Get<Game>("Game").IncWounds();
-            Console.WriteLine("Player wounded!");
+            GD.PrintErr("Player collider missing");
         }
     }
 
-    public override void OnUpdate(float dt)
+    public override void _Process(float delta)
     {
         if (reloadSec > 0.0f)
         {
-            reloadSec -= dt;
+            reloadSec -= delta;
         }
-
         if (!published)
         {
             published = true;
-            Plugin.Get<Game>("Game").Player = node;
+            Game.Instance.Player = GetNode<Node>(".."); // Adjust as necessary
         }
 
-        if (fire && reloadSec <= 0.0f)
+        if (Input.IsActionPressed("Fire"))
         {
-            reloadSec = ReloadDelaySec;
-            Fire();
+            if (reloadSec <= 0.0f)
+            {
+                reloadSec = reloadDelaySec;
+                Fire();
+            }
         }
 
         Vector3 moveDelta = Vector3.Zero;
-        if (forward) moveDelta.Z += 1.0f;
-        if (back) moveDelta.Z -= 1.0f;
-        if (left) moveDelta.X += 1.0f;
-        if (right) moveDelta.X -= 1.0f;
 
-        if (moveDelta.Length() > 0.001f) moveDelta = Vector3.Normalize(moveDelta);
-
-        moveDelta = Vector3.Transform(moveDelta, node.LocalRotation);
-        Vector3 force = moveDelta * Power;
-        node.AsRigidBody().ApplyForce(force);
-    }
-
-    public override void OnOsEvent(Event evt)
-    {
-        if (evt is WindowEvent we)
+        if (Input.IsKey(KeyCode.W))
         {
-            if (we.Event is KeyboardInput ki)
-            {
-                bool value = ki.Event.State == InputState.Pressed;
-                switch (ki.Event.PhysicalKey.Code)
-                {
-                    case KeyCode.KeyW:
-                        forward = value;
-                        break;
-                    case KeyCode.KeyS:
-                        back = value;
-                        break;
-                    case KeyCode.KeyA:
-                        left = value;
-                        break;
-                    case KeyCode.KeyD:
-                        right = value;
-                        break;
-                }
-            }
-            else if (we.Event is MouseInput mi)
-            {
-                fire = mi.Button == MouseButton.Left && mi.State == InputState.Pressed;
-            }
+            moveDelta.Z += 1.0f;
+        }
+        if (Input.IsKey(KeyCode.S))
+        {
+            moveDelta.Z -= 1.0f;
+        }
+        if (Input.IsKey(KeyCode.A))
+        {
+            moveDelta.X -= 1.0f;
+        }
+        if (Input.IsKey(KeyCode.D))
+        {
+            moveDelta.X += 1.0f;
         }
 
-        if (evt is DeviceEvent de && de.Event is MouseMotion mm)
+        Turn(-Input.MouseMove.X);
+        Aim(Input.MouseMove.Y);
+
+        if (moveDelta.LengthSquared() > 0.001f)
         {
-            Turn(-mm.Delta.X);
-            Aim(mm.Delta.Y);
+            moveDelta = moveDelta.Normalized();
+        }
+
+        // Assuming the Player is a RigidBody or has a Rigidbody component
+        RigidBody body = GetNode<RigidBody>(".."); // Adjust path as necessary
+        if (body != null)
+        {
+            Vector3 selfRotation = body.GlobalRotation * moveDelta;
+            Vector3 force = selfRotation * power;
+            body.AddForce(force);
+        }
+    }
+
+    public void OnMessage(object message)
+    {
+        if (message is BulletHitMessage hit && hit.Fraction != FRACTION_PLAYER)
+        {
+            Game.Instance.IncWounds();
+            GD.Print("Player wounded!");
         }
     }
 }

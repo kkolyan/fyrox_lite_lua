@@ -2,28 +2,16 @@
 // ReSharper disable RedundantUnsafeContext
 // ReSharper disable UnusedMember.Global
 // ReSharper disable RedundantUsingDirective
-using FyroxLite.Internal;
-using FyroxLite.LiteInput;
-using FyroxLite.LiteLog;
-using FyroxLite.LiteMath;
-using FyroxLite.LiteNode;
-using FyroxLite.LitePhysics;
-using FyroxLite.LitePlugin;
-using FyroxLite.LitePrefab;
-using FyroxLite.LiteScene;
-using FyroxLite.LiteUi;
-using FyroxLite.LiteWindow;
+using FyroxLite;
 using System.Numerics;
 using System.Drawing;
-using FyroxLite.Internal;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Collections;
-namespace FyroxLite.Internal;
+namespace FyroxLite;
 
 using System.Runtime.InteropServices;
 using FyroxLite;
-using FyroxLite.LiteMath;
 
 internal partial class FyroxNativeGlobal {
     

@@ -1,5 +1,5 @@
 
-namespace FyroxLite.Internal;
+namespace FyroxLite;
 
 internal partial struct NativeInstanceId(long handle)
 {

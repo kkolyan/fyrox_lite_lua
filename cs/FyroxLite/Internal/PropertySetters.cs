@@ -1,7 +1,4 @@
-using FyroxLite;
-using FyroxLite.Internal;
-
-namespace App01;
+namespace FyroxLite;
 
 internal static class PropertySetters
 {

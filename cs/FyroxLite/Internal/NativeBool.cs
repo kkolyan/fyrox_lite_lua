@@ -1,4 +1,4 @@
-namespace FyroxLite.Internal;
+namespace FyroxLite;
 
 internal partial struct NativeBool
 {

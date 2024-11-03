@@ -1,9 +1,10 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using FyroxLite;
 
 [Uuid("12371d19-9f1a-4286-8486-add4ebaadaec")]
-public class Bullet : Script
+public class Bullet : NodeScript
 {
     public Vector3 Velocity { get; set; }
     public float RemainingSeconds { get; set; }
@@ -25,7 +26,7 @@ public class Bullet : Script
 
     public static void Spawn(BulletSeed seed)
     {
-        Quaternion orientation = Quaternion.FaceTowards(seed.Direction, Vector3.YAxis);
+        Quaternion orientation = Quaternion.FaceTowards(seed.Direction, Vector3.UnitY);
         Node bullet = seed.Prefab.InstantiateAt(seed.Origin, orientation);
         Bullet script = bullet.FindScript<Bullet>();
         script.Velocity = Vector3.Normalize(seed.Direction) * seed.InitialVelocity;

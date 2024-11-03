@@ -1,5 +1,3 @@
-using App01;
-using FyroxLite.Internal;
 
 namespace FyroxLite
 {

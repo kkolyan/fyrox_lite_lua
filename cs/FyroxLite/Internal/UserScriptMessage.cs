@@ -1,6 +1,4 @@
-using App01;
-
-namespace FyroxLite.Internal;
+namespace FyroxLite;
 
 internal partial struct UserScriptMessage
 {
