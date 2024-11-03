@@ -116,10 +116,18 @@ public class Player : Script
                 bool value = ki.Event.State == InputState.Pressed;
                 switch (ki.Event.PhysicalKey.Code)
                 {
-                    case KeyCode.KeyW: forward = value; break;
-                    case KeyCode.KeyS: back = value; break;
-                    case KeyCode.KeyA: left = value; break;
-                    case KeyCode.KeyD: right = value; break;
+                    case KeyCode.KeyW:
+                        forward = value;
+                        break;
+                    case KeyCode.KeyS:
+                        back = value;
+                        break;
+                    case KeyCode.KeyA:
+                        left = value;
+                        break;
+                    case KeyCode.KeyD:
+                        right = value;
+                        break;
                 }
             }
             else if (we.Event is MouseInput mi)

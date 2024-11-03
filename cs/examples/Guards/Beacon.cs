@@ -12,7 +12,7 @@ public class Beacon : Script
         Plugin.Get<Game>("Game").Beacons.Add(pos);
 
         Console.WriteLine($"Beacon registered: {this.Node}");
-        
+
         this.Node.Destroy();
     }
 }

@@ -4,7 +4,8 @@ use to_vec::ToVec;
 use gen_common::code_model::{HierarchicalCodeBase, ModContent, Module};
 
 pub fn write_cs(code: HierarchicalCodeBase) {
-    let dir = "cs/App01/FyroxLite";
+    let dir = "cs/FyroxLite/Auto";
+    fs::create_dir_all(dir).unwrap();
     fs::remove_dir_all(dir).unwrap();
 
     let mut nss = vec![];

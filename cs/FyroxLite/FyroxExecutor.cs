@@ -4,8 +4,6 @@ using System.Runtime.InteropServices;
 using App01;
 using FyroxLite.Internal;
 using FyroxLite.LiteMath;
-using FyroxLite.LiteNode;
-using FyroxLite.LiteUi;
 
 namespace FyroxLite;
 
@@ -76,7 +74,6 @@ public partial class FyroxExecutor
             }
         }
 
-        FyroxC.FyroxHello();
         FyroxNativeGlobal.init_fyrox(new NativeScriptedApp
         {
             scripts = NativeScriptMetadata_slice.FromFacade(scripts),

@@ -1,4 +1,4 @@
-namespace App01;
+namespace FyroxLite;
 
 [AttributeUsage(AttributeTargets.Class)]
 public class UuidAttribute : Attribute

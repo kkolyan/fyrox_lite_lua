@@ -27,7 +27,8 @@ public class GuardChief : Script
                 if (beacons.Count > 0)
                 {
                     Vector3 position = beacons[new Random().Next(beacons.Count)];
-                    Quaternion orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, (float)(new Random().NextDouble() * 2 * Math.PI));
+                    Quaternion orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitY,
+                        (float)(new Random().NextDouble() * 2 * Math.PI));
 
                     Node guard = GuardPrefab.InstantiateAt(position, orientation);
                     guard.FindScript<Guard>().Init(i);

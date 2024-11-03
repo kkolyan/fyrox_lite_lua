@@ -73,11 +73,14 @@ public class Guard : Script
                     {
                         return true;
                     }
+
                     node = node.Parent;
                 }
+
                 return false;
             }
         }
+
         return false;
     }
 
