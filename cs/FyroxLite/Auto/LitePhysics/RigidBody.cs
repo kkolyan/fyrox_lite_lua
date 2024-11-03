@@ -3,7 +3,6 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable RedundantUsingDirective
 using FyroxLite;
-using System.Numerics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -11,8 +10,7 @@ using System.Collections;
 namespace FyroxLite;
 
 // fyrox_lite::lite_physics::LiteRigidBody
-[StructLayout(LayoutKind.Sequential)]
-public readonly partial struct RigidBody
+public partial struct RigidBody : IEquatable<RigidBody>
 {
     private readonly NativeHandle handle;
 
@@ -31,6 +29,31 @@ public readonly partial struct RigidBody
 
     [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial void fyrox_lite_lite_physics_LiteRigidBody_apply_force(RigidBody self, NativeVector3* force);
+
+    public bool Equals(RigidBody other)
+    {
+        return handle.Equals(other.handle);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is RigidBody other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return handle.GetHashCode();
+    }
+
+    public static bool operator ==(RigidBody left, RigidBody right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(RigidBody left, RigidBody right)
+    {
+        return !left.Equals(right);
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]

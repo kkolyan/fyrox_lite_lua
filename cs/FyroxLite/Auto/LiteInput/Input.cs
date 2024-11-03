@@ -3,7 +3,6 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable RedundantUsingDirective
 using FyroxLite;
-using System.Numerics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -11,7 +10,6 @@ using System.Collections;
 namespace FyroxLite;
 
 // fyrox_lite::lite_input::Input
-[StructLayout(LayoutKind.Sequential)]
 public static partial class Input
 {
     public const int MouseLeft = 0;

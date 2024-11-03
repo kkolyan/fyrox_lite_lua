@@ -61,7 +61,6 @@ fn write_cs_mod(m: &Module, ns: &str, parent_dir: &str, nss: &Vec<String>)  {
             for ns in nss.iter() {
                 s += format!("using {};\n", ns).as_str();
             }
-            s += format!("using System.Numerics;\n").as_str();
             s += format!("using System.Drawing;\n").as_str();
             s += format!("using System.Runtime.CompilerServices;\n").as_str();
             s += format!("using System.Runtime.InteropServices;\n").as_str();

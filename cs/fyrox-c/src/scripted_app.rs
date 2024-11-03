@@ -90,6 +90,8 @@ pub fn extract_for_def(md: &NativeScriptMetadata) -> ScriptMetadata {
                     NativeValueType::Handle => ScriptFieldValueType::Node,
                     NativeValueType::Prefab => ScriptFieldValueType::Prefab,
                     NativeValueType::Vector3 => ScriptFieldValueType::Vector3,
+                    NativeValueType::Vector2 => ScriptFieldValueType::Vector2,
+                    NativeValueType::Vector2I => ScriptFieldValueType::Vector2I,
                     NativeValueType::Quaternion => ScriptFieldValueType::Quaternion,
                 },
                 description: None,

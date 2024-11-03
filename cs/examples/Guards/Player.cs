@@ -1,81 +1,102 @@
-using System;
-using System.Numerics;
 using FyroxLite;
 
-public class Player : NodeScript
+[Uuid("c5671d19-9f1a-4286-8486-add4ebaadaec")]
+public class Player: NodeScript
 {
-    public float sensitivity;
-    public Node camera;
-    public float power;
-    public Prefab bullet;
-    public float initialBulletVelocity;
-    public float shootingRange;
-    public float reloadDelaySec;
-    private float reloadSec;
-    private bool published;
-    private Node collider;
-    private float aimY;
+    private float Sensitivity;
+    private Node Camera;
+    private float Power;
+    private Prefab Bullet;
+    private float InitialBulletVelocity;
+    private float ShootingRange;
+    private float ReloadDelaySec;
+    
+    [HideInInspector]
+    [Transient]
+    private float ReloadSec;
+    
+    [HideInInspector]
+    [Transient]
+    private bool Published;
+    
+    [HideInInspector]
+    [Transient]
+    private Node Collider;
+    
+    [HideInInspector]
+    [Transient]
+    private float AimY;
 
-    private const int FRACTION_PLAYER = 0;
+    private const int FractionPlayer = 0;
 
     public void Turn(float x)
     {
-        Quaternion rotDelta = Quaternion.FromAxisAngle(Vector3.Up, sensitivity * x);
-        Node rotationNode = GetNode<Node>(".."); // Assuming the Player is a child of the rotation node
-        rotationNode.Rotation = rotationNode.Rotation * rotDelta;
+        Quaternion rotDelta = Quaternion.FromEuler(Vector3.Up * Sensitivity * x);
+        Node.LocalRotation *= rotDelta;
     }
 
     public void Aim(float y)
     {
-        aimY += y * sensitivity;
-        aimY = Mathf.Clamp(aimY, -Mathf.Pi / 2.0f, Mathf.Pi / 2.0f);
-        camera.Rotation = Quaternion.FromAxisAngle(Vector3.Right, aimY);
+        AimY += y * Sensitivity;
+        AimY = Math.Max(-MathF.PI / 2.0f, Math.Min(AimY, MathF.PI / 2.0f));
+
+        Camera.LocalRotation = Quaternion.FromEuler(Vector3.Right * AimY);
     }
 
     public void Fire()
     {
-        Vector3 cameraPos = camera.GlobalPosition;
-        Quaternion bulletOrientation = camera.GlobalRotation;
+        Vector3 cameraPos = Camera.GlobalPosition;
+        Quaternion bulletOrientation = Camera.GlobalRotation;
 
-        Bullet.Spawn(new BulletSpawnParams
+        global::Bullet.Spawn(new Bullet.BulletSeed
         {
-            prefab = bullet,
-            origin = cameraPos,
-            direction = bulletOrientation * Vector3.Forward,
-            initialVelocity = initialBulletVelocity,
-            authorCollider = collider,
-            range = shootingRange,
-            fraction = FRACTION_PLAYER,
+            Prefab = Bullet,
+            Origin = cameraPos,
+            Direction = bulletOrientation * Vector3.Forward,
+            InitialVelocity = InitialBulletVelocity,
+            AuthorCollider = Collider,
+            Range = ShootingRange,
+            Fraction = FractionPlayer,
         });
     }
 
-    public override void _Ready()
+    protected override void OnInit()
     {
-        Input.SetMouseMode(Input.MouseMode.Captured);
-        collider = GetNode<Node>("..").GetChild(0); // Update the path as necessary
-        if (collider == null)
+        Window.CursorGrab = CursorGrabMode.Confined;
+        Collider = Node.FindColliderInChildren() ?? throw new Exception("player collider missing");
+    }
+
+    protected override void OnStart()
+    {
+        Node.SubscribeTo();
+    }
+
+    protected override void OnMessage(object message)
+    {
+        if (message is BulletHitMessage hitMessage && hitMessage.Fraction != FractionPlayer)
         {
-            GD.PrintErr("Player collider missing");
+            Plugin.Get<Game>().IncWounds();
+            Console.WriteLine("player wounded!");
         }
     }
 
-    public override void _Process(float delta)
+    protected override void OnUpdate(float dt)
     {
-        if (reloadSec > 0.0f)
+        if (ReloadSec > 0.0f)
         {
-            reloadSec -= delta;
+            ReloadSec -= dt;
         }
-        if (!published)
+        if (!Published)
         {
-            published = true;
-            Game.Instance.Player = GetNode<Node>(".."); // Adjust as necessary
+            Published = true;
+            Plugin.Get<Game>().Player = Node;
         }
 
-        if (Input.IsActionPressed("Fire"))
+        if (Input.IsMouseButton(Input.MouseLeft))
         {
-            if (reloadSec <= 0.0f)
+            if (ReloadSec <= 0.0f)
             {
-                reloadSec = reloadDelaySec;
+                ReloadSec = ReloadDelaySec;
                 Fire();
             }
         }
@@ -92,37 +113,24 @@ public class Player : NodeScript
         }
         if (Input.IsKey(KeyCode.A))
         {
-            moveDelta.X -= 1.0f;
+            moveDelta.X += 1.0f;
         }
         if (Input.IsKey(KeyCode.D))
         {
-            moveDelta.X += 1.0f;
+            moveDelta.X -= 1.0f;
         }
 
         Turn(-Input.MouseMove.X);
         Aim(Input.MouseMove.Y);
 
-        if (moveDelta.LengthSquared() > 0.001f)
+        if (moveDelta.Length() > 0.001f)
         {
             moveDelta = moveDelta.Normalized();
         }
 
-        // Assuming the Player is a RigidBody or has a Rigidbody component
-        RigidBody body = GetNode<RigidBody>(".."); // Adjust path as necessary
-        if (body != null)
-        {
-            Vector3 selfRotation = body.GlobalRotation * moveDelta;
-            Vector3 force = selfRotation * power;
-            body.AddForce(force);
-        }
-    }
-
-    public void OnMessage(object message)
-    {
-        if (message is BulletHitMessage hit && hit.Fraction != FRACTION_PLAYER)
-        {
-            Game.Instance.IncWounds();
-            GD.Print("Player wounded!");
-        }
+        var selfRotation = Node.LocalRotation;
+        Vector3 moveDirection = selfRotation * moveDelta;
+        Vector3 force = moveDirection * Power;
+        Node.AsRigidBody().Value.ApplyForce(force);
     }
 }

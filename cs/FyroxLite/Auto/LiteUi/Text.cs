@@ -3,7 +3,6 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable RedundantUsingDirective
 using FyroxLite;
-using System.Numerics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -11,8 +10,7 @@ using System.Collections;
 namespace FyroxLite;
 
 // fyrox_lite::lite_ui::LiteText
-[StructLayout(LayoutKind.Sequential)]
-public readonly partial struct Text
+public partial struct Text : IEquatable<Text>
 {
     private readonly NativeHandle handle;
 
@@ -45,6 +43,31 @@ public readonly partial struct Text
 
     [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial Text fyrox_lite_lite_ui_LiteText_new(TextBuilder* state);
+
+    public bool Equals(Text other)
+    {
+        return handle.Equals(other.handle);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Text other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return handle.GetHashCode();
+    }
+
+    public static bool operator ==(Text left, Text right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Text left, Text right)
+    {
+        return !left.Equals(right);
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]

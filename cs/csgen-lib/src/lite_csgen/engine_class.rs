@@ -34,28 +34,31 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
         }
     });
     let mut s = String::new();
-    render(&mut s, r#"
-            // ${rust_path}
-            [StructLayout(LayoutKind.Sequential)]
-            public ${def_type} ${class}
-            {
-    "#, [
-        ("class", &class.class_name),
-        ("rust_path", &class.rust_struct_path),
-        ("def_type", &if static_class { "static partial class" } else { "readonly partial struct" }),
-    ]);
 
-    if !static_class {
+    if static_class {
         render(&mut s, r#"
+            // ${rust_path}
+            public static partial class ${class}
+            {
+            "#, [
+            ("class", &class.class_name),
+            ("rust_path", &class.rust_struct_path),
+        ]);
+    } else {
+        render(&mut s, r#"
+            // ${rust_path}
+            public partial struct ${class} : IEquatable<${class}>
+            {
                 private readonly NativeHandle handle;
 
                 internal ${class}(NativeHandle handle)
                 {
                     this.handle = handle;
                 }
-    "#, [
+            "#, [
             ("class", &class.class_name),
-        ]);
+            ("rust_path", &class.rust_struct_path),
+        ]);;
     }
 
     rust.emit_statement(render_string(
@@ -153,9 +156,39 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
         generate_rust_entry_point(rust, class, method, ctx);
     }
 
+    if !static_class {
+        render(&mut s, r#"
+
+                public bool Equals(${class} other)
+                {
+                    return handle.Equals(other.handle);
+                }
+
+                public override bool Equals(object? obj)
+                {
+                    return obj is ${class} other && Equals(other);
+                }
+
+                public override int GetHashCode()
+                {
+                    return handle.GetHashCode();
+                }
+
+                public static bool operator ==(${class} left, ${class} right)
+                {
+                    return left.Equals(right);
+                }
+
+                public static bool operator !=(${class} left, ${class} right)
+                {
+                    return !left.Equals(right);
+                }
+        "#, [("class", &class.class_name),]);
+    }
+
     render(&mut s, r#"
             }
-    "#, []);
+        "#, []);
 
     if !static_class {
         wrappers::generate_optional(&mut s, rust, &DataType::Object(class.class_name.clone()), ctx);

@@ -3,7 +3,6 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable RedundantUsingDirective
 using FyroxLite;
-using System.Numerics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -22,5 +21,7 @@ internal enum NativeValueType {
     Handle,
     Prefab,
     Vector3,
+    Vector2,
+    Vector2I,
     Quaternion,
 }

@@ -3,7 +3,6 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable RedundantUsingDirective
 using FyroxLite;
-using System.Numerics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -40,6 +39,12 @@ internal unsafe partial struct NativeValue {
 
     [FieldOffset(0)]
     internal NativeVector3 Vector3;
+
+    [FieldOffset(0)]
+    internal NativeVector2 Vector2;
+
+    [FieldOffset(0)]
+    internal NativeVector2I Vector2I;
 
     [FieldOffset(0)]
     internal NativeQuaternion Quaternion;

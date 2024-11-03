@@ -12,7 +12,7 @@ use fyrox::{
     resource::model::Model,
     scene::node::Node,
 };
-
+use fyrox::core::algebra::Vector2;
 use super::script_metadata::{ScriptDefinition, ScriptFieldValueType};
 
 /// Useful for persisting script data, but for some languages could be used as a runtime type
@@ -48,6 +48,8 @@ pub enum ScriptFieldValue<T: Lang> {
     UiNode(Handle<UiNode>),
     Prefab(Option<Resource<Model>>),
     Vector3(Vector3<f32>),
+    Vector2(Vector2<f32>),
+    Vector2I(Vector2<i32>),
     Quaternion(UnitQuaternion<f32>),
     // global key of the value. is useful for hot-reload only, because in persistent data it's always None
     RuntimePin(T::RuntimePin),
@@ -91,6 +93,8 @@ impl<T: Lang> ScriptObject<T> {
                     ScriptFieldValueType::Prefab => ScriptFieldValue::Prefab(Default::default()),
                     ScriptFieldValueType::UiNode => ScriptFieldValue::Node(Default::default()),
                     ScriptFieldValueType::Vector3 => ScriptFieldValue::Vector3(Default::default()),
+                    ScriptFieldValueType::Vector2 => ScriptFieldValue::Vector2(Default::default()),
+                    ScriptFieldValueType::Vector2I => ScriptFieldValue::Vector2I(Default::default()),
                     ScriptFieldValueType::Quaternion => {
                         ScriptFieldValue::Quaternion(Default::default())
                     }
@@ -115,6 +119,8 @@ impl<T: Lang> Clone for ScriptFieldValue<T> {
             ScriptFieldValue::UiNode(it) => Self::UiNode(it.clone()),
             ScriptFieldValue::Prefab(it) => Self::Prefab(it.clone()),
             ScriptFieldValue::Vector3(it) => Self::Vector3(it.clone()),
+            ScriptFieldValue::Vector2(it) => Self::Vector2(it.clone()),
+            ScriptFieldValue::Vector2I(it) => Self::Vector2I(it.clone()),
             ScriptFieldValue::Quaternion(it) => Self::Quaternion(it.clone()),
             ScriptFieldValue::RuntimePin(it) => {
                 let new = T::clone_runtime_pin(it);
@@ -138,6 +144,8 @@ impl<T: Lang> ScriptFieldValue<T> {
             ScriptFieldValue::UiNode(it) => it,
             ScriptFieldValue::Prefab(it) => it,
             ScriptFieldValue::Vector3(it) => it,
+            ScriptFieldValue::Vector2(it) => it,
+            ScriptFieldValue::Vector2I(it) => it,
             ScriptFieldValue::Quaternion(it) => it,
             ScriptFieldValue::RuntimePin(_) => panic!("WTF, it shouldn't be reachable"),
             ScriptFieldValue::bool(it) => it,
@@ -155,6 +163,8 @@ impl<T: Lang> ScriptFieldValue<T> {
             ScriptFieldValue::UiNode(it) => it,
             ScriptFieldValue::Prefab(it) => it,
             ScriptFieldValue::Vector3(it) => it,
+            ScriptFieldValue::Vector2(it) => it,
+            ScriptFieldValue::Vector2I(it) => it,
             ScriptFieldValue::Quaternion(it) => it,
             ScriptFieldValue::RuntimePin(_) => panic!("WTF, it shouldn't be reachable"),
             ScriptFieldValue::bool(it) => it,

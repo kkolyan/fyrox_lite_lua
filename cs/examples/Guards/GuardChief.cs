@@ -1,15 +1,21 @@
 using System;
-using System.Numerics;
 using System.Collections.Generic;
+using System.Drawing;
 using FyroxLite;
 
 [Uuid("c69ae5fa-de26-4ee5-b70c-113df285f6e2")]
 public class GuardChief : NodeScript
 {
-    public Prefab GuardPrefab { get; set; }
-    public int InitialCount { get; set; }
-    private bool Initialized { get; set; }
-    private bool FrameSkippedForBeacons { get; set; }
+    private Prefab GuardPrefab;
+    private int InitialCount;
+    
+    [HideInInspector]
+    [Transient]
+    private bool Initialized;
+    
+    [HideInInspector]
+    [Transient]
+    private bool FrameSkippedForBeacons;
 
     public void OnUpdate(float dt)
     {
@@ -28,8 +34,8 @@ public class GuardChief : NodeScript
                 if (beacons.Count > 0)
                 {
                     Vector3 position = beacons[new Random().Next(beacons.Count)];
-                    Quaternion orientation = Quaternion.CreateFromAxisAngle(Vector3.UnitY,
-                        (float)(new Random().NextDouble() * 2 * Math.PI));
+                    var angle = (float)(new Random().NextDouble() * 2 * Math.PI);
+                    Quaternion orientation = Quaternion.FromEuler(Vector3.Up * angle);
 
                     Node guard = GuardPrefab.InstantiateAt(position, orientation);
                     guard.FindScript<Guard>().Init(i);

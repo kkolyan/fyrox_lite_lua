@@ -14,7 +14,7 @@ use fyrox_lite::{
 use crate::{bindings_manual::{
     NativeHandle, NativeValue,
 }, scripted_app::APP, UserScriptImpl};
-use crate::bindings_lite_2::{NativeQuaternion, NativeVector3};
+use crate::bindings_lite_2::{NativeQuaternion, NativeVector2, NativeVector2I, NativeVector3};
 use crate::bindings_manual::{NativeClassId, NativeInstanceId, NativePropertyValue, NativeValueType};
 
 #[derive(Debug, Clone)]
@@ -87,6 +87,30 @@ impl Lang for CCompatibleLang {
                             },
                         }
                     }
+                    ScriptFieldValue::Vector2(it) => {
+                        assert_eq!(prop.ty, ScriptFieldValueType::Vector2);
+                        NativePropertyValue {
+                            name,
+                            ty: NativeValueType::Vector2,
+                            value: NativeValue {
+                                Vector2: NativeVector2 {
+                                    x: it.x, y: it.y
+                                },
+                            },
+                        }
+                    }
+                    ScriptFieldValue::Vector2I(it) => {
+                        assert_eq!(prop.ty, ScriptFieldValueType::Vector2I);
+                        NativePropertyValue {
+                            name,
+                            ty: NativeValueType::Vector2,
+                            value: NativeValue {
+                                Vector2I: NativeVector2I {
+                                    x: it.x, y: it.y
+                                },
+                            },
+                        }
+                    }
                     ScriptFieldValue::Quaternion(it) => {
                         assert_eq!(prop.ty, ScriptFieldValueType::Quaternion);
                         NativePropertyValue {
@@ -114,6 +138,8 @@ impl Lang for CCompatibleLang {
                             ScriptFieldValue::String(_) => { todo!("handled in another block") },
                             ScriptFieldValue::Prefab(_) => { todo!("handled in another block") },
                             ScriptFieldValue::Vector3(_) => { todo!("handled in another block") },
+                            ScriptFieldValue::Vector2(_) => { todo!("handled in another block") },
+                            ScriptFieldValue::Vector2I(_) => { todo!("handled in another block") },
                             ScriptFieldValue::Quaternion(_) => { todo!("handled in another block") },
                             ScriptFieldValue::RuntimePin(_) => { todo!("not supported for C") },
                         };
@@ -127,7 +153,7 @@ impl Lang for CCompatibleLang {
             }
             let instance: Result<_, _> = (app.functions.create_script_instance)(metadata.id, state.into()).into();
             instance
-            
+
         })
     }
 }

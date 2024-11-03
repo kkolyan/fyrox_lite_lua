@@ -1,41 +1,38 @@
 using System;
-using System.Numerics;
 using System.Collections.Generic;
 using FyroxLite;
 
 [Uuid("12371d19-9f1a-4286-8486-add4ebaadaec")]
 public class Bullet : NodeScript
 {
-    public Vector3 Velocity { get; set; }
-    public float RemainingSeconds { get; set; }
-    public Node AuthorCollider { get; set; }
-    public float Fraction { get; set; }
-
-    public static readonly string HitMessage = "BulletHit";
+    private Vector3 Velocity;
+    private float RemainingSeconds;
+    private Node AuthorCollider;
+    private int Fraction;
 
     public class BulletSeed
     {
-        public Prefab Prefab { get; set; }
-        public Vector3 Origin { get; set; }
-        public Vector3 Direction { get; set; }
-        public float InitialVelocity { get; set; }
-        public Node AuthorCollider { get; set; }
-        public float Range { get; set; }
-        public float Fraction { get; set; }
+        public Prefab Prefab;
+        public Vector3 Origin;
+        public Vector3 Direction;
+        public float InitialVelocity;
+        public Node AuthorCollider;
+        public float Range;
+        public int Fraction;
     }
 
     public static void Spawn(BulletSeed seed)
     {
-        Quaternion orientation = Quaternion.FaceTowards(seed.Direction, Vector3.UnitY);
+        Quaternion orientation = Basis.LookingAt(seed.Direction, Vector3.Up).GetRotationQuaternion();
         Node bullet = seed.Prefab.InstantiateAt(seed.Origin, orientation);
         Bullet script = bullet.FindScript<Bullet>();
-        script.Velocity = Vector3.Normalize(seed.Direction) * seed.InitialVelocity;
-        script.RemainingSeconds = seed.range / seed.initial_velocity
+        script.Velocity = seed.Direction.Normalized() * seed.InitialVelocity;
+        script.RemainingSeconds = seed.Range / seed.InitialVelocity;
         script.AuthorCollider = seed.AuthorCollider;
         script.Fraction = seed.Fraction;
     }
 
-    public override void OnUpdate(float deltaTime)
+    protected override void OnUpdate(float deltaTime)
     {
         RemainingSeconds -= deltaTime;
         if (RemainingSeconds <= 0.0f)
@@ -49,8 +46,8 @@ public class Bullet : NodeScript
         RayCastOptions opts = new RayCastOptions
         {
             RayOrigin = Node.LocalPosition,
-            RayDirection = Vector3.Normalize(Velocity),
-            MaxLength = Velocity.Length() * deltaTime,
+            RayDirection = Velocity.Normalized(),
+            MaxLen = Velocity.Length() * deltaTime,
             SortResults = true
         };
 
@@ -60,7 +57,7 @@ public class Bullet : NodeScript
         {
             if (hit.Collider != AuthorCollider)
             {
-                hit.Collider.SendHierarchical(RoutingStrategy.Up, new { type = HitMessage, fraction = Fraction });
+                hit.Collider.SendHierarchical(RoutingStrategy.Up, new BulletHitMessage { Fraction = Fraction });
                 Node.Destroy();
                 return;
             }

@@ -3,7 +3,6 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable RedundantUsingDirective
 using FyroxLite;
-using System.Numerics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -11,8 +10,7 @@ using System.Collections;
 namespace FyroxLite;
 
 // fyrox_lite::lite_prefab::LitePrefab
-[StructLayout(LayoutKind.Sequential)]
-public readonly partial struct Prefab
+public partial struct Prefab : IEquatable<Prefab>
 {
     private readonly NativeHandle handle;
 
@@ -33,6 +31,31 @@ public readonly partial struct Prefab
 
     [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial Node fyrox_lite_lite_prefab_LitePrefab_instantiate_at(Prefab self, NativeVector3* position, NativeQuaternion* orientation);
+
+    public bool Equals(Prefab other)
+    {
+        return handle.Equals(other.handle);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Prefab other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return handle.GetHashCode();
+    }
+
+    public static bool operator ==(Prefab left, Prefab right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Prefab left, Prefab right)
+    {
+        return !left.Equals(right);
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]

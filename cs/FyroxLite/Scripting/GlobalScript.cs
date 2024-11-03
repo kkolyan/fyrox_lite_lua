@@ -1,12 +1,12 @@
 namespace FyroxLite;
 
-public interface GlobalScript
+public abstract class GlobalScript
 {
-    void OnGlobalUpdate()
+    protected internal virtual void OnGlobalUpdate()
     {
     }
 
-    void OnGlobalInit()
+    protected internal virtual void OnGlobalInit()
     {
     }
 }

@@ -149,6 +149,8 @@ impl<T: Lang> Visit for ScriptObject<T> {
                 ScriptFieldValue::UiNode(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::Prefab(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::Vector3(it) => it.visit(field_name, &mut guard),
+                ScriptFieldValue::Vector2(it) => it.visit(field_name, &mut guard),
+                ScriptFieldValue::Vector2I(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::Quaternion(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::RuntimePin(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::bool(it) => it.visit(field_name, &mut guard),

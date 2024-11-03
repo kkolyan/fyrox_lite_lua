@@ -1,24 +1,28 @@
+using Exception = System.Exception;
+
 namespace FyroxLite;
 
-public interface NodeScript
+public abstract class NodeScript
 {
-    void OnInit()
+    public ref Node Node => throw new Exception();
+
+    protected internal virtual void OnInit()
     {
     }
 
-    void OnStart()
+    protected internal virtual void OnStart()
     {
     }
 
-    void OnUpdate(float dt)
+    protected internal virtual void OnUpdate(float dt)
     {
     }
 
-    void OnMessage(object message)
+    protected internal virtual void OnMessage(object message)
     {
     }
 
-    void OnDeinit()
+    protected internal virtual void OnDeinit()
     {
     }
 }

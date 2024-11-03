@@ -5,7 +5,7 @@ use std::{
 
 use fyrox::core::{algebra::iter, pool::Handle};
 use fyrox_lite::{lite_math::{PodQuaternion, PodVector3}, spi::UserScript, LiteDataType};
-use crate::bindings_lite_2::{u8_slice, NativeInstanceId_result, NativePropertyValue_slice, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeValue_slice, NativeVector3};
+use crate::bindings_lite_2::{u8_slice, NativeInstanceId_result, NativePropertyValue_slice, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeValue_slice, NativeVector2, NativeVector2I, NativeVector3};
 use crate::c_lang::CCompatibleLang;
 use crate::scripted_app::{ScriptedApp, APP};
 
@@ -52,6 +52,8 @@ pub enum NativeValueType {
     Handle,
     Prefab,
     Vector3,
+    Vector2,
+    Vector2I,
     Quaternion,
 }
 
@@ -108,6 +110,8 @@ pub union NativeValue {
     /// Node and their derivatives. also, Resource passed as the handles in the specially allocated pool of Resource. because Fyrox Resource is not portable itself.
     pub Handle: NativeHandle,
     pub Vector3: NativeVector3,
+    pub Vector2: NativeVector2,
+    pub Vector2I: NativeVector2I,
     pub Quaternion: NativeQuaternion,
 }
 

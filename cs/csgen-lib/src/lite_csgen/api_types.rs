@@ -67,6 +67,7 @@ pub fn type_cs(ty: &DataType) -> CsType {
 pub fn is_implemented_externally(class_name: &ClassName) -> bool {
     class_name.0 == "Vector3" 
         || class_name.0 == "Vector2"
+        || class_name.0 == "Vector2I"
         || class_name.0 == "Quaternion"
         || class_name.0 == "Color"
 }

@@ -46,6 +46,8 @@ pub enum ScriptFieldValueType {
     UiNode,
     Prefab,
     Vector3,
+    Vector2,
+    Vector2I,
     Quaternion,
     // not available in editor, but supported to allow script type annotations
     RuntimePin,

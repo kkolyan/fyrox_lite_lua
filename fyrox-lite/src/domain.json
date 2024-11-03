@@ -1358,16 +1358,16 @@
     },
     {
       "Struct": {
-        "class_name": "Vector2i",
-        "rust_struct_path": "fyrox_lite::lite_math::PodVector2i",
+        "class_name": "Vector2I",
+        "rust_struct_path": "fyrox_lite::lite_math::PodVector2I",
         "fields": [
           {
             "name": "x",
-            "ty": "I64"
+            "ty": "I32"
           },
           {
             "name": "y",
-            "ty": "I64"
+            "ty": "I32"
           }
         ]
       }

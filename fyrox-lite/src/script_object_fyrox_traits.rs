@@ -1,7 +1,7 @@
 use std::any::TypeId;
 
 use fyrox::{asset::Resource, core::{algebra::{UnitQuaternion, Vector3}, pool::Handle, reflect::{FieldInfo, Reflect}}, gui::UiNode, resource::model::Model, scene::node::Node};
-
+use fyrox::core::algebra::Vector2;
 use crate::{reflect_base, script_metadata::ScriptFieldValueType, script_object::{Lang, ScriptFieldValue, ScriptObject}};
 
 
@@ -36,6 +36,8 @@ impl <T: Lang> Reflect for ScriptObject<T> {
                         std::any::type_name::<Option<Resource<Model>>>()
                     }
                     ScriptFieldValueType::Vector3 => std::any::type_name::<Vector3<f32>>(),
+                    ScriptFieldValueType::Vector2 => std::any::type_name::<Vector2<f32>>(),
+                    ScriptFieldValueType::Vector2I => std::any::type_name::<Vector2<i32>>(),
                     ScriptFieldValueType::Quaternion => {
                         std::any::type_name::<UnitQuaternion<f32>>()
                     }
@@ -48,6 +50,8 @@ impl <T: Lang> Reflect for ScriptObject<T> {
                     ScriptFieldValue::UiNode(it) => it,
                     ScriptFieldValue::Prefab(it) => it,
                     ScriptFieldValue::Vector3(it) => it,
+                    ScriptFieldValue::Vector2(it) => it,
+                    ScriptFieldValue::Vector2I(it) => it,
                     ScriptFieldValue::Quaternion(it) => it,
                     ScriptFieldValue::RuntimePin(_it) => panic!("WTF, it's excluded above"),
                     ScriptFieldValue::bool(it) => it,

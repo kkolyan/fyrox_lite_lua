@@ -15,11 +15,11 @@ pub struct PodVector2 {
     pub y: f32,
 }
 
-#[lite_api(class=Vector2i)]
+#[lite_api(class=Vector2I)]
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct PodVector2i {
-    pub x: i64,
-    pub y: i64,
+pub struct PodVector2I {
+    pub x: i32,
+    pub y: i32,
 }
 
 impl From<Vector3<f32>> for PodVector3 {

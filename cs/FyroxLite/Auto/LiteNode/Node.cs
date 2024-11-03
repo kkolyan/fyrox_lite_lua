@@ -3,7 +3,6 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable RedundantUsingDirective
 using FyroxLite;
-using System.Numerics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -11,8 +10,7 @@ using System.Collections;
 namespace FyroxLite;
 
 // fyrox_lite::lite_node::LiteNode
-[StructLayout(LayoutKind.Sequential)]
-public readonly partial struct Node
+public partial struct Node : IEquatable<Node>
 {
     private readonly NativeHandle handle;
 
@@ -84,7 +82,7 @@ public readonly partial struct Node
             }
         }
     }
-    public Quaternion LocalRotation
+    public  Quaternion LocalRotation
     {
         get
         {
@@ -261,6 +259,31 @@ public readonly partial struct Node
 
     [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial NativeString fyrox_lite_lite_node_LiteNode_get_tag(Node self);
+
+    public bool Equals(Node other)
+    {
+        return handle.Equals(other.handle);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Node other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return handle.GetHashCode();
+    }
+
+    public static bool operator ==(Node left, Node right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Node left, Node right)
+    {
+        return !left.Equals(right);
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]

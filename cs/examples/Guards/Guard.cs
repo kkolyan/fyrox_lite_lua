@@ -1,23 +1,38 @@
 using System;
-using System.Numerics;
 using System.Collections.Generic;
 using FyroxLite;
 
 [Uuid("9f8183d3-2a4a-4951-a6e6-5fbc9c479e2e")]
 public class Guard : NodeScript
 {
+    [HideInInspector]
+    [Transient]
     private float ReloadingSeconds;
-    public float ReloadDelaySeconds;
-    public float GunHeight;
-    public float SwitchWaypointTimeoutSeconds;
+    
+    private float ReloadDelaySeconds;
+    private float GunHeight;
+    private float SwitchWaypointTimeoutSeconds;
+    
+    [HideInInspector]
+    [Transient]
     private float WaypointSeconds;
+    
+    [HideInInspector]
+    [Transient]
     private Vector3? CurrentWaypoint;
+    
+    [HideInInspector]
+    [Transient]
     private Node Collider;
-    public Prefab BulletPrefab;
-    public float InitialBulletVelocity;
-    public float AttackRange;
-    public float BeaconReachedDistance;
-    public float MovePower;
+    
+    private Prefab BulletPrefab;
+    private float InitialBulletVelocity;
+    private float AttackRange;
+    private float BeaconReachedDistance;
+    private float MovePower;
+    
+    [HideInInspector]
+    [Transient]
     private int Id;
 
     private const int FRACTION_GUARDS = 1;
@@ -29,7 +44,7 @@ public class Guard : NodeScript
 
     public bool TryAttackPlayer()
     {
-        Vector3 playerPos = Plugin.Get<Game>("Game").Player.GlobalPosition;
+        Vector3 playerPos = Plugin.Get<Game>().Player.GlobalPosition;
         Vector3 selfPos = Node.GlobalPosition;
         Vector3 sightVector = playerPos - selfPos;
 
@@ -57,7 +72,7 @@ public class Guard : NodeScript
         RayCastOptions opts = new RayCastOptions
         {
             RayOrigin = playerPos,
-            RayDirection = Vector3.Normalize(sightVector),
+            RayDirection = sightVector.Normalized(),
             MaxLen = sightVector.Length(),
             SortResults = true
         };
@@ -101,33 +116,29 @@ public class Guard : NodeScript
         }
 
         Vector3 pos = Node.LocalPosition;
-        Vector3 vectorToBeacon = CurrentWaypoint - pos;
+        Vector3 vectorToBeacon = CurrentWaypoint.Value - pos;
         if (vectorToBeacon.Length() < BeaconReachedDistance)
         {
             CurrentWaypoint = null;
         }
         else
         {
-            Vector3 force = vectorToBeacon.Normalize() * MovePower;
-            Node.AsRigidBody().ApplyForce(force);
+            Vector3 force = vectorToBeacon.Normalized() * MovePower;
+            Node.AsRigidBody().Value.ApplyForce(force);
         }
     }
 
-    public void OnInit()
+    protected override void OnInit()
     {
-        Collider = Game.NotNil(Node.FindColliderInChildren(), "Guard collider missing");
-        if (Collider == null)
-        {
-            Log.Err("Collider not found under Guard node");
-        }
+        Collider = Node.FindColliderInChildren() ?? throw new Exception("Collider not found under Guard node");
     }
 
-    public void OnStart()
+    protected override void OnStart()
     {
         Node.SubscribeTo();
     }
 
-    public void OnUpdate(float dt)
+    protected override void OnUpdate(float dt)
     {
         if (ReloadingSeconds > 0.0f)
         {

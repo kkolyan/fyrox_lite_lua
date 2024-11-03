@@ -1,31 +1,33 @@
 using System;
-using System.Numerics;
 using System.Collections.Generic;
 using System.Drawing;
 using FyroxLite;
 
 public class Game : GlobalScript
 {
-    public Node Player { get; set; }
-    public List<Vector3> Beacons { get; set; }
-    public int Frags { get; private set; }
-    public int Wounds { get; private set; }
-    public Text Hud { get; set; }
+    public Node Player;
+    public List<Vector3> Beacons;
+    private int Frags;
+    private int Wounds;
+    private Text Hud;
 
-    public void Init(string scenePath = "data/scene.rgs")
+    protected override void OnGlobalInit()
     {
-        Scene.LoadAsync(scenePath);
+        Scene.LoadAsync("data/scene.rgs");
 
-        Hud = new Text
+        Hud = Text.New(new TextBuilder
         {
             FontSize = 40,
-            Foreground = Brush.Solid(Color.Black)
-        };
+            Foreground = new Brush
+            {
+                SolidColor = Color.Black
+            }
+        });
 
         Beacons = new List<Vector3>();
     }
 
-    public void OnGlobalUpdate()
+    protected override void OnGlobalUpdate()
     {
         Hud.TextAsync = $"Wounds: {Wounds}\nKilled Guards: {Frags}";
     }

@@ -3,7 +3,6 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable RedundantUsingDirective
 using FyroxLite;
-using System.Numerics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -11,7 +10,6 @@ using System.Collections;
 namespace FyroxLite;
 
 // fyrox_lite::lite_window::LiteWindow
-[StructLayout(LayoutKind.Sequential)]
 public static partial class Window
 {
     public static CursorGrabMode CursorGrab
