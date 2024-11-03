@@ -27,7 +27,7 @@ public readonly partial struct Text
 {
     private readonly NativeHandle handle;
 
-    public Text(NativeHandle handle)
+    internal Text(NativeHandle handle)
     {
         this.handle = handle;
     }

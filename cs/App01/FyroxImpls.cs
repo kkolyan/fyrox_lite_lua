@@ -1,12 +1,10 @@
+using App01;
 using FyroxLite.Internal;
 
 namespace FyroxLite
 {
     internal static class FyroxImpls
     {
-        internal static void load_scripts()
-        {
-        }
 
         internal static void on_init(NativeInstanceId thiz)
         {
@@ -98,30 +96,18 @@ namespace FyroxLite
             }
         }
 
-        internal static NativeInstanceId_result create_script_instance(NativeClassId thiz)
+        internal static NativeInstanceId_result create_script_instance(NativeClassId thiz, NativePropertyValue_slice state)
         {
             try
             {
                 var instance = Activator.CreateInstance(thiz.GetType());
+                PropertySetters.SetProperties(instance, NativePropertyValue_slice.ToFacade(state));
                 return NativeInstanceId_result.FromFacade(ObjectRegistry.Put(instance));
             }
             catch (Exception e)
             {
                 HandleException(e);
                 return NativeInstanceId_result.FromFacadeError(e.ToString());
-            }
-        }
-
-        internal static void set_property(NativeInstanceId thiz, int property, NativeValue value)
-        {
-            try
-            {
-                var o = ObjectRegistry.Get(thiz.value);
-                // GetNodeScript(thiz).OnUpdate(dt);
-            }
-            catch (Exception e)
-            {
-                HandleException(e);
             }
         }
 

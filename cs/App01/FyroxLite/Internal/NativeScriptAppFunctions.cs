@@ -24,12 +24,6 @@ namespace FyroxLite.Internal;
 
 [StructLayout(LayoutKind.Sequential)]
 internal unsafe partial struct NativeScriptAppFunctions {
-    private IntPtr _load_scripts;
-    internal FyroxNativeGlobal.LoadScripts load_scripts
-    {
-        get => Marshal.GetDelegateForFunctionPointer<FyroxNativeGlobal.LoadScripts>(_load_scripts);
-        set => _load_scripts = Marshal.GetFunctionPointerForDelegate(value);
-    }
     private IntPtr _on_init;
     internal FyroxNativeGlobal.NodeOnInit on_init
     {
@@ -77,11 +71,5 @@ internal unsafe partial struct NativeScriptAppFunctions {
     {
         get => Marshal.GetDelegateForFunctionPointer<FyroxNativeGlobal.CreateScriptInstance>(_create_script_instance);
         set => _create_script_instance = Marshal.GetFunctionPointerForDelegate(value);
-    }
-    private IntPtr _set_property;
-    internal FyroxNativeGlobal.SetProperty set_property
-    {
-        get => Marshal.GetDelegateForFunctionPointer<FyroxNativeGlobal.SetProperty>(_set_property);
-        set => _set_property = Marshal.GetFunctionPointerForDelegate(value);
     }
 }

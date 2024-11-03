@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using App01;
 using FyroxLite.Internal;
+using FyroxLite.LiteMath;
 using FyroxLite.LiteNode;
 using FyroxLite.LiteUi;
 
@@ -35,21 +36,24 @@ public partial class FyroxExecutor
                     }
 
                     var properties = new List<NativeScriptProperty>();
-                    var propertySetters = new List<PropertySetters.SetPropertyDelegate>();
+                    var propertySetters = new Dictionary<string, (NativeValueType, PropertySetters.SetPropertyDelegate)>();
 
                     foreach (var field in type.GetFields(BindingFlags.Instance))
                     {
+                        var (fieldType, fieldSetter) = ExtractFieldType(field.FieldType);
                         properties.Add(new NativeScriptProperty
                         {
                             id = properties.Count,
                             name = NativeString.FromFacade(field.Name),
-                            ty = ExtractFieldType(field.FieldType),
+                            ty = fieldType,
                             hide_in_inspector =
                                 NativeBool.FromFacade(field.GetCustomAttribute<HideInInspectorAttribute>() != null),
                             transient = NativeBool.FromFacade(field.GetCustomAttribute<TransientAttribute>() != null),
                         });
-                        propertySetters.Add((o, value) => { field.SetValue(o, value); });
+                        propertySetters.Add(field.Name, (fieldType, (o, value) => fieldSetter(o, field, value)));
                     }
+                    
+                    PropertySetters.Register(type, propertySetters);
 
                     var metadata = new NativeScriptMetadata
                     {
@@ -78,7 +82,6 @@ public partial class FyroxExecutor
             scripts = NativeScriptMetadata_slice.FromFacade(scripts),
             functions = new NativeScriptAppFunctions
             {
-                load_scripts = FyroxImpls.load_scripts,
                 on_init = FyroxImpls.on_init,
                 on_start = FyroxImpls.on_start,
                 on_deinit = FyroxImpls.on_deinit,
@@ -87,7 +90,6 @@ public partial class FyroxExecutor
                 on_game_init = FyroxImpls.on_game_init,
                 on_game_update = FyroxImpls.on_game_update,
                 create_script_instance = FyroxImpls.create_script_instance,
-                set_property = FyroxImpls.set_property,
             },
         });
 
@@ -99,19 +101,26 @@ public partial class FyroxExecutor
     private static (NativeValueType, SetField) ExtractFieldType(Type type)
     {
         // @formatter:off
-        if (type == typeof(bool)) return (NativeValueType.@bool, (o, field, value) => field.SetValue(o, value.@bool));
+        
+        // value types
+        
+        if (type == typeof(bool)) return (NativeValueType.@bool, (o, field, value) => field.SetValue(o, NativeBool.ToFacade(value.@bool)));
         if (type == typeof(float)) return (NativeValueType.f32, (o, field, value) => field.SetValue(o, value.f32));
         if (type == typeof(double)) return (NativeValueType.f64, (o, field, value) => field.SetValue(o, value.f64));
         if (type == typeof(short)) return (NativeValueType.i16, (o, field, value) => field.SetValue(o, value.i16));
         if (type == typeof(int)) return (NativeValueType.i32, (o, field, value) => field.SetValue(o, value.i32));
         if (type == typeof(long)) return (NativeValueType.i64, (o, field, value) => field.SetValue(o, value.i64));
-        if (type == typeof(string)) return (NativeValueType.String, (o, field, value) => field.SetValue(o, value.String));
-        if (type == typeof(Vector3)) return (NativeValueType.Vector3, (o, field, value) => field.SetValue(o, value.Vector3));
-        if (type == typeof(Quaternion)) return (NativeValueType.Quaternion, (o, field, value) => field.SetValue(o, value.Quaternion));
-        if (type == typeof(Node)) return (NativeValueType.Node, (o, field, value) => field.SetValue(o, new Node(value.Handle)));
-        if (type == typeof(UiNode)) return (NativeValueType.UiNode, (o, field, value) => field.SetValue(o, new UiNode);
-        // @formatter:on
+        if (type == typeof(string)) return (NativeValueType.String, (o, field, value) => field.SetValue(o, NativeString.ToFacade(value.String)));
+        if (type == typeof(Vector3)) return (NativeValueType.Vector3, (o, field, value) => field.SetValue(o, NativeVector3.ToFacade(value.Vector3)));
+        if (type == typeof(Quaternion)) return (NativeValueType.Quaternion, (o, field, value) => field.SetValue(o, NativeQuaternion.ToFacade(value.Quaternion)));
+        
+        // node-backed types, prefabs
+        var fromHandle = type.GetConstructor([typeof(NativeHandle)]);
+        if (fromHandle != null) {
+            return (NativeValueType.Handle, (o, field, value) => field.SetValue(o, fromHandle.Invoke([value.Handle])));}
+
         throw new Exception($"ERROR [FyroxLite] Unsupported field type: {type}");
+        // @formatter:on
     }
 
     private static NativeBool HasDeclaredMethod(Type type, string name, Type[] paramTypes)

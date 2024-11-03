@@ -5,7 +5,7 @@ use std::{
 
 use fyrox::core::{algebra::iter, pool::Handle};
 use fyrox_lite::{lite_math::{PodQuaternion, PodVector3}, spi::UserScript, LiteDataType};
-use crate::bindings_lite_2::{u8_slice, NativeInstanceId_result, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeVector3};
+use crate::bindings_lite_2::{u8_slice, NativeInstanceId_result, NativePropertyValue_slice, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeValue_slice, NativeVector3};
 use crate::c_lang::CCompatibleLang;
 use crate::scripted_app::{ScriptedApp, APP};
 
@@ -49,8 +49,7 @@ pub enum NativeValueType {
     i32,
     i64,
     String,
-    Node,
-    UiNode,
+    Handle,
     Prefab,
     Vector3,
     Quaternion,
@@ -99,7 +98,7 @@ pub type NativeString = u8_slice;
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub union NativeValue {
-    pub bool: bool,
+    pub bool: NativeBool,
     pub f32: f32,
     pub f64: f64,
     pub i16: i16,
@@ -110,6 +109,14 @@ pub union NativeValue {
     pub Handle: NativeHandle,
     pub Vector3: NativeVector3,
     pub Quaternion: NativeQuaternion,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativePropertyValue {
+    pub name: NativeString,
+    pub ty: NativeValueType,
+    pub value: NativeValue,
 }
 
 pub trait NativeType: Sized {
@@ -181,7 +188,6 @@ pub struct NativeScriptedApp {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct NativeScriptAppFunctions {
-    pub load_scripts: LoadScripts,
     pub on_init: NodeOnInit,
     pub on_start: NodeOnStart,
     pub on_deinit: NodeOnDeinit,
@@ -191,10 +197,7 @@ pub struct NativeScriptAppFunctions {
     pub on_game_init: GameOnInit,
     pub on_game_update: GameOnUpdate,
     pub create_script_instance: CreateScriptInstance,
-    pub set_property: SetProperty,
 }
-
-pub type LoadScripts = extern "C" fn();
 
 pub type NodeOnUpdate = extern "C" fn(thiz: NativeInstanceId, dt: f32);
 pub type NodeOnInit = extern "C" fn(thiz: NativeInstanceId);
@@ -205,8 +208,7 @@ pub type NodeOnMessage = extern "C" fn(thiz: NativeInstanceId, message: UserScri
 pub type GameOnInit = extern "C" fn(thiz: NativeInstanceId);
 pub type GameOnUpdate = extern "C" fn(thiz: NativeInstanceId);
 
-pub type CreateScriptInstance = extern "C" fn(thiz: NativeClassId) -> NativeInstanceId_result;
-pub type SetProperty = extern "C" fn(thiz: NativeInstanceId, property: i32, value: NativeValue);
+pub type CreateScriptInstance = extern "C" fn(thiz: NativeClassId, state: NativePropertyValue_slice) -> NativeInstanceId_result;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]

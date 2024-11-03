@@ -22,36 +22,9 @@ using System.Collections;
 namespace FyroxLite.Internal;
 
 
-[StructLayout(LayoutKind.Explicit)]
-internal unsafe partial struct NativeValue {
-
-    [FieldOffset(0)]
-    internal NativeBool @bool;
-
-    [FieldOffset(0)]
-    internal float f32;
-
-    [FieldOffset(0)]
-    internal double f64;
-
-    [FieldOffset(0)]
-    internal short i16;
-
-    [FieldOffset(0)]
-    internal int i32;
-
-    [FieldOffset(0)]
-    internal long i64;
-
-    [FieldOffset(0)]
-    internal NativeString String;
-
-    [FieldOffset(0)]
-    internal NativeHandle Handle;
-
-    [FieldOffset(0)]
-    internal NativeVector3 Vector3;
-
-    [FieldOffset(0)]
-    internal NativeQuaternion Quaternion;
+[StructLayout(LayoutKind.Sequential)]
+internal unsafe partial struct NativePropertyValue {
+    internal NativeString name;
+    internal NativeValueType ty;
+    internal NativeValue value;
 }

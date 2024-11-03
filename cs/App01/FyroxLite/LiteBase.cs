@@ -1128,6 +1128,120 @@ internal partial struct NativeScriptProperty_slice
     internal static unsafe partial NativeScriptProperty_slice fyrox_lite_upload_NativeScriptProperty_slice(NativeScriptProperty_slice managed);
 }
 
+[StructLayout(LayoutKind.Sequential)]
+internal partial struct NativeValue_slice
+{
+    internal unsafe NativeValue* begin;
+    internal int length;
+
+    internal unsafe NativeValue_slice(NativeValue* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
+
+    internal static unsafe List<NativeValue> ToFacade(in NativeValue_slice self)
+    {
+        var fetched = new List<NativeValue>();
+
+        for (var i = 0; i < self.length; i++)
+        {
+            var __item = *(self.begin + i);
+            var __item_to_facade = __item;
+            fetched.Add(__item_to_facade);
+        }
+        return fetched;
+    }
+
+    [ThreadStatic]
+    private static NativeValue[]? _uploadBuffer;
+
+    internal static NativeValue_slice FromFacade(in List<NativeValue> self)
+    {
+        _uploadBuffer ??= new NativeValue[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new NativeValue[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = __item;
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (NativeValue* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_NativeValue_slice(new NativeValue_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
+    }
+
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial NativeValue_slice fyrox_lite_upload_NativeValue_slice(NativeValue_slice managed);
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal partial struct NativePropertyValue_slice
+{
+    internal unsafe NativePropertyValue* begin;
+    internal int length;
+
+    internal unsafe NativePropertyValue_slice(NativePropertyValue* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
+
+    internal static unsafe List<NativePropertyValue> ToFacade(in NativePropertyValue_slice self)
+    {
+        var fetched = new List<NativePropertyValue>();
+
+        for (var i = 0; i < self.length; i++)
+        {
+            var __item = *(self.begin + i);
+            var __item_to_facade = __item;
+            fetched.Add(__item_to_facade);
+        }
+        return fetched;
+    }
+
+    [ThreadStatic]
+    private static NativePropertyValue[]? _uploadBuffer;
+
+    internal static NativePropertyValue_slice FromFacade(in List<NativePropertyValue> self)
+    {
+        _uploadBuffer ??= new NativePropertyValue[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new NativePropertyValue[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = __item;
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (NativePropertyValue* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_NativePropertyValue_slice(new NativePropertyValue_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
+    }
+
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial NativePropertyValue_slice fyrox_lite_upload_NativePropertyValue_slice(NativePropertyValue_slice managed);
+}
+
 [StructLayout(LayoutKind.Explicit)]
 internal struct NativeInstanceId_optional_result
 {

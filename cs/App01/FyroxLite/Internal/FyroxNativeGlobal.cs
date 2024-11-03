@@ -31,8 +31,6 @@ internal partial class FyroxNativeGlobal {
     [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static partial void init_fyrox(NativeScriptedApp app);
 
-    internal delegate void LoadScripts();
-
     internal delegate void NodeOnUpdate(NativeInstanceId thiz, float dt);
 
     internal delegate void NodeOnInit(NativeInstanceId thiz);
@@ -47,7 +45,5 @@ internal partial class FyroxNativeGlobal {
 
     internal delegate void GameOnUpdate(NativeInstanceId thiz);
 
-    internal delegate NativeInstanceId_result CreateScriptInstance(NativeClassId thiz);
-
-    internal delegate void SetProperty(NativeInstanceId thiz, int property, NativeValue value);
+    internal delegate NativeInstanceId_result CreateScriptInstance(NativeClassId thiz, NativePropertyValue_slice state);
 }

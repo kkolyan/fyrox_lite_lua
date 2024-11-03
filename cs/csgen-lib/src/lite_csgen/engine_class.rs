@@ -49,7 +49,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
         render(&mut s, r#"
                 private readonly NativeHandle handle;
 
-                public ${class}(NativeHandle handle)
+                internal ${class}(NativeHandle handle)
                 {
                     this.handle = handle;
                 }

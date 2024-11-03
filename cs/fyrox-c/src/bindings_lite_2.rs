@@ -8,6 +8,770 @@ use fyrox_lite::externalizable::Externalizable;
 
 #[repr(C)]
 #[derive(Clone, Copy)]
+pub struct NativeInput {
+    pub handle: NativeHandle,
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_input_Input_is_mouse_button_down(button: i32) -> NativeBool {
+    let button = button.into();
+    let ret = fyrox_lite::lite_input::Input::is_mouse_button_down(button);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_input_Input_is_mouse_button_up(button: i32) -> NativeBool {
+    let button = button.into();
+    let ret = fyrox_lite::lite_input::Input::is_mouse_button_up(button);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_input_Input_is_mouse_button(button: i32) -> NativeBool {
+    let button = button.into();
+    let ret = fyrox_lite::lite_input::Input::is_mouse_button(button);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_input_Input_is_key_down(key: NativeKeyCode) -> NativeBool {
+    let key = key.into();
+    let ret = fyrox_lite::lite_input::Input::is_key_down(key);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_input_Input_is_key_up(key: NativeKeyCode) -> NativeBool {
+    let key = key.into();
+    let ret = fyrox_lite::lite_input::Input::is_key_up(key);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_input_Input_is_key(key: NativeKeyCode) -> NativeBool {
+    let key = key.into();
+    let ret = fyrox_lite::lite_input::Input::is_key(key);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_input_Input_get_mouse_move() -> NativeVector2 {
+    let ret = fyrox_lite::lite_input::Input::get_mouse_move();
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_input_Input_get_mouse_scroll() -> NativeVector2 {
+    let ret = fyrox_lite::lite_input::Input::get_mouse_scroll();
+    ret.into()
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum NativeKeyCode {
+    Backquote,
+    Backslash,
+    BracketLeft,
+    BracketRight,
+    Comma,
+    Digit0,
+    Digit1,
+    Digit2,
+    Digit3,
+    Digit4,
+    Digit5,
+    Digit6,
+    Digit7,
+    Digit8,
+    Digit9,
+    Equal,
+    IntlBackslash,
+    IntlRo,
+    IntlYen,
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+    H,
+    I,
+    J,
+    K,
+    L,
+    M,
+    N,
+    O,
+    P,
+    Q,
+    R,
+    S,
+    T,
+    U,
+    V,
+    W,
+    X,
+    Y,
+    Z,
+    Minus,
+    Period,
+    Quote,
+    Semicolon,
+    Slash,
+    AltLeft,
+    AltRight,
+    Backspace,
+    CapsLock,
+    ContextMenu,
+    ControlLeft,
+    ControlRight,
+    Enter,
+    SuperLeft,
+    SuperRight,
+    ShiftLeft,
+    ShiftRight,
+    Space,
+    Tab,
+    Convert,
+    KanaMode,
+    Lang1,
+    Lang2,
+    Lang3,
+    Lang4,
+    Lang5,
+    NonConvert,
+    Delete,
+    End,
+    Help,
+    Home,
+    Insert,
+    PageDown,
+    PageUp,
+    ArrowDown,
+    ArrowLeft,
+    ArrowRight,
+    ArrowUp,
+    NumLock,
+    Numpad0,
+    Numpad1,
+    Numpad2,
+    Numpad3,
+    Numpad4,
+    Numpad5,
+    Numpad6,
+    Numpad7,
+    Numpad8,
+    Numpad9,
+    NumpadAdd,
+    NumpadBackspace,
+    NumpadClear,
+    NumpadClearEntry,
+    NumpadComma,
+    NumpadDecimal,
+    NumpadDivide,
+    NumpadEnter,
+    NumpadEqual,
+    NumpadHash,
+    NumpadMemoryAdd,
+    NumpadMemoryClear,
+    NumpadMemoryRecall,
+    NumpadMemoryStore,
+    NumpadMemorySubtract,
+    NumpadMultiply,
+    NumpadParenLeft,
+    NumpadParenRight,
+    NumpadStar,
+    NumpadSubtract,
+    Escape,
+    Fn,
+    FnLock,
+    PrintScreen,
+    ScrollLock,
+    Pause,
+    BrowserBack,
+    BrowserFavorites,
+    BrowserForward,
+    BrowserHome,
+    BrowserRefresh,
+    BrowserSearch,
+    BrowserStop,
+    Eject,
+    LaunchApp1,
+    LaunchApp2,
+    LaunchMail,
+    MediaPlayPause,
+    MediaSelect,
+    MediaStop,
+    MediaTrackNext,
+    MediaTrackPrevious,
+    Power,
+    Sleep,
+    AudioVolumeDown,
+    AudioVolumeMute,
+    AudioVolumeUp,
+    WakeUp,
+    Meta,
+    Hyper,
+    Turbo,
+    Abort,
+    Resume,
+    Suspend,
+    Again,
+    Copy,
+    Cut,
+    Find,
+    Open,
+    Paste,
+    Props,
+    Select,
+    Undo,
+    Hiragana,
+    Katakana,
+    F1,
+    F2,
+    F3,
+    F4,
+    F5,
+    F6,
+    F7,
+    F8,
+    F9,
+    F10,
+    F11,
+    F12,
+    F13,
+    F14,
+    F15,
+    F16,
+    F17,
+    F18,
+    F19,
+    F20,
+    F21,
+    F22,
+    F23,
+    F24,
+    F25,
+    F26,
+    F27,
+    F28,
+    F29,
+    F30,
+    F31,
+    F32,
+    F33,
+    F34,
+    F35,
+}
+
+impl From<fyrox_lite::lite_input::LiteKeyCode> for NativeKeyCode {
+    fn from(value: fyrox_lite::lite_input::LiteKeyCode) -> Self {
+        match value {
+            fyrox_lite::lite_input::LiteKeyCode::Backquote => NativeKeyCode::Backquote,
+            fyrox_lite::lite_input::LiteKeyCode::Backslash => NativeKeyCode::Backslash,
+            fyrox_lite::lite_input::LiteKeyCode::BracketLeft => NativeKeyCode::BracketLeft,
+            fyrox_lite::lite_input::LiteKeyCode::BracketRight => NativeKeyCode::BracketRight,
+            fyrox_lite::lite_input::LiteKeyCode::Comma => NativeKeyCode::Comma,
+            fyrox_lite::lite_input::LiteKeyCode::Digit0 => NativeKeyCode::Digit0,
+            fyrox_lite::lite_input::LiteKeyCode::Digit1 => NativeKeyCode::Digit1,
+            fyrox_lite::lite_input::LiteKeyCode::Digit2 => NativeKeyCode::Digit2,
+            fyrox_lite::lite_input::LiteKeyCode::Digit3 => NativeKeyCode::Digit3,
+            fyrox_lite::lite_input::LiteKeyCode::Digit4 => NativeKeyCode::Digit4,
+            fyrox_lite::lite_input::LiteKeyCode::Digit5 => NativeKeyCode::Digit5,
+            fyrox_lite::lite_input::LiteKeyCode::Digit6 => NativeKeyCode::Digit6,
+            fyrox_lite::lite_input::LiteKeyCode::Digit7 => NativeKeyCode::Digit7,
+            fyrox_lite::lite_input::LiteKeyCode::Digit8 => NativeKeyCode::Digit8,
+            fyrox_lite::lite_input::LiteKeyCode::Digit9 => NativeKeyCode::Digit9,
+            fyrox_lite::lite_input::LiteKeyCode::Equal => NativeKeyCode::Equal,
+            fyrox_lite::lite_input::LiteKeyCode::IntlBackslash => NativeKeyCode::IntlBackslash,
+            fyrox_lite::lite_input::LiteKeyCode::IntlRo => NativeKeyCode::IntlRo,
+            fyrox_lite::lite_input::LiteKeyCode::IntlYen => NativeKeyCode::IntlYen,
+            fyrox_lite::lite_input::LiteKeyCode::A => NativeKeyCode::A,
+            fyrox_lite::lite_input::LiteKeyCode::B => NativeKeyCode::B,
+            fyrox_lite::lite_input::LiteKeyCode::C => NativeKeyCode::C,
+            fyrox_lite::lite_input::LiteKeyCode::D => NativeKeyCode::D,
+            fyrox_lite::lite_input::LiteKeyCode::E => NativeKeyCode::E,
+            fyrox_lite::lite_input::LiteKeyCode::F => NativeKeyCode::F,
+            fyrox_lite::lite_input::LiteKeyCode::G => NativeKeyCode::G,
+            fyrox_lite::lite_input::LiteKeyCode::H => NativeKeyCode::H,
+            fyrox_lite::lite_input::LiteKeyCode::I => NativeKeyCode::I,
+            fyrox_lite::lite_input::LiteKeyCode::J => NativeKeyCode::J,
+            fyrox_lite::lite_input::LiteKeyCode::K => NativeKeyCode::K,
+            fyrox_lite::lite_input::LiteKeyCode::L => NativeKeyCode::L,
+            fyrox_lite::lite_input::LiteKeyCode::M => NativeKeyCode::M,
+            fyrox_lite::lite_input::LiteKeyCode::N => NativeKeyCode::N,
+            fyrox_lite::lite_input::LiteKeyCode::O => NativeKeyCode::O,
+            fyrox_lite::lite_input::LiteKeyCode::P => NativeKeyCode::P,
+            fyrox_lite::lite_input::LiteKeyCode::Q => NativeKeyCode::Q,
+            fyrox_lite::lite_input::LiteKeyCode::R => NativeKeyCode::R,
+            fyrox_lite::lite_input::LiteKeyCode::S => NativeKeyCode::S,
+            fyrox_lite::lite_input::LiteKeyCode::T => NativeKeyCode::T,
+            fyrox_lite::lite_input::LiteKeyCode::U => NativeKeyCode::U,
+            fyrox_lite::lite_input::LiteKeyCode::V => NativeKeyCode::V,
+            fyrox_lite::lite_input::LiteKeyCode::W => NativeKeyCode::W,
+            fyrox_lite::lite_input::LiteKeyCode::X => NativeKeyCode::X,
+            fyrox_lite::lite_input::LiteKeyCode::Y => NativeKeyCode::Y,
+            fyrox_lite::lite_input::LiteKeyCode::Z => NativeKeyCode::Z,
+            fyrox_lite::lite_input::LiteKeyCode::Minus => NativeKeyCode::Minus,
+            fyrox_lite::lite_input::LiteKeyCode::Period => NativeKeyCode::Period,
+            fyrox_lite::lite_input::LiteKeyCode::Quote => NativeKeyCode::Quote,
+            fyrox_lite::lite_input::LiteKeyCode::Semicolon => NativeKeyCode::Semicolon,
+            fyrox_lite::lite_input::LiteKeyCode::Slash => NativeKeyCode::Slash,
+            fyrox_lite::lite_input::LiteKeyCode::AltLeft => NativeKeyCode::AltLeft,
+            fyrox_lite::lite_input::LiteKeyCode::AltRight => NativeKeyCode::AltRight,
+            fyrox_lite::lite_input::LiteKeyCode::Backspace => NativeKeyCode::Backspace,
+            fyrox_lite::lite_input::LiteKeyCode::CapsLock => NativeKeyCode::CapsLock,
+            fyrox_lite::lite_input::LiteKeyCode::ContextMenu => NativeKeyCode::ContextMenu,
+            fyrox_lite::lite_input::LiteKeyCode::ControlLeft => NativeKeyCode::ControlLeft,
+            fyrox_lite::lite_input::LiteKeyCode::ControlRight => NativeKeyCode::ControlRight,
+            fyrox_lite::lite_input::LiteKeyCode::Enter => NativeKeyCode::Enter,
+            fyrox_lite::lite_input::LiteKeyCode::SuperLeft => NativeKeyCode::SuperLeft,
+            fyrox_lite::lite_input::LiteKeyCode::SuperRight => NativeKeyCode::SuperRight,
+            fyrox_lite::lite_input::LiteKeyCode::ShiftLeft => NativeKeyCode::ShiftLeft,
+            fyrox_lite::lite_input::LiteKeyCode::ShiftRight => NativeKeyCode::ShiftRight,
+            fyrox_lite::lite_input::LiteKeyCode::Space => NativeKeyCode::Space,
+            fyrox_lite::lite_input::LiteKeyCode::Tab => NativeKeyCode::Tab,
+            fyrox_lite::lite_input::LiteKeyCode::Convert => NativeKeyCode::Convert,
+            fyrox_lite::lite_input::LiteKeyCode::KanaMode => NativeKeyCode::KanaMode,
+            fyrox_lite::lite_input::LiteKeyCode::Lang1 => NativeKeyCode::Lang1,
+            fyrox_lite::lite_input::LiteKeyCode::Lang2 => NativeKeyCode::Lang2,
+            fyrox_lite::lite_input::LiteKeyCode::Lang3 => NativeKeyCode::Lang3,
+            fyrox_lite::lite_input::LiteKeyCode::Lang4 => NativeKeyCode::Lang4,
+            fyrox_lite::lite_input::LiteKeyCode::Lang5 => NativeKeyCode::Lang5,
+            fyrox_lite::lite_input::LiteKeyCode::NonConvert => NativeKeyCode::NonConvert,
+            fyrox_lite::lite_input::LiteKeyCode::Delete => NativeKeyCode::Delete,
+            fyrox_lite::lite_input::LiteKeyCode::End => NativeKeyCode::End,
+            fyrox_lite::lite_input::LiteKeyCode::Help => NativeKeyCode::Help,
+            fyrox_lite::lite_input::LiteKeyCode::Home => NativeKeyCode::Home,
+            fyrox_lite::lite_input::LiteKeyCode::Insert => NativeKeyCode::Insert,
+            fyrox_lite::lite_input::LiteKeyCode::PageDown => NativeKeyCode::PageDown,
+            fyrox_lite::lite_input::LiteKeyCode::PageUp => NativeKeyCode::PageUp,
+            fyrox_lite::lite_input::LiteKeyCode::ArrowDown => NativeKeyCode::ArrowDown,
+            fyrox_lite::lite_input::LiteKeyCode::ArrowLeft => NativeKeyCode::ArrowLeft,
+            fyrox_lite::lite_input::LiteKeyCode::ArrowRight => NativeKeyCode::ArrowRight,
+            fyrox_lite::lite_input::LiteKeyCode::ArrowUp => NativeKeyCode::ArrowUp,
+            fyrox_lite::lite_input::LiteKeyCode::NumLock => NativeKeyCode::NumLock,
+            fyrox_lite::lite_input::LiteKeyCode::Numpad0 => NativeKeyCode::Numpad0,
+            fyrox_lite::lite_input::LiteKeyCode::Numpad1 => NativeKeyCode::Numpad1,
+            fyrox_lite::lite_input::LiteKeyCode::Numpad2 => NativeKeyCode::Numpad2,
+            fyrox_lite::lite_input::LiteKeyCode::Numpad3 => NativeKeyCode::Numpad3,
+            fyrox_lite::lite_input::LiteKeyCode::Numpad4 => NativeKeyCode::Numpad4,
+            fyrox_lite::lite_input::LiteKeyCode::Numpad5 => NativeKeyCode::Numpad5,
+            fyrox_lite::lite_input::LiteKeyCode::Numpad6 => NativeKeyCode::Numpad6,
+            fyrox_lite::lite_input::LiteKeyCode::Numpad7 => NativeKeyCode::Numpad7,
+            fyrox_lite::lite_input::LiteKeyCode::Numpad8 => NativeKeyCode::Numpad8,
+            fyrox_lite::lite_input::LiteKeyCode::Numpad9 => NativeKeyCode::Numpad9,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadAdd => NativeKeyCode::NumpadAdd,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadBackspace => NativeKeyCode::NumpadBackspace,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadClear => NativeKeyCode::NumpadClear,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadClearEntry => {
+                NativeKeyCode::NumpadClearEntry
+            }
+            fyrox_lite::lite_input::LiteKeyCode::NumpadComma => NativeKeyCode::NumpadComma,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadDecimal => NativeKeyCode::NumpadDecimal,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadDivide => NativeKeyCode::NumpadDivide,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadEnter => NativeKeyCode::NumpadEnter,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadEqual => NativeKeyCode::NumpadEqual,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadHash => NativeKeyCode::NumpadHash,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryAdd => NativeKeyCode::NumpadMemoryAdd,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryClear => {
+                NativeKeyCode::NumpadMemoryClear
+            }
+            fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryRecall => {
+                NativeKeyCode::NumpadMemoryRecall
+            }
+            fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryStore => {
+                NativeKeyCode::NumpadMemoryStore
+            }
+            fyrox_lite::lite_input::LiteKeyCode::NumpadMemorySubtract => {
+                NativeKeyCode::NumpadMemorySubtract
+            }
+            fyrox_lite::lite_input::LiteKeyCode::NumpadMultiply => NativeKeyCode::NumpadMultiply,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadParenLeft => NativeKeyCode::NumpadParenLeft,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadParenRight => {
+                NativeKeyCode::NumpadParenRight
+            }
+            fyrox_lite::lite_input::LiteKeyCode::NumpadStar => NativeKeyCode::NumpadStar,
+            fyrox_lite::lite_input::LiteKeyCode::NumpadSubtract => NativeKeyCode::NumpadSubtract,
+            fyrox_lite::lite_input::LiteKeyCode::Escape => NativeKeyCode::Escape,
+            fyrox_lite::lite_input::LiteKeyCode::Fn => NativeKeyCode::Fn,
+            fyrox_lite::lite_input::LiteKeyCode::FnLock => NativeKeyCode::FnLock,
+            fyrox_lite::lite_input::LiteKeyCode::PrintScreen => NativeKeyCode::PrintScreen,
+            fyrox_lite::lite_input::LiteKeyCode::ScrollLock => NativeKeyCode::ScrollLock,
+            fyrox_lite::lite_input::LiteKeyCode::Pause => NativeKeyCode::Pause,
+            fyrox_lite::lite_input::LiteKeyCode::BrowserBack => NativeKeyCode::BrowserBack,
+            fyrox_lite::lite_input::LiteKeyCode::BrowserFavorites => {
+                NativeKeyCode::BrowserFavorites
+            }
+            fyrox_lite::lite_input::LiteKeyCode::BrowserForward => NativeKeyCode::BrowserForward,
+            fyrox_lite::lite_input::LiteKeyCode::BrowserHome => NativeKeyCode::BrowserHome,
+            fyrox_lite::lite_input::LiteKeyCode::BrowserRefresh => NativeKeyCode::BrowserRefresh,
+            fyrox_lite::lite_input::LiteKeyCode::BrowserSearch => NativeKeyCode::BrowserSearch,
+            fyrox_lite::lite_input::LiteKeyCode::BrowserStop => NativeKeyCode::BrowserStop,
+            fyrox_lite::lite_input::LiteKeyCode::Eject => NativeKeyCode::Eject,
+            fyrox_lite::lite_input::LiteKeyCode::LaunchApp1 => NativeKeyCode::LaunchApp1,
+            fyrox_lite::lite_input::LiteKeyCode::LaunchApp2 => NativeKeyCode::LaunchApp2,
+            fyrox_lite::lite_input::LiteKeyCode::LaunchMail => NativeKeyCode::LaunchMail,
+            fyrox_lite::lite_input::LiteKeyCode::MediaPlayPause => NativeKeyCode::MediaPlayPause,
+            fyrox_lite::lite_input::LiteKeyCode::MediaSelect => NativeKeyCode::MediaSelect,
+            fyrox_lite::lite_input::LiteKeyCode::MediaStop => NativeKeyCode::MediaStop,
+            fyrox_lite::lite_input::LiteKeyCode::MediaTrackNext => NativeKeyCode::MediaTrackNext,
+            fyrox_lite::lite_input::LiteKeyCode::MediaTrackPrevious => {
+                NativeKeyCode::MediaTrackPrevious
+            }
+            fyrox_lite::lite_input::LiteKeyCode::Power => NativeKeyCode::Power,
+            fyrox_lite::lite_input::LiteKeyCode::Sleep => NativeKeyCode::Sleep,
+            fyrox_lite::lite_input::LiteKeyCode::AudioVolumeDown => NativeKeyCode::AudioVolumeDown,
+            fyrox_lite::lite_input::LiteKeyCode::AudioVolumeMute => NativeKeyCode::AudioVolumeMute,
+            fyrox_lite::lite_input::LiteKeyCode::AudioVolumeUp => NativeKeyCode::AudioVolumeUp,
+            fyrox_lite::lite_input::LiteKeyCode::WakeUp => NativeKeyCode::WakeUp,
+            fyrox_lite::lite_input::LiteKeyCode::Meta => NativeKeyCode::Meta,
+            fyrox_lite::lite_input::LiteKeyCode::Hyper => NativeKeyCode::Hyper,
+            fyrox_lite::lite_input::LiteKeyCode::Turbo => NativeKeyCode::Turbo,
+            fyrox_lite::lite_input::LiteKeyCode::Abort => NativeKeyCode::Abort,
+            fyrox_lite::lite_input::LiteKeyCode::Resume => NativeKeyCode::Resume,
+            fyrox_lite::lite_input::LiteKeyCode::Suspend => NativeKeyCode::Suspend,
+            fyrox_lite::lite_input::LiteKeyCode::Again => NativeKeyCode::Again,
+            fyrox_lite::lite_input::LiteKeyCode::Copy => NativeKeyCode::Copy,
+            fyrox_lite::lite_input::LiteKeyCode::Cut => NativeKeyCode::Cut,
+            fyrox_lite::lite_input::LiteKeyCode::Find => NativeKeyCode::Find,
+            fyrox_lite::lite_input::LiteKeyCode::Open => NativeKeyCode::Open,
+            fyrox_lite::lite_input::LiteKeyCode::Paste => NativeKeyCode::Paste,
+            fyrox_lite::lite_input::LiteKeyCode::Props => NativeKeyCode::Props,
+            fyrox_lite::lite_input::LiteKeyCode::Select => NativeKeyCode::Select,
+            fyrox_lite::lite_input::LiteKeyCode::Undo => NativeKeyCode::Undo,
+            fyrox_lite::lite_input::LiteKeyCode::Hiragana => NativeKeyCode::Hiragana,
+            fyrox_lite::lite_input::LiteKeyCode::Katakana => NativeKeyCode::Katakana,
+            fyrox_lite::lite_input::LiteKeyCode::F1 => NativeKeyCode::F1,
+            fyrox_lite::lite_input::LiteKeyCode::F2 => NativeKeyCode::F2,
+            fyrox_lite::lite_input::LiteKeyCode::F3 => NativeKeyCode::F3,
+            fyrox_lite::lite_input::LiteKeyCode::F4 => NativeKeyCode::F4,
+            fyrox_lite::lite_input::LiteKeyCode::F5 => NativeKeyCode::F5,
+            fyrox_lite::lite_input::LiteKeyCode::F6 => NativeKeyCode::F6,
+            fyrox_lite::lite_input::LiteKeyCode::F7 => NativeKeyCode::F7,
+            fyrox_lite::lite_input::LiteKeyCode::F8 => NativeKeyCode::F8,
+            fyrox_lite::lite_input::LiteKeyCode::F9 => NativeKeyCode::F9,
+            fyrox_lite::lite_input::LiteKeyCode::F10 => NativeKeyCode::F10,
+            fyrox_lite::lite_input::LiteKeyCode::F11 => NativeKeyCode::F11,
+            fyrox_lite::lite_input::LiteKeyCode::F12 => NativeKeyCode::F12,
+            fyrox_lite::lite_input::LiteKeyCode::F13 => NativeKeyCode::F13,
+            fyrox_lite::lite_input::LiteKeyCode::F14 => NativeKeyCode::F14,
+            fyrox_lite::lite_input::LiteKeyCode::F15 => NativeKeyCode::F15,
+            fyrox_lite::lite_input::LiteKeyCode::F16 => NativeKeyCode::F16,
+            fyrox_lite::lite_input::LiteKeyCode::F17 => NativeKeyCode::F17,
+            fyrox_lite::lite_input::LiteKeyCode::F18 => NativeKeyCode::F18,
+            fyrox_lite::lite_input::LiteKeyCode::F19 => NativeKeyCode::F19,
+            fyrox_lite::lite_input::LiteKeyCode::F20 => NativeKeyCode::F20,
+            fyrox_lite::lite_input::LiteKeyCode::F21 => NativeKeyCode::F21,
+            fyrox_lite::lite_input::LiteKeyCode::F22 => NativeKeyCode::F22,
+            fyrox_lite::lite_input::LiteKeyCode::F23 => NativeKeyCode::F23,
+            fyrox_lite::lite_input::LiteKeyCode::F24 => NativeKeyCode::F24,
+            fyrox_lite::lite_input::LiteKeyCode::F25 => NativeKeyCode::F25,
+            fyrox_lite::lite_input::LiteKeyCode::F26 => NativeKeyCode::F26,
+            fyrox_lite::lite_input::LiteKeyCode::F27 => NativeKeyCode::F27,
+            fyrox_lite::lite_input::LiteKeyCode::F28 => NativeKeyCode::F28,
+            fyrox_lite::lite_input::LiteKeyCode::F29 => NativeKeyCode::F29,
+            fyrox_lite::lite_input::LiteKeyCode::F30 => NativeKeyCode::F30,
+            fyrox_lite::lite_input::LiteKeyCode::F31 => NativeKeyCode::F31,
+            fyrox_lite::lite_input::LiteKeyCode::F32 => NativeKeyCode::F32,
+            fyrox_lite::lite_input::LiteKeyCode::F33 => NativeKeyCode::F33,
+            fyrox_lite::lite_input::LiteKeyCode::F34 => NativeKeyCode::F34,
+            fyrox_lite::lite_input::LiteKeyCode::F35 => NativeKeyCode::F35,
+        }
+    }
+}
+
+impl From<NativeKeyCode> for fyrox_lite::lite_input::LiteKeyCode {
+    fn from(value: NativeKeyCode) -> Self {
+        match value {
+            NativeKeyCode::Backquote => fyrox_lite::lite_input::LiteKeyCode::Backquote,
+            NativeKeyCode::Backslash => fyrox_lite::lite_input::LiteKeyCode::Backslash,
+            NativeKeyCode::BracketLeft => fyrox_lite::lite_input::LiteKeyCode::BracketLeft,
+            NativeKeyCode::BracketRight => fyrox_lite::lite_input::LiteKeyCode::BracketRight,
+            NativeKeyCode::Comma => fyrox_lite::lite_input::LiteKeyCode::Comma,
+            NativeKeyCode::Digit0 => fyrox_lite::lite_input::LiteKeyCode::Digit0,
+            NativeKeyCode::Digit1 => fyrox_lite::lite_input::LiteKeyCode::Digit1,
+            NativeKeyCode::Digit2 => fyrox_lite::lite_input::LiteKeyCode::Digit2,
+            NativeKeyCode::Digit3 => fyrox_lite::lite_input::LiteKeyCode::Digit3,
+            NativeKeyCode::Digit4 => fyrox_lite::lite_input::LiteKeyCode::Digit4,
+            NativeKeyCode::Digit5 => fyrox_lite::lite_input::LiteKeyCode::Digit5,
+            NativeKeyCode::Digit6 => fyrox_lite::lite_input::LiteKeyCode::Digit6,
+            NativeKeyCode::Digit7 => fyrox_lite::lite_input::LiteKeyCode::Digit7,
+            NativeKeyCode::Digit8 => fyrox_lite::lite_input::LiteKeyCode::Digit8,
+            NativeKeyCode::Digit9 => fyrox_lite::lite_input::LiteKeyCode::Digit9,
+            NativeKeyCode::Equal => fyrox_lite::lite_input::LiteKeyCode::Equal,
+            NativeKeyCode::IntlBackslash => fyrox_lite::lite_input::LiteKeyCode::IntlBackslash,
+            NativeKeyCode::IntlRo => fyrox_lite::lite_input::LiteKeyCode::IntlRo,
+            NativeKeyCode::IntlYen => fyrox_lite::lite_input::LiteKeyCode::IntlYen,
+            NativeKeyCode::A => fyrox_lite::lite_input::LiteKeyCode::A,
+            NativeKeyCode::B => fyrox_lite::lite_input::LiteKeyCode::B,
+            NativeKeyCode::C => fyrox_lite::lite_input::LiteKeyCode::C,
+            NativeKeyCode::D => fyrox_lite::lite_input::LiteKeyCode::D,
+            NativeKeyCode::E => fyrox_lite::lite_input::LiteKeyCode::E,
+            NativeKeyCode::F => fyrox_lite::lite_input::LiteKeyCode::F,
+            NativeKeyCode::G => fyrox_lite::lite_input::LiteKeyCode::G,
+            NativeKeyCode::H => fyrox_lite::lite_input::LiteKeyCode::H,
+            NativeKeyCode::I => fyrox_lite::lite_input::LiteKeyCode::I,
+            NativeKeyCode::J => fyrox_lite::lite_input::LiteKeyCode::J,
+            NativeKeyCode::K => fyrox_lite::lite_input::LiteKeyCode::K,
+            NativeKeyCode::L => fyrox_lite::lite_input::LiteKeyCode::L,
+            NativeKeyCode::M => fyrox_lite::lite_input::LiteKeyCode::M,
+            NativeKeyCode::N => fyrox_lite::lite_input::LiteKeyCode::N,
+            NativeKeyCode::O => fyrox_lite::lite_input::LiteKeyCode::O,
+            NativeKeyCode::P => fyrox_lite::lite_input::LiteKeyCode::P,
+            NativeKeyCode::Q => fyrox_lite::lite_input::LiteKeyCode::Q,
+            NativeKeyCode::R => fyrox_lite::lite_input::LiteKeyCode::R,
+            NativeKeyCode::S => fyrox_lite::lite_input::LiteKeyCode::S,
+            NativeKeyCode::T => fyrox_lite::lite_input::LiteKeyCode::T,
+            NativeKeyCode::U => fyrox_lite::lite_input::LiteKeyCode::U,
+            NativeKeyCode::V => fyrox_lite::lite_input::LiteKeyCode::V,
+            NativeKeyCode::W => fyrox_lite::lite_input::LiteKeyCode::W,
+            NativeKeyCode::X => fyrox_lite::lite_input::LiteKeyCode::X,
+            NativeKeyCode::Y => fyrox_lite::lite_input::LiteKeyCode::Y,
+            NativeKeyCode::Z => fyrox_lite::lite_input::LiteKeyCode::Z,
+            NativeKeyCode::Minus => fyrox_lite::lite_input::LiteKeyCode::Minus,
+            NativeKeyCode::Period => fyrox_lite::lite_input::LiteKeyCode::Period,
+            NativeKeyCode::Quote => fyrox_lite::lite_input::LiteKeyCode::Quote,
+            NativeKeyCode::Semicolon => fyrox_lite::lite_input::LiteKeyCode::Semicolon,
+            NativeKeyCode::Slash => fyrox_lite::lite_input::LiteKeyCode::Slash,
+            NativeKeyCode::AltLeft => fyrox_lite::lite_input::LiteKeyCode::AltLeft,
+            NativeKeyCode::AltRight => fyrox_lite::lite_input::LiteKeyCode::AltRight,
+            NativeKeyCode::Backspace => fyrox_lite::lite_input::LiteKeyCode::Backspace,
+            NativeKeyCode::CapsLock => fyrox_lite::lite_input::LiteKeyCode::CapsLock,
+            NativeKeyCode::ContextMenu => fyrox_lite::lite_input::LiteKeyCode::ContextMenu,
+            NativeKeyCode::ControlLeft => fyrox_lite::lite_input::LiteKeyCode::ControlLeft,
+            NativeKeyCode::ControlRight => fyrox_lite::lite_input::LiteKeyCode::ControlRight,
+            NativeKeyCode::Enter => fyrox_lite::lite_input::LiteKeyCode::Enter,
+            NativeKeyCode::SuperLeft => fyrox_lite::lite_input::LiteKeyCode::SuperLeft,
+            NativeKeyCode::SuperRight => fyrox_lite::lite_input::LiteKeyCode::SuperRight,
+            NativeKeyCode::ShiftLeft => fyrox_lite::lite_input::LiteKeyCode::ShiftLeft,
+            NativeKeyCode::ShiftRight => fyrox_lite::lite_input::LiteKeyCode::ShiftRight,
+            NativeKeyCode::Space => fyrox_lite::lite_input::LiteKeyCode::Space,
+            NativeKeyCode::Tab => fyrox_lite::lite_input::LiteKeyCode::Tab,
+            NativeKeyCode::Convert => fyrox_lite::lite_input::LiteKeyCode::Convert,
+            NativeKeyCode::KanaMode => fyrox_lite::lite_input::LiteKeyCode::KanaMode,
+            NativeKeyCode::Lang1 => fyrox_lite::lite_input::LiteKeyCode::Lang1,
+            NativeKeyCode::Lang2 => fyrox_lite::lite_input::LiteKeyCode::Lang2,
+            NativeKeyCode::Lang3 => fyrox_lite::lite_input::LiteKeyCode::Lang3,
+            NativeKeyCode::Lang4 => fyrox_lite::lite_input::LiteKeyCode::Lang4,
+            NativeKeyCode::Lang5 => fyrox_lite::lite_input::LiteKeyCode::Lang5,
+            NativeKeyCode::NonConvert => fyrox_lite::lite_input::LiteKeyCode::NonConvert,
+            NativeKeyCode::Delete => fyrox_lite::lite_input::LiteKeyCode::Delete,
+            NativeKeyCode::End => fyrox_lite::lite_input::LiteKeyCode::End,
+            NativeKeyCode::Help => fyrox_lite::lite_input::LiteKeyCode::Help,
+            NativeKeyCode::Home => fyrox_lite::lite_input::LiteKeyCode::Home,
+            NativeKeyCode::Insert => fyrox_lite::lite_input::LiteKeyCode::Insert,
+            NativeKeyCode::PageDown => fyrox_lite::lite_input::LiteKeyCode::PageDown,
+            NativeKeyCode::PageUp => fyrox_lite::lite_input::LiteKeyCode::PageUp,
+            NativeKeyCode::ArrowDown => fyrox_lite::lite_input::LiteKeyCode::ArrowDown,
+            NativeKeyCode::ArrowLeft => fyrox_lite::lite_input::LiteKeyCode::ArrowLeft,
+            NativeKeyCode::ArrowRight => fyrox_lite::lite_input::LiteKeyCode::ArrowRight,
+            NativeKeyCode::ArrowUp => fyrox_lite::lite_input::LiteKeyCode::ArrowUp,
+            NativeKeyCode::NumLock => fyrox_lite::lite_input::LiteKeyCode::NumLock,
+            NativeKeyCode::Numpad0 => fyrox_lite::lite_input::LiteKeyCode::Numpad0,
+            NativeKeyCode::Numpad1 => fyrox_lite::lite_input::LiteKeyCode::Numpad1,
+            NativeKeyCode::Numpad2 => fyrox_lite::lite_input::LiteKeyCode::Numpad2,
+            NativeKeyCode::Numpad3 => fyrox_lite::lite_input::LiteKeyCode::Numpad3,
+            NativeKeyCode::Numpad4 => fyrox_lite::lite_input::LiteKeyCode::Numpad4,
+            NativeKeyCode::Numpad5 => fyrox_lite::lite_input::LiteKeyCode::Numpad5,
+            NativeKeyCode::Numpad6 => fyrox_lite::lite_input::LiteKeyCode::Numpad6,
+            NativeKeyCode::Numpad7 => fyrox_lite::lite_input::LiteKeyCode::Numpad7,
+            NativeKeyCode::Numpad8 => fyrox_lite::lite_input::LiteKeyCode::Numpad8,
+            NativeKeyCode::Numpad9 => fyrox_lite::lite_input::LiteKeyCode::Numpad9,
+            NativeKeyCode::NumpadAdd => fyrox_lite::lite_input::LiteKeyCode::NumpadAdd,
+            NativeKeyCode::NumpadBackspace => fyrox_lite::lite_input::LiteKeyCode::NumpadBackspace,
+            NativeKeyCode::NumpadClear => fyrox_lite::lite_input::LiteKeyCode::NumpadClear,
+            NativeKeyCode::NumpadClearEntry => {
+                fyrox_lite::lite_input::LiteKeyCode::NumpadClearEntry
+            }
+            NativeKeyCode::NumpadComma => fyrox_lite::lite_input::LiteKeyCode::NumpadComma,
+            NativeKeyCode::NumpadDecimal => fyrox_lite::lite_input::LiteKeyCode::NumpadDecimal,
+            NativeKeyCode::NumpadDivide => fyrox_lite::lite_input::LiteKeyCode::NumpadDivide,
+            NativeKeyCode::NumpadEnter => fyrox_lite::lite_input::LiteKeyCode::NumpadEnter,
+            NativeKeyCode::NumpadEqual => fyrox_lite::lite_input::LiteKeyCode::NumpadEqual,
+            NativeKeyCode::NumpadHash => fyrox_lite::lite_input::LiteKeyCode::NumpadHash,
+            NativeKeyCode::NumpadMemoryAdd => fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryAdd,
+            NativeKeyCode::NumpadMemoryClear => {
+                fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryClear
+            }
+            NativeKeyCode::NumpadMemoryRecall => {
+                fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryRecall
+            }
+            NativeKeyCode::NumpadMemoryStore => {
+                fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryStore
+            }
+            NativeKeyCode::NumpadMemorySubtract => {
+                fyrox_lite::lite_input::LiteKeyCode::NumpadMemorySubtract
+            }
+            NativeKeyCode::NumpadMultiply => fyrox_lite::lite_input::LiteKeyCode::NumpadMultiply,
+            NativeKeyCode::NumpadParenLeft => fyrox_lite::lite_input::LiteKeyCode::NumpadParenLeft,
+            NativeKeyCode::NumpadParenRight => {
+                fyrox_lite::lite_input::LiteKeyCode::NumpadParenRight
+            }
+            NativeKeyCode::NumpadStar => fyrox_lite::lite_input::LiteKeyCode::NumpadStar,
+            NativeKeyCode::NumpadSubtract => fyrox_lite::lite_input::LiteKeyCode::NumpadSubtract,
+            NativeKeyCode::Escape => fyrox_lite::lite_input::LiteKeyCode::Escape,
+            NativeKeyCode::Fn => fyrox_lite::lite_input::LiteKeyCode::Fn,
+            NativeKeyCode::FnLock => fyrox_lite::lite_input::LiteKeyCode::FnLock,
+            NativeKeyCode::PrintScreen => fyrox_lite::lite_input::LiteKeyCode::PrintScreen,
+            NativeKeyCode::ScrollLock => fyrox_lite::lite_input::LiteKeyCode::ScrollLock,
+            NativeKeyCode::Pause => fyrox_lite::lite_input::LiteKeyCode::Pause,
+            NativeKeyCode::BrowserBack => fyrox_lite::lite_input::LiteKeyCode::BrowserBack,
+            NativeKeyCode::BrowserFavorites => {
+                fyrox_lite::lite_input::LiteKeyCode::BrowserFavorites
+            }
+            NativeKeyCode::BrowserForward => fyrox_lite::lite_input::LiteKeyCode::BrowserForward,
+            NativeKeyCode::BrowserHome => fyrox_lite::lite_input::LiteKeyCode::BrowserHome,
+            NativeKeyCode::BrowserRefresh => fyrox_lite::lite_input::LiteKeyCode::BrowserRefresh,
+            NativeKeyCode::BrowserSearch => fyrox_lite::lite_input::LiteKeyCode::BrowserSearch,
+            NativeKeyCode::BrowserStop => fyrox_lite::lite_input::LiteKeyCode::BrowserStop,
+            NativeKeyCode::Eject => fyrox_lite::lite_input::LiteKeyCode::Eject,
+            NativeKeyCode::LaunchApp1 => fyrox_lite::lite_input::LiteKeyCode::LaunchApp1,
+            NativeKeyCode::LaunchApp2 => fyrox_lite::lite_input::LiteKeyCode::LaunchApp2,
+            NativeKeyCode::LaunchMail => fyrox_lite::lite_input::LiteKeyCode::LaunchMail,
+            NativeKeyCode::MediaPlayPause => fyrox_lite::lite_input::LiteKeyCode::MediaPlayPause,
+            NativeKeyCode::MediaSelect => fyrox_lite::lite_input::LiteKeyCode::MediaSelect,
+            NativeKeyCode::MediaStop => fyrox_lite::lite_input::LiteKeyCode::MediaStop,
+            NativeKeyCode::MediaTrackNext => fyrox_lite::lite_input::LiteKeyCode::MediaTrackNext,
+            NativeKeyCode::MediaTrackPrevious => {
+                fyrox_lite::lite_input::LiteKeyCode::MediaTrackPrevious
+            }
+            NativeKeyCode::Power => fyrox_lite::lite_input::LiteKeyCode::Power,
+            NativeKeyCode::Sleep => fyrox_lite::lite_input::LiteKeyCode::Sleep,
+            NativeKeyCode::AudioVolumeDown => fyrox_lite::lite_input::LiteKeyCode::AudioVolumeDown,
+            NativeKeyCode::AudioVolumeMute => fyrox_lite::lite_input::LiteKeyCode::AudioVolumeMute,
+            NativeKeyCode::AudioVolumeUp => fyrox_lite::lite_input::LiteKeyCode::AudioVolumeUp,
+            NativeKeyCode::WakeUp => fyrox_lite::lite_input::LiteKeyCode::WakeUp,
+            NativeKeyCode::Meta => fyrox_lite::lite_input::LiteKeyCode::Meta,
+            NativeKeyCode::Hyper => fyrox_lite::lite_input::LiteKeyCode::Hyper,
+            NativeKeyCode::Turbo => fyrox_lite::lite_input::LiteKeyCode::Turbo,
+            NativeKeyCode::Abort => fyrox_lite::lite_input::LiteKeyCode::Abort,
+            NativeKeyCode::Resume => fyrox_lite::lite_input::LiteKeyCode::Resume,
+            NativeKeyCode::Suspend => fyrox_lite::lite_input::LiteKeyCode::Suspend,
+            NativeKeyCode::Again => fyrox_lite::lite_input::LiteKeyCode::Again,
+            NativeKeyCode::Copy => fyrox_lite::lite_input::LiteKeyCode::Copy,
+            NativeKeyCode::Cut => fyrox_lite::lite_input::LiteKeyCode::Cut,
+            NativeKeyCode::Find => fyrox_lite::lite_input::LiteKeyCode::Find,
+            NativeKeyCode::Open => fyrox_lite::lite_input::LiteKeyCode::Open,
+            NativeKeyCode::Paste => fyrox_lite::lite_input::LiteKeyCode::Paste,
+            NativeKeyCode::Props => fyrox_lite::lite_input::LiteKeyCode::Props,
+            NativeKeyCode::Select => fyrox_lite::lite_input::LiteKeyCode::Select,
+            NativeKeyCode::Undo => fyrox_lite::lite_input::LiteKeyCode::Undo,
+            NativeKeyCode::Hiragana => fyrox_lite::lite_input::LiteKeyCode::Hiragana,
+            NativeKeyCode::Katakana => fyrox_lite::lite_input::LiteKeyCode::Katakana,
+            NativeKeyCode::F1 => fyrox_lite::lite_input::LiteKeyCode::F1,
+            NativeKeyCode::F2 => fyrox_lite::lite_input::LiteKeyCode::F2,
+            NativeKeyCode::F3 => fyrox_lite::lite_input::LiteKeyCode::F3,
+            NativeKeyCode::F4 => fyrox_lite::lite_input::LiteKeyCode::F4,
+            NativeKeyCode::F5 => fyrox_lite::lite_input::LiteKeyCode::F5,
+            NativeKeyCode::F6 => fyrox_lite::lite_input::LiteKeyCode::F6,
+            NativeKeyCode::F7 => fyrox_lite::lite_input::LiteKeyCode::F7,
+            NativeKeyCode::F8 => fyrox_lite::lite_input::LiteKeyCode::F8,
+            NativeKeyCode::F9 => fyrox_lite::lite_input::LiteKeyCode::F9,
+            NativeKeyCode::F10 => fyrox_lite::lite_input::LiteKeyCode::F10,
+            NativeKeyCode::F11 => fyrox_lite::lite_input::LiteKeyCode::F11,
+            NativeKeyCode::F12 => fyrox_lite::lite_input::LiteKeyCode::F12,
+            NativeKeyCode::F13 => fyrox_lite::lite_input::LiteKeyCode::F13,
+            NativeKeyCode::F14 => fyrox_lite::lite_input::LiteKeyCode::F14,
+            NativeKeyCode::F15 => fyrox_lite::lite_input::LiteKeyCode::F15,
+            NativeKeyCode::F16 => fyrox_lite::lite_input::LiteKeyCode::F16,
+            NativeKeyCode::F17 => fyrox_lite::lite_input::LiteKeyCode::F17,
+            NativeKeyCode::F18 => fyrox_lite::lite_input::LiteKeyCode::F18,
+            NativeKeyCode::F19 => fyrox_lite::lite_input::LiteKeyCode::F19,
+            NativeKeyCode::F20 => fyrox_lite::lite_input::LiteKeyCode::F20,
+            NativeKeyCode::F21 => fyrox_lite::lite_input::LiteKeyCode::F21,
+            NativeKeyCode::F22 => fyrox_lite::lite_input::LiteKeyCode::F22,
+            NativeKeyCode::F23 => fyrox_lite::lite_input::LiteKeyCode::F23,
+            NativeKeyCode::F24 => fyrox_lite::lite_input::LiteKeyCode::F24,
+            NativeKeyCode::F25 => fyrox_lite::lite_input::LiteKeyCode::F25,
+            NativeKeyCode::F26 => fyrox_lite::lite_input::LiteKeyCode::F26,
+            NativeKeyCode::F27 => fyrox_lite::lite_input::LiteKeyCode::F27,
+            NativeKeyCode::F28 => fyrox_lite::lite_input::LiteKeyCode::F28,
+            NativeKeyCode::F29 => fyrox_lite::lite_input::LiteKeyCode::F29,
+            NativeKeyCode::F30 => fyrox_lite::lite_input::LiteKeyCode::F30,
+            NativeKeyCode::F31 => fyrox_lite::lite_input::LiteKeyCode::F31,
+            NativeKeyCode::F32 => fyrox_lite::lite_input::LiteKeyCode::F32,
+            NativeKeyCode::F33 => fyrox_lite::lite_input::LiteKeyCode::F33,
+            NativeKeyCode::F34 => fyrox_lite::lite_input::LiteKeyCode::F34,
+            NativeKeyCode::F35 => fyrox_lite::lite_input::LiteKeyCode::F35,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativePlugin {
+    pub handle: NativeHandle,
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_plugin_LitePlugin_get(
+    class_id: NativeClassId,
+) -> NativeInstanceId_result {
+    let class_id = class_id.into();
+    let ret = fyrox_lite::lite_plugin::LitePlugin::get::<crate::UserScriptImpl>(class_id, ());
+    ret.into()
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeScene {
+    pub handle: NativeHandle,
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_scene_LiteScene_load_async(scene_path: NativeString) -> () {
+    let scene_path = scene_path.into();
+    let ret = fyrox_lite::lite_scene::LiteScene::load_async(scene_path);
+    ret.into()
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindow {
+    pub handle: NativeHandle,
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_window_LiteWindow_set_cursor_grab(
+    mode: NativeCursorGrabMode,
+) -> () {
+    let mode = mode.into();
+    let ret = fyrox_lite::lite_window::LiteWindow::set_cursor_grab(mode);
+    ret.into()
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum NativeCursorGrabMode {
+    None,
+    Confined,
+    Locked,
+}
+
+impl From<fyrox_lite::lite_window::LiteCursorGrabMode> for NativeCursorGrabMode {
+    fn from(value: fyrox_lite::lite_window::LiteCursorGrabMode) -> Self {
+        match value {
+            fyrox_lite::lite_window::LiteCursorGrabMode::None => NativeCursorGrabMode::None,
+            fyrox_lite::lite_window::LiteCursorGrabMode::Confined => NativeCursorGrabMode::Confined,
+            fyrox_lite::lite_window::LiteCursorGrabMode::Locked => NativeCursorGrabMode::Locked,
+        }
+    }
+}
+
+impl From<NativeCursorGrabMode> for fyrox_lite::lite_window::LiteCursorGrabMode {
+    fn from(value: NativeCursorGrabMode) -> Self {
+        match value {
+            NativeCursorGrabMode::None => fyrox_lite::lite_window::LiteCursorGrabMode::None,
+            NativeCursorGrabMode::Confined => fyrox_lite::lite_window::LiteCursorGrabMode::Confined,
+            NativeCursorGrabMode::Locked => fyrox_lite::lite_window::LiteCursorGrabMode::Locked,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
 pub struct NativePrefab {
     pub handle: NativeHandle,
 }
@@ -72,1371 +836,29 @@ impl From<NativePrefab_optional> for Option<fyrox_lite::lite_prefab::LitePrefab>
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct NativePlugin {
+pub struct NativeLog {
     pub handle: NativeHandle,
 }
 
 #[no_mangle]
-pub extern "C" fn fyrox_lite_lite_plugin_LitePlugin_get(
-    class_id: NativeClassId,
-) -> NativeInstanceId_result {
-    let class_id = class_id.into();
-    let ret = fyrox_lite::lite_plugin::LitePlugin::get::<crate::UserScriptImpl>(class_id, ());
+pub extern "C" fn fyrox_lite_lite_log_LiteLog_info(msg: NativeString) -> () {
+    let msg = msg.into();
+    let ret = fyrox_lite::lite_log::LiteLog::info(msg);
     ret.into()
 }
 
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativePhysics {
-    pub handle: NativeHandle,
-}
-
 #[no_mangle]
-pub extern "C" fn fyrox_lite_lite_physics_LitePhysics_cast_ray(
-    opts: NativeRayCastOptions,
-) -> NativeIntersection_slice {
-    let opts = opts.into();
-    let ret = fyrox_lite::lite_physics::LitePhysics::cast_ray(opts);
+pub extern "C" fn fyrox_lite_lite_log_LiteLog_warn(msg: NativeString) -> () {
+    let msg = msg.into();
+    let ret = fyrox_lite::lite_log::LiteLog::warn(msg);
     ret.into()
 }
 
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeIntersection {
-    pub collider: NativeNode,
-    pub normal: NativeVector3,
-    pub position: NativeVector3,
-    pub feature: NativeFeatureId,
-    pub toi: f32,
-}
-
-impl From<fyrox_lite::lite_physics::LiteIntersection> for NativeIntersection {
-    fn from(__value: fyrox_lite::lite_physics::LiteIntersection) -> Self {
-        let collider = __value.collider.into();
-        let normal = __value.normal.into();
-        let position = __value.position.into();
-        let feature = __value.feature.into();
-        let toi = __value.toi.into();
-        Self {
-            collider,
-            normal,
-            position,
-            feature,
-            toi,
-        }
-    }
-}
-
-impl From<NativeIntersection> for fyrox_lite::lite_physics::LiteIntersection {
-    fn from(__value: NativeIntersection) -> Self {
-        let collider = __value.collider.into();
-        let normal = __value.normal.into();
-        let position = __value.position.into();
-        let feature = __value.feature.into();
-        let toi = __value.toi.into();
-        Self {
-            collider,
-            normal,
-            position,
-            feature,
-            toi,
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeIntersection_optional {
-    pub value: NativeIntersection,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_physics::LiteIntersection>> for NativeIntersection_optional {
-    fn from(value: Option<fyrox_lite::lite_physics::LiteIntersection>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeIntersection_optional> for Option<fyrox_lite::lite_physics::LiteIntersection> {
-    fn from(value: NativeIntersection_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeIntersection_slice {
-    pub begin: *mut NativeIntersection,
-    pub len: i32,
-}
-
-impl From<Vec<fyrox_lite::lite_physics::LiteIntersection>> for NativeIntersection_slice {
-    fn from(value: Vec<fyrox_lite::lite_physics::LiteIntersection>) -> Self {
-        let len = value.len() as i32;
-        let native_vec: Vec<NativeIntersection> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeIntersection_slice> for Vec<fyrox_lite::lite_physics::LiteIntersection> {
-    fn from(value: NativeIntersection_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
 #[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_physics_LiteIntersection_slice(
-    data: NativeIntersection_slice,
-) -> NativeIntersection_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeIntersection_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeIntersection_result {
-    pub ok: i32,
-    pub value: NativeIntersection_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeIntersection_result_value {
-    ok: NativeIntersection,
-    err: NativeString,
-}
-
-impl From<Result<fyrox_lite::lite_physics::LiteIntersection, crate::LangSpecificError>>
-    for NativeIntersection_result
-{
-    fn from(
-        value: Result<fyrox_lite::lite_physics::LiteIntersection, crate::LangSpecificError>,
-    ) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeIntersection_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeIntersection_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeIntersection_result>
-    for Result<fyrox_lite::lite_physics::LiteIntersection, crate::LangSpecificError>
-{
-    fn from(value: NativeIntersection_result) -> Self {
-        unsafe {
-            if value.ok != 0 {
-                Ok(value.value.ok.into())
-            } else {
-                Err(value.value.err.into())
-            }
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeFeatureId {
-    pub kind: NativeFeatureKind,
-    pub id: i32,
-}
-
-impl From<fyrox_lite::lite_physics::LiteFeatureId> for NativeFeatureId {
-    fn from(__value: fyrox_lite::lite_physics::LiteFeatureId) -> Self {
-        let kind = __value.kind.into();
-        let id = __value.id.into();
-        Self { kind, id }
-    }
-}
-
-impl From<NativeFeatureId> for fyrox_lite::lite_physics::LiteFeatureId {
-    fn from(__value: NativeFeatureId) -> Self {
-        let kind = __value.kind.into();
-        let id = __value.id.into();
-        Self { kind, id }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeFeatureId_optional {
-    pub value: NativeFeatureId,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_physics::LiteFeatureId>> for NativeFeatureId_optional {
-    fn from(value: Option<fyrox_lite::lite_physics::LiteFeatureId>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeFeatureId_optional> for Option<fyrox_lite::lite_physics::LiteFeatureId> {
-    fn from(value: NativeFeatureId_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeFeatureId_slice {
-    pub begin: *mut NativeFeatureId,
-    pub len: i32,
-}
-
-impl From<Vec<fyrox_lite::lite_physics::LiteFeatureId>> for NativeFeatureId_slice {
-    fn from(value: Vec<fyrox_lite::lite_physics::LiteFeatureId>) -> Self {
-        let len = value.len() as i32;
-        let native_vec: Vec<NativeFeatureId> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeFeatureId_slice> for Vec<fyrox_lite::lite_physics::LiteFeatureId> {
-    fn from(value: NativeFeatureId_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_physics_LiteFeatureId_slice(
-    data: NativeFeatureId_slice,
-) -> NativeFeatureId_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeFeatureId_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeFeatureId_result {
-    pub ok: i32,
-    pub value: NativeFeatureId_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeFeatureId_result_value {
-    ok: NativeFeatureId,
-    err: NativeString,
-}
-
-impl From<Result<fyrox_lite::lite_physics::LiteFeatureId, crate::LangSpecificError>>
-    for NativeFeatureId_result
-{
-    fn from(
-        value: Result<fyrox_lite::lite_physics::LiteFeatureId, crate::LangSpecificError>,
-    ) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeFeatureId_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeFeatureId_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeFeatureId_result>
-    for Result<fyrox_lite::lite_physics::LiteFeatureId, crate::LangSpecificError>
-{
-    fn from(value: NativeFeatureId_result) -> Self {
-        unsafe {
-            if value.ok != 0 {
-                Ok(value.value.ok.into())
-            } else {
-                Err(value.value.err.into())
-            }
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum NativeFeatureKind {
-    Vertex,
-    Edge,
-    Face,
-    Unknown,
-}
-
-impl From<fyrox_lite::lite_physics::LiteFeatureKind> for NativeFeatureKind {
-    fn from(value: fyrox_lite::lite_physics::LiteFeatureKind) -> Self {
-        match value {
-            fyrox_lite::lite_physics::LiteFeatureKind::Vertex => NativeFeatureKind::Vertex,
-            fyrox_lite::lite_physics::LiteFeatureKind::Edge => NativeFeatureKind::Edge,
-            fyrox_lite::lite_physics::LiteFeatureKind::Face => NativeFeatureKind::Face,
-            fyrox_lite::lite_physics::LiteFeatureKind::Unknown => NativeFeatureKind::Unknown,
-        }
-    }
-}
-
-impl From<NativeFeatureKind> for fyrox_lite::lite_physics::LiteFeatureKind {
-    fn from(value: NativeFeatureKind) -> Self {
-        match value {
-            NativeFeatureKind::Vertex => fyrox_lite::lite_physics::LiteFeatureKind::Vertex,
-            NativeFeatureKind::Edge => fyrox_lite::lite_physics::LiteFeatureKind::Edge,
-            NativeFeatureKind::Face => fyrox_lite::lite_physics::LiteFeatureKind::Face,
-            NativeFeatureKind::Unknown => fyrox_lite::lite_physics::LiteFeatureKind::Unknown,
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeRayCastOptions {
-    pub ray_origin: NativeVector3,
-    pub ray_direction: NativeVector3,
-    pub max_len: f32,
-    pub groups: NativeInteractionGroups_optional,
-    pub sort_results: NativeBool,
-}
-
-impl From<fyrox_lite::lite_physics::LiteRayCastOptions> for NativeRayCastOptions {
-    fn from(__value: fyrox_lite::lite_physics::LiteRayCastOptions) -> Self {
-        let ray_origin = __value.ray_origin.into();
-        let ray_direction = __value.ray_direction.into();
-        let max_len = __value.max_len.into();
-        let groups = __value.groups.into();
-        let sort_results = __value.sort_results.into();
-        Self {
-            ray_origin,
-            ray_direction,
-            max_len,
-            groups,
-            sort_results,
-        }
-    }
-}
-
-impl From<NativeRayCastOptions> for fyrox_lite::lite_physics::LiteRayCastOptions {
-    fn from(__value: NativeRayCastOptions) -> Self {
-        let ray_origin = __value.ray_origin.into();
-        let ray_direction = __value.ray_direction.into();
-        let max_len = __value.max_len.into();
-        let groups = __value.groups.into();
-        let sort_results = __value.sort_results.into();
-        Self {
-            ray_origin,
-            ray_direction,
-            max_len,
-            groups,
-            sort_results,
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeRayCastOptions_optional {
-    pub value: NativeRayCastOptions,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_physics::LiteRayCastOptions>> for NativeRayCastOptions_optional {
-    fn from(value: Option<fyrox_lite::lite_physics::LiteRayCastOptions>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeRayCastOptions_optional> for Option<fyrox_lite::lite_physics::LiteRayCastOptions> {
-    fn from(value: NativeRayCastOptions_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeRayCastOptions_slice {
-    pub begin: *mut NativeRayCastOptions,
-    pub len: i32,
-}
-
-impl From<Vec<fyrox_lite::lite_physics::LiteRayCastOptions>> for NativeRayCastOptions_slice {
-    fn from(value: Vec<fyrox_lite::lite_physics::LiteRayCastOptions>) -> Self {
-        let len = value.len() as i32;
-        let native_vec: Vec<NativeRayCastOptions> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeRayCastOptions_slice> for Vec<fyrox_lite::lite_physics::LiteRayCastOptions> {
-    fn from(value: NativeRayCastOptions_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_physics_LiteRayCastOptions_slice(
-    data: NativeRayCastOptions_slice,
-) -> NativeRayCastOptions_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeRayCastOptions_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeRayCastOptions_result {
-    pub ok: i32,
-    pub value: NativeRayCastOptions_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeRayCastOptions_result_value {
-    ok: NativeRayCastOptions,
-    err: NativeString,
-}
-
-impl From<Result<fyrox_lite::lite_physics::LiteRayCastOptions, crate::LangSpecificError>>
-    for NativeRayCastOptions_result
-{
-    fn from(
-        value: Result<fyrox_lite::lite_physics::LiteRayCastOptions, crate::LangSpecificError>,
-    ) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeRayCastOptions_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeRayCastOptions_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeRayCastOptions_result>
-    for Result<fyrox_lite::lite_physics::LiteRayCastOptions, crate::LangSpecificError>
-{
-    fn from(value: NativeRayCastOptions_result) -> Self {
-        unsafe {
-            if value.ok != 0 {
-                Ok(value.value.ok.into())
-            } else {
-                Err(value.value.err.into())
-            }
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeInteractionGroups {
-    pub memberships: i32,
-    pub filter: i32,
-}
-
-impl From<fyrox_lite::lite_physics::LiteInteractionGroups> for NativeInteractionGroups {
-    fn from(__value: fyrox_lite::lite_physics::LiteInteractionGroups) -> Self {
-        let memberships = __value.memberships.into();
-        let filter = __value.filter.into();
-        Self {
-            memberships,
-            filter,
-        }
-    }
-}
-
-impl From<NativeInteractionGroups> for fyrox_lite::lite_physics::LiteInteractionGroups {
-    fn from(__value: NativeInteractionGroups) -> Self {
-        let memberships = __value.memberships.into();
-        let filter = __value.filter.into();
-        Self {
-            memberships,
-            filter,
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeInteractionGroups_optional {
-    pub value: NativeInteractionGroups,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_physics::LiteInteractionGroups>>
-    for NativeInteractionGroups_optional
-{
-    fn from(value: Option<fyrox_lite::lite_physics::LiteInteractionGroups>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeInteractionGroups_optional>
-    for Option<fyrox_lite::lite_physics::LiteInteractionGroups>
-{
-    fn from(value: NativeInteractionGroups_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeInteractionGroups_slice {
-    pub begin: *mut NativeInteractionGroups,
-    pub len: i32,
-}
-
-impl From<Vec<fyrox_lite::lite_physics::LiteInteractionGroups>> for NativeInteractionGroups_slice {
-    fn from(value: Vec<fyrox_lite::lite_physics::LiteInteractionGroups>) -> Self {
-        let len = value.len() as i32;
-        let native_vec: Vec<NativeInteractionGroups> =
-            value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeInteractionGroups_slice> for Vec<fyrox_lite::lite_physics::LiteInteractionGroups> {
-    fn from(value: NativeInteractionGroups_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_physics_LiteInteractionGroups_slice(
-    data: NativeInteractionGroups_slice,
-) -> NativeInteractionGroups_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeInteractionGroups_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeInteractionGroups_result {
-    pub ok: i32,
-    pub value: NativeInteractionGroups_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeInteractionGroups_result_value {
-    ok: NativeInteractionGroups,
-    err: NativeString,
-}
-
-impl From<Result<fyrox_lite::lite_physics::LiteInteractionGroups, crate::LangSpecificError>>
-    for NativeInteractionGroups_result
-{
-    fn from(
-        value: Result<fyrox_lite::lite_physics::LiteInteractionGroups, crate::LangSpecificError>,
-    ) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeInteractionGroups_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeInteractionGroups_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeInteractionGroups_result>
-    for Result<fyrox_lite::lite_physics::LiteInteractionGroups, crate::LangSpecificError>
-{
-    fn from(value: NativeInteractionGroups_result) -> Self {
-        unsafe {
-            if value.ok != 0 {
-                Ok(value.value.ok.into())
-            } else {
-                Err(value.value.err.into())
-            }
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeRigidBody {
-    pub handle: NativeHandle,
-}
-
-impl From<fyrox_lite::lite_physics::LiteRigidBody> for NativeRigidBody {
-    fn from(value: fyrox_lite::lite_physics::LiteRigidBody) -> Self {
-        Self {
-            handle: NativeHandle::from_u128(value.to_external()),
-        }
-    }
-}
-
-impl From<NativeRigidBody> for fyrox_lite::lite_physics::LiteRigidBody {
-    fn from(value: NativeRigidBody) -> Self {
-        Self::from_external(value.handle.as_u128())
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_physics_LiteRigidBody_apply_force(
-    this: NativeRigidBody,
-    force: NativeVector3,
-) -> () {
-    let force = force.into();
-    let ret = fyrox_lite::lite_physics::LiteRigidBody::from(this).apply_force(force);
+pub extern "C" fn fyrox_lite_lite_log_LiteLog_err(msg: NativeString) -> () {
+    let msg = msg.into();
+    let ret = fyrox_lite::lite_log::LiteLog::err(msg);
     ret.into()
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeRigidBody_optional {
-    pub value: NativeRigidBody,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_physics::LiteRigidBody>> for NativeRigidBody_optional {
-    fn from(value: Option<fyrox_lite::lite_physics::LiteRigidBody>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeRigidBody_optional> for Option<fyrox_lite::lite_physics::LiteRigidBody> {
-    fn from(value: NativeRigidBody_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector3 {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-}
-
-impl From<fyrox_lite::lite_math::PodVector3> for NativeVector3 {
-    fn from(__value: fyrox_lite::lite_math::PodVector3) -> Self {
-        let x = __value.x.into();
-        let y = __value.y.into();
-        let z = __value.z.into();
-        Self { x, y, z }
-    }
-}
-
-impl From<NativeVector3> for fyrox_lite::lite_math::PodVector3 {
-    fn from(__value: NativeVector3) -> Self {
-        let x = __value.x.into();
-        let y = __value.y.into();
-        let z = __value.z.into();
-        Self { x, y, z }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector3_optional {
-    pub value: NativeVector3,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_math::PodVector3>> for NativeVector3_optional {
-    fn from(value: Option<fyrox_lite::lite_math::PodVector3>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeVector3_optional> for Option<fyrox_lite::lite_math::PodVector3> {
-    fn from(value: NativeVector3_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector3_slice {
-    pub begin: *mut NativeVector3,
-    pub len: i32,
-}
-
-impl From<Vec<fyrox_lite::lite_math::PodVector3>> for NativeVector3_slice {
-    fn from(value: Vec<fyrox_lite::lite_math::PodVector3>) -> Self {
-        let len = value.len() as i32;
-        let native_vec: Vec<NativeVector3> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeVector3_slice> for Vec<fyrox_lite::lite_math::PodVector3> {
-    fn from(value: NativeVector3_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_math_PodVector3_slice(
-    data: NativeVector3_slice,
-) -> NativeVector3_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeVector3_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector3_result {
-    pub ok: i32,
-    pub value: NativeVector3_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeVector3_result_value {
-    ok: NativeVector3,
-    err: NativeString,
-}
-
-impl From<Result<fyrox_lite::lite_math::PodVector3, crate::LangSpecificError>>
-    for NativeVector3_result
-{
-    fn from(value: Result<fyrox_lite::lite_math::PodVector3, crate::LangSpecificError>) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeVector3_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeVector3_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeVector3_result>
-    for Result<fyrox_lite::lite_math::PodVector3, crate::LangSpecificError>
-{
-    fn from(value: NativeVector3_result) -> Self {
-        unsafe {
-            if value.ok != 0 {
-                Ok(value.value.ok.into())
-            } else {
-                Err(value.value.err.into())
-            }
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector2 {
-    pub x: f32,
-    pub y: f32,
-}
-
-impl From<fyrox_lite::lite_math::PodVector2> for NativeVector2 {
-    fn from(__value: fyrox_lite::lite_math::PodVector2) -> Self {
-        let x = __value.x.into();
-        let y = __value.y.into();
-        Self { x, y }
-    }
-}
-
-impl From<NativeVector2> for fyrox_lite::lite_math::PodVector2 {
-    fn from(__value: NativeVector2) -> Self {
-        let x = __value.x.into();
-        let y = __value.y.into();
-        Self { x, y }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector2_optional {
-    pub value: NativeVector2,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_math::PodVector2>> for NativeVector2_optional {
-    fn from(value: Option<fyrox_lite::lite_math::PodVector2>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeVector2_optional> for Option<fyrox_lite::lite_math::PodVector2> {
-    fn from(value: NativeVector2_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector2_slice {
-    pub begin: *mut NativeVector2,
-    pub len: i32,
-}
-
-impl From<Vec<fyrox_lite::lite_math::PodVector2>> for NativeVector2_slice {
-    fn from(value: Vec<fyrox_lite::lite_math::PodVector2>) -> Self {
-        let len = value.len() as i32;
-        let native_vec: Vec<NativeVector2> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeVector2_slice> for Vec<fyrox_lite::lite_math::PodVector2> {
-    fn from(value: NativeVector2_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_math_PodVector2_slice(
-    data: NativeVector2_slice,
-) -> NativeVector2_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeVector2_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector2_result {
-    pub ok: i32,
-    pub value: NativeVector2_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeVector2_result_value {
-    ok: NativeVector2,
-    err: NativeString,
-}
-
-impl From<Result<fyrox_lite::lite_math::PodVector2, crate::LangSpecificError>>
-    for NativeVector2_result
-{
-    fn from(value: Result<fyrox_lite::lite_math::PodVector2, crate::LangSpecificError>) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeVector2_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeVector2_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeVector2_result>
-    for Result<fyrox_lite::lite_math::PodVector2, crate::LangSpecificError>
-{
-    fn from(value: NativeVector2_result) -> Self {
-        unsafe {
-            if value.ok != 0 {
-                Ok(value.value.ok.into())
-            } else {
-                Err(value.value.err.into())
-            }
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector2i {
-    pub x: i64,
-    pub y: i64,
-}
-
-impl From<fyrox_lite::lite_math::PodVector2i> for NativeVector2i {
-    fn from(__value: fyrox_lite::lite_math::PodVector2i) -> Self {
-        let x = __value.x.into();
-        let y = __value.y.into();
-        Self { x, y }
-    }
-}
-
-impl From<NativeVector2i> for fyrox_lite::lite_math::PodVector2i {
-    fn from(__value: NativeVector2i) -> Self {
-        let x = __value.x.into();
-        let y = __value.y.into();
-        Self { x, y }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector2i_optional {
-    pub value: NativeVector2i,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_math::PodVector2i>> for NativeVector2i_optional {
-    fn from(value: Option<fyrox_lite::lite_math::PodVector2i>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeVector2i_optional> for Option<fyrox_lite::lite_math::PodVector2i> {
-    fn from(value: NativeVector2i_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector2i_slice {
-    pub begin: *mut NativeVector2i,
-    pub len: i32,
-}
-
-impl From<Vec<fyrox_lite::lite_math::PodVector2i>> for NativeVector2i_slice {
-    fn from(value: Vec<fyrox_lite::lite_math::PodVector2i>) -> Self {
-        let len = value.len() as i32;
-        let native_vec: Vec<NativeVector2i> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeVector2i_slice> for Vec<fyrox_lite::lite_math::PodVector2i> {
-    fn from(value: NativeVector2i_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_math_PodVector2i_slice(
-    data: NativeVector2i_slice,
-) -> NativeVector2i_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeVector2i_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeVector2i_result {
-    pub ok: i32,
-    pub value: NativeVector2i_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeVector2i_result_value {
-    ok: NativeVector2i,
-    err: NativeString,
-}
-
-impl From<Result<fyrox_lite::lite_math::PodVector2i, crate::LangSpecificError>>
-    for NativeVector2i_result
-{
-    fn from(value: Result<fyrox_lite::lite_math::PodVector2i, crate::LangSpecificError>) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeVector2i_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeVector2i_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeVector2i_result>
-    for Result<fyrox_lite::lite_math::PodVector2i, crate::LangSpecificError>
-{
-    fn from(value: NativeVector2i_result) -> Self {
-        unsafe {
-            if value.ok != 0 {
-                Ok(value.value.ok.into())
-            } else {
-                Err(value.value.err.into())
-            }
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeQuaternion {
-    pub i: f32,
-    pub j: f32,
-    pub k: f32,
-    pub w: f32,
-}
-
-impl From<fyrox_lite::lite_math::PodQuaternion> for NativeQuaternion {
-    fn from(__value: fyrox_lite::lite_math::PodQuaternion) -> Self {
-        let i = __value.i.into();
-        let j = __value.j.into();
-        let k = __value.k.into();
-        let w = __value.w.into();
-        Self { i, j, k, w }
-    }
-}
-
-impl From<NativeQuaternion> for fyrox_lite::lite_math::PodQuaternion {
-    fn from(__value: NativeQuaternion) -> Self {
-        let i = __value.i.into();
-        let j = __value.j.into();
-        let k = __value.k.into();
-        let w = __value.w.into();
-        Self { i, j, k, w }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeQuaternion_optional {
-    pub value: NativeQuaternion,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_math::PodQuaternion>> for NativeQuaternion_optional {
-    fn from(value: Option<fyrox_lite::lite_math::PodQuaternion>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeQuaternion_optional> for Option<fyrox_lite::lite_math::PodQuaternion> {
-    fn from(value: NativeQuaternion_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeQuaternion_slice {
-    pub begin: *mut NativeQuaternion,
-    pub len: i32,
-}
-
-impl From<Vec<fyrox_lite::lite_math::PodQuaternion>> for NativeQuaternion_slice {
-    fn from(value: Vec<fyrox_lite::lite_math::PodQuaternion>) -> Self {
-        let len = value.len() as i32;
-        let native_vec: Vec<NativeQuaternion> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeQuaternion_slice> for Vec<fyrox_lite::lite_math::PodQuaternion> {
-    fn from(value: NativeQuaternion_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_math_PodQuaternion_slice(
-    data: NativeQuaternion_slice,
-) -> NativeQuaternion_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeQuaternion_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeQuaternion_result {
-    pub ok: i32,
-    pub value: NativeQuaternion_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeQuaternion_result_value {
-    ok: NativeQuaternion,
-    err: NativeString,
-}
-
-impl From<Result<fyrox_lite::lite_math::PodQuaternion, crate::LangSpecificError>>
-    for NativeQuaternion_result
-{
-    fn from(value: Result<fyrox_lite::lite_math::PodQuaternion, crate::LangSpecificError>) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeQuaternion_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeQuaternion_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeQuaternion_result>
-    for Result<fyrox_lite::lite_math::PodQuaternion, crate::LangSpecificError>
-{
-    fn from(value: NativeQuaternion_result) -> Self {
-        unsafe {
-            if value.ok != 0 {
-                Ok(value.value.ok.into())
-            } else {
-                Err(value.value.err.into())
-            }
-        }
-    }
 }
 
 #[repr(C)]
@@ -1676,89 +1098,6 @@ impl From<NativeRoutingStrategy> for fyrox_lite::lite_node::LiteRoutingStrategy 
             NativeRoutingStrategy::Down => fyrox_lite::lite_node::LiteRoutingStrategy::Down,
         }
     }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeLog {
-    pub handle: NativeHandle,
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_log_LiteLog_info(msg: NativeString) -> () {
-    let msg = msg.into();
-    let ret = fyrox_lite::lite_log::LiteLog::info(msg);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_log_LiteLog_warn(msg: NativeString) -> () {
-    let msg = msg.into();
-    let ret = fyrox_lite::lite_log::LiteLog::warn(msg);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_log_LiteLog_err(msg: NativeString) -> () {
-    let msg = msg.into();
-    let ret = fyrox_lite::lite_log::LiteLog::err(msg);
-    ret.into()
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeWindow {
-    pub handle: NativeHandle,
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_window_LiteWindow_set_cursor_grab(
-    mode: NativeCursorGrabMode,
-) -> () {
-    let mode = mode.into();
-    let ret = fyrox_lite::lite_window::LiteWindow::set_cursor_grab(mode);
-    ret.into()
-}
-
-#[repr(C)]
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum NativeCursorGrabMode {
-    None,
-    Confined,
-    Locked,
-}
-
-impl From<fyrox_lite::lite_window::LiteCursorGrabMode> for NativeCursorGrabMode {
-    fn from(value: fyrox_lite::lite_window::LiteCursorGrabMode) -> Self {
-        match value {
-            fyrox_lite::lite_window::LiteCursorGrabMode::None => NativeCursorGrabMode::None,
-            fyrox_lite::lite_window::LiteCursorGrabMode::Confined => NativeCursorGrabMode::Confined,
-            fyrox_lite::lite_window::LiteCursorGrabMode::Locked => NativeCursorGrabMode::Locked,
-        }
-    }
-}
-
-impl From<NativeCursorGrabMode> for fyrox_lite::lite_window::LiteCursorGrabMode {
-    fn from(value: NativeCursorGrabMode) -> Self {
-        match value {
-            NativeCursorGrabMode::None => fyrox_lite::lite_window::LiteCursorGrabMode::None,
-            NativeCursorGrabMode::Confined => fyrox_lite::lite_window::LiteCursorGrabMode::Confined,
-            NativeCursorGrabMode::Locked => fyrox_lite::lite_window::LiteCursorGrabMode::Locked,
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeScene {
-    pub handle: NativeHandle,
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_scene_LiteScene_load_async(scene_path: NativeString) -> () {
-    let scene_path = scene_path.into();
-    let ret = fyrox_lite::lite_scene::LiteScene::load_async(scene_path);
-    ret.into()
 }
 
 #[repr(C)]
@@ -2738,693 +2077,1354 @@ impl From<NativeGradientPoint_result>
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct NativeInput {
-    pub handle: NativeHandle,
+pub struct NativeVector3 {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_input_Input_is_mouse_button_down(button: i32) -> NativeBool {
-    let button = button.into();
-    let ret = fyrox_lite::lite_input::Input::is_mouse_button_down(button);
-    ret.into()
+impl From<fyrox_lite::lite_math::PodVector3> for NativeVector3 {
+    fn from(__value: fyrox_lite::lite_math::PodVector3) -> Self {
+        let x = __value.x.into();
+        let y = __value.y.into();
+        let z = __value.z.into();
+        Self { x, y, z }
+    }
 }
 
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_input_Input_is_mouse_button_up(button: i32) -> NativeBool {
-    let button = button.into();
-    let ret = fyrox_lite::lite_input::Input::is_mouse_button_up(button);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_input_Input_is_mouse_button(button: i32) -> NativeBool {
-    let button = button.into();
-    let ret = fyrox_lite::lite_input::Input::is_mouse_button(button);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_input_Input_is_key_down(key: NativeKeyCode) -> NativeBool {
-    let key = key.into();
-    let ret = fyrox_lite::lite_input::Input::is_key_down(key);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_input_Input_is_key_up(key: NativeKeyCode) -> NativeBool {
-    let key = key.into();
-    let ret = fyrox_lite::lite_input::Input::is_key_up(key);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_input_Input_is_key(key: NativeKeyCode) -> NativeBool {
-    let key = key.into();
-    let ret = fyrox_lite::lite_input::Input::is_key(key);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_input_Input_get_mouse_move() -> NativeVector2 {
-    let ret = fyrox_lite::lite_input::Input::get_mouse_move();
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_input_Input_get_mouse_scroll() -> NativeVector2 {
-    let ret = fyrox_lite::lite_input::Input::get_mouse_scroll();
-    ret.into()
+impl From<NativeVector3> for fyrox_lite::lite_math::PodVector3 {
+    fn from(__value: NativeVector3) -> Self {
+        let x = __value.x.into();
+        let y = __value.y.into();
+        let z = __value.z.into();
+        Self { x, y, z }
+    }
 }
 
 #[repr(C)]
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum NativeKeyCode {
-    Backquote,
-    Backslash,
-    BracketLeft,
-    BracketRight,
-    Comma,
-    Digit0,
-    Digit1,
-    Digit2,
-    Digit3,
-    Digit4,
-    Digit5,
-    Digit6,
-    Digit7,
-    Digit8,
-    Digit9,
-    Equal,
-    IntlBackslash,
-    IntlRo,
-    IntlYen,
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
-    H,
-    I,
-    J,
-    K,
-    L,
-    M,
-    N,
-    O,
-    P,
-    Q,
-    R,
-    S,
-    T,
-    U,
-    V,
-    W,
-    X,
-    Y,
-    Z,
-    Minus,
-    Period,
-    Quote,
-    Semicolon,
-    Slash,
-    AltLeft,
-    AltRight,
-    Backspace,
-    CapsLock,
-    ContextMenu,
-    ControlLeft,
-    ControlRight,
-    Enter,
-    SuperLeft,
-    SuperRight,
-    ShiftLeft,
-    ShiftRight,
-    Space,
-    Tab,
-    Convert,
-    KanaMode,
-    Lang1,
-    Lang2,
-    Lang3,
-    Lang4,
-    Lang5,
-    NonConvert,
-    Delete,
-    End,
-    Help,
-    Home,
-    Insert,
-    PageDown,
-    PageUp,
-    ArrowDown,
-    ArrowLeft,
-    ArrowRight,
-    ArrowUp,
-    NumLock,
-    Numpad0,
-    Numpad1,
-    Numpad2,
-    Numpad3,
-    Numpad4,
-    Numpad5,
-    Numpad6,
-    Numpad7,
-    Numpad8,
-    Numpad9,
-    NumpadAdd,
-    NumpadBackspace,
-    NumpadClear,
-    NumpadClearEntry,
-    NumpadComma,
-    NumpadDecimal,
-    NumpadDivide,
-    NumpadEnter,
-    NumpadEqual,
-    NumpadHash,
-    NumpadMemoryAdd,
-    NumpadMemoryClear,
-    NumpadMemoryRecall,
-    NumpadMemoryStore,
-    NumpadMemorySubtract,
-    NumpadMultiply,
-    NumpadParenLeft,
-    NumpadParenRight,
-    NumpadStar,
-    NumpadSubtract,
-    Escape,
-    Fn,
-    FnLock,
-    PrintScreen,
-    ScrollLock,
-    Pause,
-    BrowserBack,
-    BrowserFavorites,
-    BrowserForward,
-    BrowserHome,
-    BrowserRefresh,
-    BrowserSearch,
-    BrowserStop,
-    Eject,
-    LaunchApp1,
-    LaunchApp2,
-    LaunchMail,
-    MediaPlayPause,
-    MediaSelect,
-    MediaStop,
-    MediaTrackNext,
-    MediaTrackPrevious,
-    Power,
-    Sleep,
-    AudioVolumeDown,
-    AudioVolumeMute,
-    AudioVolumeUp,
-    WakeUp,
-    Meta,
-    Hyper,
-    Turbo,
-    Abort,
-    Resume,
-    Suspend,
-    Again,
-    Copy,
-    Cut,
-    Find,
-    Open,
-    Paste,
-    Props,
-    Select,
-    Undo,
-    Hiragana,
-    Katakana,
-    F1,
-    F2,
-    F3,
-    F4,
-    F5,
-    F6,
-    F7,
-    F8,
-    F9,
-    F10,
-    F11,
-    F12,
-    F13,
-    F14,
-    F15,
-    F16,
-    F17,
-    F18,
-    F19,
-    F20,
-    F21,
-    F22,
-    F23,
-    F24,
-    F25,
-    F26,
-    F27,
-    F28,
-    F29,
-    F30,
-    F31,
-    F32,
-    F33,
-    F34,
-    F35,
+#[derive(Clone, Copy)]
+pub struct NativeVector3_optional {
+    pub value: NativeVector3,
+    pub has_value: i32,
 }
 
-impl From<fyrox_lite::lite_input::LiteKeyCode> for NativeKeyCode {
-    fn from(value: fyrox_lite::lite_input::LiteKeyCode) -> Self {
+impl From<Option<fyrox_lite::lite_math::PodVector3>> for NativeVector3_optional {
+    fn from(value: Option<fyrox_lite::lite_math::PodVector3>) -> Self {
         match value {
-            fyrox_lite::lite_input::LiteKeyCode::Backquote => NativeKeyCode::Backquote,
-            fyrox_lite::lite_input::LiteKeyCode::Backslash => NativeKeyCode::Backslash,
-            fyrox_lite::lite_input::LiteKeyCode::BracketLeft => NativeKeyCode::BracketLeft,
-            fyrox_lite::lite_input::LiteKeyCode::BracketRight => NativeKeyCode::BracketRight,
-            fyrox_lite::lite_input::LiteKeyCode::Comma => NativeKeyCode::Comma,
-            fyrox_lite::lite_input::LiteKeyCode::Digit0 => NativeKeyCode::Digit0,
-            fyrox_lite::lite_input::LiteKeyCode::Digit1 => NativeKeyCode::Digit1,
-            fyrox_lite::lite_input::LiteKeyCode::Digit2 => NativeKeyCode::Digit2,
-            fyrox_lite::lite_input::LiteKeyCode::Digit3 => NativeKeyCode::Digit3,
-            fyrox_lite::lite_input::LiteKeyCode::Digit4 => NativeKeyCode::Digit4,
-            fyrox_lite::lite_input::LiteKeyCode::Digit5 => NativeKeyCode::Digit5,
-            fyrox_lite::lite_input::LiteKeyCode::Digit6 => NativeKeyCode::Digit6,
-            fyrox_lite::lite_input::LiteKeyCode::Digit7 => NativeKeyCode::Digit7,
-            fyrox_lite::lite_input::LiteKeyCode::Digit8 => NativeKeyCode::Digit8,
-            fyrox_lite::lite_input::LiteKeyCode::Digit9 => NativeKeyCode::Digit9,
-            fyrox_lite::lite_input::LiteKeyCode::Equal => NativeKeyCode::Equal,
-            fyrox_lite::lite_input::LiteKeyCode::IntlBackslash => NativeKeyCode::IntlBackslash,
-            fyrox_lite::lite_input::LiteKeyCode::IntlRo => NativeKeyCode::IntlRo,
-            fyrox_lite::lite_input::LiteKeyCode::IntlYen => NativeKeyCode::IntlYen,
-            fyrox_lite::lite_input::LiteKeyCode::A => NativeKeyCode::A,
-            fyrox_lite::lite_input::LiteKeyCode::B => NativeKeyCode::B,
-            fyrox_lite::lite_input::LiteKeyCode::C => NativeKeyCode::C,
-            fyrox_lite::lite_input::LiteKeyCode::D => NativeKeyCode::D,
-            fyrox_lite::lite_input::LiteKeyCode::E => NativeKeyCode::E,
-            fyrox_lite::lite_input::LiteKeyCode::F => NativeKeyCode::F,
-            fyrox_lite::lite_input::LiteKeyCode::G => NativeKeyCode::G,
-            fyrox_lite::lite_input::LiteKeyCode::H => NativeKeyCode::H,
-            fyrox_lite::lite_input::LiteKeyCode::I => NativeKeyCode::I,
-            fyrox_lite::lite_input::LiteKeyCode::J => NativeKeyCode::J,
-            fyrox_lite::lite_input::LiteKeyCode::K => NativeKeyCode::K,
-            fyrox_lite::lite_input::LiteKeyCode::L => NativeKeyCode::L,
-            fyrox_lite::lite_input::LiteKeyCode::M => NativeKeyCode::M,
-            fyrox_lite::lite_input::LiteKeyCode::N => NativeKeyCode::N,
-            fyrox_lite::lite_input::LiteKeyCode::O => NativeKeyCode::O,
-            fyrox_lite::lite_input::LiteKeyCode::P => NativeKeyCode::P,
-            fyrox_lite::lite_input::LiteKeyCode::Q => NativeKeyCode::Q,
-            fyrox_lite::lite_input::LiteKeyCode::R => NativeKeyCode::R,
-            fyrox_lite::lite_input::LiteKeyCode::S => NativeKeyCode::S,
-            fyrox_lite::lite_input::LiteKeyCode::T => NativeKeyCode::T,
-            fyrox_lite::lite_input::LiteKeyCode::U => NativeKeyCode::U,
-            fyrox_lite::lite_input::LiteKeyCode::V => NativeKeyCode::V,
-            fyrox_lite::lite_input::LiteKeyCode::W => NativeKeyCode::W,
-            fyrox_lite::lite_input::LiteKeyCode::X => NativeKeyCode::X,
-            fyrox_lite::lite_input::LiteKeyCode::Y => NativeKeyCode::Y,
-            fyrox_lite::lite_input::LiteKeyCode::Z => NativeKeyCode::Z,
-            fyrox_lite::lite_input::LiteKeyCode::Minus => NativeKeyCode::Minus,
-            fyrox_lite::lite_input::LiteKeyCode::Period => NativeKeyCode::Period,
-            fyrox_lite::lite_input::LiteKeyCode::Quote => NativeKeyCode::Quote,
-            fyrox_lite::lite_input::LiteKeyCode::Semicolon => NativeKeyCode::Semicolon,
-            fyrox_lite::lite_input::LiteKeyCode::Slash => NativeKeyCode::Slash,
-            fyrox_lite::lite_input::LiteKeyCode::AltLeft => NativeKeyCode::AltLeft,
-            fyrox_lite::lite_input::LiteKeyCode::AltRight => NativeKeyCode::AltRight,
-            fyrox_lite::lite_input::LiteKeyCode::Backspace => NativeKeyCode::Backspace,
-            fyrox_lite::lite_input::LiteKeyCode::CapsLock => NativeKeyCode::CapsLock,
-            fyrox_lite::lite_input::LiteKeyCode::ContextMenu => NativeKeyCode::ContextMenu,
-            fyrox_lite::lite_input::LiteKeyCode::ControlLeft => NativeKeyCode::ControlLeft,
-            fyrox_lite::lite_input::LiteKeyCode::ControlRight => NativeKeyCode::ControlRight,
-            fyrox_lite::lite_input::LiteKeyCode::Enter => NativeKeyCode::Enter,
-            fyrox_lite::lite_input::LiteKeyCode::SuperLeft => NativeKeyCode::SuperLeft,
-            fyrox_lite::lite_input::LiteKeyCode::SuperRight => NativeKeyCode::SuperRight,
-            fyrox_lite::lite_input::LiteKeyCode::ShiftLeft => NativeKeyCode::ShiftLeft,
-            fyrox_lite::lite_input::LiteKeyCode::ShiftRight => NativeKeyCode::ShiftRight,
-            fyrox_lite::lite_input::LiteKeyCode::Space => NativeKeyCode::Space,
-            fyrox_lite::lite_input::LiteKeyCode::Tab => NativeKeyCode::Tab,
-            fyrox_lite::lite_input::LiteKeyCode::Convert => NativeKeyCode::Convert,
-            fyrox_lite::lite_input::LiteKeyCode::KanaMode => NativeKeyCode::KanaMode,
-            fyrox_lite::lite_input::LiteKeyCode::Lang1 => NativeKeyCode::Lang1,
-            fyrox_lite::lite_input::LiteKeyCode::Lang2 => NativeKeyCode::Lang2,
-            fyrox_lite::lite_input::LiteKeyCode::Lang3 => NativeKeyCode::Lang3,
-            fyrox_lite::lite_input::LiteKeyCode::Lang4 => NativeKeyCode::Lang4,
-            fyrox_lite::lite_input::LiteKeyCode::Lang5 => NativeKeyCode::Lang5,
-            fyrox_lite::lite_input::LiteKeyCode::NonConvert => NativeKeyCode::NonConvert,
-            fyrox_lite::lite_input::LiteKeyCode::Delete => NativeKeyCode::Delete,
-            fyrox_lite::lite_input::LiteKeyCode::End => NativeKeyCode::End,
-            fyrox_lite::lite_input::LiteKeyCode::Help => NativeKeyCode::Help,
-            fyrox_lite::lite_input::LiteKeyCode::Home => NativeKeyCode::Home,
-            fyrox_lite::lite_input::LiteKeyCode::Insert => NativeKeyCode::Insert,
-            fyrox_lite::lite_input::LiteKeyCode::PageDown => NativeKeyCode::PageDown,
-            fyrox_lite::lite_input::LiteKeyCode::PageUp => NativeKeyCode::PageUp,
-            fyrox_lite::lite_input::LiteKeyCode::ArrowDown => NativeKeyCode::ArrowDown,
-            fyrox_lite::lite_input::LiteKeyCode::ArrowLeft => NativeKeyCode::ArrowLeft,
-            fyrox_lite::lite_input::LiteKeyCode::ArrowRight => NativeKeyCode::ArrowRight,
-            fyrox_lite::lite_input::LiteKeyCode::ArrowUp => NativeKeyCode::ArrowUp,
-            fyrox_lite::lite_input::LiteKeyCode::NumLock => NativeKeyCode::NumLock,
-            fyrox_lite::lite_input::LiteKeyCode::Numpad0 => NativeKeyCode::Numpad0,
-            fyrox_lite::lite_input::LiteKeyCode::Numpad1 => NativeKeyCode::Numpad1,
-            fyrox_lite::lite_input::LiteKeyCode::Numpad2 => NativeKeyCode::Numpad2,
-            fyrox_lite::lite_input::LiteKeyCode::Numpad3 => NativeKeyCode::Numpad3,
-            fyrox_lite::lite_input::LiteKeyCode::Numpad4 => NativeKeyCode::Numpad4,
-            fyrox_lite::lite_input::LiteKeyCode::Numpad5 => NativeKeyCode::Numpad5,
-            fyrox_lite::lite_input::LiteKeyCode::Numpad6 => NativeKeyCode::Numpad6,
-            fyrox_lite::lite_input::LiteKeyCode::Numpad7 => NativeKeyCode::Numpad7,
-            fyrox_lite::lite_input::LiteKeyCode::Numpad8 => NativeKeyCode::Numpad8,
-            fyrox_lite::lite_input::LiteKeyCode::Numpad9 => NativeKeyCode::Numpad9,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadAdd => NativeKeyCode::NumpadAdd,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadBackspace => NativeKeyCode::NumpadBackspace,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadClear => NativeKeyCode::NumpadClear,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadClearEntry => {
-                NativeKeyCode::NumpadClearEntry
-            }
-            fyrox_lite::lite_input::LiteKeyCode::NumpadComma => NativeKeyCode::NumpadComma,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadDecimal => NativeKeyCode::NumpadDecimal,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadDivide => NativeKeyCode::NumpadDivide,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadEnter => NativeKeyCode::NumpadEnter,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadEqual => NativeKeyCode::NumpadEqual,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadHash => NativeKeyCode::NumpadHash,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryAdd => NativeKeyCode::NumpadMemoryAdd,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryClear => {
-                NativeKeyCode::NumpadMemoryClear
-            }
-            fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryRecall => {
-                NativeKeyCode::NumpadMemoryRecall
-            }
-            fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryStore => {
-                NativeKeyCode::NumpadMemoryStore
-            }
-            fyrox_lite::lite_input::LiteKeyCode::NumpadMemorySubtract => {
-                NativeKeyCode::NumpadMemorySubtract
-            }
-            fyrox_lite::lite_input::LiteKeyCode::NumpadMultiply => NativeKeyCode::NumpadMultiply,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadParenLeft => NativeKeyCode::NumpadParenLeft,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadParenRight => {
-                NativeKeyCode::NumpadParenRight
-            }
-            fyrox_lite::lite_input::LiteKeyCode::NumpadStar => NativeKeyCode::NumpadStar,
-            fyrox_lite::lite_input::LiteKeyCode::NumpadSubtract => NativeKeyCode::NumpadSubtract,
-            fyrox_lite::lite_input::LiteKeyCode::Escape => NativeKeyCode::Escape,
-            fyrox_lite::lite_input::LiteKeyCode::Fn => NativeKeyCode::Fn,
-            fyrox_lite::lite_input::LiteKeyCode::FnLock => NativeKeyCode::FnLock,
-            fyrox_lite::lite_input::LiteKeyCode::PrintScreen => NativeKeyCode::PrintScreen,
-            fyrox_lite::lite_input::LiteKeyCode::ScrollLock => NativeKeyCode::ScrollLock,
-            fyrox_lite::lite_input::LiteKeyCode::Pause => NativeKeyCode::Pause,
-            fyrox_lite::lite_input::LiteKeyCode::BrowserBack => NativeKeyCode::BrowserBack,
-            fyrox_lite::lite_input::LiteKeyCode::BrowserFavorites => {
-                NativeKeyCode::BrowserFavorites
-            }
-            fyrox_lite::lite_input::LiteKeyCode::BrowserForward => NativeKeyCode::BrowserForward,
-            fyrox_lite::lite_input::LiteKeyCode::BrowserHome => NativeKeyCode::BrowserHome,
-            fyrox_lite::lite_input::LiteKeyCode::BrowserRefresh => NativeKeyCode::BrowserRefresh,
-            fyrox_lite::lite_input::LiteKeyCode::BrowserSearch => NativeKeyCode::BrowserSearch,
-            fyrox_lite::lite_input::LiteKeyCode::BrowserStop => NativeKeyCode::BrowserStop,
-            fyrox_lite::lite_input::LiteKeyCode::Eject => NativeKeyCode::Eject,
-            fyrox_lite::lite_input::LiteKeyCode::LaunchApp1 => NativeKeyCode::LaunchApp1,
-            fyrox_lite::lite_input::LiteKeyCode::LaunchApp2 => NativeKeyCode::LaunchApp2,
-            fyrox_lite::lite_input::LiteKeyCode::LaunchMail => NativeKeyCode::LaunchMail,
-            fyrox_lite::lite_input::LiteKeyCode::MediaPlayPause => NativeKeyCode::MediaPlayPause,
-            fyrox_lite::lite_input::LiteKeyCode::MediaSelect => NativeKeyCode::MediaSelect,
-            fyrox_lite::lite_input::LiteKeyCode::MediaStop => NativeKeyCode::MediaStop,
-            fyrox_lite::lite_input::LiteKeyCode::MediaTrackNext => NativeKeyCode::MediaTrackNext,
-            fyrox_lite::lite_input::LiteKeyCode::MediaTrackPrevious => {
-                NativeKeyCode::MediaTrackPrevious
-            }
-            fyrox_lite::lite_input::LiteKeyCode::Power => NativeKeyCode::Power,
-            fyrox_lite::lite_input::LiteKeyCode::Sleep => NativeKeyCode::Sleep,
-            fyrox_lite::lite_input::LiteKeyCode::AudioVolumeDown => NativeKeyCode::AudioVolumeDown,
-            fyrox_lite::lite_input::LiteKeyCode::AudioVolumeMute => NativeKeyCode::AudioVolumeMute,
-            fyrox_lite::lite_input::LiteKeyCode::AudioVolumeUp => NativeKeyCode::AudioVolumeUp,
-            fyrox_lite::lite_input::LiteKeyCode::WakeUp => NativeKeyCode::WakeUp,
-            fyrox_lite::lite_input::LiteKeyCode::Meta => NativeKeyCode::Meta,
-            fyrox_lite::lite_input::LiteKeyCode::Hyper => NativeKeyCode::Hyper,
-            fyrox_lite::lite_input::LiteKeyCode::Turbo => NativeKeyCode::Turbo,
-            fyrox_lite::lite_input::LiteKeyCode::Abort => NativeKeyCode::Abort,
-            fyrox_lite::lite_input::LiteKeyCode::Resume => NativeKeyCode::Resume,
-            fyrox_lite::lite_input::LiteKeyCode::Suspend => NativeKeyCode::Suspend,
-            fyrox_lite::lite_input::LiteKeyCode::Again => NativeKeyCode::Again,
-            fyrox_lite::lite_input::LiteKeyCode::Copy => NativeKeyCode::Copy,
-            fyrox_lite::lite_input::LiteKeyCode::Cut => NativeKeyCode::Cut,
-            fyrox_lite::lite_input::LiteKeyCode::Find => NativeKeyCode::Find,
-            fyrox_lite::lite_input::LiteKeyCode::Open => NativeKeyCode::Open,
-            fyrox_lite::lite_input::LiteKeyCode::Paste => NativeKeyCode::Paste,
-            fyrox_lite::lite_input::LiteKeyCode::Props => NativeKeyCode::Props,
-            fyrox_lite::lite_input::LiteKeyCode::Select => NativeKeyCode::Select,
-            fyrox_lite::lite_input::LiteKeyCode::Undo => NativeKeyCode::Undo,
-            fyrox_lite::lite_input::LiteKeyCode::Hiragana => NativeKeyCode::Hiragana,
-            fyrox_lite::lite_input::LiteKeyCode::Katakana => NativeKeyCode::Katakana,
-            fyrox_lite::lite_input::LiteKeyCode::F1 => NativeKeyCode::F1,
-            fyrox_lite::lite_input::LiteKeyCode::F2 => NativeKeyCode::F2,
-            fyrox_lite::lite_input::LiteKeyCode::F3 => NativeKeyCode::F3,
-            fyrox_lite::lite_input::LiteKeyCode::F4 => NativeKeyCode::F4,
-            fyrox_lite::lite_input::LiteKeyCode::F5 => NativeKeyCode::F5,
-            fyrox_lite::lite_input::LiteKeyCode::F6 => NativeKeyCode::F6,
-            fyrox_lite::lite_input::LiteKeyCode::F7 => NativeKeyCode::F7,
-            fyrox_lite::lite_input::LiteKeyCode::F8 => NativeKeyCode::F8,
-            fyrox_lite::lite_input::LiteKeyCode::F9 => NativeKeyCode::F9,
-            fyrox_lite::lite_input::LiteKeyCode::F10 => NativeKeyCode::F10,
-            fyrox_lite::lite_input::LiteKeyCode::F11 => NativeKeyCode::F11,
-            fyrox_lite::lite_input::LiteKeyCode::F12 => NativeKeyCode::F12,
-            fyrox_lite::lite_input::LiteKeyCode::F13 => NativeKeyCode::F13,
-            fyrox_lite::lite_input::LiteKeyCode::F14 => NativeKeyCode::F14,
-            fyrox_lite::lite_input::LiteKeyCode::F15 => NativeKeyCode::F15,
-            fyrox_lite::lite_input::LiteKeyCode::F16 => NativeKeyCode::F16,
-            fyrox_lite::lite_input::LiteKeyCode::F17 => NativeKeyCode::F17,
-            fyrox_lite::lite_input::LiteKeyCode::F18 => NativeKeyCode::F18,
-            fyrox_lite::lite_input::LiteKeyCode::F19 => NativeKeyCode::F19,
-            fyrox_lite::lite_input::LiteKeyCode::F20 => NativeKeyCode::F20,
-            fyrox_lite::lite_input::LiteKeyCode::F21 => NativeKeyCode::F21,
-            fyrox_lite::lite_input::LiteKeyCode::F22 => NativeKeyCode::F22,
-            fyrox_lite::lite_input::LiteKeyCode::F23 => NativeKeyCode::F23,
-            fyrox_lite::lite_input::LiteKeyCode::F24 => NativeKeyCode::F24,
-            fyrox_lite::lite_input::LiteKeyCode::F25 => NativeKeyCode::F25,
-            fyrox_lite::lite_input::LiteKeyCode::F26 => NativeKeyCode::F26,
-            fyrox_lite::lite_input::LiteKeyCode::F27 => NativeKeyCode::F27,
-            fyrox_lite::lite_input::LiteKeyCode::F28 => NativeKeyCode::F28,
-            fyrox_lite::lite_input::LiteKeyCode::F29 => NativeKeyCode::F29,
-            fyrox_lite::lite_input::LiteKeyCode::F30 => NativeKeyCode::F30,
-            fyrox_lite::lite_input::LiteKeyCode::F31 => NativeKeyCode::F31,
-            fyrox_lite::lite_input::LiteKeyCode::F32 => NativeKeyCode::F32,
-            fyrox_lite::lite_input::LiteKeyCode::F33 => NativeKeyCode::F33,
-            fyrox_lite::lite_input::LiteKeyCode::F34 => NativeKeyCode::F34,
-            fyrox_lite::lite_input::LiteKeyCode::F35 => NativeKeyCode::F35,
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
         }
     }
 }
 
-impl From<NativeKeyCode> for fyrox_lite::lite_input::LiteKeyCode {
-    fn from(value: NativeKeyCode) -> Self {
+impl From<NativeVector3_optional> for Option<fyrox_lite::lite_math::PodVector3> {
+    fn from(value: NativeVector3_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeVector3_slice {
+    pub begin: *mut NativeVector3,
+    pub len: i32,
+}
+
+impl From<Vec<fyrox_lite::lite_math::PodVector3>> for NativeVector3_slice {
+    fn from(value: Vec<fyrox_lite::lite_math::PodVector3>) -> Self {
+        let len = value.len() as i32;
+        let native_vec: Vec<NativeVector3> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeVector3_slice> for Vec<fyrox_lite::lite_math::PodVector3> {
+    fn from(value: NativeVector3_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
+            }
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_math_PodVector3_slice(
+    data: NativeVector3_slice,
+) -> NativeVector3_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeVector3_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeVector3_result {
+    pub ok: i32,
+    pub value: NativeVector3_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeVector3_result_value {
+    ok: NativeVector3,
+    err: NativeString,
+}
+
+impl From<Result<fyrox_lite::lite_math::PodVector3, crate::LangSpecificError>>
+    for NativeVector3_result
+{
+    fn from(value: Result<fyrox_lite::lite_math::PodVector3, crate::LangSpecificError>) -> Self {
         match value {
-            NativeKeyCode::Backquote => fyrox_lite::lite_input::LiteKeyCode::Backquote,
-            NativeKeyCode::Backslash => fyrox_lite::lite_input::LiteKeyCode::Backslash,
-            NativeKeyCode::BracketLeft => fyrox_lite::lite_input::LiteKeyCode::BracketLeft,
-            NativeKeyCode::BracketRight => fyrox_lite::lite_input::LiteKeyCode::BracketRight,
-            NativeKeyCode::Comma => fyrox_lite::lite_input::LiteKeyCode::Comma,
-            NativeKeyCode::Digit0 => fyrox_lite::lite_input::LiteKeyCode::Digit0,
-            NativeKeyCode::Digit1 => fyrox_lite::lite_input::LiteKeyCode::Digit1,
-            NativeKeyCode::Digit2 => fyrox_lite::lite_input::LiteKeyCode::Digit2,
-            NativeKeyCode::Digit3 => fyrox_lite::lite_input::LiteKeyCode::Digit3,
-            NativeKeyCode::Digit4 => fyrox_lite::lite_input::LiteKeyCode::Digit4,
-            NativeKeyCode::Digit5 => fyrox_lite::lite_input::LiteKeyCode::Digit5,
-            NativeKeyCode::Digit6 => fyrox_lite::lite_input::LiteKeyCode::Digit6,
-            NativeKeyCode::Digit7 => fyrox_lite::lite_input::LiteKeyCode::Digit7,
-            NativeKeyCode::Digit8 => fyrox_lite::lite_input::LiteKeyCode::Digit8,
-            NativeKeyCode::Digit9 => fyrox_lite::lite_input::LiteKeyCode::Digit9,
-            NativeKeyCode::Equal => fyrox_lite::lite_input::LiteKeyCode::Equal,
-            NativeKeyCode::IntlBackslash => fyrox_lite::lite_input::LiteKeyCode::IntlBackslash,
-            NativeKeyCode::IntlRo => fyrox_lite::lite_input::LiteKeyCode::IntlRo,
-            NativeKeyCode::IntlYen => fyrox_lite::lite_input::LiteKeyCode::IntlYen,
-            NativeKeyCode::A => fyrox_lite::lite_input::LiteKeyCode::A,
-            NativeKeyCode::B => fyrox_lite::lite_input::LiteKeyCode::B,
-            NativeKeyCode::C => fyrox_lite::lite_input::LiteKeyCode::C,
-            NativeKeyCode::D => fyrox_lite::lite_input::LiteKeyCode::D,
-            NativeKeyCode::E => fyrox_lite::lite_input::LiteKeyCode::E,
-            NativeKeyCode::F => fyrox_lite::lite_input::LiteKeyCode::F,
-            NativeKeyCode::G => fyrox_lite::lite_input::LiteKeyCode::G,
-            NativeKeyCode::H => fyrox_lite::lite_input::LiteKeyCode::H,
-            NativeKeyCode::I => fyrox_lite::lite_input::LiteKeyCode::I,
-            NativeKeyCode::J => fyrox_lite::lite_input::LiteKeyCode::J,
-            NativeKeyCode::K => fyrox_lite::lite_input::LiteKeyCode::K,
-            NativeKeyCode::L => fyrox_lite::lite_input::LiteKeyCode::L,
-            NativeKeyCode::M => fyrox_lite::lite_input::LiteKeyCode::M,
-            NativeKeyCode::N => fyrox_lite::lite_input::LiteKeyCode::N,
-            NativeKeyCode::O => fyrox_lite::lite_input::LiteKeyCode::O,
-            NativeKeyCode::P => fyrox_lite::lite_input::LiteKeyCode::P,
-            NativeKeyCode::Q => fyrox_lite::lite_input::LiteKeyCode::Q,
-            NativeKeyCode::R => fyrox_lite::lite_input::LiteKeyCode::R,
-            NativeKeyCode::S => fyrox_lite::lite_input::LiteKeyCode::S,
-            NativeKeyCode::T => fyrox_lite::lite_input::LiteKeyCode::T,
-            NativeKeyCode::U => fyrox_lite::lite_input::LiteKeyCode::U,
-            NativeKeyCode::V => fyrox_lite::lite_input::LiteKeyCode::V,
-            NativeKeyCode::W => fyrox_lite::lite_input::LiteKeyCode::W,
-            NativeKeyCode::X => fyrox_lite::lite_input::LiteKeyCode::X,
-            NativeKeyCode::Y => fyrox_lite::lite_input::LiteKeyCode::Y,
-            NativeKeyCode::Z => fyrox_lite::lite_input::LiteKeyCode::Z,
-            NativeKeyCode::Minus => fyrox_lite::lite_input::LiteKeyCode::Minus,
-            NativeKeyCode::Period => fyrox_lite::lite_input::LiteKeyCode::Period,
-            NativeKeyCode::Quote => fyrox_lite::lite_input::LiteKeyCode::Quote,
-            NativeKeyCode::Semicolon => fyrox_lite::lite_input::LiteKeyCode::Semicolon,
-            NativeKeyCode::Slash => fyrox_lite::lite_input::LiteKeyCode::Slash,
-            NativeKeyCode::AltLeft => fyrox_lite::lite_input::LiteKeyCode::AltLeft,
-            NativeKeyCode::AltRight => fyrox_lite::lite_input::LiteKeyCode::AltRight,
-            NativeKeyCode::Backspace => fyrox_lite::lite_input::LiteKeyCode::Backspace,
-            NativeKeyCode::CapsLock => fyrox_lite::lite_input::LiteKeyCode::CapsLock,
-            NativeKeyCode::ContextMenu => fyrox_lite::lite_input::LiteKeyCode::ContextMenu,
-            NativeKeyCode::ControlLeft => fyrox_lite::lite_input::LiteKeyCode::ControlLeft,
-            NativeKeyCode::ControlRight => fyrox_lite::lite_input::LiteKeyCode::ControlRight,
-            NativeKeyCode::Enter => fyrox_lite::lite_input::LiteKeyCode::Enter,
-            NativeKeyCode::SuperLeft => fyrox_lite::lite_input::LiteKeyCode::SuperLeft,
-            NativeKeyCode::SuperRight => fyrox_lite::lite_input::LiteKeyCode::SuperRight,
-            NativeKeyCode::ShiftLeft => fyrox_lite::lite_input::LiteKeyCode::ShiftLeft,
-            NativeKeyCode::ShiftRight => fyrox_lite::lite_input::LiteKeyCode::ShiftRight,
-            NativeKeyCode::Space => fyrox_lite::lite_input::LiteKeyCode::Space,
-            NativeKeyCode::Tab => fyrox_lite::lite_input::LiteKeyCode::Tab,
-            NativeKeyCode::Convert => fyrox_lite::lite_input::LiteKeyCode::Convert,
-            NativeKeyCode::KanaMode => fyrox_lite::lite_input::LiteKeyCode::KanaMode,
-            NativeKeyCode::Lang1 => fyrox_lite::lite_input::LiteKeyCode::Lang1,
-            NativeKeyCode::Lang2 => fyrox_lite::lite_input::LiteKeyCode::Lang2,
-            NativeKeyCode::Lang3 => fyrox_lite::lite_input::LiteKeyCode::Lang3,
-            NativeKeyCode::Lang4 => fyrox_lite::lite_input::LiteKeyCode::Lang4,
-            NativeKeyCode::Lang5 => fyrox_lite::lite_input::LiteKeyCode::Lang5,
-            NativeKeyCode::NonConvert => fyrox_lite::lite_input::LiteKeyCode::NonConvert,
-            NativeKeyCode::Delete => fyrox_lite::lite_input::LiteKeyCode::Delete,
-            NativeKeyCode::End => fyrox_lite::lite_input::LiteKeyCode::End,
-            NativeKeyCode::Help => fyrox_lite::lite_input::LiteKeyCode::Help,
-            NativeKeyCode::Home => fyrox_lite::lite_input::LiteKeyCode::Home,
-            NativeKeyCode::Insert => fyrox_lite::lite_input::LiteKeyCode::Insert,
-            NativeKeyCode::PageDown => fyrox_lite::lite_input::LiteKeyCode::PageDown,
-            NativeKeyCode::PageUp => fyrox_lite::lite_input::LiteKeyCode::PageUp,
-            NativeKeyCode::ArrowDown => fyrox_lite::lite_input::LiteKeyCode::ArrowDown,
-            NativeKeyCode::ArrowLeft => fyrox_lite::lite_input::LiteKeyCode::ArrowLeft,
-            NativeKeyCode::ArrowRight => fyrox_lite::lite_input::LiteKeyCode::ArrowRight,
-            NativeKeyCode::ArrowUp => fyrox_lite::lite_input::LiteKeyCode::ArrowUp,
-            NativeKeyCode::NumLock => fyrox_lite::lite_input::LiteKeyCode::NumLock,
-            NativeKeyCode::Numpad0 => fyrox_lite::lite_input::LiteKeyCode::Numpad0,
-            NativeKeyCode::Numpad1 => fyrox_lite::lite_input::LiteKeyCode::Numpad1,
-            NativeKeyCode::Numpad2 => fyrox_lite::lite_input::LiteKeyCode::Numpad2,
-            NativeKeyCode::Numpad3 => fyrox_lite::lite_input::LiteKeyCode::Numpad3,
-            NativeKeyCode::Numpad4 => fyrox_lite::lite_input::LiteKeyCode::Numpad4,
-            NativeKeyCode::Numpad5 => fyrox_lite::lite_input::LiteKeyCode::Numpad5,
-            NativeKeyCode::Numpad6 => fyrox_lite::lite_input::LiteKeyCode::Numpad6,
-            NativeKeyCode::Numpad7 => fyrox_lite::lite_input::LiteKeyCode::Numpad7,
-            NativeKeyCode::Numpad8 => fyrox_lite::lite_input::LiteKeyCode::Numpad8,
-            NativeKeyCode::Numpad9 => fyrox_lite::lite_input::LiteKeyCode::Numpad9,
-            NativeKeyCode::NumpadAdd => fyrox_lite::lite_input::LiteKeyCode::NumpadAdd,
-            NativeKeyCode::NumpadBackspace => fyrox_lite::lite_input::LiteKeyCode::NumpadBackspace,
-            NativeKeyCode::NumpadClear => fyrox_lite::lite_input::LiteKeyCode::NumpadClear,
-            NativeKeyCode::NumpadClearEntry => {
-                fyrox_lite::lite_input::LiteKeyCode::NumpadClearEntry
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeVector3_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeVector3_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeVector3_result>
+    for Result<fyrox_lite::lite_math::PodVector3, crate::LangSpecificError>
+{
+    fn from(value: NativeVector3_result) -> Self {
+        unsafe {
+            if value.ok != 0 {
+                Ok(value.value.ok.into())
+            } else {
+                Err(value.value.err.into())
             }
-            NativeKeyCode::NumpadComma => fyrox_lite::lite_input::LiteKeyCode::NumpadComma,
-            NativeKeyCode::NumpadDecimal => fyrox_lite::lite_input::LiteKeyCode::NumpadDecimal,
-            NativeKeyCode::NumpadDivide => fyrox_lite::lite_input::LiteKeyCode::NumpadDivide,
-            NativeKeyCode::NumpadEnter => fyrox_lite::lite_input::LiteKeyCode::NumpadEnter,
-            NativeKeyCode::NumpadEqual => fyrox_lite::lite_input::LiteKeyCode::NumpadEqual,
-            NativeKeyCode::NumpadHash => fyrox_lite::lite_input::LiteKeyCode::NumpadHash,
-            NativeKeyCode::NumpadMemoryAdd => fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryAdd,
-            NativeKeyCode::NumpadMemoryClear => {
-                fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryClear
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeVector2 {
+    pub x: f32,
+    pub y: f32,
+}
+
+impl From<fyrox_lite::lite_math::PodVector2> for NativeVector2 {
+    fn from(__value: fyrox_lite::lite_math::PodVector2) -> Self {
+        let x = __value.x.into();
+        let y = __value.y.into();
+        Self { x, y }
+    }
+}
+
+impl From<NativeVector2> for fyrox_lite::lite_math::PodVector2 {
+    fn from(__value: NativeVector2) -> Self {
+        let x = __value.x.into();
+        let y = __value.y.into();
+        Self { x, y }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeVector2_optional {
+    pub value: NativeVector2,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_math::PodVector2>> for NativeVector2_optional {
+    fn from(value: Option<fyrox_lite::lite_math::PodVector2>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeVector2_optional> for Option<fyrox_lite::lite_math::PodVector2> {
+    fn from(value: NativeVector2_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeVector2_slice {
+    pub begin: *mut NativeVector2,
+    pub len: i32,
+}
+
+impl From<Vec<fyrox_lite::lite_math::PodVector2>> for NativeVector2_slice {
+    fn from(value: Vec<fyrox_lite::lite_math::PodVector2>) -> Self {
+        let len = value.len() as i32;
+        let native_vec: Vec<NativeVector2> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeVector2_slice> for Vec<fyrox_lite::lite_math::PodVector2> {
+    fn from(value: NativeVector2_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
             }
-            NativeKeyCode::NumpadMemoryRecall => {
-                fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryRecall
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_math_PodVector2_slice(
+    data: NativeVector2_slice,
+) -> NativeVector2_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeVector2_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeVector2_result {
+    pub ok: i32,
+    pub value: NativeVector2_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeVector2_result_value {
+    ok: NativeVector2,
+    err: NativeString,
+}
+
+impl From<Result<fyrox_lite::lite_math::PodVector2, crate::LangSpecificError>>
+    for NativeVector2_result
+{
+    fn from(value: Result<fyrox_lite::lite_math::PodVector2, crate::LangSpecificError>) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeVector2_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeVector2_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeVector2_result>
+    for Result<fyrox_lite::lite_math::PodVector2, crate::LangSpecificError>
+{
+    fn from(value: NativeVector2_result) -> Self {
+        unsafe {
+            if value.ok != 0 {
+                Ok(value.value.ok.into())
+            } else {
+                Err(value.value.err.into())
             }
-            NativeKeyCode::NumpadMemoryStore => {
-                fyrox_lite::lite_input::LiteKeyCode::NumpadMemoryStore
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeVector2i {
+    pub x: i64,
+    pub y: i64,
+}
+
+impl From<fyrox_lite::lite_math::PodVector2i> for NativeVector2i {
+    fn from(__value: fyrox_lite::lite_math::PodVector2i) -> Self {
+        let x = __value.x.into();
+        let y = __value.y.into();
+        Self { x, y }
+    }
+}
+
+impl From<NativeVector2i> for fyrox_lite::lite_math::PodVector2i {
+    fn from(__value: NativeVector2i) -> Self {
+        let x = __value.x.into();
+        let y = __value.y.into();
+        Self { x, y }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeVector2i_optional {
+    pub value: NativeVector2i,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_math::PodVector2i>> for NativeVector2i_optional {
+    fn from(value: Option<fyrox_lite::lite_math::PodVector2i>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeVector2i_optional> for Option<fyrox_lite::lite_math::PodVector2i> {
+    fn from(value: NativeVector2i_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeVector2i_slice {
+    pub begin: *mut NativeVector2i,
+    pub len: i32,
+}
+
+impl From<Vec<fyrox_lite::lite_math::PodVector2i>> for NativeVector2i_slice {
+    fn from(value: Vec<fyrox_lite::lite_math::PodVector2i>) -> Self {
+        let len = value.len() as i32;
+        let native_vec: Vec<NativeVector2i> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeVector2i_slice> for Vec<fyrox_lite::lite_math::PodVector2i> {
+    fn from(value: NativeVector2i_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
             }
-            NativeKeyCode::NumpadMemorySubtract => {
-                fyrox_lite::lite_input::LiteKeyCode::NumpadMemorySubtract
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_math_PodVector2i_slice(
+    data: NativeVector2i_slice,
+) -> NativeVector2i_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeVector2i_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeVector2i_result {
+    pub ok: i32,
+    pub value: NativeVector2i_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeVector2i_result_value {
+    ok: NativeVector2i,
+    err: NativeString,
+}
+
+impl From<Result<fyrox_lite::lite_math::PodVector2i, crate::LangSpecificError>>
+    for NativeVector2i_result
+{
+    fn from(value: Result<fyrox_lite::lite_math::PodVector2i, crate::LangSpecificError>) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeVector2i_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeVector2i_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeVector2i_result>
+    for Result<fyrox_lite::lite_math::PodVector2i, crate::LangSpecificError>
+{
+    fn from(value: NativeVector2i_result) -> Self {
+        unsafe {
+            if value.ok != 0 {
+                Ok(value.value.ok.into())
+            } else {
+                Err(value.value.err.into())
             }
-            NativeKeyCode::NumpadMultiply => fyrox_lite::lite_input::LiteKeyCode::NumpadMultiply,
-            NativeKeyCode::NumpadParenLeft => fyrox_lite::lite_input::LiteKeyCode::NumpadParenLeft,
-            NativeKeyCode::NumpadParenRight => {
-                fyrox_lite::lite_input::LiteKeyCode::NumpadParenRight
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeQuaternion {
+    pub i: f32,
+    pub j: f32,
+    pub k: f32,
+    pub w: f32,
+}
+
+impl From<fyrox_lite::lite_math::PodQuaternion> for NativeQuaternion {
+    fn from(__value: fyrox_lite::lite_math::PodQuaternion) -> Self {
+        let i = __value.i.into();
+        let j = __value.j.into();
+        let k = __value.k.into();
+        let w = __value.w.into();
+        Self { i, j, k, w }
+    }
+}
+
+impl From<NativeQuaternion> for fyrox_lite::lite_math::PodQuaternion {
+    fn from(__value: NativeQuaternion) -> Self {
+        let i = __value.i.into();
+        let j = __value.j.into();
+        let k = __value.k.into();
+        let w = __value.w.into();
+        Self { i, j, k, w }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeQuaternion_optional {
+    pub value: NativeQuaternion,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_math::PodQuaternion>> for NativeQuaternion_optional {
+    fn from(value: Option<fyrox_lite::lite_math::PodQuaternion>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeQuaternion_optional> for Option<fyrox_lite::lite_math::PodQuaternion> {
+    fn from(value: NativeQuaternion_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeQuaternion_slice {
+    pub begin: *mut NativeQuaternion,
+    pub len: i32,
+}
+
+impl From<Vec<fyrox_lite::lite_math::PodQuaternion>> for NativeQuaternion_slice {
+    fn from(value: Vec<fyrox_lite::lite_math::PodQuaternion>) -> Self {
+        let len = value.len() as i32;
+        let native_vec: Vec<NativeQuaternion> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeQuaternion_slice> for Vec<fyrox_lite::lite_math::PodQuaternion> {
+    fn from(value: NativeQuaternion_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
             }
-            NativeKeyCode::NumpadStar => fyrox_lite::lite_input::LiteKeyCode::NumpadStar,
-            NativeKeyCode::NumpadSubtract => fyrox_lite::lite_input::LiteKeyCode::NumpadSubtract,
-            NativeKeyCode::Escape => fyrox_lite::lite_input::LiteKeyCode::Escape,
-            NativeKeyCode::Fn => fyrox_lite::lite_input::LiteKeyCode::Fn,
-            NativeKeyCode::FnLock => fyrox_lite::lite_input::LiteKeyCode::FnLock,
-            NativeKeyCode::PrintScreen => fyrox_lite::lite_input::LiteKeyCode::PrintScreen,
-            NativeKeyCode::ScrollLock => fyrox_lite::lite_input::LiteKeyCode::ScrollLock,
-            NativeKeyCode::Pause => fyrox_lite::lite_input::LiteKeyCode::Pause,
-            NativeKeyCode::BrowserBack => fyrox_lite::lite_input::LiteKeyCode::BrowserBack,
-            NativeKeyCode::BrowserFavorites => {
-                fyrox_lite::lite_input::LiteKeyCode::BrowserFavorites
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_math_PodQuaternion_slice(
+    data: NativeQuaternion_slice,
+) -> NativeQuaternion_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeQuaternion_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeQuaternion_result {
+    pub ok: i32,
+    pub value: NativeQuaternion_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeQuaternion_result_value {
+    ok: NativeQuaternion,
+    err: NativeString,
+}
+
+impl From<Result<fyrox_lite::lite_math::PodQuaternion, crate::LangSpecificError>>
+    for NativeQuaternion_result
+{
+    fn from(value: Result<fyrox_lite::lite_math::PodQuaternion, crate::LangSpecificError>) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeQuaternion_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeQuaternion_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeQuaternion_result>
+    for Result<fyrox_lite::lite_math::PodQuaternion, crate::LangSpecificError>
+{
+    fn from(value: NativeQuaternion_result) -> Self {
+        unsafe {
+            if value.ok != 0 {
+                Ok(value.value.ok.into())
+            } else {
+                Err(value.value.err.into())
             }
-            NativeKeyCode::BrowserForward => fyrox_lite::lite_input::LiteKeyCode::BrowserForward,
-            NativeKeyCode::BrowserHome => fyrox_lite::lite_input::LiteKeyCode::BrowserHome,
-            NativeKeyCode::BrowserRefresh => fyrox_lite::lite_input::LiteKeyCode::BrowserRefresh,
-            NativeKeyCode::BrowserSearch => fyrox_lite::lite_input::LiteKeyCode::BrowserSearch,
-            NativeKeyCode::BrowserStop => fyrox_lite::lite_input::LiteKeyCode::BrowserStop,
-            NativeKeyCode::Eject => fyrox_lite::lite_input::LiteKeyCode::Eject,
-            NativeKeyCode::LaunchApp1 => fyrox_lite::lite_input::LiteKeyCode::LaunchApp1,
-            NativeKeyCode::LaunchApp2 => fyrox_lite::lite_input::LiteKeyCode::LaunchApp2,
-            NativeKeyCode::LaunchMail => fyrox_lite::lite_input::LiteKeyCode::LaunchMail,
-            NativeKeyCode::MediaPlayPause => fyrox_lite::lite_input::LiteKeyCode::MediaPlayPause,
-            NativeKeyCode::MediaSelect => fyrox_lite::lite_input::LiteKeyCode::MediaSelect,
-            NativeKeyCode::MediaStop => fyrox_lite::lite_input::LiteKeyCode::MediaStop,
-            NativeKeyCode::MediaTrackNext => fyrox_lite::lite_input::LiteKeyCode::MediaTrackNext,
-            NativeKeyCode::MediaTrackPrevious => {
-                fyrox_lite::lite_input::LiteKeyCode::MediaTrackPrevious
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativePhysics {
+    pub handle: NativeHandle,
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_physics_LitePhysics_cast_ray(
+    opts: NativeRayCastOptions,
+) -> NativeIntersection_slice {
+    let opts = opts.into();
+    let ret = fyrox_lite::lite_physics::LitePhysics::cast_ray(opts);
+    ret.into()
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeIntersection {
+    pub collider: NativeNode,
+    pub normal: NativeVector3,
+    pub position: NativeVector3,
+    pub feature: NativeFeatureId,
+    pub toi: f32,
+}
+
+impl From<fyrox_lite::lite_physics::LiteIntersection> for NativeIntersection {
+    fn from(__value: fyrox_lite::lite_physics::LiteIntersection) -> Self {
+        let collider = __value.collider.into();
+        let normal = __value.normal.into();
+        let position = __value.position.into();
+        let feature = __value.feature.into();
+        let toi = __value.toi.into();
+        Self {
+            collider,
+            normal,
+            position,
+            feature,
+            toi,
+        }
+    }
+}
+
+impl From<NativeIntersection> for fyrox_lite::lite_physics::LiteIntersection {
+    fn from(__value: NativeIntersection) -> Self {
+        let collider = __value.collider.into();
+        let normal = __value.normal.into();
+        let position = __value.position.into();
+        let feature = __value.feature.into();
+        let toi = __value.toi.into();
+        Self {
+            collider,
+            normal,
+            position,
+            feature,
+            toi,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeIntersection_optional {
+    pub value: NativeIntersection,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_physics::LiteIntersection>> for NativeIntersection_optional {
+    fn from(value: Option<fyrox_lite::lite_physics::LiteIntersection>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeIntersection_optional> for Option<fyrox_lite::lite_physics::LiteIntersection> {
+    fn from(value: NativeIntersection_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeIntersection_slice {
+    pub begin: *mut NativeIntersection,
+    pub len: i32,
+}
+
+impl From<Vec<fyrox_lite::lite_physics::LiteIntersection>> for NativeIntersection_slice {
+    fn from(value: Vec<fyrox_lite::lite_physics::LiteIntersection>) -> Self {
+        let len = value.len() as i32;
+        let native_vec: Vec<NativeIntersection> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeIntersection_slice> for Vec<fyrox_lite::lite_physics::LiteIntersection> {
+    fn from(value: NativeIntersection_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
             }
-            NativeKeyCode::Power => fyrox_lite::lite_input::LiteKeyCode::Power,
-            NativeKeyCode::Sleep => fyrox_lite::lite_input::LiteKeyCode::Sleep,
-            NativeKeyCode::AudioVolumeDown => fyrox_lite::lite_input::LiteKeyCode::AudioVolumeDown,
-            NativeKeyCode::AudioVolumeMute => fyrox_lite::lite_input::LiteKeyCode::AudioVolumeMute,
-            NativeKeyCode::AudioVolumeUp => fyrox_lite::lite_input::LiteKeyCode::AudioVolumeUp,
-            NativeKeyCode::WakeUp => fyrox_lite::lite_input::LiteKeyCode::WakeUp,
-            NativeKeyCode::Meta => fyrox_lite::lite_input::LiteKeyCode::Meta,
-            NativeKeyCode::Hyper => fyrox_lite::lite_input::LiteKeyCode::Hyper,
-            NativeKeyCode::Turbo => fyrox_lite::lite_input::LiteKeyCode::Turbo,
-            NativeKeyCode::Abort => fyrox_lite::lite_input::LiteKeyCode::Abort,
-            NativeKeyCode::Resume => fyrox_lite::lite_input::LiteKeyCode::Resume,
-            NativeKeyCode::Suspend => fyrox_lite::lite_input::LiteKeyCode::Suspend,
-            NativeKeyCode::Again => fyrox_lite::lite_input::LiteKeyCode::Again,
-            NativeKeyCode::Copy => fyrox_lite::lite_input::LiteKeyCode::Copy,
-            NativeKeyCode::Cut => fyrox_lite::lite_input::LiteKeyCode::Cut,
-            NativeKeyCode::Find => fyrox_lite::lite_input::LiteKeyCode::Find,
-            NativeKeyCode::Open => fyrox_lite::lite_input::LiteKeyCode::Open,
-            NativeKeyCode::Paste => fyrox_lite::lite_input::LiteKeyCode::Paste,
-            NativeKeyCode::Props => fyrox_lite::lite_input::LiteKeyCode::Props,
-            NativeKeyCode::Select => fyrox_lite::lite_input::LiteKeyCode::Select,
-            NativeKeyCode::Undo => fyrox_lite::lite_input::LiteKeyCode::Undo,
-            NativeKeyCode::Hiragana => fyrox_lite::lite_input::LiteKeyCode::Hiragana,
-            NativeKeyCode::Katakana => fyrox_lite::lite_input::LiteKeyCode::Katakana,
-            NativeKeyCode::F1 => fyrox_lite::lite_input::LiteKeyCode::F1,
-            NativeKeyCode::F2 => fyrox_lite::lite_input::LiteKeyCode::F2,
-            NativeKeyCode::F3 => fyrox_lite::lite_input::LiteKeyCode::F3,
-            NativeKeyCode::F4 => fyrox_lite::lite_input::LiteKeyCode::F4,
-            NativeKeyCode::F5 => fyrox_lite::lite_input::LiteKeyCode::F5,
-            NativeKeyCode::F6 => fyrox_lite::lite_input::LiteKeyCode::F6,
-            NativeKeyCode::F7 => fyrox_lite::lite_input::LiteKeyCode::F7,
-            NativeKeyCode::F8 => fyrox_lite::lite_input::LiteKeyCode::F8,
-            NativeKeyCode::F9 => fyrox_lite::lite_input::LiteKeyCode::F9,
-            NativeKeyCode::F10 => fyrox_lite::lite_input::LiteKeyCode::F10,
-            NativeKeyCode::F11 => fyrox_lite::lite_input::LiteKeyCode::F11,
-            NativeKeyCode::F12 => fyrox_lite::lite_input::LiteKeyCode::F12,
-            NativeKeyCode::F13 => fyrox_lite::lite_input::LiteKeyCode::F13,
-            NativeKeyCode::F14 => fyrox_lite::lite_input::LiteKeyCode::F14,
-            NativeKeyCode::F15 => fyrox_lite::lite_input::LiteKeyCode::F15,
-            NativeKeyCode::F16 => fyrox_lite::lite_input::LiteKeyCode::F16,
-            NativeKeyCode::F17 => fyrox_lite::lite_input::LiteKeyCode::F17,
-            NativeKeyCode::F18 => fyrox_lite::lite_input::LiteKeyCode::F18,
-            NativeKeyCode::F19 => fyrox_lite::lite_input::LiteKeyCode::F19,
-            NativeKeyCode::F20 => fyrox_lite::lite_input::LiteKeyCode::F20,
-            NativeKeyCode::F21 => fyrox_lite::lite_input::LiteKeyCode::F21,
-            NativeKeyCode::F22 => fyrox_lite::lite_input::LiteKeyCode::F22,
-            NativeKeyCode::F23 => fyrox_lite::lite_input::LiteKeyCode::F23,
-            NativeKeyCode::F24 => fyrox_lite::lite_input::LiteKeyCode::F24,
-            NativeKeyCode::F25 => fyrox_lite::lite_input::LiteKeyCode::F25,
-            NativeKeyCode::F26 => fyrox_lite::lite_input::LiteKeyCode::F26,
-            NativeKeyCode::F27 => fyrox_lite::lite_input::LiteKeyCode::F27,
-            NativeKeyCode::F28 => fyrox_lite::lite_input::LiteKeyCode::F28,
-            NativeKeyCode::F29 => fyrox_lite::lite_input::LiteKeyCode::F29,
-            NativeKeyCode::F30 => fyrox_lite::lite_input::LiteKeyCode::F30,
-            NativeKeyCode::F31 => fyrox_lite::lite_input::LiteKeyCode::F31,
-            NativeKeyCode::F32 => fyrox_lite::lite_input::LiteKeyCode::F32,
-            NativeKeyCode::F33 => fyrox_lite::lite_input::LiteKeyCode::F33,
-            NativeKeyCode::F34 => fyrox_lite::lite_input::LiteKeyCode::F34,
-            NativeKeyCode::F35 => fyrox_lite::lite_input::LiteKeyCode::F35,
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_physics_LiteIntersection_slice(
+    data: NativeIntersection_slice,
+) -> NativeIntersection_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeIntersection_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeIntersection_result {
+    pub ok: i32,
+    pub value: NativeIntersection_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeIntersection_result_value {
+    ok: NativeIntersection,
+    err: NativeString,
+}
+
+impl From<Result<fyrox_lite::lite_physics::LiteIntersection, crate::LangSpecificError>>
+    for NativeIntersection_result
+{
+    fn from(
+        value: Result<fyrox_lite::lite_physics::LiteIntersection, crate::LangSpecificError>,
+    ) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeIntersection_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeIntersection_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeIntersection_result>
+    for Result<fyrox_lite::lite_physics::LiteIntersection, crate::LangSpecificError>
+{
+    fn from(value: NativeIntersection_result) -> Self {
+        unsafe {
+            if value.ok != 0 {
+                Ok(value.value.ok.into())
+            } else {
+                Err(value.value.err.into())
+            }
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeFeatureId {
+    pub kind: NativeFeatureKind,
+    pub id: i32,
+}
+
+impl From<fyrox_lite::lite_physics::LiteFeatureId> for NativeFeatureId {
+    fn from(__value: fyrox_lite::lite_physics::LiteFeatureId) -> Self {
+        let kind = __value.kind.into();
+        let id = __value.id.into();
+        Self { kind, id }
+    }
+}
+
+impl From<NativeFeatureId> for fyrox_lite::lite_physics::LiteFeatureId {
+    fn from(__value: NativeFeatureId) -> Self {
+        let kind = __value.kind.into();
+        let id = __value.id.into();
+        Self { kind, id }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeFeatureId_optional {
+    pub value: NativeFeatureId,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_physics::LiteFeatureId>> for NativeFeatureId_optional {
+    fn from(value: Option<fyrox_lite::lite_physics::LiteFeatureId>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeFeatureId_optional> for Option<fyrox_lite::lite_physics::LiteFeatureId> {
+    fn from(value: NativeFeatureId_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeFeatureId_slice {
+    pub begin: *mut NativeFeatureId,
+    pub len: i32,
+}
+
+impl From<Vec<fyrox_lite::lite_physics::LiteFeatureId>> for NativeFeatureId_slice {
+    fn from(value: Vec<fyrox_lite::lite_physics::LiteFeatureId>) -> Self {
+        let len = value.len() as i32;
+        let native_vec: Vec<NativeFeatureId> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeFeatureId_slice> for Vec<fyrox_lite::lite_physics::LiteFeatureId> {
+    fn from(value: NativeFeatureId_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
+            }
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_physics_LiteFeatureId_slice(
+    data: NativeFeatureId_slice,
+) -> NativeFeatureId_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeFeatureId_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeFeatureId_result {
+    pub ok: i32,
+    pub value: NativeFeatureId_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeFeatureId_result_value {
+    ok: NativeFeatureId,
+    err: NativeString,
+}
+
+impl From<Result<fyrox_lite::lite_physics::LiteFeatureId, crate::LangSpecificError>>
+    for NativeFeatureId_result
+{
+    fn from(
+        value: Result<fyrox_lite::lite_physics::LiteFeatureId, crate::LangSpecificError>,
+    ) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeFeatureId_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeFeatureId_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeFeatureId_result>
+    for Result<fyrox_lite::lite_physics::LiteFeatureId, crate::LangSpecificError>
+{
+    fn from(value: NativeFeatureId_result) -> Self {
+        unsafe {
+            if value.ok != 0 {
+                Ok(value.value.ok.into())
+            } else {
+                Err(value.value.err.into())
+            }
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum NativeFeatureKind {
+    Vertex,
+    Edge,
+    Face,
+    Unknown,
+}
+
+impl From<fyrox_lite::lite_physics::LiteFeatureKind> for NativeFeatureKind {
+    fn from(value: fyrox_lite::lite_physics::LiteFeatureKind) -> Self {
+        match value {
+            fyrox_lite::lite_physics::LiteFeatureKind::Vertex => NativeFeatureKind::Vertex,
+            fyrox_lite::lite_physics::LiteFeatureKind::Edge => NativeFeatureKind::Edge,
+            fyrox_lite::lite_physics::LiteFeatureKind::Face => NativeFeatureKind::Face,
+            fyrox_lite::lite_physics::LiteFeatureKind::Unknown => NativeFeatureKind::Unknown,
+        }
+    }
+}
+
+impl From<NativeFeatureKind> for fyrox_lite::lite_physics::LiteFeatureKind {
+    fn from(value: NativeFeatureKind) -> Self {
+        match value {
+            NativeFeatureKind::Vertex => fyrox_lite::lite_physics::LiteFeatureKind::Vertex,
+            NativeFeatureKind::Edge => fyrox_lite::lite_physics::LiteFeatureKind::Edge,
+            NativeFeatureKind::Face => fyrox_lite::lite_physics::LiteFeatureKind::Face,
+            NativeFeatureKind::Unknown => fyrox_lite::lite_physics::LiteFeatureKind::Unknown,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeRayCastOptions {
+    pub ray_origin: NativeVector3,
+    pub ray_direction: NativeVector3,
+    pub max_len: f32,
+    pub groups: NativeInteractionGroups_optional,
+    pub sort_results: NativeBool,
+}
+
+impl From<fyrox_lite::lite_physics::LiteRayCastOptions> for NativeRayCastOptions {
+    fn from(__value: fyrox_lite::lite_physics::LiteRayCastOptions) -> Self {
+        let ray_origin = __value.ray_origin.into();
+        let ray_direction = __value.ray_direction.into();
+        let max_len = __value.max_len.into();
+        let groups = __value.groups.into();
+        let sort_results = __value.sort_results.into();
+        Self {
+            ray_origin,
+            ray_direction,
+            max_len,
+            groups,
+            sort_results,
+        }
+    }
+}
+
+impl From<NativeRayCastOptions> for fyrox_lite::lite_physics::LiteRayCastOptions {
+    fn from(__value: NativeRayCastOptions) -> Self {
+        let ray_origin = __value.ray_origin.into();
+        let ray_direction = __value.ray_direction.into();
+        let max_len = __value.max_len.into();
+        let groups = __value.groups.into();
+        let sort_results = __value.sort_results.into();
+        Self {
+            ray_origin,
+            ray_direction,
+            max_len,
+            groups,
+            sort_results,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeRayCastOptions_optional {
+    pub value: NativeRayCastOptions,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_physics::LiteRayCastOptions>> for NativeRayCastOptions_optional {
+    fn from(value: Option<fyrox_lite::lite_physics::LiteRayCastOptions>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeRayCastOptions_optional> for Option<fyrox_lite::lite_physics::LiteRayCastOptions> {
+    fn from(value: NativeRayCastOptions_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeRayCastOptions_slice {
+    pub begin: *mut NativeRayCastOptions,
+    pub len: i32,
+}
+
+impl From<Vec<fyrox_lite::lite_physics::LiteRayCastOptions>> for NativeRayCastOptions_slice {
+    fn from(value: Vec<fyrox_lite::lite_physics::LiteRayCastOptions>) -> Self {
+        let len = value.len() as i32;
+        let native_vec: Vec<NativeRayCastOptions> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeRayCastOptions_slice> for Vec<fyrox_lite::lite_physics::LiteRayCastOptions> {
+    fn from(value: NativeRayCastOptions_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
+            }
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_physics_LiteRayCastOptions_slice(
+    data: NativeRayCastOptions_slice,
+) -> NativeRayCastOptions_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeRayCastOptions_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeRayCastOptions_result {
+    pub ok: i32,
+    pub value: NativeRayCastOptions_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeRayCastOptions_result_value {
+    ok: NativeRayCastOptions,
+    err: NativeString,
+}
+
+impl From<Result<fyrox_lite::lite_physics::LiteRayCastOptions, crate::LangSpecificError>>
+    for NativeRayCastOptions_result
+{
+    fn from(
+        value: Result<fyrox_lite::lite_physics::LiteRayCastOptions, crate::LangSpecificError>,
+    ) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeRayCastOptions_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeRayCastOptions_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeRayCastOptions_result>
+    for Result<fyrox_lite::lite_physics::LiteRayCastOptions, crate::LangSpecificError>
+{
+    fn from(value: NativeRayCastOptions_result) -> Self {
+        unsafe {
+            if value.ok != 0 {
+                Ok(value.value.ok.into())
+            } else {
+                Err(value.value.err.into())
+            }
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeInteractionGroups {
+    pub memberships: i32,
+    pub filter: i32,
+}
+
+impl From<fyrox_lite::lite_physics::LiteInteractionGroups> for NativeInteractionGroups {
+    fn from(__value: fyrox_lite::lite_physics::LiteInteractionGroups) -> Self {
+        let memberships = __value.memberships.into();
+        let filter = __value.filter.into();
+        Self {
+            memberships,
+            filter,
+        }
+    }
+}
+
+impl From<NativeInteractionGroups> for fyrox_lite::lite_physics::LiteInteractionGroups {
+    fn from(__value: NativeInteractionGroups) -> Self {
+        let memberships = __value.memberships.into();
+        let filter = __value.filter.into();
+        Self {
+            memberships,
+            filter,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeInteractionGroups_optional {
+    pub value: NativeInteractionGroups,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_physics::LiteInteractionGroups>>
+    for NativeInteractionGroups_optional
+{
+    fn from(value: Option<fyrox_lite::lite_physics::LiteInteractionGroups>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeInteractionGroups_optional>
+    for Option<fyrox_lite::lite_physics::LiteInteractionGroups>
+{
+    fn from(value: NativeInteractionGroups_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeInteractionGroups_slice {
+    pub begin: *mut NativeInteractionGroups,
+    pub len: i32,
+}
+
+impl From<Vec<fyrox_lite::lite_physics::LiteInteractionGroups>> for NativeInteractionGroups_slice {
+    fn from(value: Vec<fyrox_lite::lite_physics::LiteInteractionGroups>) -> Self {
+        let len = value.len() as i32;
+        let native_vec: Vec<NativeInteractionGroups> =
+            value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeInteractionGroups_slice> for Vec<fyrox_lite::lite_physics::LiteInteractionGroups> {
+    fn from(value: NativeInteractionGroups_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
+            }
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_physics_LiteInteractionGroups_slice(
+    data: NativeInteractionGroups_slice,
+) -> NativeInteractionGroups_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeInteractionGroups_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeInteractionGroups_result {
+    pub ok: i32,
+    pub value: NativeInteractionGroups_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeInteractionGroups_result_value {
+    ok: NativeInteractionGroups,
+    err: NativeString,
+}
+
+impl From<Result<fyrox_lite::lite_physics::LiteInteractionGroups, crate::LangSpecificError>>
+    for NativeInteractionGroups_result
+{
+    fn from(
+        value: Result<fyrox_lite::lite_physics::LiteInteractionGroups, crate::LangSpecificError>,
+    ) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeInteractionGroups_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeInteractionGroups_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeInteractionGroups_result>
+    for Result<fyrox_lite::lite_physics::LiteInteractionGroups, crate::LangSpecificError>
+{
+    fn from(value: NativeInteractionGroups_result) -> Self {
+        unsafe {
+            if value.ok != 0 {
+                Ok(value.value.ok.into())
+            } else {
+                Err(value.value.err.into())
+            }
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeRigidBody {
+    pub handle: NativeHandle,
+}
+
+impl From<fyrox_lite::lite_physics::LiteRigidBody> for NativeRigidBody {
+    fn from(value: fyrox_lite::lite_physics::LiteRigidBody) -> Self {
+        Self {
+            handle: NativeHandle::from_u128(value.to_external()),
+        }
+    }
+}
+
+impl From<NativeRigidBody> for fyrox_lite::lite_physics::LiteRigidBody {
+    fn from(value: NativeRigidBody) -> Self {
+        Self::from_external(value.handle.as_u128())
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_physics_LiteRigidBody_apply_force(
+    this: NativeRigidBody,
+    force: NativeVector3,
+) -> () {
+    let force = force.into();
+    let ret = fyrox_lite::lite_physics::LiteRigidBody::from(this).apply_force(force);
+    ret.into()
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeRigidBody_optional {
+    pub value: NativeRigidBody,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_physics::LiteRigidBody>> for NativeRigidBody_optional {
+    fn from(value: Option<fyrox_lite::lite_physics::LiteRigidBody>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeRigidBody_optional> for Option<fyrox_lite::lite_physics::LiteRigidBody> {
+    fn from(value: NativeRigidBody_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
         }
     }
 }
@@ -4464,6 +4464,100 @@ pub extern "C" fn fyrox_lite_upload_NativeScriptProperty_slice(
     }
     let ptr = crate::Arena::allocate_vec(vec);
     NativeScriptProperty_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeValue_slice {
+    pub begin: *mut NativeValue,
+    pub len: i32,
+}
+
+impl From<Vec<NativeValue>> for NativeValue_slice {
+    fn from(value: Vec<NativeValue>) -> Self {
+        let len = value.len() as i32;
+        let native_vec: Vec<NativeValue> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeValue_slice> for Vec<NativeValue> {
+    fn from(value: NativeValue_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
+            }
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_NativeValue_slice(
+    data: NativeValue_slice,
+) -> NativeValue_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeValue_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativePropertyValue_slice {
+    pub begin: *mut NativePropertyValue,
+    pub len: i32,
+}
+
+impl From<Vec<NativePropertyValue>> for NativePropertyValue_slice {
+    fn from(value: Vec<NativePropertyValue>) -> Self {
+        let len = value.len() as i32;
+        let native_vec: Vec<NativePropertyValue> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativePropertyValue_slice> for Vec<NativePropertyValue> {
+    fn from(value: NativePropertyValue_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
+            }
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_NativePropertyValue_slice(
+    data: NativePropertyValue_slice,
+) -> NativePropertyValue_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativePropertyValue_slice {
         begin: ptr,
         len: data.len,
     }

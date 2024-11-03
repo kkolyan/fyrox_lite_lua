@@ -27,7 +27,7 @@ public readonly partial struct RigidBody
 {
     private readonly NativeHandle handle;
 
-    public RigidBody(NativeHandle handle)
+    internal RigidBody(NativeHandle handle)
     {
         this.handle = handle;
     }

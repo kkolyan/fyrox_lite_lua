@@ -27,7 +27,7 @@ public readonly partial struct Prefab
 {
     private readonly NativeHandle handle;
 
-    public Prefab(NativeHandle handle)
+    internal Prefab(NativeHandle handle)
     {
         this.handle = handle;
     }
