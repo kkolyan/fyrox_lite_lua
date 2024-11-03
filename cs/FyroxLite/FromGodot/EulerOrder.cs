@@ -1,4 +1,4 @@
-namespace Godot;
+namespace FyroxLite;
 
 public enum EulerOrder
 {

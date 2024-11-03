@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 // This file contains extra members for the Mathf class that aren't part of Godot's Core API.
 // Math API that is also part of Core should go into Mathf.cs.
 
-namespace Godot
+namespace FyroxLite
 {
     public static partial class Mathf
     {

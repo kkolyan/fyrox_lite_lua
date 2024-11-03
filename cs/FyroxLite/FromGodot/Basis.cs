@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 #nullable enable
 
-namespace Godot
+namespace FyroxLite
 {
     /// <summary>
     /// 3×3 matrix used for 3D rotation and scale.

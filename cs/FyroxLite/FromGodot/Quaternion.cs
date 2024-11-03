@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 #nullable enable
 
-namespace Godot
+namespace FyroxLite
 {
     /// <summary>
     /// A unit quaternion used for representing 3D rotations.
