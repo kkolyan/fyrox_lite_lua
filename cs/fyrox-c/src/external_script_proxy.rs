@@ -28,21 +28,21 @@ impl ScriptTrait for ExternalScriptProxy {
     fn on_init(&mut self, ctx: &mut ScriptContext) {
         self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
         invoke_callback(ctx, |app| {
-            (app.functions.on_init)(self.data.inner_unpacked().unwrap().handle)
+            (app.functions.on_init)(self.data.inner_unpacked().unwrap().instance)
         });
     }
 
     fn on_start(&mut self, ctx: &mut ScriptContext) {
         self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
         invoke_callback(ctx, |app| {
-            (app.functions.on_start)(self.data.inner_unpacked().unwrap().handle);
+            (app.functions.on_start)(self.data.inner_unpacked().unwrap().instance);
         });
     }
 
     fn on_deinit(&mut self, ctx: &mut fyrox::script::ScriptDeinitContext) {
         self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
         invoke_callback(ctx, |app| {
-            (app.functions.on_deinit)(self.data.inner_unpacked().unwrap().handle);
+            (app.functions.on_deinit)(self.data.inner_unpacked().unwrap().instance);
         });
     }
 
@@ -53,7 +53,7 @@ impl ScriptTrait for ExternalScriptProxy {
         self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
         let dt = ctx.dt;
         invoke_callback(ctx, |app| {
-            (app.functions.on_update)(self.data.inner_unpacked().unwrap().handle, dt);
+            (app.functions.on_update)(self.data.inner_unpacked().unwrap().instance, dt);
         });
     }
 
@@ -67,7 +67,7 @@ impl ScriptTrait for ExternalScriptProxy {
         };
         self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
         invoke_callback(ctx, |app| {
-            (app.functions.on_message)(self.data.inner_unpacked().unwrap().handle, *message);
+            (app.functions.on_message)(self.data.inner_unpacked().unwrap().instance, *message);
         });
     }
 }

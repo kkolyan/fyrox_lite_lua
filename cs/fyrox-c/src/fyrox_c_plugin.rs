@@ -112,6 +112,7 @@ impl Plugin for CPlugin {
                     assembly_name: self.assembly_name(),
                 });
                 let name = def.metadata.class.clone();
+                let class = md.id;
                 context
                     .serialization_context
                     .script_constructors
@@ -124,6 +125,7 @@ impl Plugin for CPlugin {
                             constructor: Box::new(move || {
                                 Script::new(ExternalScriptProxy {
                                     name: name.to_string(),
+                                    class,
                                     data: ScriptResidence::Packed(ScriptObject::new(&def)),
                                 })
                             }),
@@ -136,10 +138,11 @@ impl Plugin for CPlugin {
     }
 
     fn init(&mut self, scene_path: Option<&str>, mut context: PluginContext) {
+        Input::init_thread_local_state();
         for script in self.scripts.borrow_mut().0.iter_mut() {
             script.data.ensure_unpacked(&mut self.failed);
             invoke_callback(&mut context, |app| {
-                (app.functions.on_game_init)(script.data.inner_unpacked().unwrap().handle);
+                (app.functions.on_game_init)(script.data.inner_unpacked().unwrap().instance);
             });
         }
     }
@@ -148,12 +151,14 @@ impl Plugin for CPlugin {
         for script in self.scripts.borrow_mut().0.iter_mut() {
             script.data.ensure_unpacked(&mut self.failed);
             invoke_callback(context, |app| {
-                (app.functions.on_game_update)(script.data.inner_unpacked().unwrap().handle);
+                (app.functions.on_game_update)(script.data.inner_unpacked().unwrap().instance);
             });
         }
     }
 
-    fn on_os_event(&mut self, _event: &Event<()>, _context: PluginContext) {}
+    fn on_os_event(&mut self, event: &Event<()>, _context: PluginContext) {
+        Input::on_os_event(event);
+    }
 
     fn post_update(&mut self, _context: &mut PluginContext) {
         Input::post_fixed_update();

@@ -32,6 +32,10 @@ pub fn generate_c_bindings_lite(domain: &Domain) -> CBindingsLite {
             #![allow(non_camel_case_types)]
             #![allow(non_upper_case_globals)]
             #![allow(non_snake_case)]
+            #![allow(clippy::useless_conversion)]
+            #![allow(clippy::unused_unit)]
+            #![allow(clippy::let_unit_value)]
+            #![allow(unused)]
             #![allow(clippy::redundant_locals)]
             use std::fmt::Display;
             use fyrox_lite::spi::UserScript;

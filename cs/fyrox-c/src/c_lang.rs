@@ -15,7 +15,7 @@ use crate::{bindings_manual::{
     NativeHandle, NativeValue,
 }, scripted_app::APP, UserScriptImpl};
 use crate::bindings_lite_2::{NativeQuaternion, NativeVector3};
-use crate::bindings_manual::{NativeClassId, NativeInstanceId};
+use crate::bindings_manual::{NativeClassId, NativeInstanceId, NativePropertyValue, NativeValueType};
 
 #[derive(Debug, Clone)]
 pub struct CCompatibleLang;
@@ -44,88 +44,90 @@ impl Lang for CCompatibleLang {
         APP.with_borrow(|app| {
             let app = app.as_ref().unwrap();
             let metadata = app.scripts.get(&uuid).unwrap();
-            let instance = (app.functions.create_script_instance)(metadata.id);
+            let state = Vec::new();
 
             for (i, prop) in metadata.md.fields.iter().enumerate() {
                 let value = &script.values[i];
+                let name = prop.name.clone().into();
 
-                match value {
-                    ScriptFieldValue::String(it) => {
-                        // let mut s = CString::new(it.as_str()).unwrap();
-                        // assert_eq!(prop.ty, ScriptFieldValueType::String);
-                        // (app.functions.set_property)(instance, i as u16, NativeValue { String: s.() });
-                    }
+                let value = match value {
                     ScriptFieldValue::Prefab(resource) => {
                         assert_eq!(prop.ty, ScriptFieldValueType::Prefab);
                         match resource {
                             Some(resource) => {
                                 let prefab = LitePrefab::new(resource.clone());
-                                (app.functions.set_property)(
-                                    instance,
-                                    i as i32,
-                                    NativeValue {
+                                NativePropertyValue {
+                                    name,
+                                    ty: NativeValueType::Handle,
+                                    value: NativeValue {
                                         Handle: NativeHandle::from_u128(prefab.to_external()),
                                     },
-                                );
+                                }
                             },
                             None => {
-
-                                (app.functions.set_property)(
-                                    instance,
-                                    i as i32,
-                                    NativeValue {
+                                NativePropertyValue {
+                                    name,
+                                    ty: NativeValueType::Handle,
+                                    value: NativeValue {
                                         Handle: Handle::<()>::NONE.into(),
                                     },
-                                );
+                                }
                             },
                         }
                     }
                     ScriptFieldValue::Vector3(it) => {
                         assert_eq!(prop.ty, ScriptFieldValueType::Vector3);
-                        (app.functions.set_property)(
-                            instance,
-                            i as i32,
-                            NativeValue {
+                        NativePropertyValue {
+                            name,
+                            ty: NativeValueType::Vector3,
+                            value: NativeValue {
                                 Vector3: NativeVector3 {
                                     x: it.x, y: it.y, z: it.z
                                 },
                             },
-                        );
+                        }
                     }
                     ScriptFieldValue::Quaternion(it) => {
                         assert_eq!(prop.ty, ScriptFieldValueType::Quaternion);
-                        (app.functions.set_property)(
-                            instance,
-                            i as i32,
-                            NativeValue {
+                        NativePropertyValue {
+                            name,
+                            ty: NativeValueType::Quaternion,
+                            value: NativeValue {
                                 Quaternion: NativeQuaternion {
                                     i: it.i,j: it.j,k: it.k, w:it.w
                                 },
                             },
-                        );
+                        }
                     }
                     value => {
                         #[rustfmt::skip]
-                        let native_value = match value {
-                            ScriptFieldValue::bool(it) => { assert_eq!(prop.ty, ScriptFieldValueType::bool); NativeValue { bool: *it} },
-                            ScriptFieldValue::f32(it) => { assert_eq!(prop.ty, ScriptFieldValueType::f32); NativeValue { f32: *it} },
-                            ScriptFieldValue::f64(it) => { assert_eq!(prop.ty, ScriptFieldValueType::f64); NativeValue { f64: *it} },
-                            ScriptFieldValue::i16(it) => { assert_eq!(prop.ty, ScriptFieldValueType::i16); NativeValue { i16: *it} },
-                            ScriptFieldValue::i32(it) => { assert_eq!(prop.ty, ScriptFieldValueType::i32); NativeValue { i32: *it} },
-                            ScriptFieldValue::i64(it) => { assert_eq!(prop.ty, ScriptFieldValueType::i64); NativeValue { i64: *it} },
-                            ScriptFieldValue::Node(it) => { assert_eq!(prop.ty, ScriptFieldValueType::Node); NativeValue { Handle: (*it).into()} },
-                            ScriptFieldValue::UiNode(it) => { assert_eq!(prop.ty, ScriptFieldValueType::UiNode); NativeValue { Handle: (*it).into()} },
+                        let (native_value_type, native_value) = match value {
+                            ScriptFieldValue::bool(it) => { assert_eq!(prop.ty, ScriptFieldValueType::bool); (NativeValueType::bool, NativeValue { bool: (*it).into()}) },
+                            ScriptFieldValue::String(it) => { assert_eq!(prop.ty, ScriptFieldValueType::String); (NativeValueType::String, NativeValue { String: (it.clone()).into()}) },
+                            ScriptFieldValue::f32(it) => { assert_eq!(prop.ty, ScriptFieldValueType::f32); (NativeValueType::f32, NativeValue { f32: *it}) },
+                            ScriptFieldValue::f64(it) => { assert_eq!(prop.ty, ScriptFieldValueType::f64); (NativeValueType::f64, NativeValue { f64: *it}) },
+                            ScriptFieldValue::i16(it) => { assert_eq!(prop.ty, ScriptFieldValueType::i16); (NativeValueType::i16, NativeValue { i16: *it}) },
+                            ScriptFieldValue::i32(it) => { assert_eq!(prop.ty, ScriptFieldValueType::i32); (NativeValueType::i32, NativeValue { i32: *it}) },
+                            ScriptFieldValue::i64(it) => { assert_eq!(prop.ty, ScriptFieldValueType::i64); (NativeValueType::i64, NativeValue { i64: *it}) },
+                            ScriptFieldValue::Node(it) => { assert_eq!(prop.ty, ScriptFieldValueType::Node); (NativeValueType::Handle,NativeValue { Handle: (*it).into()}) },
+                            ScriptFieldValue::UiNode(it) => { assert_eq!(prop.ty, ScriptFieldValueType::UiNode); (NativeValueType::Handle, NativeValue { Handle: (*it).into()}) },
                             ScriptFieldValue::String(_) => { todo!("handled in another block") },
                             ScriptFieldValue::Prefab(_) => { todo!("handled in another block") },
                             ScriptFieldValue::Vector3(_) => { todo!("handled in another block") },
                             ScriptFieldValue::Quaternion(_) => { todo!("handled in another block") },
                             ScriptFieldValue::RuntimePin(_) => { todo!("not supported for C") },
                         };
-                        (app.functions.set_property)(instance, i as i32, native_value);
+                        NativePropertyValue {
+                            name,
+                            ty: native_value_type,
+                            value: native_value,
+                        }
                     }
-                }
+                };
             }
-            Ok(UnpackedObject { uuid, instance, class: metadata.id })
+            let instance: Result<_, _> = (app.functions.create_script_instance)(metadata.id, state.into()).into();
+            instance
+            
         })
     }
 }

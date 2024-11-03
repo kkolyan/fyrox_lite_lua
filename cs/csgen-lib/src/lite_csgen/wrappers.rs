@@ -66,6 +66,27 @@ pub(crate) fn generate_result(s: &mut String, rust: &mut RustEmitter, wrapped_ty
                 ok: ${class_native},
                 err: NativeString,
             }
+            
+            impl ${class_native}_result {
+                pub fn into_result_shallow(self) -> Result<${class_native}, crate::LangSpecificError> {
+                    unsafe {
+                        if self.ok != 0 {
+                            Ok(self.value.ok)
+                        } else {
+                            Err(self.value.err.into())
+                        }
+                    }
+                }
+                pub fn into_result(self) -> Result<${class_lite}, crate::LangSpecificError> {
+                    unsafe {
+                        if self.ok != 0 {
+                            Ok(self.value.ok.into())
+                        } else {
+                            Err(self.value.err.into())
+                        }
+                    }
+                }
+            }
 
             impl From<Result<${class_lite}, crate::LangSpecificError>> for ${class_native}_result {
                 fn from(value: Result<${class_lite}, crate::LangSpecificError>) -> Self {
@@ -78,13 +99,7 @@ pub(crate) fn generate_result(s: &mut String, rust: &mut RustEmitter, wrapped_ty
 
             impl From<${class_native}_result> for Result<${class_lite}, crate::LangSpecificError> {
                 fn from(value: ${class_native}_result) -> Self {
-                    unsafe {
-                        if value.ok != 0 {
-                            Ok(value.value.ok.into())
-                        } else {
-                            Err(value.value.err.into())
-                        }
-                    }
+                    value.into_result()
                 }
             }
     "#, [
@@ -241,10 +256,19 @@ pub fn generate_slice(mut s: &mut String, rust: &mut RustEmitter, wrapped_type: 
                 pub begin: *mut ${class_native},
                 pub len: i32,
             }
-
+            
+            impl Default for ${class_native}_slice {
+                fn default() -> Self {
+                    Self { begin: std::ptr::null_mut(), len: 0 }
+                }
+            }
+            
             impl From<Vec<${class_lite}>> for ${class_native}_slice {
                 fn from(value: Vec<${class_lite}>) -> Self {
                     let len = value.len() as i32;
+                    if len == 0 {
+                        return Self::default();
+                    }
                     let native_vec: Vec<${class_native}> = value.into_iter().map(|it| it.into()).collect();
                     let begin = crate::Arena::allocate_vec(native_vec);
                     Self { begin, len }

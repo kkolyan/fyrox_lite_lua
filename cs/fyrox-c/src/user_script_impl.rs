@@ -5,6 +5,7 @@ use fyrox_lite::script_context::with_script_context;
 use fyrox_lite::script_object_residence::ScriptResidence;
 use fyrox_lite::spi::ClassId;
 use crate::{bindings_manual::{NativeHandle, NativeInstanceId}, external_script_proxy::ExternalScriptProxy, fyrox_c_plugin::CPlugin};
+use crate::bindings_lite_2::NativePropertyValue_slice;
 use crate::bindings_manual::NativeClassId;
 use crate::c_lang::UnpackedObject;
 use crate::scripted_app::APP;
@@ -53,7 +54,7 @@ impl UserScript for UnpackedObject {
             let app = it.as_ref().unwrap();
             let uuid = app.uuid_by_class.get(class).unwrap();
             let md = app.scripts.get(uuid).unwrap();
-            let instance_id = (app.functions.create_script_instance)(md.id);
+            let instance_id = (app.functions.create_script_instance)(md.id, Default::default()).into_result_shallow()?;
             Ok(UnpackedObject {
                 uuid: *uuid,
                 class: md.id,

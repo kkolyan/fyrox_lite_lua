@@ -16,6 +16,10 @@ fn main() {
             #![allow(non_upper_case_globals)]
             #![allow(non_snake_case)]
             #![allow(clippy::redundant_locals)]
+            #![allow(clippy::useless_conversion)]
+            #![allow(clippy::unused_unit)]
+            #![allow(clippy::let_unit_value)]
+            #![allow(unused)]
             use crate::bindings_manual::*;
             use fyrox_lite::externalizable::Externalizable;
             {}
