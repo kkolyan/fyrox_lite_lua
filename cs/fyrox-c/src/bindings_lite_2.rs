@@ -12,17 +12,1215 @@ use fyrox_lite::externalizable::Externalizable;
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct NativePlugin {
+pub struct NativeLog {
     pub handle: NativeHandle,
 }
 
 #[no_mangle]
-pub extern "C" fn fyrox_lite_lite_plugin_LitePlugin_get(
-    class_id: NativeClassId,
-) -> NativeInstanceId_result {
-    let class_id = class_id.into();
-    let ret = fyrox_lite::lite_plugin::LitePlugin::get::<crate::UserScriptImpl>(class_id, ());
+pub extern "C" fn fyrox_lite_lite_log_LiteLog_info(msg: NativeString) -> () {
+    let msg = msg.into();
+    let ret = fyrox_lite::lite_log::LiteLog::info(msg);
     ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_log_LiteLog_warn(msg: NativeString) -> () {
+    let msg = msg.into();
+    let ret = fyrox_lite::lite_log::LiteLog::warn(msg);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_log_LiteLog_err(msg: NativeString) -> () {
+    let msg = msg.into();
+    let ret = fyrox_lite::lite_log::LiteLog::err(msg);
+    ret.into()
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindow {
+    pub handle: NativeHandle,
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_window_LiteWindow_set_cursor_grab(
+    mode: NativeCursorGrabMode,
+) -> () {
+    let mode = mode.into();
+    let ret = fyrox_lite::lite_window::LiteWindow::set_cursor_grab(mode);
+    ret.into()
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum NativeCursorGrabMode {
+    None,
+    Confined,
+    Locked,
+}
+
+impl From<fyrox_lite::lite_window::LiteCursorGrabMode> for NativeCursorGrabMode {
+    fn from(value: fyrox_lite::lite_window::LiteCursorGrabMode) -> Self {
+        match value {
+            fyrox_lite::lite_window::LiteCursorGrabMode::None => NativeCursorGrabMode::None,
+            fyrox_lite::lite_window::LiteCursorGrabMode::Confined => NativeCursorGrabMode::Confined,
+            fyrox_lite::lite_window::LiteCursorGrabMode::Locked => NativeCursorGrabMode::Locked,
+        }
+    }
+}
+
+impl From<NativeCursorGrabMode> for fyrox_lite::lite_window::LiteCursorGrabMode {
+    fn from(value: NativeCursorGrabMode) -> Self {
+        match value {
+            NativeCursorGrabMode::None => fyrox_lite::lite_window::LiteCursorGrabMode::None,
+            NativeCursorGrabMode::Confined => fyrox_lite::lite_window::LiteCursorGrabMode::Confined,
+            NativeCursorGrabMode::Locked => fyrox_lite::lite_window::LiteCursorGrabMode::Locked,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeUiNode {
+    pub handle: NativeHandle,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeText {
+    pub handle: NativeHandle,
+}
+
+impl From<fyrox_lite::lite_ui::LiteText> for NativeText {
+    fn from(value: fyrox_lite::lite_ui::LiteText) -> Self {
+        Self {
+            handle: NativeHandle::from_u128(value.to_external()),
+        }
+    }
+}
+
+impl From<NativeText> for fyrox_lite::lite_ui::LiteText {
+    fn from(value: NativeText) -> Self {
+        Self::from_external(value.handle.as_u128())
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_ui_LiteText_set_text_async(
+    this: NativeText,
+    text: NativeString,
+) -> () {
+    let text = text.into();
+    let ret = fyrox_lite::lite_ui::LiteText::from(this).set_text_async(text);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_ui_LiteText_new(state: NativeTextBuilder) -> NativeText {
+    let state = state.into();
+    let ret = fyrox_lite::lite_ui::LiteText::new(state);
+    ret.into()
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeText_optional {
+    pub value: NativeText,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_ui::LiteText>> for NativeText_optional {
+    fn from(value: Option<fyrox_lite::lite_ui::LiteText>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeText_optional> for Option<fyrox_lite::lite_ui::LiteText> {
+    fn from(value: NativeText_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeColor {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+    pub a: u8,
+}
+
+impl From<fyrox_lite::lite_ui::Color> for NativeColor {
+    fn from(__value: fyrox_lite::lite_ui::Color) -> Self {
+        let r = __value.r.into();
+        let g = __value.g.into();
+        let b = __value.b.into();
+        let a = __value.a.into();
+        Self { r, g, b, a }
+    }
+}
+
+impl From<NativeColor> for fyrox_lite::lite_ui::Color {
+    fn from(__value: NativeColor) -> Self {
+        let r = __value.r.into();
+        let g = __value.g.into();
+        let b = __value.b.into();
+        let a = __value.a.into();
+        Self { r, g, b, a }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeColor_optional {
+    pub value: NativeColor,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_ui::Color>> for NativeColor_optional {
+    fn from(value: Option<fyrox_lite::lite_ui::Color>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeColor_optional> for Option<fyrox_lite::lite_ui::Color> {
+    fn from(value: NativeColor_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeColor_slice {
+    pub begin: *mut NativeColor,
+    pub len: i32,
+}
+
+impl Default for NativeColor_slice {
+    fn default() -> Self {
+        Self {
+            begin: std::ptr::null_mut(),
+            len: 0,
+        }
+    }
+}
+
+impl From<Vec<fyrox_lite::lite_ui::Color>> for NativeColor_slice {
+    fn from(value: Vec<fyrox_lite::lite_ui::Color>) -> Self {
+        let len = value.len() as i32;
+        if len == 0 {
+            return Self::default();
+        }
+        let native_vec: Vec<NativeColor> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeColor_slice> for Vec<fyrox_lite::lite_ui::Color> {
+    fn from(value: NativeColor_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
+            }
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_ui_Color_slice(
+    data: NativeColor_slice,
+) -> NativeColor_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeColor_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeColor_result {
+    pub ok: i32,
+    pub value: NativeColor_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeColor_result_value {
+    ok: NativeColor,
+    err: NativeString,
+}
+
+impl NativeColor_result {
+    pub fn into_result_shallow(self) -> Result<NativeColor, crate::LangSpecificError> {
+        unsafe {
+            if self.ok != 0 {
+                Ok(self.value.ok)
+            } else {
+                Err(self.value.err.into())
+            }
+        }
+    }
+    pub fn into_result(self) -> Result<fyrox_lite::lite_ui::Color, crate::LangSpecificError> {
+        unsafe {
+            if self.ok != 0 {
+                Ok(self.value.ok.into())
+            } else {
+                Err(self.value.err.into())
+            }
+        }
+    }
+}
+
+impl From<Result<fyrox_lite::lite_ui::Color, crate::LangSpecificError>> for NativeColor_result {
+    fn from(value: Result<fyrox_lite::lite_ui::Color, crate::LangSpecificError>) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeColor_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeColor_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeColor_result> for Result<fyrox_lite::lite_ui::Color, crate::LangSpecificError> {
+    fn from(value: NativeColor_result) -> Self {
+        value.into_result()
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeTextBuilder {
+    pub foreground: NativeBrush_optional,
+    pub font_size: f32_optional,
+}
+
+impl From<fyrox_lite::lite_ui::TextBuilder> for NativeTextBuilder {
+    fn from(__value: fyrox_lite::lite_ui::TextBuilder) -> Self {
+        let foreground = __value.foreground.into();
+        let font_size = __value.font_size.into();
+        Self {
+            foreground,
+            font_size,
+        }
+    }
+}
+
+impl From<NativeTextBuilder> for fyrox_lite::lite_ui::TextBuilder {
+    fn from(__value: NativeTextBuilder) -> Self {
+        let foreground = __value.foreground.into();
+        let font_size = __value.font_size.into();
+        Self {
+            foreground,
+            font_size,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeTextBuilder_optional {
+    pub value: NativeTextBuilder,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_ui::TextBuilder>> for NativeTextBuilder_optional {
+    fn from(value: Option<fyrox_lite::lite_ui::TextBuilder>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeTextBuilder_optional> for Option<fyrox_lite::lite_ui::TextBuilder> {
+    fn from(value: NativeTextBuilder_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeTextBuilder_slice {
+    pub begin: *mut NativeTextBuilder,
+    pub len: i32,
+}
+
+impl Default for NativeTextBuilder_slice {
+    fn default() -> Self {
+        Self {
+            begin: std::ptr::null_mut(),
+            len: 0,
+        }
+    }
+}
+
+impl From<Vec<fyrox_lite::lite_ui::TextBuilder>> for NativeTextBuilder_slice {
+    fn from(value: Vec<fyrox_lite::lite_ui::TextBuilder>) -> Self {
+        let len = value.len() as i32;
+        if len == 0 {
+            return Self::default();
+        }
+        let native_vec: Vec<NativeTextBuilder> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeTextBuilder_slice> for Vec<fyrox_lite::lite_ui::TextBuilder> {
+    fn from(value: NativeTextBuilder_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
+            }
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_ui_TextBuilder_slice(
+    data: NativeTextBuilder_slice,
+) -> NativeTextBuilder_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeTextBuilder_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeTextBuilder_result {
+    pub ok: i32,
+    pub value: NativeTextBuilder_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeTextBuilder_result_value {
+    ok: NativeTextBuilder,
+    err: NativeString,
+}
+
+impl NativeTextBuilder_result {
+    pub fn into_result_shallow(self) -> Result<NativeTextBuilder, crate::LangSpecificError> {
+        unsafe {
+            if self.ok != 0 {
+                Ok(self.value.ok)
+            } else {
+                Err(self.value.err.into())
+            }
+        }
+    }
+    pub fn into_result(self) -> Result<fyrox_lite::lite_ui::TextBuilder, crate::LangSpecificError> {
+        unsafe {
+            if self.ok != 0 {
+                Ok(self.value.ok.into())
+            } else {
+                Err(self.value.err.into())
+            }
+        }
+    }
+}
+
+impl From<Result<fyrox_lite::lite_ui::TextBuilder, crate::LangSpecificError>>
+    for NativeTextBuilder_result
+{
+    fn from(value: Result<fyrox_lite::lite_ui::TextBuilder, crate::LangSpecificError>) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeTextBuilder_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeTextBuilder_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeTextBuilder_result>
+    for Result<fyrox_lite::lite_ui::TextBuilder, crate::LangSpecificError>
+{
+    fn from(value: NativeTextBuilder_result) -> Self {
+        value.into_result()
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeBrush {
+    pub solid_color: NativeColor_optional,
+    pub linear_gradient: NativeLinearGradient_optional,
+    pub radial_gradient: NativeRadialGradient_optional,
+}
+
+impl From<fyrox_lite::lite_ui::Brush> for NativeBrush {
+    fn from(__value: fyrox_lite::lite_ui::Brush) -> Self {
+        let solid_color = __value.solid_color.into();
+        let linear_gradient = __value.linear_gradient.into();
+        let radial_gradient = __value.radial_gradient.into();
+        Self {
+            solid_color,
+            linear_gradient,
+            radial_gradient,
+        }
+    }
+}
+
+impl From<NativeBrush> for fyrox_lite::lite_ui::Brush {
+    fn from(__value: NativeBrush) -> Self {
+        let solid_color = __value.solid_color.into();
+        let linear_gradient = __value.linear_gradient.into();
+        let radial_gradient = __value.radial_gradient.into();
+        Self {
+            solid_color,
+            linear_gradient,
+            radial_gradient,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeBrush_optional {
+    pub value: NativeBrush,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_ui::Brush>> for NativeBrush_optional {
+    fn from(value: Option<fyrox_lite::lite_ui::Brush>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeBrush_optional> for Option<fyrox_lite::lite_ui::Brush> {
+    fn from(value: NativeBrush_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeBrush_slice {
+    pub begin: *mut NativeBrush,
+    pub len: i32,
+}
+
+impl Default for NativeBrush_slice {
+    fn default() -> Self {
+        Self {
+            begin: std::ptr::null_mut(),
+            len: 0,
+        }
+    }
+}
+
+impl From<Vec<fyrox_lite::lite_ui::Brush>> for NativeBrush_slice {
+    fn from(value: Vec<fyrox_lite::lite_ui::Brush>) -> Self {
+        let len = value.len() as i32;
+        if len == 0 {
+            return Self::default();
+        }
+        let native_vec: Vec<NativeBrush> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeBrush_slice> for Vec<fyrox_lite::lite_ui::Brush> {
+    fn from(value: NativeBrush_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
+            }
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_ui_Brush_slice(
+    data: NativeBrush_slice,
+) -> NativeBrush_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeBrush_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeBrush_result {
+    pub ok: i32,
+    pub value: NativeBrush_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeBrush_result_value {
+    ok: NativeBrush,
+    err: NativeString,
+}
+
+impl NativeBrush_result {
+    pub fn into_result_shallow(self) -> Result<NativeBrush, crate::LangSpecificError> {
+        unsafe {
+            if self.ok != 0 {
+                Ok(self.value.ok)
+            } else {
+                Err(self.value.err.into())
+            }
+        }
+    }
+    pub fn into_result(self) -> Result<fyrox_lite::lite_ui::Brush, crate::LangSpecificError> {
+        unsafe {
+            if self.ok != 0 {
+                Ok(self.value.ok.into())
+            } else {
+                Err(self.value.err.into())
+            }
+        }
+    }
+}
+
+impl From<Result<fyrox_lite::lite_ui::Brush, crate::LangSpecificError>> for NativeBrush_result {
+    fn from(value: Result<fyrox_lite::lite_ui::Brush, crate::LangSpecificError>) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeBrush_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeBrush_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeBrush_result> for Result<fyrox_lite::lite_ui::Brush, crate::LangSpecificError> {
+    fn from(value: NativeBrush_result) -> Self {
+        value.into_result()
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeLinearGradient {
+    pub from: NativeVector2,
+    pub to: NativeVector2,
+    pub stops: NativeGradientPoint_slice,
+}
+
+impl From<fyrox_lite::lite_ui::LinearGradient> for NativeLinearGradient {
+    fn from(__value: fyrox_lite::lite_ui::LinearGradient) -> Self {
+        let from = __value.from.into();
+        let to = __value.to.into();
+        let stops = __value.stops.into();
+        Self { from, to, stops }
+    }
+}
+
+impl From<NativeLinearGradient> for fyrox_lite::lite_ui::LinearGradient {
+    fn from(__value: NativeLinearGradient) -> Self {
+        let from = __value.from.into();
+        let to = __value.to.into();
+        let stops = __value.stops.into();
+        Self { from, to, stops }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeLinearGradient_optional {
+    pub value: NativeLinearGradient,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_ui::LinearGradient>> for NativeLinearGradient_optional {
+    fn from(value: Option<fyrox_lite::lite_ui::LinearGradient>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeLinearGradient_optional> for Option<fyrox_lite::lite_ui::LinearGradient> {
+    fn from(value: NativeLinearGradient_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeLinearGradient_slice {
+    pub begin: *mut NativeLinearGradient,
+    pub len: i32,
+}
+
+impl Default for NativeLinearGradient_slice {
+    fn default() -> Self {
+        Self {
+            begin: std::ptr::null_mut(),
+            len: 0,
+        }
+    }
+}
+
+impl From<Vec<fyrox_lite::lite_ui::LinearGradient>> for NativeLinearGradient_slice {
+    fn from(value: Vec<fyrox_lite::lite_ui::LinearGradient>) -> Self {
+        let len = value.len() as i32;
+        if len == 0 {
+            return Self::default();
+        }
+        let native_vec: Vec<NativeLinearGradient> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeLinearGradient_slice> for Vec<fyrox_lite::lite_ui::LinearGradient> {
+    fn from(value: NativeLinearGradient_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
+            }
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_ui_LinearGradient_slice(
+    data: NativeLinearGradient_slice,
+) -> NativeLinearGradient_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeLinearGradient_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeLinearGradient_result {
+    pub ok: i32,
+    pub value: NativeLinearGradient_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeLinearGradient_result_value {
+    ok: NativeLinearGradient,
+    err: NativeString,
+}
+
+impl NativeLinearGradient_result {
+    pub fn into_result_shallow(self) -> Result<NativeLinearGradient, crate::LangSpecificError> {
+        unsafe {
+            if self.ok != 0 {
+                Ok(self.value.ok)
+            } else {
+                Err(self.value.err.into())
+            }
+        }
+    }
+    pub fn into_result(
+        self,
+    ) -> Result<fyrox_lite::lite_ui::LinearGradient, crate::LangSpecificError> {
+        unsafe {
+            if self.ok != 0 {
+                Ok(self.value.ok.into())
+            } else {
+                Err(self.value.err.into())
+            }
+        }
+    }
+}
+
+impl From<Result<fyrox_lite::lite_ui::LinearGradient, crate::LangSpecificError>>
+    for NativeLinearGradient_result
+{
+    fn from(value: Result<fyrox_lite::lite_ui::LinearGradient, crate::LangSpecificError>) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeLinearGradient_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeLinearGradient_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeLinearGradient_result>
+    for Result<fyrox_lite::lite_ui::LinearGradient, crate::LangSpecificError>
+{
+    fn from(value: NativeLinearGradient_result) -> Self {
+        value.into_result()
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeRadialGradient {
+    pub center: NativeVector2,
+    pub stops: NativeGradientPoint_slice,
+}
+
+impl From<fyrox_lite::lite_ui::RadialGradient> for NativeRadialGradient {
+    fn from(__value: fyrox_lite::lite_ui::RadialGradient) -> Self {
+        let center = __value.center.into();
+        let stops = __value.stops.into();
+        Self { center, stops }
+    }
+}
+
+impl From<NativeRadialGradient> for fyrox_lite::lite_ui::RadialGradient {
+    fn from(__value: NativeRadialGradient) -> Self {
+        let center = __value.center.into();
+        let stops = __value.stops.into();
+        Self { center, stops }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeRadialGradient_optional {
+    pub value: NativeRadialGradient,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_ui::RadialGradient>> for NativeRadialGradient_optional {
+    fn from(value: Option<fyrox_lite::lite_ui::RadialGradient>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeRadialGradient_optional> for Option<fyrox_lite::lite_ui::RadialGradient> {
+    fn from(value: NativeRadialGradient_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeRadialGradient_slice {
+    pub begin: *mut NativeRadialGradient,
+    pub len: i32,
+}
+
+impl Default for NativeRadialGradient_slice {
+    fn default() -> Self {
+        Self {
+            begin: std::ptr::null_mut(),
+            len: 0,
+        }
+    }
+}
+
+impl From<Vec<fyrox_lite::lite_ui::RadialGradient>> for NativeRadialGradient_slice {
+    fn from(value: Vec<fyrox_lite::lite_ui::RadialGradient>) -> Self {
+        let len = value.len() as i32;
+        if len == 0 {
+            return Self::default();
+        }
+        let native_vec: Vec<NativeRadialGradient> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeRadialGradient_slice> for Vec<fyrox_lite::lite_ui::RadialGradient> {
+    fn from(value: NativeRadialGradient_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
+            }
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_ui_RadialGradient_slice(
+    data: NativeRadialGradient_slice,
+) -> NativeRadialGradient_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeRadialGradient_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeRadialGradient_result {
+    pub ok: i32,
+    pub value: NativeRadialGradient_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeRadialGradient_result_value {
+    ok: NativeRadialGradient,
+    err: NativeString,
+}
+
+impl NativeRadialGradient_result {
+    pub fn into_result_shallow(self) -> Result<NativeRadialGradient, crate::LangSpecificError> {
+        unsafe {
+            if self.ok != 0 {
+                Ok(self.value.ok)
+            } else {
+                Err(self.value.err.into())
+            }
+        }
+    }
+    pub fn into_result(
+        self,
+    ) -> Result<fyrox_lite::lite_ui::RadialGradient, crate::LangSpecificError> {
+        unsafe {
+            if self.ok != 0 {
+                Ok(self.value.ok.into())
+            } else {
+                Err(self.value.err.into())
+            }
+        }
+    }
+}
+
+impl From<Result<fyrox_lite::lite_ui::RadialGradient, crate::LangSpecificError>>
+    for NativeRadialGradient_result
+{
+    fn from(value: Result<fyrox_lite::lite_ui::RadialGradient, crate::LangSpecificError>) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeRadialGradient_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeRadialGradient_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeRadialGradient_result>
+    for Result<fyrox_lite::lite_ui::RadialGradient, crate::LangSpecificError>
+{
+    fn from(value: NativeRadialGradient_result) -> Self {
+        value.into_result()
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeGradientPoint {
+    pub stop: f32,
+    pub color: NativeColor,
+}
+
+impl From<fyrox_lite::lite_ui::GradientPoint> for NativeGradientPoint {
+    fn from(__value: fyrox_lite::lite_ui::GradientPoint) -> Self {
+        let stop = __value.stop.into();
+        let color = __value.color.into();
+        Self { stop, color }
+    }
+}
+
+impl From<NativeGradientPoint> for fyrox_lite::lite_ui::GradientPoint {
+    fn from(__value: NativeGradientPoint) -> Self {
+        let stop = __value.stop.into();
+        let color = __value.color.into();
+        Self { stop, color }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeGradientPoint_optional {
+    pub value: NativeGradientPoint,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_ui::GradientPoint>> for NativeGradientPoint_optional {
+    fn from(value: Option<fyrox_lite::lite_ui::GradientPoint>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeGradientPoint_optional> for Option<fyrox_lite::lite_ui::GradientPoint> {
+    fn from(value: NativeGradientPoint_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeGradientPoint_slice {
+    pub begin: *mut NativeGradientPoint,
+    pub len: i32,
+}
+
+impl Default for NativeGradientPoint_slice {
+    fn default() -> Self {
+        Self {
+            begin: std::ptr::null_mut(),
+            len: 0,
+        }
+    }
+}
+
+impl From<Vec<fyrox_lite::lite_ui::GradientPoint>> for NativeGradientPoint_slice {
+    fn from(value: Vec<fyrox_lite::lite_ui::GradientPoint>) -> Self {
+        let len = value.len() as i32;
+        if len == 0 {
+            return Self::default();
+        }
+        let native_vec: Vec<NativeGradientPoint> = value.into_iter().map(|it| it.into()).collect();
+        let begin = crate::Arena::allocate_vec(native_vec);
+        Self { begin, len }
+    }
+}
+
+impl From<NativeGradientPoint_slice> for Vec<fyrox_lite::lite_ui::GradientPoint> {
+    fn from(value: NativeGradientPoint_slice) -> Self {
+        let mut vec = Vec::new();
+        unsafe {
+            for i in 0..value.len {
+                let v = *value.begin.add(i as usize);
+                vec.push(v.into());
+            }
+        }
+        vec
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_ui_GradientPoint_slice(
+    data: NativeGradientPoint_slice,
+) -> NativeGradientPoint_slice {
+    let mut vec = Vec::new();
+    unsafe {
+        for i in 0..data.len {
+            let v = *data.begin.add(i as usize);
+            vec.push(v);
+        }
+    }
+    let ptr = crate::Arena::allocate_vec(vec);
+    NativeGradientPoint_slice {
+        begin: ptr,
+        len: data.len,
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeGradientPoint_result {
+    pub ok: i32,
+    pub value: NativeGradientPoint_result_value,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union NativeGradientPoint_result_value {
+    ok: NativeGradientPoint,
+    err: NativeString,
+}
+
+impl NativeGradientPoint_result {
+    pub fn into_result_shallow(self) -> Result<NativeGradientPoint, crate::LangSpecificError> {
+        unsafe {
+            if self.ok != 0 {
+                Ok(self.value.ok)
+            } else {
+                Err(self.value.err.into())
+            }
+        }
+    }
+    pub fn into_result(
+        self,
+    ) -> Result<fyrox_lite::lite_ui::GradientPoint, crate::LangSpecificError> {
+        unsafe {
+            if self.ok != 0 {
+                Ok(self.value.ok.into())
+            } else {
+                Err(self.value.err.into())
+            }
+        }
+    }
+}
+
+impl From<Result<fyrox_lite::lite_ui::GradientPoint, crate::LangSpecificError>>
+    for NativeGradientPoint_result
+{
+    fn from(value: Result<fyrox_lite::lite_ui::GradientPoint, crate::LangSpecificError>) -> Self {
+        match value {
+            Ok(it) => Self {
+                ok: 1,
+                value: NativeGradientPoint_result_value { ok: it.into() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                value: NativeGradientPoint_result_value { err: err.into() },
+            },
+        }
+    }
+}
+
+impl From<NativeGradientPoint_result>
+    for Result<fyrox_lite::lite_ui::GradientPoint, crate::LangSpecificError>
+{
+    fn from(value: NativeGradientPoint_result) -> Self {
+        value.into_result()
+    }
 }
 
 #[repr(C)]
@@ -1613,1145 +2811,30 @@ impl From<NativeRigidBody_optional> for Option<fyrox_lite::lite_physics::LiteRig
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct NativeUiNode {
+pub struct NativeScene {
     pub handle: NativeHandle,
 }
 
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeText {
-    pub handle: NativeHandle,
-}
-
-impl From<fyrox_lite::lite_ui::LiteText> for NativeText {
-    fn from(value: fyrox_lite::lite_ui::LiteText) -> Self {
-        Self {
-            handle: NativeHandle::from_u128(value.to_external()),
-        }
-    }
-}
-
-impl From<NativeText> for fyrox_lite::lite_ui::LiteText {
-    fn from(value: NativeText) -> Self {
-        Self::from_external(value.handle.as_u128())
-    }
-}
-
 #[no_mangle]
-pub extern "C" fn fyrox_lite_lite_ui_LiteText_set_text_async(
-    this: NativeText,
-    text: NativeString,
-) -> () {
-    let text = text.into();
-    let ret = fyrox_lite::lite_ui::LiteText::from(this).set_text_async(text);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_ui_LiteText_new(state: NativeTextBuilder) -> NativeText {
-    let state = state.into();
-    let ret = fyrox_lite::lite_ui::LiteText::new(state);
+pub extern "C" fn fyrox_lite_lite_scene_LiteScene_load_async(scene_path: NativeString) -> () {
+    let scene_path = scene_path.into();
+    let ret = fyrox_lite::lite_scene::LiteScene::load_async(scene_path);
     ret.into()
 }
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct NativeText_optional {
-    pub value: NativeText,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_ui::LiteText>> for NativeText_optional {
-    fn from(value: Option<fyrox_lite::lite_ui::LiteText>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeText_optional> for Option<fyrox_lite::lite_ui::LiteText> {
-    fn from(value: NativeText_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeColor {
-    pub r: u8,
-    pub g: u8,
-    pub b: u8,
-    pub a: u8,
-}
-
-impl From<fyrox_lite::lite_ui::Color> for NativeColor {
-    fn from(__value: fyrox_lite::lite_ui::Color) -> Self {
-        let r = __value.r.into();
-        let g = __value.g.into();
-        let b = __value.b.into();
-        let a = __value.a.into();
-        Self { r, g, b, a }
-    }
-}
-
-impl From<NativeColor> for fyrox_lite::lite_ui::Color {
-    fn from(__value: NativeColor) -> Self {
-        let r = __value.r.into();
-        let g = __value.g.into();
-        let b = __value.b.into();
-        let a = __value.a.into();
-        Self { r, g, b, a }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeColor_optional {
-    pub value: NativeColor,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_ui::Color>> for NativeColor_optional {
-    fn from(value: Option<fyrox_lite::lite_ui::Color>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeColor_optional> for Option<fyrox_lite::lite_ui::Color> {
-    fn from(value: NativeColor_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeColor_slice {
-    pub begin: *mut NativeColor,
-    pub len: i32,
-}
-
-impl Default for NativeColor_slice {
-    fn default() -> Self {
-        Self {
-            begin: std::ptr::null_mut(),
-            len: 0,
-        }
-    }
-}
-
-impl From<Vec<fyrox_lite::lite_ui::Color>> for NativeColor_slice {
-    fn from(value: Vec<fyrox_lite::lite_ui::Color>) -> Self {
-        let len = value.len() as i32;
-        if len == 0 {
-            return Self::default();
-        }
-        let native_vec: Vec<NativeColor> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeColor_slice> for Vec<fyrox_lite::lite_ui::Color> {
-    fn from(value: NativeColor_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
+pub struct NativePlugin {
+    pub handle: NativeHandle,
 }
 
 #[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_ui_Color_slice(
-    data: NativeColor_slice,
-) -> NativeColor_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeColor_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeColor_result {
-    pub ok: i32,
-    pub value: NativeColor_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeColor_result_value {
-    ok: NativeColor,
-    err: NativeString,
-}
-
-impl NativeColor_result {
-    pub fn into_result_shallow(self) -> Result<NativeColor, crate::LangSpecificError> {
-        unsafe {
-            if self.ok != 0 {
-                Ok(self.value.ok)
-            } else {
-                Err(self.value.err.into())
-            }
-        }
-    }
-    pub fn into_result(self) -> Result<fyrox_lite::lite_ui::Color, crate::LangSpecificError> {
-        unsafe {
-            if self.ok != 0 {
-                Ok(self.value.ok.into())
-            } else {
-                Err(self.value.err.into())
-            }
-        }
-    }
-}
-
-impl From<Result<fyrox_lite::lite_ui::Color, crate::LangSpecificError>> for NativeColor_result {
-    fn from(value: Result<fyrox_lite::lite_ui::Color, crate::LangSpecificError>) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeColor_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeColor_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeColor_result> for Result<fyrox_lite::lite_ui::Color, crate::LangSpecificError> {
-    fn from(value: NativeColor_result) -> Self {
-        value.into_result()
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeTextBuilder {
-    pub foreground: NativeBrush_optional,
-    pub font_size: f32_optional,
-}
-
-impl From<fyrox_lite::lite_ui::TextBuilder> for NativeTextBuilder {
-    fn from(__value: fyrox_lite::lite_ui::TextBuilder) -> Self {
-        let foreground = __value.foreground.into();
-        let font_size = __value.font_size.into();
-        Self {
-            foreground,
-            font_size,
-        }
-    }
-}
-
-impl From<NativeTextBuilder> for fyrox_lite::lite_ui::TextBuilder {
-    fn from(__value: NativeTextBuilder) -> Self {
-        let foreground = __value.foreground.into();
-        let font_size = __value.font_size.into();
-        Self {
-            foreground,
-            font_size,
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeTextBuilder_optional {
-    pub value: NativeTextBuilder,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_ui::TextBuilder>> for NativeTextBuilder_optional {
-    fn from(value: Option<fyrox_lite::lite_ui::TextBuilder>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeTextBuilder_optional> for Option<fyrox_lite::lite_ui::TextBuilder> {
-    fn from(value: NativeTextBuilder_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeTextBuilder_slice {
-    pub begin: *mut NativeTextBuilder,
-    pub len: i32,
-}
-
-impl Default for NativeTextBuilder_slice {
-    fn default() -> Self {
-        Self {
-            begin: std::ptr::null_mut(),
-            len: 0,
-        }
-    }
-}
-
-impl From<Vec<fyrox_lite::lite_ui::TextBuilder>> for NativeTextBuilder_slice {
-    fn from(value: Vec<fyrox_lite::lite_ui::TextBuilder>) -> Self {
-        let len = value.len() as i32;
-        if len == 0 {
-            return Self::default();
-        }
-        let native_vec: Vec<NativeTextBuilder> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeTextBuilder_slice> for Vec<fyrox_lite::lite_ui::TextBuilder> {
-    fn from(value: NativeTextBuilder_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_ui_TextBuilder_slice(
-    data: NativeTextBuilder_slice,
-) -> NativeTextBuilder_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeTextBuilder_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeTextBuilder_result {
-    pub ok: i32,
-    pub value: NativeTextBuilder_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeTextBuilder_result_value {
-    ok: NativeTextBuilder,
-    err: NativeString,
-}
-
-impl NativeTextBuilder_result {
-    pub fn into_result_shallow(self) -> Result<NativeTextBuilder, crate::LangSpecificError> {
-        unsafe {
-            if self.ok != 0 {
-                Ok(self.value.ok)
-            } else {
-                Err(self.value.err.into())
-            }
-        }
-    }
-    pub fn into_result(self) -> Result<fyrox_lite::lite_ui::TextBuilder, crate::LangSpecificError> {
-        unsafe {
-            if self.ok != 0 {
-                Ok(self.value.ok.into())
-            } else {
-                Err(self.value.err.into())
-            }
-        }
-    }
-}
-
-impl From<Result<fyrox_lite::lite_ui::TextBuilder, crate::LangSpecificError>>
-    for NativeTextBuilder_result
-{
-    fn from(value: Result<fyrox_lite::lite_ui::TextBuilder, crate::LangSpecificError>) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeTextBuilder_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeTextBuilder_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeTextBuilder_result>
-    for Result<fyrox_lite::lite_ui::TextBuilder, crate::LangSpecificError>
-{
-    fn from(value: NativeTextBuilder_result) -> Self {
-        value.into_result()
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeBrush {
-    pub solid_color: NativeColor_optional,
-    pub linear_gradient: NativeLinearGradient_optional,
-    pub radial_gradient: NativeRadialGradient_optional,
-}
-
-impl From<fyrox_lite::lite_ui::Brush> for NativeBrush {
-    fn from(__value: fyrox_lite::lite_ui::Brush) -> Self {
-        let solid_color = __value.solid_color.into();
-        let linear_gradient = __value.linear_gradient.into();
-        let radial_gradient = __value.radial_gradient.into();
-        Self {
-            solid_color,
-            linear_gradient,
-            radial_gradient,
-        }
-    }
-}
-
-impl From<NativeBrush> for fyrox_lite::lite_ui::Brush {
-    fn from(__value: NativeBrush) -> Self {
-        let solid_color = __value.solid_color.into();
-        let linear_gradient = __value.linear_gradient.into();
-        let radial_gradient = __value.radial_gradient.into();
-        Self {
-            solid_color,
-            linear_gradient,
-            radial_gradient,
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeBrush_optional {
-    pub value: NativeBrush,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_ui::Brush>> for NativeBrush_optional {
-    fn from(value: Option<fyrox_lite::lite_ui::Brush>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeBrush_optional> for Option<fyrox_lite::lite_ui::Brush> {
-    fn from(value: NativeBrush_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeBrush_slice {
-    pub begin: *mut NativeBrush,
-    pub len: i32,
-}
-
-impl Default for NativeBrush_slice {
-    fn default() -> Self {
-        Self {
-            begin: std::ptr::null_mut(),
-            len: 0,
-        }
-    }
-}
-
-impl From<Vec<fyrox_lite::lite_ui::Brush>> for NativeBrush_slice {
-    fn from(value: Vec<fyrox_lite::lite_ui::Brush>) -> Self {
-        let len = value.len() as i32;
-        if len == 0 {
-            return Self::default();
-        }
-        let native_vec: Vec<NativeBrush> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeBrush_slice> for Vec<fyrox_lite::lite_ui::Brush> {
-    fn from(value: NativeBrush_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_ui_Brush_slice(
-    data: NativeBrush_slice,
-) -> NativeBrush_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeBrush_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeBrush_result {
-    pub ok: i32,
-    pub value: NativeBrush_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeBrush_result_value {
-    ok: NativeBrush,
-    err: NativeString,
-}
-
-impl NativeBrush_result {
-    pub fn into_result_shallow(self) -> Result<NativeBrush, crate::LangSpecificError> {
-        unsafe {
-            if self.ok != 0 {
-                Ok(self.value.ok)
-            } else {
-                Err(self.value.err.into())
-            }
-        }
-    }
-    pub fn into_result(self) -> Result<fyrox_lite::lite_ui::Brush, crate::LangSpecificError> {
-        unsafe {
-            if self.ok != 0 {
-                Ok(self.value.ok.into())
-            } else {
-                Err(self.value.err.into())
-            }
-        }
-    }
-}
-
-impl From<Result<fyrox_lite::lite_ui::Brush, crate::LangSpecificError>> for NativeBrush_result {
-    fn from(value: Result<fyrox_lite::lite_ui::Brush, crate::LangSpecificError>) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeBrush_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeBrush_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeBrush_result> for Result<fyrox_lite::lite_ui::Brush, crate::LangSpecificError> {
-    fn from(value: NativeBrush_result) -> Self {
-        value.into_result()
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeLinearGradient {
-    pub from: NativeVector2,
-    pub to: NativeVector2,
-    pub stops: NativeGradientPoint_slice,
-}
-
-impl From<fyrox_lite::lite_ui::LinearGradient> for NativeLinearGradient {
-    fn from(__value: fyrox_lite::lite_ui::LinearGradient) -> Self {
-        let from = __value.from.into();
-        let to = __value.to.into();
-        let stops = __value.stops.into();
-        Self { from, to, stops }
-    }
-}
-
-impl From<NativeLinearGradient> for fyrox_lite::lite_ui::LinearGradient {
-    fn from(__value: NativeLinearGradient) -> Self {
-        let from = __value.from.into();
-        let to = __value.to.into();
-        let stops = __value.stops.into();
-        Self { from, to, stops }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeLinearGradient_optional {
-    pub value: NativeLinearGradient,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_ui::LinearGradient>> for NativeLinearGradient_optional {
-    fn from(value: Option<fyrox_lite::lite_ui::LinearGradient>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeLinearGradient_optional> for Option<fyrox_lite::lite_ui::LinearGradient> {
-    fn from(value: NativeLinearGradient_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeLinearGradient_slice {
-    pub begin: *mut NativeLinearGradient,
-    pub len: i32,
-}
-
-impl Default for NativeLinearGradient_slice {
-    fn default() -> Self {
-        Self {
-            begin: std::ptr::null_mut(),
-            len: 0,
-        }
-    }
-}
-
-impl From<Vec<fyrox_lite::lite_ui::LinearGradient>> for NativeLinearGradient_slice {
-    fn from(value: Vec<fyrox_lite::lite_ui::LinearGradient>) -> Self {
-        let len = value.len() as i32;
-        if len == 0 {
-            return Self::default();
-        }
-        let native_vec: Vec<NativeLinearGradient> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeLinearGradient_slice> for Vec<fyrox_lite::lite_ui::LinearGradient> {
-    fn from(value: NativeLinearGradient_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_ui_LinearGradient_slice(
-    data: NativeLinearGradient_slice,
-) -> NativeLinearGradient_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeLinearGradient_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeLinearGradient_result {
-    pub ok: i32,
-    pub value: NativeLinearGradient_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeLinearGradient_result_value {
-    ok: NativeLinearGradient,
-    err: NativeString,
-}
-
-impl NativeLinearGradient_result {
-    pub fn into_result_shallow(self) -> Result<NativeLinearGradient, crate::LangSpecificError> {
-        unsafe {
-            if self.ok != 0 {
-                Ok(self.value.ok)
-            } else {
-                Err(self.value.err.into())
-            }
-        }
-    }
-    pub fn into_result(
-        self,
-    ) -> Result<fyrox_lite::lite_ui::LinearGradient, crate::LangSpecificError> {
-        unsafe {
-            if self.ok != 0 {
-                Ok(self.value.ok.into())
-            } else {
-                Err(self.value.err.into())
-            }
-        }
-    }
-}
-
-impl From<Result<fyrox_lite::lite_ui::LinearGradient, crate::LangSpecificError>>
-    for NativeLinearGradient_result
-{
-    fn from(value: Result<fyrox_lite::lite_ui::LinearGradient, crate::LangSpecificError>) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeLinearGradient_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeLinearGradient_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeLinearGradient_result>
-    for Result<fyrox_lite::lite_ui::LinearGradient, crate::LangSpecificError>
-{
-    fn from(value: NativeLinearGradient_result) -> Self {
-        value.into_result()
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeRadialGradient {
-    pub center: NativeVector2,
-    pub stops: NativeGradientPoint_slice,
-}
-
-impl From<fyrox_lite::lite_ui::RadialGradient> for NativeRadialGradient {
-    fn from(__value: fyrox_lite::lite_ui::RadialGradient) -> Self {
-        let center = __value.center.into();
-        let stops = __value.stops.into();
-        Self { center, stops }
-    }
-}
-
-impl From<NativeRadialGradient> for fyrox_lite::lite_ui::RadialGradient {
-    fn from(__value: NativeRadialGradient) -> Self {
-        let center = __value.center.into();
-        let stops = __value.stops.into();
-        Self { center, stops }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeRadialGradient_optional {
-    pub value: NativeRadialGradient,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_ui::RadialGradient>> for NativeRadialGradient_optional {
-    fn from(value: Option<fyrox_lite::lite_ui::RadialGradient>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeRadialGradient_optional> for Option<fyrox_lite::lite_ui::RadialGradient> {
-    fn from(value: NativeRadialGradient_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeRadialGradient_slice {
-    pub begin: *mut NativeRadialGradient,
-    pub len: i32,
-}
-
-impl Default for NativeRadialGradient_slice {
-    fn default() -> Self {
-        Self {
-            begin: std::ptr::null_mut(),
-            len: 0,
-        }
-    }
-}
-
-impl From<Vec<fyrox_lite::lite_ui::RadialGradient>> for NativeRadialGradient_slice {
-    fn from(value: Vec<fyrox_lite::lite_ui::RadialGradient>) -> Self {
-        let len = value.len() as i32;
-        if len == 0 {
-            return Self::default();
-        }
-        let native_vec: Vec<NativeRadialGradient> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeRadialGradient_slice> for Vec<fyrox_lite::lite_ui::RadialGradient> {
-    fn from(value: NativeRadialGradient_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_ui_RadialGradient_slice(
-    data: NativeRadialGradient_slice,
-) -> NativeRadialGradient_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeRadialGradient_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeRadialGradient_result {
-    pub ok: i32,
-    pub value: NativeRadialGradient_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeRadialGradient_result_value {
-    ok: NativeRadialGradient,
-    err: NativeString,
-}
-
-impl NativeRadialGradient_result {
-    pub fn into_result_shallow(self) -> Result<NativeRadialGradient, crate::LangSpecificError> {
-        unsafe {
-            if self.ok != 0 {
-                Ok(self.value.ok)
-            } else {
-                Err(self.value.err.into())
-            }
-        }
-    }
-    pub fn into_result(
-        self,
-    ) -> Result<fyrox_lite::lite_ui::RadialGradient, crate::LangSpecificError> {
-        unsafe {
-            if self.ok != 0 {
-                Ok(self.value.ok.into())
-            } else {
-                Err(self.value.err.into())
-            }
-        }
-    }
-}
-
-impl From<Result<fyrox_lite::lite_ui::RadialGradient, crate::LangSpecificError>>
-    for NativeRadialGradient_result
-{
-    fn from(value: Result<fyrox_lite::lite_ui::RadialGradient, crate::LangSpecificError>) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeRadialGradient_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeRadialGradient_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeRadialGradient_result>
-    for Result<fyrox_lite::lite_ui::RadialGradient, crate::LangSpecificError>
-{
-    fn from(value: NativeRadialGradient_result) -> Self {
-        value.into_result()
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeGradientPoint {
-    pub stop: f32,
-    pub color: NativeColor,
-}
-
-impl From<fyrox_lite::lite_ui::GradientPoint> for NativeGradientPoint {
-    fn from(__value: fyrox_lite::lite_ui::GradientPoint) -> Self {
-        let stop = __value.stop.into();
-        let color = __value.color.into();
-        Self { stop, color }
-    }
-}
-
-impl From<NativeGradientPoint> for fyrox_lite::lite_ui::GradientPoint {
-    fn from(__value: NativeGradientPoint) -> Self {
-        let stop = __value.stop.into();
-        let color = __value.color.into();
-        Self { stop, color }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeGradientPoint_optional {
-    pub value: NativeGradientPoint,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_ui::GradientPoint>> for NativeGradientPoint_optional {
-    fn from(value: Option<fyrox_lite::lite_ui::GradientPoint>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeGradientPoint_optional> for Option<fyrox_lite::lite_ui::GradientPoint> {
-    fn from(value: NativeGradientPoint_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeGradientPoint_slice {
-    pub begin: *mut NativeGradientPoint,
-    pub len: i32,
-}
-
-impl Default for NativeGradientPoint_slice {
-    fn default() -> Self {
-        Self {
-            begin: std::ptr::null_mut(),
-            len: 0,
-        }
-    }
-}
-
-impl From<Vec<fyrox_lite::lite_ui::GradientPoint>> for NativeGradientPoint_slice {
-    fn from(value: Vec<fyrox_lite::lite_ui::GradientPoint>) -> Self {
-        let len = value.len() as i32;
-        if len == 0 {
-            return Self::default();
-        }
-        let native_vec: Vec<NativeGradientPoint> = value.into_iter().map(|it| it.into()).collect();
-        let begin = crate::Arena::allocate_vec(native_vec);
-        Self { begin, len }
-    }
-}
-
-impl From<NativeGradientPoint_slice> for Vec<fyrox_lite::lite_ui::GradientPoint> {
-    fn from(value: NativeGradientPoint_slice) -> Self {
-        let mut vec = Vec::new();
-        unsafe {
-            for i in 0..value.len {
-                let v = *value.begin.add(i as usize);
-                vec.push(v.into());
-            }
-        }
-        vec
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_upload_fyrox_lite_lite_ui_GradientPoint_slice(
-    data: NativeGradientPoint_slice,
-) -> NativeGradientPoint_slice {
-    let mut vec = Vec::new();
-    unsafe {
-        for i in 0..data.len {
-            let v = *data.begin.add(i as usize);
-            vec.push(v);
-        }
-    }
-    let ptr = crate::Arena::allocate_vec(vec);
-    NativeGradientPoint_slice {
-        begin: ptr,
-        len: data.len,
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeGradientPoint_result {
-    pub ok: i32,
-    pub value: NativeGradientPoint_result_value,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub union NativeGradientPoint_result_value {
-    ok: NativeGradientPoint,
-    err: NativeString,
-}
-
-impl NativeGradientPoint_result {
-    pub fn into_result_shallow(self) -> Result<NativeGradientPoint, crate::LangSpecificError> {
-        unsafe {
-            if self.ok != 0 {
-                Ok(self.value.ok)
-            } else {
-                Err(self.value.err.into())
-            }
-        }
-    }
-    pub fn into_result(
-        self,
-    ) -> Result<fyrox_lite::lite_ui::GradientPoint, crate::LangSpecificError> {
-        unsafe {
-            if self.ok != 0 {
-                Ok(self.value.ok.into())
-            } else {
-                Err(self.value.err.into())
-            }
-        }
-    }
-}
-
-impl From<Result<fyrox_lite::lite_ui::GradientPoint, crate::LangSpecificError>>
-    for NativeGradientPoint_result
-{
-    fn from(value: Result<fyrox_lite::lite_ui::GradientPoint, crate::LangSpecificError>) -> Self {
-        match value {
-            Ok(it) => Self {
-                ok: 1,
-                value: NativeGradientPoint_result_value { ok: it.into() },
-            },
-            Err(err) => Self {
-                ok: 0,
-                value: NativeGradientPoint_result_value { err: err.into() },
-            },
-        }
-    }
-}
-
-impl From<NativeGradientPoint_result>
-    for Result<fyrox_lite::lite_ui::GradientPoint, crate::LangSpecificError>
-{
-    fn from(value: NativeGradientPoint_result) -> Self {
-        value.into_result()
-    }
+pub extern "C" fn fyrox_lite_lite_plugin_LitePlugin_get(
+    class_id: NativeClassId,
+) -> NativeInstanceId_result {
+    let class_id = class_id.into();
+    let ret = fyrox_lite::lite_plugin::LitePlugin::get::<crate::UserScriptImpl>(class_id, ());
+    ret.into()
 }
 
 #[repr(C)]
@@ -3513,49 +3596,6 @@ impl From<NativePrefab_optional> for Option<fyrox_lite::lite_prefab::LitePrefab>
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct NativeWindow {
-    pub handle: NativeHandle,
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_window_LiteWindow_set_cursor_grab(
-    mode: NativeCursorGrabMode,
-) -> () {
-    let mode = mode.into();
-    let ret = fyrox_lite::lite_window::LiteWindow::set_cursor_grab(mode);
-    ret.into()
-}
-
-#[repr(C)]
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum NativeCursorGrabMode {
-    None,
-    Confined,
-    Locked,
-}
-
-impl From<fyrox_lite::lite_window::LiteCursorGrabMode> for NativeCursorGrabMode {
-    fn from(value: fyrox_lite::lite_window::LiteCursorGrabMode) -> Self {
-        match value {
-            fyrox_lite::lite_window::LiteCursorGrabMode::None => NativeCursorGrabMode::None,
-            fyrox_lite::lite_window::LiteCursorGrabMode::Confined => NativeCursorGrabMode::Confined,
-            fyrox_lite::lite_window::LiteCursorGrabMode::Locked => NativeCursorGrabMode::Locked,
-        }
-    }
-}
-
-impl From<NativeCursorGrabMode> for fyrox_lite::lite_window::LiteCursorGrabMode {
-    fn from(value: NativeCursorGrabMode) -> Self {
-        match value {
-            NativeCursorGrabMode::None => fyrox_lite::lite_window::LiteCursorGrabMode::None,
-            NativeCursorGrabMode::Confined => fyrox_lite::lite_window::LiteCursorGrabMode::Confined,
-            NativeCursorGrabMode::Locked => fyrox_lite::lite_window::LiteCursorGrabMode::Locked,
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
 pub struct NativeNode {
     pub handle: NativeHandle,
 }
@@ -3791,46 +3831,6 @@ impl From<NativeRoutingStrategy> for fyrox_lite::lite_node::LiteRoutingStrategy 
             NativeRoutingStrategy::Down => fyrox_lite::lite_node::LiteRoutingStrategy::Down,
         }
     }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeScene {
-    pub handle: NativeHandle,
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_scene_LiteScene_load_async(scene_path: NativeString) -> () {
-    let scene_path = scene_path.into();
-    let ret = fyrox_lite::lite_scene::LiteScene::load_async(scene_path);
-    ret.into()
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeLog {
-    pub handle: NativeHandle,
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_log_LiteLog_info(msg: NativeString) -> () {
-    let msg = msg.into();
-    let ret = fyrox_lite::lite_log::LiteLog::info(msg);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_log_LiteLog_warn(msg: NativeString) -> () {
-    let msg = msg.into();
-    let ret = fyrox_lite::lite_log::LiteLog::warn(msg);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_log_LiteLog_err(msg: NativeString) -> () {
-    let msg = msg.into();
-    let ret = fyrox_lite::lite_log::LiteLog::err(msg);
-    ret.into()
 }
 
 #[repr(C)]

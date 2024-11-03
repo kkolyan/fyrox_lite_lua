@@ -82,7 +82,7 @@ public partial struct Node : IEquatable<Node>
             }
         }
     }
-    public  Quaternion LocalRotation
+    public Quaternion LocalRotation
     {
         get
         {
