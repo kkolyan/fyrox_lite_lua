@@ -15,7 +15,7 @@ Plugin = {}
 Plugin_instance = {}
 
 ---@generic T
----@param class_name `T`
+---@param class `T`
 ---@return T
-function Plugin:get(class_name) end
+function Plugin:get(class) end
 

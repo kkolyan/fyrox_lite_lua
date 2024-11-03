@@ -22,7 +22,7 @@ pub fn type_cs(ty: &DataType) -> CsType {
             facade_generic: "string".to_string(),
             blittable: "NativeString".to_string(),
         },
-        DataType::ClassName => type_cs(&DataType::String),
+        DataType::ClassName => CsType::Blittable(format!("NativeClassId")),
         DataType::Vec(it) => CsType::templated(
             // TODO there is two options to design it;
             // 1. return iterator, that also contains seem hash to check the rust-side arena-allocated collection is alive every iteration
@@ -36,7 +36,7 @@ pub fn type_cs(ty: &DataType) -> CsType {
         DataType::UserScript => CsType::Mapped {
             facade: "object".to_string(),
             facade_generic: "T".to_string(),
-            blittable: "UserScript".to_string(),
+            blittable: "NativeInstanceId".to_string(),
         },
         DataType::UserScriptMessage => CsType::Mapped {
             facade: "object".to_string(),
@@ -82,7 +82,7 @@ pub fn type_rs(ty: &DataType, ctx: &GenerationContext) -> RsType {
         DataType::F32 => RsType::Basic(format!("f32")),
         DataType::F64 => RsType::Basic(format!("f64")),
         DataType::String => RsType::Mapped {native: "NativeString".to_string(), lite: "String".to_string()},
-        DataType::ClassName => type_rs(&DataType::String, ctx),
+        DataType::ClassName => RsType::Basic("NativeClassId".to_string()),
         DataType::Vec(it) => RsType::templated(
             // TODO there is two options to design it;
             // 1. return iterator, that also contains seem hash to check the rust-side arena-allocated collection is alive every iteration
@@ -95,7 +95,7 @@ pub fn type_rs(ty: &DataType, ctx: &GenerationContext) -> RsType {
         ),
         DataType::UserScript => RsType::Mapped {
             lite: "crate::UserScriptImpl".to_string(),
-            native: "NativeHandle".to_string(),
+            native: "NativeInstanceId".to_string(),
         },
         DataType::UserScriptMessage => RsType::Basic("UserScriptMessage".to_string()),
         DataType::UserScriptGenericStub => panic!("WTF, UserScriptGenericStub should be filtered out"),

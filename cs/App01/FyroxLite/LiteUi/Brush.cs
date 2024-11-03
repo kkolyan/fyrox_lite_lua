@@ -15,7 +15,6 @@ using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Numerics;
 using System.Drawing;
-using FyroxLite.LiteBase;
 using FyroxLite.Internal;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -164,5 +163,10 @@ internal struct Brush_result
         var __item = self;
         var __item_from_facade = __item;
         return new Brush_result {ok = 1, value = __item_from_facade};
+    }
+
+    internal static Brush_result FromFacadeError(in string err)
+    {
+        return new Brush_result {ok = 0, err = NativeString.FromFacade(err)};
     }
 }

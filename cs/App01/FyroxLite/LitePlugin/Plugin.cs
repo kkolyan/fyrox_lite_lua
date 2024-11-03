@@ -15,7 +15,6 @@ using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Numerics;
 using System.Drawing;
-using FyroxLite.LiteBase;
 using FyroxLite.Internal;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -31,11 +30,11 @@ public static partial class Plugin
     {
         unsafe {
             
-            var __ret = fyrox_lite_lite_plugin_LitePlugin_get(NativeString.FromFacade(typeof(T).Name));
-            return UserScript_result.ToFacade(__ret) as T;
+            var __ret = fyrox_lite_lite_plugin_LitePlugin_get(NativeClassId.By<T>.Resolve());
+            return NativeInstanceId_result.ToFacade(__ret) as T;
         }
     }
 
     [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial UserScript_result fyrox_lite_lite_plugin_LitePlugin_get(NativeString class_name);
+    private static unsafe partial NativeInstanceId_result fyrox_lite_lite_plugin_LitePlugin_get(NativeClassId class_id);
 }

@@ -11,7 +11,7 @@ use fyrox_lite::script_context::UnsafeAsUnifiedContext;
 use fyrox_lite::script_object_residence::ScriptResidence;
 use std::any::Any;
 use std::fmt::Debug;
-use crate::bindings_manual::UserScriptMessage;
+use crate::bindings_manual::NativeClassId;
 use crate::c_lang::CCompatibleLang;
 use crate::fyrox_c_plugin::CPlugin;
 use crate::scripted_app::ScriptedApp;
@@ -20,6 +20,7 @@ use crate::scripted_app::APP;
 #[derive(Debug, Clone, ComponentProvider)]
 pub struct ExternalScriptProxy {
     pub name: String,
+    pub class: NativeClassId,
     pub data: ScriptResidence<CCompatibleLang>,
 }
 
@@ -91,7 +92,7 @@ impl BaseScript for ExternalScriptProxy {
         self
     }
     fn id(&self) -> Uuid {
-        todo!()
+        self.data.id()
     }
 }
 

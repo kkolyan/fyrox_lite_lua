@@ -15,7 +15,6 @@ using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Numerics;
 using System.Drawing;
-using FyroxLite.LiteBase;
 using FyroxLite.Internal;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -48,7 +47,7 @@ internal partial class FyroxNativeGlobal {
 
     internal delegate void GameOnUpdate(NativeInstanceId thiz);
 
-    internal delegate NativeInstanceId CreateScriptInstance(NativeClassId thiz);
+    internal delegate NativeInstanceId_result CreateScriptInstance(NativeClassId thiz);
 
     internal delegate void SetProperty(NativeInstanceId thiz, int property, NativeValue value);
 }

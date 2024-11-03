@@ -15,7 +15,6 @@ using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Numerics;
 using System.Drawing;
-using FyroxLite.LiteBase;
 using FyroxLite.Internal;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -51,6 +50,11 @@ internal struct NativeBool_result
         var __item = self;
         var __item_from_facade = NativeBool.FromFacade(__item);
         return new NativeBool_result {ok = 1, value = __item_from_facade};
+    }
+
+    internal static NativeBool_result FromFacadeError(in string err)
+    {
+        return new NativeBool_result {ok = 0, err = NativeString.FromFacade(err)};
     }
 }
 
@@ -171,6 +175,11 @@ internal struct byte_result
         var __item_from_facade = __item;
         return new byte_result {ok = 1, value = __item_from_facade};
     }
+
+    internal static byte_result FromFacadeError(in string err)
+    {
+        return new byte_result {ok = 0, err = NativeString.FromFacade(err)};
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -289,6 +298,11 @@ internal struct int_result
         var __item = self;
         var __item_from_facade = __item;
         return new int_result {ok = 1, value = __item_from_facade};
+    }
+
+    internal static int_result FromFacadeError(in string err)
+    {
+        return new int_result {ok = 0, err = NativeString.FromFacade(err)};
     }
 }
 
@@ -409,6 +423,11 @@ internal struct long_result
         var __item_from_facade = __item;
         return new long_result {ok = 1, value = __item_from_facade};
     }
+
+    internal static long_result FromFacadeError(in string err)
+    {
+        return new long_result {ok = 0, err = NativeString.FromFacade(err)};
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -527,6 +546,11 @@ internal struct float_result
         var __item = self;
         var __item_from_facade = __item;
         return new float_result {ok = 1, value = __item_from_facade};
+    }
+
+    internal static float_result FromFacadeError(in string err)
+    {
+        return new float_result {ok = 0, err = NativeString.FromFacade(err)};
     }
 }
 
@@ -647,6 +671,11 @@ internal struct double_result
         var __item_from_facade = __item;
         return new double_result {ok = 1, value = __item_from_facade};
     }
+
+    internal static double_result FromFacadeError(in string err)
+    {
+        return new double_result {ok = 0, err = NativeString.FromFacade(err)};
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -766,6 +795,11 @@ internal struct NativeString_result
         var __item_from_facade = NativeString.FromFacade(__item);
         return new NativeString_result {ok = 1, value = __item_from_facade};
     }
+
+    internal static NativeString_result FromFacadeError(in string err)
+    {
+        return new NativeString_result {ok = 0, err = NativeString.FromFacade(err)};
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -857,122 +891,127 @@ internal partial struct NativeString_slice
 }
 
 [StructLayout(LayoutKind.Explicit)]
-internal struct UserScript_result
+internal struct NativeInstanceId_result
 {
     [FieldOffset(0)]
     private int ok;
 
     [FieldOffset(sizeof(int))]
-    private UserScript value;
+    private NativeInstanceId value;
 
     [FieldOffset(sizeof(int))]
     private NativeString err;
 
-    internal static unsafe object ToFacade(in UserScript_result self)
+    internal static unsafe object ToFacade(in NativeInstanceId_result self)
     {
         if (self.ok != 0)
         {
             var __item = self.value;
-            var __item_to_facade = UserScript.ToFacade(__item);
+            var __item_to_facade = NativeInstanceId.ToFacade(__item);
             return __item_to_facade;
         }
         throw new Exception(NativeString.ToFacade(self.err));
     }
 
-    internal static UserScript_result FromFacade(in object self)
+    internal static NativeInstanceId_result FromFacade(in object self)
     {
         var __item = self;
-        var __item_from_facade = UserScript.FromFacade(__item);
-        return new UserScript_result {ok = 1, value = __item_from_facade};
+        var __item_from_facade = NativeInstanceId.FromFacade(__item);
+        return new NativeInstanceId_result {ok = 1, value = __item_from_facade};
+    }
+
+    internal static NativeInstanceId_result FromFacadeError(in string err)
+    {
+        return new NativeInstanceId_result {ok = 0, err = NativeString.FromFacade(err)};
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct UserScript_optional
+internal struct NativeInstanceId_optional
 {
-    private UserScript value;
+    private NativeInstanceId value;
     private int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static object? ToFacade(in UserScript_optional value)
+    public static object? ToFacade(in NativeInstanceId_optional value)
     {
         if (value.has_value != 0)
         {
             var __item = value.value;
-            var __item_to_facade = UserScript.ToFacade(__item);
+            var __item_to_facade = NativeInstanceId.ToFacade(__item);
             return __item_to_facade;
         }
         return null;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static UserScript_optional FromFacade(in object? value)
+    public static NativeInstanceId_optional FromFacade(in object? value)
     {
         if (value == null)
         {
-            return new UserScript_optional { value = default, has_value = 0 };
+            return new NativeInstanceId_optional { value = default, has_value = 0 };
         }
         var __item = value;
-        var __item_from_facade = UserScript.FromFacade(__item);
-        return new UserScript_optional { value = __item_from_facade, has_value = 1 };
+        var __item_from_facade = NativeInstanceId.FromFacade(__item);
+        return new NativeInstanceId_optional { value = __item_from_facade, has_value = 1 };
     }
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal partial struct UserScript_slice
+internal partial struct NativeInstanceId_slice
 {
-    internal unsafe UserScript* begin;
+    internal unsafe NativeInstanceId* begin;
     internal int length;
 
-    internal unsafe UserScript_slice(UserScript* begin, int length)
+    internal unsafe NativeInstanceId_slice(NativeInstanceId* begin, int length)
     {
         this.begin = begin;
         this.length = length;
     }
 
-    internal static unsafe List<object> ToFacade(in UserScript_slice self)
+    internal static unsafe List<object> ToFacade(in NativeInstanceId_slice self)
     {
         var fetched = new List<object>();
 
         for (var i = 0; i < self.length; i++)
         {
             var __item = *(self.begin + i);
-            var __item_to_facade = UserScript.ToFacade(__item);
+            var __item_to_facade = NativeInstanceId.ToFacade(__item);
             fetched.Add(__item_to_facade);
         }
         return fetched;
     }
 
     [ThreadStatic]
-    private static UserScript[]? _uploadBuffer;
+    private static NativeInstanceId[]? _uploadBuffer;
 
-    internal static UserScript_slice FromFacade(in List<object> self)
+    internal static NativeInstanceId_slice FromFacade(in List<object> self)
     {
-        _uploadBuffer ??= new UserScript[1024];
+        _uploadBuffer ??= new NativeInstanceId[1024];
         while (_uploadBuffer.Length < self.Count)
         {
-            _uploadBuffer = new UserScript[_uploadBuffer.Length * 2];
+            _uploadBuffer = new NativeInstanceId[_uploadBuffer.Length * 2];
         }
 
         for (var i = 0; i < self.Count; i++)
         {
             var __item = self[i];
-            var __item_from_facade = UserScript.FromFacade(__item);
+            var __item_from_facade = NativeInstanceId.FromFacade(__item);
             _uploadBuffer[i] = __item_from_facade;
         }
 
         unsafe
         {
-            fixed (UserScript* buffer_ptr = _uploadBuffer)
+            fixed (NativeInstanceId* buffer_ptr = _uploadBuffer)
             {
-                var native_slice = fyrox_lite_upload_crate_UserScriptImpl_slice(new UserScript_slice(buffer_ptr, self.Count));
+                var native_slice = fyrox_lite_upload_crate_UserScriptImpl_slice(new NativeInstanceId_slice(buffer_ptr, self.Count));
                 return native_slice;
             }
         }
     }
 
     [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    internal static unsafe partial UserScript_slice fyrox_lite_upload_crate_UserScriptImpl_slice(UserScript_slice managed);
+    internal static unsafe partial NativeInstanceId_slice fyrox_lite_upload_crate_UserScriptImpl_slice(NativeInstanceId_slice managed);
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -1090,32 +1129,37 @@ internal partial struct NativeScriptProperty_slice
 }
 
 [StructLayout(LayoutKind.Explicit)]
-internal struct UserScript_optional_result
+internal struct NativeInstanceId_optional_result
 {
     [FieldOffset(0)]
     private int ok;
 
     [FieldOffset(sizeof(int))]
-    private UserScript_optional value;
+    private NativeInstanceId_optional value;
 
     [FieldOffset(sizeof(int))]
     private NativeString err;
 
-    internal static unsafe object? ToFacade(in UserScript_optional_result self)
+    internal static unsafe object? ToFacade(in NativeInstanceId_optional_result self)
     {
         if (self.ok != 0)
         {
             var __item = self.value;
-            var __item_to_facade = UserScript_optional.ToFacade(__item);
+            var __item_to_facade = NativeInstanceId_optional.ToFacade(__item);
             return __item_to_facade;
         }
         throw new Exception(NativeString.ToFacade(self.err));
     }
 
-    internal static UserScript_optional_result FromFacade(in object? self)
+    internal static NativeInstanceId_optional_result FromFacade(in object? self)
     {
         var __item = self;
-        var __item_from_facade = UserScript_optional.FromFacade(__item);
-        return new UserScript_optional_result {ok = 1, value = __item_from_facade};
+        var __item_from_facade = NativeInstanceId_optional.FromFacade(__item);
+        return new NativeInstanceId_optional_result {ok = 1, value = __item_from_facade};
+    }
+
+    internal static NativeInstanceId_optional_result FromFacadeError(in string err)
+    {
+        return new NativeInstanceId_optional_result {ok = 0, err = NativeString.FromFacade(err)};
     }
 }

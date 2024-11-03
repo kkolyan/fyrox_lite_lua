@@ -39,6 +39,11 @@ pub(crate) fn generate_result(s: &mut String, rust: &mut RustEmitter, wrapped_ty
                     var __item_from_facade = ${item_from_facade};
                     return new ${blittable}_result {ok = 1, value = __item_from_facade};
                 }
+
+                internal static ${blittable}_result FromFacadeError(in string err)
+                {
+                    return new ${blittable}_result {ok = 0, err = NativeString.FromFacade(err)};
+                }
             }
     "#, [
         ("blittable", &marshalling.to_blittable()),

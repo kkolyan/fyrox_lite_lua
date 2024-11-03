@@ -2,7 +2,7 @@ using FyroxLite.Internal;
 
 namespace FyroxLite
 {
-    internal class FyroxImpls
+    internal static class FyroxImpls
     {
         internal static void load_scripts()
         {
@@ -98,24 +98,25 @@ namespace FyroxLite
             }
         }
 
-        internal static NativeInstanceId create_script_instance(NativeClassId thiz)
+        internal static NativeInstanceId_result create_script_instance(NativeClassId thiz)
         {
             try
             {
-                
+                var instance = Activator.CreateInstance(thiz.GetType());
+                return NativeInstanceId_result.FromFacade(ObjectRegistry.Put(instance));
             }
             catch (Exception e)
             {
                 HandleException(e);
+                return NativeInstanceId_result.FromFacadeError(e.ToString());
             }
-
-            throw new Exception();
         }
 
         internal static void set_property(NativeInstanceId thiz, int property, NativeValue value)
         {
             try
             {
+                var o = ObjectRegistry.Get(thiz.value);
                 // GetNodeScript(thiz).OnUpdate(dt);
             }
             catch (Exception e)

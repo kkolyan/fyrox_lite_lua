@@ -96,20 +96,20 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
             };
             Ok(ret)
         });
-        methods.add_method_mut("add_script", |lua, this, (class_name): (mlua::String)| {
-            let class_name = class_name.to_str()?.to_string();
+        methods.add_method_mut("add_script", |lua, this, (class): (mlua::String)| {
+            let class = class.to_str()?.to_string();
             let _stub = Default::default();
-            let ret = this.add_script::<TypedUserData<Traitor<ScriptObject>>>(class_name, _stub);
+            let ret = this.add_script::<TypedUserData<Traitor<ScriptObject>>>(class, _stub);
             let ret = match ret {
                 Ok(ret) => ret,
                 Err(err) => return Err(err),
             };
             Ok(ret)
         });
-        methods.add_method_mut("find_script", |lua, this, (class_name): (mlua::String)| {
-            let class_name = class_name.to_str()?.to_string();
+        methods.add_method_mut("find_script", |lua, this, (class): (mlua::String)| {
+            let class = class.to_str()?.to_string();
             let _stub = Default::default();
-            let ret = this.find_script::<TypedUserData<Traitor<ScriptObject>>>(class_name, _stub);
+            let ret = this.find_script::<TypedUserData<Traitor<ScriptObject>>>(class, _stub);
             let ret = match ret {
                 Ok(ret) => {
                     if let Some(ret) = ret {

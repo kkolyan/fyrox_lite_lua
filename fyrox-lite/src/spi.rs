@@ -2,24 +2,31 @@ use std::fmt::Debug;
 
 use fyrox::script::{ScriptMessagePayload, ScriptTrait};
 
+pub trait ClassId: LiteDataType + Clone {
+    fn lookup_class_name(&self) -> String;
+}
+
+// TODO merge this trait into Lang trait
 pub trait UserScript: Sized + LiteDataType {
     type Plugin: fyrox::plugin::Plugin;
     type ProxyScript: ScriptTrait;
+
+    type ClassId: ClassId;
     type LangSpecificError: Clone + Debug;
     type UserScriptMessage: ScriptMessagePayload + LiteDataType;
     type UserScriptGenericStub: LiteDataType + Copy;
 
     fn extract_from(
         proxy: &mut Self::ProxyScript,
-        class_name: &str,
+        class_id: &Self::ClassId,
         ctx: &mut Self::Plugin,
     ) -> Option<Self>;
 
-    fn into_proxy_script(self) -> Result<Self::ProxyScript, Self::LangSpecificError>;
+    fn into_proxy_script(self, class_id: &Self::ClassId) -> Result<Self::ProxyScript, Self::LangSpecificError>;
 
-    fn new_instance(class: &str) -> Result<Self, Self::LangSpecificError>;
+    fn new_instance(class_id: &Self::ClassId) -> Result<Self, Self::LangSpecificError>;
 
-    fn find_plugin_script(class_name: &str) -> Result<Self, Self::LangSpecificError>;
+    fn find_plugin_script(class_name: &Self::ClassId) -> Result<Self, Self::LangSpecificError>;
 
     fn create_error(msg: &str) -> Self::LangSpecificError;
 }
@@ -41,3 +48,9 @@ impl LiteDataType for f32 {}
 impl LiteDataType for f64 {}
 impl LiteDataType for bool {}
 impl LiteDataType for () {}
+
+impl ClassId for String {
+    fn lookup_class_name(&self) -> String {
+        self.clone()
+    }
+}

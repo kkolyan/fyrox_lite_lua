@@ -24,6 +24,8 @@ use fyrox_lite::wrapper_reflect;
 use std::cell::RefCell;
 use std::fmt::Debug;
 use std::sync::Arc;
+use fyrox_lite::lite_input::Input;
+use crate::arena::Arena;
 
 #[derive(Visit, Reflect)]
 pub struct CPlugin {
@@ -152,6 +154,11 @@ impl Plugin for CPlugin {
     }
 
     fn on_os_event(&mut self, _event: &Event<()>, _context: PluginContext) {}
+
+    fn post_update(&mut self, _context: &mut PluginContext) {
+        Input::post_fixed_update();
+        Arena::free();
+    }
 }
 
 #[derive(Debug, Default, Clone)]

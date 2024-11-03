@@ -25,6 +25,9 @@ pub fn extract_ty_path(
                 if ident == "UserScriptGenericStub" {
                     return Ok(DataType::UserScriptGenericStub);
                 }
+                if ident == "ClassId" {
+                    return Ok(DataType::ClassName);
+                }
             }
             UserScriptBasedType::Itself => {
                 return Ok(DataType::UserScript);

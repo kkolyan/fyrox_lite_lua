@@ -15,7 +15,6 @@ using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Numerics;
 using System.Drawing;
-using FyroxLite.LiteBase;
 using FyroxLite.Internal;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -27,6 +26,11 @@ namespace FyroxLite.LitePhysics;
 public readonly partial struct RigidBody
 {
     private readonly NativeHandle handle;
+
+    public RigidBody(NativeHandle handle)
+    {
+        this.handle = handle;
+    }
 
     public void ApplyForce(Vector3 force)
     {

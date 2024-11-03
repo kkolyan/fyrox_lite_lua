@@ -8,7 +8,7 @@ pub struct LitePlugin;
 #[lite_api(class=Plugin)]
 impl LitePlugin {
 	/// find a plugin script by name
-	pub fn get<T: UserScript>(#[class_name] class_name: String, _stub: T::UserScriptGenericStub) -> Result<T, T::LangSpecificError> {
-		T::find_plugin_script(class_name.as_str())
+	pub fn get<T: UserScript>(class_id: T::ClassId, _stub: T::UserScriptGenericStub) -> Result<T, T::LangSpecificError> {
+		T::find_plugin_script(&class_id)
 	}
 }

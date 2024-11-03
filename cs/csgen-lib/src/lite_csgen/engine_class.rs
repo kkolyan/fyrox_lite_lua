@@ -39,13 +39,24 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
             [StructLayout(LayoutKind.Sequential)]
             public ${def_type} ${class}
             {
-                ${handle}
     "#, [
-        ("handle", &if static_class {""} else {"private readonly NativeHandle handle;"}),
         ("class", &class.class_name),
         ("rust_path", &class.rust_struct_path),
         ("def_type", &if static_class { "static partial class" } else { "readonly partial struct" }),
     ]);
+
+    if !static_class {
+        render(&mut s, r#"
+                private readonly NativeHandle handle;
+
+                public ${class}(NativeHandle handle)
+                {
+                    this.handle = handle;
+                }
+    "#, [
+            ("class", &class.class_name),
+        ]);
+    }
 
     rust.emit_statement(render_string(
         "
@@ -273,7 +284,7 @@ fn generate_method(
     let output_params = method.signature.params.iter()
         .filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub))
         .map(|param| match &param.ty {
-            DataType::ClassName => format!("NativeString.FromFacade(typeof(T).Name)"),
+            DataType::ClassName => format!("NativeClassId.By<T>.Resolve()"),
             ty => if ctx.is_struct(ty) { format!("&_{}", param.name) } else { format!("_{}", param.name) },
         })
         .to_vec();

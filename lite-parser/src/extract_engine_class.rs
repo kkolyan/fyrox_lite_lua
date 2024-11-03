@@ -142,31 +142,10 @@ pub fn extract_fn(
             }
             syn::FnArg::Typed(pat_type) => pat_type,
         };
-        let is_class_name = if arg
-            .attrs
-            .iter()
-            .any(|it| it.meta.path().is_ident("class_name"))
-        {
-            arg.attrs
-                .retain(|it| !it.meta.path().is_ident("class_name"));
-            true
-        } else {
-            false
-        };
         let ty = arg.ty.as_ref();
         types.push(ty.clone());
         match extract_ty(ty, Some(&generic_params)) {
             Ok(mut it) => {
-                if is_class_name {
-                    if !matches!(it, DataType::String) {
-                        errors.push(syn::Error::new_spanned(
-                            fn_arg,
-                            "Fyrox Lite: only String parameter could be a class name",
-                        ));
-                        return None;
-                    }
-                    it = DataType::ClassName;
-                }
                 // handle #[variadic]
                 let variadic_index = arg
                     .attrs

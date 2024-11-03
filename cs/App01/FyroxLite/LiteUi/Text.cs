@@ -15,7 +15,6 @@ using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Numerics;
 using System.Drawing;
-using FyroxLite.LiteBase;
 using FyroxLite.Internal;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -27,6 +26,11 @@ namespace FyroxLite.LiteUi;
 public readonly partial struct Text
 {
     private readonly NativeHandle handle;
+
+    public Text(NativeHandle handle)
+    {
+        this.handle = handle;
+    }
     public string TextAsync
     {
         set

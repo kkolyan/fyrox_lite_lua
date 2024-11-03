@@ -15,7 +15,6 @@ using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Numerics;
 using System.Drawing;
-using FyroxLite.LiteBase;
 using FyroxLite.Internal;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -27,6 +26,11 @@ namespace FyroxLite.LiteNode;
 public readonly partial struct Node
 {
     private readonly NativeHandle handle;
+
+    public Node(NativeHandle handle)
+    {
+        this.handle = handle;
+    }
 
     public RigidBody? AsRigidBody()
     {
@@ -159,8 +163,8 @@ public readonly partial struct Node
     {
         unsafe {
             
-            var __ret = fyrox_lite_lite_node_LiteNode_add_script(this, NativeString.FromFacade(typeof(T).Name));
-            return UserScript_result.ToFacade(__ret) as T;
+            var __ret = fyrox_lite_lite_node_LiteNode_add_script(this, NativeClassId.By<T>.Resolve());
+            return NativeInstanceId_result.ToFacade(__ret) as T;
         }
     }
 
@@ -168,8 +172,8 @@ public readonly partial struct Node
     {
         unsafe {
             
-            var __ret = fyrox_lite_lite_node_LiteNode_find_script(this, NativeString.FromFacade(typeof(T).Name));
-            return UserScript_optional_result.ToFacade(__ret) as T;
+            var __ret = fyrox_lite_lite_node_LiteNode_find_script(this, NativeClassId.By<T>.Resolve());
+            return NativeInstanceId_optional_result.ToFacade(__ret) as T;
         }
     }
     public Quaternion GlobalRotation
@@ -252,10 +256,10 @@ public readonly partial struct Node
     private static unsafe partial Node fyrox_lite_lite_node_LiteNode_get_parent(Node self);
 
     [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial UserScript_result fyrox_lite_lite_node_LiteNode_add_script(Node self, NativeString class_name);
+    private static unsafe partial NativeInstanceId_result fyrox_lite_lite_node_LiteNode_add_script(Node self, NativeClassId class_id);
 
     [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial UserScript_optional_result fyrox_lite_lite_node_LiteNode_find_script(Node self, NativeString class_name);
+    private static unsafe partial NativeInstanceId_optional_result fyrox_lite_lite_node_LiteNode_find_script(Node self, NativeClassId class_id);
 
     [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial NativeQuaternion fyrox_lite_lite_node_LiteNode_get_global_rotation(Node self);

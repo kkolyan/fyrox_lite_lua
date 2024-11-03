@@ -15,7 +15,6 @@ using FyroxLite.LiteUi;
 using FyroxLite.LiteWindow;
 using System.Numerics;
 using System.Drawing;
-using FyroxLite.LiteBase;
 using FyroxLite.Internal;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -27,6 +26,11 @@ namespace FyroxLite.LitePrefab;
 public readonly partial struct Prefab
 {
     private readonly NativeHandle handle;
+
+    public Prefab(NativeHandle handle)
+    {
+        this.handle = handle;
+    }
 
     public Node InstantiateAt(Vector3 position, Quaternion orientation)
     {

@@ -16,8 +16,9 @@ mod string;
 pub(crate) mod executor_cs;
 
 pub(crate) use arena::Arena;
-use crate::bindings_manual::{NativeHandle, UserScriptMessage};
+use crate::bindings_manual::UserScriptMessage;
+use crate::c_lang::UnpackedObject;
 
 pub(crate) type LangSpecificError = String;
 pub(crate) type UserScriptMessageImpl = UserScriptMessage;
-pub(crate) type UserScriptImpl = NativeHandle;
+pub(crate) type UserScriptImpl = UnpackedObject;

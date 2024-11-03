@@ -40,14 +40,14 @@ function Node_instance:subscribe_to() end
 function Node_instance:find_collider_in_children() end
 
 ---@generic T
----@param class_name `T`
+---@param class `T`
 ---@return T
-function Node_instance:add_script(class_name) end
+function Node_instance:add_script(class) end
 
 ---@generic T
----@param class_name `T`
+---@param class `T`
 ---@return T?
-function Node_instance:find_script(class_name) end
+function Node_instance:find_script(class) end
 
 ---@param tag string
 ---@return boolean

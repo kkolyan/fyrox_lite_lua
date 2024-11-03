@@ -1,6 +1,6 @@
 use crate::externalizable::Externalizable;
 use crate::lite_math::{PodQuaternion, PodVector3};
-use crate::spi::UserScript;
+use crate::spi::{ClassId, UserScript};
 use crate::wrapper_reflect;
 use std::fmt::Debug;
 
@@ -179,22 +179,22 @@ impl LiteNode {
         })
     }
 
-    pub fn add_script<T: UserScript>(&self, #[class_name] class_name: String, _stub: T::UserScriptGenericStub) -> Result<T, T::LangSpecificError> {
-        if self.find_script::<T>(class_name.clone(), _stub)?.is_some() {
-            return Err(T::create_error(format!("node {:?} already contains script of class {}", self, &class_name).as_str()))
+    pub fn add_script<T: UserScript>(&self, class_id: T::ClassId, _stub: T::UserScriptGenericStub) -> Result<T, T::LangSpecificError> {
+        if self.find_script::<T>(class_id.clone(), _stub)?.is_some() {
+            return Err(T::create_error(format!("node {:?} already contains script of class {}", self, class_id.lookup_class_name()).as_str()))
         }
-        let script = T::new_instance(&class_name)?;
-        let proxy = T::into_proxy_script(script)?;
+        let script = T::new_instance(&class_id)?;
+        let proxy = T::into_proxy_script(script, &class_id)?;
         
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
             node.add_script(proxy);
         });
-        let script = self.find_script(class_name, _stub)?;
+        let script = self.find_script(class_id.clone(), _stub)?;
         Ok(script.expect("WTF: it was just added"))
     }
 
-    pub fn find_script<T: UserScript>(&self, #[class_name] class_name: String, _stub: T::UserScriptGenericStub) -> Result<Option<T>, T::LangSpecificError> {
+    pub fn find_script<T: UserScript>(&self, class_id: T::ClassId, _stub: T::UserScriptGenericStub) -> Result<Option<T>, T::LangSpecificError> {
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
             for script in node.try_get_scripts_mut::<T::ProxyScript>() {
@@ -202,7 +202,7 @@ impl LiteNode {
                     return Err(T::create_error("plugins access not allowed from Plugin scripts"));
                 };
                 let plugin = plugin.of_type_mut::<T::Plugin>().expect("WTF: Lua plugin unavailable");
-                if let Some(r) = T::extract_from(script, &class_name, plugin) {
+                if let Some(r) = T::extract_from(script, &class_id, plugin) {
                     return Ok(Some(r));
                 }
             }

@@ -1407,7 +1407,7 @@
             "signature": {
               "params": [
                 {
-                  "name": "class_name",
+                  "name": "class_id",
                   "ty": "ClassName",
                   "variadic": false
                 },
@@ -1596,7 +1596,7 @@
             "signature": {
               "params": [
                 {
-                  "name": "class_name",
+                  "name": "class_id",
                   "ty": "ClassName",
                   "variadic": false
                 },
@@ -1619,7 +1619,7 @@
             "signature": {
               "params": [
                 {
-                  "name": "class_name",
+                  "name": "class_id",
                   "ty": "ClassName",
                   "variadic": false
                 },

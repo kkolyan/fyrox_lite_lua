@@ -5,7 +5,7 @@ use std::{
 
 use fyrox::core::{algebra::iter, pool::Handle};
 use fyrox_lite::{lite_math::{PodQuaternion, PodVector3}, spi::UserScript, LiteDataType};
-use crate::bindings_lite_2::{u8_slice, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeVector3};
+use crate::bindings_lite_2::{u8_slice, NativeInstanceId_result, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeVector3};
 use crate::c_lang::CCompatibleLang;
 use crate::scripted_app::{ScriptedApp, APP};
 
@@ -23,7 +23,7 @@ pub struct NativeInstanceId {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct NativeClassId {
     pub value: i32,
 }
@@ -205,7 +205,7 @@ pub type NodeOnMessage = extern "C" fn(thiz: NativeInstanceId, message: UserScri
 pub type GameOnInit = extern "C" fn(thiz: NativeInstanceId);
 pub type GameOnUpdate = extern "C" fn(thiz: NativeInstanceId);
 
-pub type CreateScriptInstance = extern "C" fn(thiz: NativeClassId) -> NativeInstanceId;
+pub type CreateScriptInstance = extern "C" fn(thiz: NativeClassId) -> NativeInstanceId_result;
 pub type SetProperty = extern "C" fn(thiz: NativeInstanceId, property: i32, value: NativeValue);
 
 #[repr(C)]

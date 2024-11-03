@@ -29,34 +29,39 @@ pub struct CScriptMetadata {
 
 pub struct ScriptedApp {
     pub scripts: HashMap<Uuid, CScriptMetadata>,
+    pub uuid_by_class: HashMap<NativeClassId, Uuid>,
     pub functions: NativeScriptAppFunctions,
 }
 
 impl ScriptedApp {
     pub fn from_native(app: NativeScriptedApp) -> Self {
         let scripts: Vec<_> = app.scripts.into();
+        let scripts: HashMap<Uuid, CScriptMetadata> = scripts.into_iter()
+            .filter_map(|native_class| {
+                let script = extract_for_def(&native_class);
+                Some((
+                    match script.kind {
+                        ScriptKind::Node(uuid) => uuid,
+                        ScriptKind::Global => return None,
+                    },
+                    CScriptMetadata {
+                        id: native_class.id,
+                        md: script,
+                        has_on_init: true,
+                        has_on_start: true,
+                        has_on_deinit: true,
+                        has_on_update: true,
+                        has_on_message: true,
+                    },
+                ))
+            })
+            .collect();
+        let uuid_by_class = scripts.iter()
+            .map(|(uuid, md)| (md.id, *uuid))
+            .collect();
         ScriptedApp {
-            scripts: scripts.into_iter()
-                .map(|native_class| {
-                    let script = extract_for_def(&native_class);
-                    Some((
-                        match script.kind {
-                            ScriptKind::Node(uuid) => uuid,
-                            ScriptKind::Global => return None,
-                        },
-                        CScriptMetadata {
-                            id: native_class.id,
-                            md: script,
-                            has_on_init: true,
-                            has_on_start: true,
-                            has_on_deinit: true,
-                            has_on_update: true,
-                            has_on_message: true,
-                        },
-                    ))
-                })
-                .flatten()
-                .collect(),
+            uuid_by_class,
+            scripts,
             functions: app.functions,
         }
     }

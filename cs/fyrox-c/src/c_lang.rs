@@ -1,7 +1,6 @@
 use std::{cell::RefCell, collections::HashMap, ffi::CString};
 
 use fyrox::{
-    asset::untyped::{ResourceHeader, UntypedResource},
     core::{
         pool::{Handle, Pool},
         visitor::Visit,
@@ -12,12 +11,11 @@ use fyrox_lite::{
     externalizable::Externalizable, lite_prefab::LitePrefab, script_metadata::ScriptFieldValueType, script_object::{Lang, ScriptFieldValue, ScriptObject}, script_object_residence::uuid_of_script
 };
 
-use crate::{
-    bindings_manual::{
-        NativeHandle, NativeInstanceId, NativeValue,
-    }, scripted_app::APP
-};
+use crate::{bindings_manual::{
+    NativeHandle, NativeValue,
+}, scripted_app::APP, UserScriptImpl};
 use crate::bindings_lite_2::{NativeQuaternion, NativeVector3};
+use crate::bindings_manual::{NativeClassId, NativeInstanceId};
 
 #[derive(Debug, Clone)]
 pub struct CCompatibleLang;
@@ -27,7 +25,7 @@ impl Lang for CCompatibleLang {
 
     type RuntimePin = NativeRuntimePin;
 
-    type UnpackedScriptObject = UnpackedObject;
+    type UnpackedScriptObject = UserScriptImpl;
 
     fn drop_runtime_pin(_runtime_pin: &mut Self::RuntimePin) {
         todo!("is not needed without Hot reload")
@@ -43,7 +41,7 @@ impl Lang for CCompatibleLang {
 
     fn unpack_script(script: &ScriptObject<Self>) -> Result<Self::UnpackedScriptObject, String> {
         let uuid = uuid_of_script(script);
-        let handle = APP.with_borrow(|app| {
+        APP.with_borrow(|app| {
             let app = app.as_ref().unwrap();
             let metadata = app.scripts.get(&uuid).unwrap();
             let instance = (app.functions.create_script_instance)(metadata.id);
@@ -127,9 +125,8 @@ impl Lang for CCompatibleLang {
                     }
                 }
             }
-            instance
-        });
-        Ok(UnpackedObject { uuid, handle })
+            Ok(UnpackedObject { uuid, instance, class: metadata.id })
+        })
     }
 }
 
@@ -163,10 +160,23 @@ impl Visit for NativeRuntimePin {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct UnpackedObject {
     pub uuid: Uuid,
-    pub handle: NativeInstanceId,
+    pub class: NativeClassId,
+    pub instance: NativeInstanceId,
+}
+
+impl From<UnpackedObject> for NativeInstanceId {
+    fn from(value: UnpackedObject) -> Self {
+        value.instance
+    }
+}
+
+impl From<NativeInstanceId> for UnpackedObject {
+    fn from(_value: NativeInstanceId) -> Self {
+        todo!("call of Rust-implemented script methods is not implemented yet")
+    }
 }
 
 impl Visit for UnpackedObject {
