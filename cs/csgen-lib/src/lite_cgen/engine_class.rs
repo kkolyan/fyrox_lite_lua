@@ -43,6 +43,7 @@ pub(crate) fn generate_engine_class(
         render(
             s,
             r#"
+            #[no_mangle]
             pub extern "C" fn fyrox_lite_${class}_${method}(${input_args}) -> ${return} {
         "#,
             [

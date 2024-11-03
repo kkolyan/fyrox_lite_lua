@@ -89,8 +89,8 @@ impl<T: Lang> ScriptResidence<T> {
 
 pub fn uuid_of_script<T: Lang>(script: &ScriptObject<T>) -> Uuid {
     match script.def.metadata.kind {
-        ScriptKind::Script(uuid) => uuid,
-        ScriptKind::Plugin => panic!("not expected to be called for Plugin scripts"),
+        ScriptKind::Node(uuid) => uuid,
+        ScriptKind::Global => panic!("not expected to be called for Plugin scripts"),
     }
 }
 

@@ -60,6 +60,7 @@ fn write_cs_mod(m: &Module, ns: &str, parent_dir: &str, nss: &Vec<String>)  {
             s += format!("using System.Numerics;\n").as_str();
             s += format!("using System.Drawing;\n").as_str();
             s += format!("using FyroxLite.LiteBase;\n").as_str();
+            s += format!("using FyroxLite.Internal;\n").as_str();
             s += format!("using System.Runtime.CompilerServices;\n").as_str();
             s += format!("using System.Runtime.InteropServices;\n").as_str();
             s += format!("using System.Collections;\n").as_str();

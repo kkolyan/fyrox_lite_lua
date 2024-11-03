@@ -5,7 +5,7 @@ use std::{
 
 use fyrox::core::{algebra::iter, pool::Handle};
 use fyrox_lite::{lite_math::{PodQuaternion, PodVector3}, spi::UserScript, LiteDataType};
-use crate::bindings_lite_2::{u8_slice, NativeQuaternion, NativeVector3};
+use crate::bindings_lite_2::{u8_slice, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeVector3};
 use crate::c_lang::CCompatibleLang;
 use crate::scripted_app::{ScriptedApp, APP};
 
@@ -19,7 +19,7 @@ pub extern "C" fn init_fyrox(app: NativeScriptedApp) {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct NativeInstanceId {
-    pub value: i32,
+    pub value: i64,
 }
 
 #[repr(C)]
@@ -29,10 +29,13 @@ pub struct NativeClassId {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct NativeScriptProperty {
-    pub name: *const c_char,
+    pub id: i32,
+    pub name: NativeString,
     pub ty: NativeValueType,
+    pub hide_in_inspector: NativeBool,
+    pub transient: NativeBool,
 }
 
 #[allow(non_camel_case_types)]
@@ -145,22 +148,20 @@ impl NativeHandle {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct NativeScriptMetadata {
     pub id: NativeClassId,
-    pub uuid: *mut c_char,
+    pub uuid: NativeString,
     pub kind: NativeScriptKind,
-    pub name: *mut c_char,
-    /// null (the same as empty for zero-terminated) if no parent
-    pub parent: *const c_char,
-    pub has_on_init: bool,
-    pub has_on_start: bool,
-    pub has_on_deinit: bool,
-    pub has_on_os_event: bool,
-    pub has_on_update: bool,
-    pub has_on_message: bool,
-    pub properties: *mut NativeScriptProperty,
-    pub properties_len: u16,
+    pub name: NativeString,
+    pub has_global_on_init: NativeBool,
+    pub has_global_on_update: NativeBool,
+    pub has_node_on_init: NativeBool,
+    pub has_node_on_start: NativeBool,
+    pub has_node_on_deinit: NativeBool,
+    pub has_node_on_update: NativeBool,
+    pub has_node_on_message: NativeBool,
+    pub properties: NativeScriptProperty_slice,
 }
 
 #[repr(C)]
@@ -171,43 +172,41 @@ pub enum NativeScriptKind {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct NativeScriptedApp {
-    pub scripts: *const NativeScriptMetadata,
-    pub scripts_len: u16,
+    pub scripts: NativeScriptMetadata_slice,
     pub functions: NativeScriptAppFunctions,
 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct NativeScriptAppFunctions {
+    pub load_scripts: LoadScripts,
     pub on_init: NodeOnInit,
     pub on_start: NodeOnStart,
     pub on_deinit: NodeOnDeinit,
-    pub on_os_event: NodeOnOsEvent,
     pub on_update: NodeOnUpdate,
     pub on_message: NodeOnMessage,
 
     pub on_game_init: GameOnInit,
     pub on_game_update: GameOnUpdate,
-    pub on_game_on_os_event: GameOnOsEvent,
     pub create_script_instance: CreateScriptInstance,
     pub set_property: SetProperty,
 }
+
+pub type LoadScripts = extern "C" fn();
 
 pub type NodeOnUpdate = extern "C" fn(thiz: NativeInstanceId, dt: f32);
 pub type NodeOnInit = extern "C" fn(thiz: NativeInstanceId);
 pub type NodeOnDeinit = extern "C" fn(thiz: NativeInstanceId);
 pub type NodeOnStart = extern "C" fn(thiz: NativeInstanceId);
-pub type NodeOnOsEvent = extern "C" fn(thiz: NativeInstanceId);
-pub type NodeOnMessage = extern "C" fn(thiz: NativeInstanceId);
+pub type NodeOnMessage = extern "C" fn(thiz: NativeInstanceId, message: UserScriptMessage);
 
 pub type GameOnInit = extern "C" fn(thiz: NativeInstanceId);
 pub type GameOnUpdate = extern "C" fn(thiz: NativeInstanceId);
-pub type GameOnOsEvent = extern "C" fn(thiz: NativeInstanceId);
 
 pub type CreateScriptInstance = extern "C" fn(thiz: NativeClassId) -> NativeInstanceId;
-pub type SetProperty = extern "C" fn(thiz: NativeInstanceId, property: u16, value: NativeValue);
+pub type SetProperty = extern "C" fn(thiz: NativeInstanceId, property: i32, value: NativeValue);
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]

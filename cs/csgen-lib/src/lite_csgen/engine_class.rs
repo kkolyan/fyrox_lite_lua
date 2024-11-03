@@ -130,7 +130,7 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
 
         render(&mut s, r#"
 
-                [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+                [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
                 private static unsafe partial ${return_ty} ${rust_path_escaped}_${name}(${this}${native_input_params});
         "#, [
             ("return_ty", &method.signature.return_ty.as_ref().map(|it| api_types::type_cs(it).to_blittable()).unwrap_or("void".to_string())),
@@ -397,6 +397,7 @@ fn generate_rust_entry_point(rust: &mut RustEmitter, class: &EngineClass, method
 
     let mut rs = String::new();
     render(&mut rs, r#"
+            #[no_mangle]
             pub extern "C" fn ${rust_path_escaped}_${name}(
                 ${this}${input_params}
             ) -> ${return_ty} {
@@ -456,6 +457,7 @@ fn generate_rust_entry_point_buffer(rust: &mut RustEmitter, class: &EngineClass,
 
     let mut rs = String::new();
     render(&mut rs, r#"
+            #[no_mangle]
             pub extern "C" fn ${rust_path_escaped}_${name}(
                 ${this}${input_params}
             ) -> i32 {

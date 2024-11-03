@@ -2,6 +2,7 @@
 // ReSharper disable RedundantUnsafeContext
 // ReSharper disable UnusedMember.Global
 // ReSharper disable RedundantUsingDirective
+using FyroxLite.Internal;
 using FyroxLite.LiteInput;
 using FyroxLite.LiteLog;
 using FyroxLite.LiteMath;
@@ -15,6 +16,7 @@ using FyroxLite.LiteWindow;
 using System.Numerics;
 using System.Drawing;
 using FyroxLite.LiteBase;
+using FyroxLite.Internal;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Collections;
@@ -136,8 +138,8 @@ internal partial struct NativeBool_slice
         }
     }
 
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial NativeBool_slice fyrox_lite_upload_bool_slice(NativeBool_slice managed);
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial NativeBool_slice fyrox_lite_upload_bool_slice(NativeBool_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -255,8 +257,8 @@ internal partial struct byte_slice
         }
     }
 
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial byte_slice fyrox_lite_upload_u8_slice(byte_slice managed);
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial byte_slice fyrox_lite_upload_u8_slice(byte_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -374,8 +376,8 @@ internal partial struct int_slice
         }
     }
 
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial int_slice fyrox_lite_upload_i32_slice(int_slice managed);
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial int_slice fyrox_lite_upload_i32_slice(int_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -493,8 +495,8 @@ internal partial struct long_slice
         }
     }
 
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial long_slice fyrox_lite_upload_i64_slice(long_slice managed);
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial long_slice fyrox_lite_upload_i64_slice(long_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -612,8 +614,8 @@ internal partial struct float_slice
         }
     }
 
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial float_slice fyrox_lite_upload_f32_slice(float_slice managed);
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial float_slice fyrox_lite_upload_f32_slice(float_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -731,8 +733,8 @@ internal partial struct double_slice
         }
     }
 
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial double_slice fyrox_lite_upload_f64_slice(double_slice managed);
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial double_slice fyrox_lite_upload_f64_slice(double_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -850,8 +852,8 @@ internal partial struct NativeString_slice
         }
     }
 
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial NativeString_slice fyrox_lite_upload_String_slice(NativeString_slice managed);
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial NativeString_slice fyrox_lite_upload_String_slice(NativeString_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]
@@ -969,8 +971,122 @@ internal partial struct UserScript_slice
         }
     }
 
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial UserScript_slice fyrox_lite_upload_crate_UserScriptImpl_slice(UserScript_slice managed);
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial UserScript_slice fyrox_lite_upload_crate_UserScriptImpl_slice(UserScript_slice managed);
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal partial struct NativeScriptMetadata_slice
+{
+    internal unsafe NativeScriptMetadata* begin;
+    internal int length;
+
+    internal unsafe NativeScriptMetadata_slice(NativeScriptMetadata* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
+
+    internal static unsafe List<NativeScriptMetadata> ToFacade(in NativeScriptMetadata_slice self)
+    {
+        var fetched = new List<NativeScriptMetadata>();
+
+        for (var i = 0; i < self.length; i++)
+        {
+            var __item = *(self.begin + i);
+            var __item_to_facade = __item;
+            fetched.Add(__item_to_facade);
+        }
+        return fetched;
+    }
+
+    [ThreadStatic]
+    private static NativeScriptMetadata[]? _uploadBuffer;
+
+    internal static NativeScriptMetadata_slice FromFacade(in List<NativeScriptMetadata> self)
+    {
+        _uploadBuffer ??= new NativeScriptMetadata[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new NativeScriptMetadata[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = __item;
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (NativeScriptMetadata* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_NativeScriptMetadata_slice(new NativeScriptMetadata_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
+    }
+
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial NativeScriptMetadata_slice fyrox_lite_upload_NativeScriptMetadata_slice(NativeScriptMetadata_slice managed);
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal partial struct NativeScriptProperty_slice
+{
+    internal unsafe NativeScriptProperty* begin;
+    internal int length;
+
+    internal unsafe NativeScriptProperty_slice(NativeScriptProperty* begin, int length)
+    {
+        this.begin = begin;
+        this.length = length;
+    }
+
+    internal static unsafe List<NativeScriptProperty> ToFacade(in NativeScriptProperty_slice self)
+    {
+        var fetched = new List<NativeScriptProperty>();
+
+        for (var i = 0; i < self.length; i++)
+        {
+            var __item = *(self.begin + i);
+            var __item_to_facade = __item;
+            fetched.Add(__item_to_facade);
+        }
+        return fetched;
+    }
+
+    [ThreadStatic]
+    private static NativeScriptProperty[]? _uploadBuffer;
+
+    internal static NativeScriptProperty_slice FromFacade(in List<NativeScriptProperty> self)
+    {
+        _uploadBuffer ??= new NativeScriptProperty[1024];
+        while (_uploadBuffer.Length < self.Count)
+        {
+            _uploadBuffer = new NativeScriptProperty[_uploadBuffer.Length * 2];
+        }
+
+        for (var i = 0; i < self.Count; i++)
+        {
+            var __item = self[i];
+            var __item_from_facade = __item;
+            _uploadBuffer[i] = __item_from_facade;
+        }
+
+        unsafe
+        {
+            fixed (NativeScriptProperty* buffer_ptr = _uploadBuffer)
+            {
+                var native_slice = fyrox_lite_upload_NativeScriptProperty_slice(new NativeScriptProperty_slice(buffer_ptr, self.Count));
+                return native_slice;
+            }
+        }
+    }
+
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial NativeScriptProperty_slice fyrox_lite_upload_NativeScriptProperty_slice(NativeScriptProperty_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]

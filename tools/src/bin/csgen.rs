@@ -1,13 +1,15 @@
 use std::fs;
+use gen_common::code_model::Module;
 use gen_common::fmt::fmt_file;
 
 fn main() {
-    csgen_lib::generate_manual_bindings_cs();
+    let manuals = csgen_lib::generate_manual_bindings_cs();
     
     println!("parsing domain");
     let domain = tools::get_fyrox_lite_domain();
 
-    let (codebase, rust) = csgen_lib::lite_csgen::generate_cs_facade(&domain);
+    let (mut codebase, rust) = csgen_lib::lite_csgen::generate_cs_facade(&domain);
+    codebase.mods.push(Module::children("Internal", manuals.mods));
     csgen_lib::lite_csgen::write_cs::write_cs(codebase);
     let s = format!("
             #![allow(non_camel_case_types)]

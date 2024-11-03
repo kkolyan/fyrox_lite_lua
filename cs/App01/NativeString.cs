@@ -30,13 +30,9 @@ internal partial struct NativeString
         {
             fixed (byte* buffer_ptr = _buffer)
             {
-                var native_slice = fyrox_lite_upload_data(new byte_slice(buffer_ptr, bytes));
+                var native_slice = byte_slice.fyrox_lite_upload_u8_slice(new byte_slice(buffer_ptr, bytes));
                 return new NativeString(native_slice);
             }
         }
     }
-    
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial byte_slice fyrox_lite_upload_data(byte_slice managed);
-    
 }

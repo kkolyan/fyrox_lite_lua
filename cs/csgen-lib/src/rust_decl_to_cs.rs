@@ -1,15 +1,17 @@
 use std::collections::{HashMap, HashSet};
-
-use gen_common::templating::render;
+use std::ops::Deref;
+use itertools::Itertools;
+use gen_common::templating::{render, render_string};
 use quote::ToTokens;
 use syn::{Attribute, Expr, File, FnArg, Item, ReturnType, Type};
 use to_vec::ToVec;
+use gen_common::code_model::{HierarchicalCodeBase, Module};
 
 struct CustomTypeProps {
     is_delegate: bool
 }
 
-pub fn rust_decl_to_c(file: &File, known_structs: &HashSet<String>) -> String {
+pub fn rust_decl_to_c(file: &File, known_structs: &HashSet<String>) -> HierarchicalCodeBase {
     let mut custom_type_names: HashMap<String, CustomTypeProps> = Default::default();
     collect_custom_type_names(file, &mut custom_type_names);
     for known_struct in known_structs.iter() {
@@ -30,31 +32,65 @@ fn collect_custom_type_names(file: &File, custom_type_names: &mut HashMap<String
             custom_type_names.insert(item.ident.to_string(), CustomTypeProps { is_delegate: false });
         }
         if let Item::Type(item) = item {
-            custom_type_names.insert(item.ident.to_string(), CustomTypeProps { is_delegate: true });
+            match item.ty.deref() {
+                Type::BareFn(_) => {
+                    custom_type_names.insert(item.ident.to_string(), CustomTypeProps { is_delegate: true });       
+                }
+                _ => {}
+            }
         }
     }
 }
 
-fn convert_file(file: &File, custom_type_names: &HashMap<String, CustomTypeProps>) -> String {
-    let mut s = String::new();
+fn convert_file(file: &File, custom_type_names: &HashMap<String, CustomTypeProps>) -> HierarchicalCodeBase {
+    let mut mods = vec![];
+    let mut globals = String::new();
     for item in file.items.iter() {
         if let Item::Struct(item) = item {
+            let mut s = String::new();
             convert_struct(&mut s, item, custom_type_names);
+            mods.push(Module::code(item.ident.to_string(), strip_indent(s, "    ")));
         }
         if let Item::Union(item) = item {
+            let mut s = String::new();
             convert_union(&mut s, item, custom_type_names);
+            mods.push(Module::code(item.ident.to_string(), strip_indent(s, "    ")));
         }
         if let Item::Enum(item) = item {
+            let mut s = String::new();
             convert_enum(&mut s, item, custom_type_names);
+            mods.push(Module::code(item.ident.to_string(), strip_indent(s, "    ")));
         }
         if let Item::Type(item) = item {
-            convert_functor_def(&mut s, item, custom_type_names);
+            convert_functor_def(&mut globals, item, custom_type_names);
         }
         if let Item::Fn(item) = item {
-            convert_function(&mut s, item, custom_type_names);
+            convert_function(&mut globals, item, custom_type_names);
         }
     }
-    s
+    let globals_host_class = "FyroxNativeGlobal";
+    let globals = render_string(
+        r#"
+                using System.Runtime.InteropServices;
+                using FyroxLite;
+                using FyroxLite.LiteMath;
+    
+                internal partial class ${class} {
+                    ${code}
+                }
+    "#,
+        [
+            ("class", &globals_host_class),
+            ("code", &globals),
+        ],
+    );
+    mods.push(Module::code(globals_host_class, strip_indent(globals, "    ")));
+    HierarchicalCodeBase { mods }
+}
+
+fn strip_indent(s: String, indent: &str) -> String {
+    s.lines().map(|it| it.strip_prefix(indent).unwrap_or(it)).to_vec().iter().join("\n")
+    // s
 }
 
 pub struct OopDecl {
@@ -112,8 +148,8 @@ fn convert_function(s: &mut String, item: &syn::ItemFn, custom_type_names: &Hash
         s,
         r#"
 
-                [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-                internal static partial ${fn};
+                    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+                    internal static partial ${fn};
         "#,
         [("fn", &format!("{} {}({})", ret, name, &args.join(", ")))],
     );
@@ -145,7 +181,7 @@ fn convert_functor_def(s: &mut String, item: &syn::ItemType, custom_type_names: 
             s,
             r#"
 
-                internal delegate ${fn};
+                    internal delegate ${fn};
             "#,
             [("fn", &format!("{} {}({})", ret, name, &args.join(", ")))],
         );
@@ -208,22 +244,46 @@ fn convert_struct(s: &mut String, item: &syn::ItemStruct, custom_type_names: &Ha
             r#"
 
                 [StructLayout(LayoutKind.Sequential)]
-                internal unsafe struct ${name} {
+                internal unsafe partial struct ${name} {
             "#,
             [("name", &name)],
         );
 
         for field in item.fields.iter() {
-            render(
-                s,
-                "
+            let ty = type_rs2cs(&field.ty, &custom_type_names);
+            let delegate = if let Some(it) = custom_type_names.get(&ty) {
+                it.is_delegate
+            } else {
+                false
+            };
+            if delegate {
+                render(
+                    s,
+                    "
+                    private IntPtr _${name};
+                    internal FyroxNativeGlobal.${type} ${name}
+                    {
+                        get => Marshal.GetDelegateForFunctionPointer<FyroxNativeGlobal.${type}>(_${name});
+                        set => _${name} = Marshal.GetFunctionPointerForDelegate(value);
+                    }
+                ",
+                    [
+                        ("name", field.ident.as_ref().unwrap()),
+                        ("type", &ty),
+                    ],
+                );
+            } else {
+                render(
+                    s,
+                    "
                     internal ${type} ${name};
                 ",
-                [
-                    ("name", field.ident.as_ref().unwrap()),
-                    ("type", &type_rs2cs(&field.ty, &custom_type_names)),
-                ],
-            );
+                    [
+                        ("name", field.ident.as_ref().unwrap()),
+                        ("type", &ty),
+                    ],
+                );
+            }
         }
 
         render(
@@ -248,7 +308,7 @@ fn convert_union(s: &mut String, item: &syn::ItemUnion, custom_type_names: &Hash
             r#"
 
                 [StructLayout(LayoutKind.Explicit)]
-                internal unsafe struct ${name} {
+                internal unsafe partial struct ${name} {
             "#,
             [("name", &name)],
         );
@@ -304,12 +364,7 @@ fn type_rs2cs(ty: &Type, custom_type_names: &HashMap<String, CustomTypeProps> ) 
             if ident == "NativeHandle" { return "NativeHandle".to_owned(); }
             if ident == "NativeVector3" { return "NativeVector3".to_owned(); }
             if ident == "NativeQuaternion" { return "NativeQuaternion".to_owned(); }
-            if let Some(it) = custom_type_names.get(&ident) {
-                if it.is_delegate {
-                    return format!("IntPtr");
-                }
-                return ident;
-            }
+            return ident;
         }
     }
     if let Type::Ptr(ty) = ty {

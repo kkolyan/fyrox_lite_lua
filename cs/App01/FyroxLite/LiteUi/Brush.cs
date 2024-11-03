@@ -2,6 +2,7 @@
 // ReSharper disable RedundantUnsafeContext
 // ReSharper disable UnusedMember.Global
 // ReSharper disable RedundantUsingDirective
+using FyroxLite.Internal;
 using FyroxLite.LiteInput;
 using FyroxLite.LiteLog;
 using FyroxLite.LiteMath;
@@ -15,6 +16,7 @@ using FyroxLite.LiteWindow;
 using System.Numerics;
 using System.Drawing;
 using FyroxLite.LiteBase;
+using FyroxLite.Internal;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Collections;
@@ -130,8 +132,8 @@ internal partial struct Brush_slice
         }
     }
 
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Brush_slice fyrox_lite_upload_fyrox_lite_lite_ui_Brush_slice(Brush_slice managed);
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    internal static unsafe partial Brush_slice fyrox_lite_upload_fyrox_lite_lite_ui_Brush_slice(Brush_slice managed);
 }
 
 [StructLayout(LayoutKind.Explicit)]

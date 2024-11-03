@@ -12,8 +12,6 @@ impl UserScript for NativeHandle {
     type UserScriptMessage = crate::UserScriptMessage;
 
     type UserScriptGenericStub = ();
-    
-    type Buffer<T: LiteDataType + 'static> = Vec<T>;
 
     fn extract_from(
         proxy: &mut Self::ProxyScript,

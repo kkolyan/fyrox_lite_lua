@@ -1,6 +1,6 @@
-namespace App01;
+namespace FyroxLite;
 
-public static class ObjectRegistry
+internal static class ObjectRegistry
 {
     [ThreadStatic]
     private static Dictionary<long, object>? _objects;

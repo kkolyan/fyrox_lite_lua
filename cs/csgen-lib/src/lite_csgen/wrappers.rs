@@ -219,8 +219,8 @@ pub fn generate_slice(mut s: &mut String, rust: &mut RustEmitter, wrapped_type: 
                     }
                 }
 
-                [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-                private static unsafe partial ${blittable}_slice fyrox_lite_upload_${class_lite_escaped}_slice(${blittable}_slice managed);
+                [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+                internal static unsafe partial ${blittable}_slice fyrox_lite_upload_${class_lite_escaped}_slice(${blittable}_slice managed);
             }
     "#, [
         ("blittable", &marshalling.to_blittable()),
@@ -259,6 +259,7 @@ pub fn generate_slice(mut s: &mut String, rust: &mut RustEmitter, wrapped_type: 
                 }
             }
 
+            #[no_mangle]
             pub extern "C" fn fyrox_lite_upload_${class_lite_escaped}_slice(data: ${class_native}_slice) -> ${class_native}_slice {
                 let mut vec = Vec::new();
                 unsafe {

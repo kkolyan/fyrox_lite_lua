@@ -23,7 +23,6 @@ pub struct CScriptMetadata {
     pub has_on_init: bool,
     pub has_on_start: bool,
     pub has_on_deinit: bool,
-    pub has_on_os_event: bool,
     pub has_on_update: bool,
     pub has_on_message: bool,
 }
@@ -35,15 +34,15 @@ pub struct ScriptedApp {
 
 impl ScriptedApp {
     pub fn from_native(app: NativeScriptedApp) -> Self {
+        let scripts: Vec<_> = app.scripts.into();
         ScriptedApp {
-            scripts: (0..app.scripts_len)
-                .map(|i| {
-                    let native_class = &unsafe { *app.scripts.add(i as usize) };
-                    let script = extract_for_def(native_class);
+            scripts: scripts.into_iter()
+                .map(|native_class| {
+                    let script = extract_for_def(&native_class);
                     Some((
                         match script.kind {
-                            ScriptKind::Script(uuid) => uuid,
-                            ScriptKind::Plugin => return None,
+                            ScriptKind::Node(uuid) => uuid,
+                            ScriptKind::Global => return None,
                         },
                         CScriptMetadata {
                             id: native_class.id,
@@ -51,7 +50,6 @@ impl ScriptedApp {
                             has_on_init: true,
                             has_on_start: true,
                             has_on_deinit: true,
-                            has_on_os_event: true,
                             has_on_update: true,
                             has_on_message: true,
                         },
@@ -65,14 +63,13 @@ impl ScriptedApp {
 }
 
 pub fn extract_for_def(md: &NativeScriptMetadata) -> ScriptMetadata {
-    let name = unsafe { CStr::from_ptr(md.name) };
-    let fields = (0..md.properties_len)
-        .map(|it| {
-            let property = unsafe { *md.properties.add(it as usize) };
-            let name = unsafe { CStr::from_ptr(property.name) }
-                .to_str()
-                .unwrap()
-                .to_string();
+    let properties: Vec<_> = md.properties.into();
+    let class: String = md.name.into();
+    let uuid: String = md.uuid.into();
+    let fields = properties
+        .into_iter()
+        .map(|property| {
+            let name: String = property.name.into();
             let title = name.to_case(convert_case::Case::Title);
             ScriptField {
                 name,
@@ -102,12 +99,12 @@ pub fn extract_for_def(md: &NativeScriptMetadata) -> ScriptMetadata {
         .map(|(i, v)| (v.name.clone(), i))
         .collect();
     ScriptMetadata {
-        class: name.to_str().unwrap().to_string(),
+        class,
         kind: match md.kind {
-            NativeScriptKind::Node => ScriptKind::Script(
-                Uuid::parse_str(unsafe { CStr::from_ptr(md.uuid) }.to_str().unwrap()).unwrap(),
+            NativeScriptKind::Node => ScriptKind::Node(
+                Uuid::parse_str(&uuid).unwrap(),
             ),
-            NativeScriptKind::Global => ScriptKind::Plugin,
+            NativeScriptKind::Global => ScriptKind::Global,
         },
         fields,
         field_name_to_index,

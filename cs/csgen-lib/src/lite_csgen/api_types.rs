@@ -99,9 +99,16 @@ pub fn type_rs(ty: &DataType, ctx: &GenerationContext) -> RsType {
         },
         DataType::UserScriptMessage => RsType::Basic("UserScriptMessage".to_string()),
         DataType::UserScriptGenericStub => panic!("WTF, UserScriptGenericStub should be filtered out"),
-        DataType::Object(it) => RsType::Mapped {
-            lite: ctx.domain.get_class(it).unwrap().rust_name().to_string(),
-            native: format!("Native{}", it),
+        DataType::Object(it) => {
+            let class = ctx.domain.get_class(it);
+            if let Some(class) = class {
+                RsType::Mapped {
+                    lite: class.rust_name().to_string(),
+                    native: format!("Native{}", it),
+                }   
+            } else {
+                RsType::Basic(it.to_string())
+            }
         },
         DataType::Option(it) => RsType::templated(
             "Option<{}>",

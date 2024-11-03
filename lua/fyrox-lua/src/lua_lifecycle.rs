@@ -124,7 +124,7 @@ pub(crate) fn load_script(
     class.def = Some(definition.clone());
 
     match definition.metadata.kind {
-        ScriptKind::Script(uuid) => {
+        ScriptKind::Node(uuid) => {
             let addition_result = context
                 .serialization_context
                 .script_constructors
@@ -146,7 +146,7 @@ pub(crate) fn load_script(
                 Log::err(err.to_string().as_str());
             }
         }
-        ScriptKind::Plugin => {
+        ScriptKind::Global => {
             plugin_scripts.inner_mut().push(ExternalScriptProxy {
                 name: name.to_string(),
                 data: ScriptResidence::Unpacked(UnpackedScriptObjectVisit(SendWrapper::new(

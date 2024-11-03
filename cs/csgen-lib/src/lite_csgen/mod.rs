@@ -1,7 +1,7 @@
 use gen_common::by_package::classes_by_package;
 use gen_common::code_model::{HierarchicalCodeBase, ModContent, Module};
 use gen_common::context::GenerationContext;
-use lite_model::{Class, DataType, Domain};
+use lite_model::{Class, ClassName, DataType, Domain};
 use crate::lite_csgen::gen_rs::RustEmitter;
 
 pub mod engine_class;
@@ -66,6 +66,8 @@ fn generate_base(rust: &mut RustEmitter, ctx: &GenerationContext) -> Module {
         wrappers::generate_optional(&mut s, rust, &basic_type, ctx);
         wrappers::generate_slice(&mut s, rust, &basic_type, ctx);
     }
+    wrappers::generate_slice(&mut s, rust, &DataType::Object(ClassName("NativeScriptMetadata".to_string())), ctx);
+    wrappers::generate_slice(&mut s, rust, &DataType::Object(ClassName("NativeScriptProperty".to_string())), ctx);
     wrappers::generate_result(&mut s, rust, &DataType::Option(Box::new(DataType::UserScript)), ctx);
     Module::code("LiteBase", s)
 }

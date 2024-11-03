@@ -154,8 +154,8 @@ pub(crate) fn parse_source(script_source: Vec<u8>) -> Result<ScriptMetadata, Vec
         .map(|(i, v)| (v.name.clone(), i))
         .collect();
     let kind =  match parent_class.unwrap() {
-        "Script" => ScriptKind::Script(uuid.unwrap()),
-        "Plugin" => ScriptKind::Plugin,
+        "Script" => ScriptKind::Node(uuid.unwrap()),
+        "Plugin" => ScriptKind::Global,
         unknown => panic!("unknown ScriptKind constant: {:?}", unknown),
     };
     Ok(ScriptMetadata {

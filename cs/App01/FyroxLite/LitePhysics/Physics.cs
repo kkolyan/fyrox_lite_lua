@@ -2,6 +2,7 @@
 // ReSharper disable RedundantUnsafeContext
 // ReSharper disable UnusedMember.Global
 // ReSharper disable RedundantUsingDirective
+using FyroxLite.Internal;
 using FyroxLite.LiteInput;
 using FyroxLite.LiteLog;
 using FyroxLite.LiteMath;
@@ -15,6 +16,7 @@ using FyroxLite.LiteWindow;
 using System.Numerics;
 using System.Drawing;
 using FyroxLite.LiteBase;
+using FyroxLite.Internal;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Collections;
@@ -42,6 +44,6 @@ public static partial class Physics
         }
     }
 
-    [LibraryImport("../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial Intersection_slice fyrox_lite_lite_physics_LitePhysics_cast_ray(RayCastOptions* opts);
 }

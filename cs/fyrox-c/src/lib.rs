@@ -13,6 +13,7 @@ pub(crate) mod scripted_app;
 pub(crate) mod user_script_impl;
 pub(crate) mod buffer;
 mod string;
+pub(crate) mod executor_cs;
 
 pub(crate) use arena::Arena;
 use crate::bindings_manual::{NativeHandle, UserScriptMessage};

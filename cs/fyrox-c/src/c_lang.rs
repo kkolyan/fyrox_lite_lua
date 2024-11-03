@@ -13,10 +13,11 @@ use fyrox_lite::{
 };
 
 use crate::{
-    bindings_lite::{NativeQuaternion, NativeVector3}, bindings_manual::{
+    bindings_manual::{
         NativeHandle, NativeInstanceId, NativeValue,
     }, scripted_app::APP
 };
+use crate::bindings_lite_2::{NativeQuaternion, NativeVector3};
 
 #[derive(Debug, Clone)]
 pub struct CCompatibleLang;
@@ -63,7 +64,7 @@ impl Lang for CCompatibleLang {
                                 let prefab = LitePrefab::new(resource.clone());
                                 (app.functions.set_property)(
                                     instance,
-                                    i as u16,
+                                    i as i32,
                                     NativeValue {
                                         Handle: NativeHandle::from_u128(prefab.to_external()),
                                     },
@@ -73,7 +74,7 @@ impl Lang for CCompatibleLang {
 
                                 (app.functions.set_property)(
                                     instance,
-                                    i as u16,
+                                    i as i32,
                                     NativeValue {
                                         Handle: Handle::<()>::NONE.into(),
                                     },
@@ -85,7 +86,7 @@ impl Lang for CCompatibleLang {
                         assert_eq!(prop.ty, ScriptFieldValueType::Vector3);
                         (app.functions.set_property)(
                             instance,
-                            i as u16,
+                            i as i32,
                             NativeValue {
                                 Vector3: NativeVector3 {
                                     x: it.x, y: it.y, z: it.z
@@ -97,7 +98,7 @@ impl Lang for CCompatibleLang {
                         assert_eq!(prop.ty, ScriptFieldValueType::Quaternion);
                         (app.functions.set_property)(
                             instance,
-                            i as u16,
+                            i as i32,
                             NativeValue {
                                 Quaternion: NativeQuaternion {
                                     i: it.i,j: it.j,k: it.k, w:it.w
@@ -122,7 +123,7 @@ impl Lang for CCompatibleLang {
                             ScriptFieldValue::Quaternion(_) => { todo!("handled in another block") },
                             ScriptFieldValue::RuntimePin(_) => { todo!("not supported for C") },
                         };
-                        (app.functions.set_property)(instance, i as u16, native_value);
+                        (app.functions.set_property)(instance, i as i32, native_value);
                     }
                 }
             }

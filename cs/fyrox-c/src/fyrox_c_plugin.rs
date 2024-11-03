@@ -66,7 +66,13 @@ impl CPlugin {
     }
 
     pub fn new(scripts_dir: &str, hot_reload_enabled: bool) -> Self {
-        todo!()
+        Self {
+            failed: false,
+            scripts_dir: scripts_dir.to_string(),
+            need_reload: false,
+            scripts: RefCell::new(Default::default()),
+            hot_reload: HotReload::Disabled,
+        }
     }
 
     pub fn check_for_script_changes(&mut self) {

@@ -1,20 +1,23 @@
 using App01;
 
-namespace FyroxLite.LiteBase;
+namespace FyroxLite.Internal;
 
-internal readonly struct UserScriptMessage(long handle) : IEquatable<UserScriptMessage>
+internal partial struct UserScriptMessage
 {
-    private readonly long _handle = handle;
+    private UserScriptMessage(long id)
+    {
+        this.id = id;
+    }
 
     internal static UserScriptMessage FromFacade(object value) => new(ObjectRegistry.Put(value));
 
-    internal static object? ToFacade(UserScriptMessage id) => ObjectRegistry.Get(id._handle);
+    internal static object? ToFacade(UserScriptMessage id) => ObjectRegistry.Get(id.id);
 
-    internal static void DropMessage(UserScriptMessage id) => ObjectRegistry.Drop(id._handle);
+    internal static void DropMessage(UserScriptMessage id) => ObjectRegistry.Drop(id.id);
 
-    public bool Equals(UserScriptMessage other) => _handle == other._handle;
+    public bool Equals(UserScriptMessage other) => id == other.id;
 
     public override bool Equals(object? obj) => obj is UserScriptMessage other && Equals(other);
 
-    public override int GetHashCode() => _handle.GetHashCode();
+    public override int GetHashCode() => id.GetHashCode();
 }

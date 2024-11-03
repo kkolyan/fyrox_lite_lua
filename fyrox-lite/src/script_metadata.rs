@@ -19,8 +19,8 @@ pub struct ScriptMetadata {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ScriptKind {
-    Script(Uuid),
-    Plugin,
+    Node(Uuid),
+    Global,
 }
 
 #[derive(Debug, Clone)]
