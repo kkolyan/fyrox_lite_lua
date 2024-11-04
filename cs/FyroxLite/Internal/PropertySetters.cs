@@ -25,10 +25,14 @@ internal static class PropertySetters
     [ThreadStatic]
     private static Dictionary<Type, Dictionary<string, (NativeValueType, SetPropertyDelegate)>?>? _byType;
 
+    internal static void InitThread()
+    {
+        _byType ??= new Dictionary<Type, Dictionary<string, (NativeValueType, SetPropertyDelegate)>?>();   
+    }
+
     internal static void Register(Type type, Dictionary<string, (NativeValueType, SetPropertyDelegate)> propertySetters)
     {
-        _byType ??= new Dictionary<Type, Dictionary<string, (NativeValueType, SetPropertyDelegate)>>();
-        _byType[type] = propertySetters;
+        _byType.GetInRightThread()[type] = propertySetters;
     }
 
 

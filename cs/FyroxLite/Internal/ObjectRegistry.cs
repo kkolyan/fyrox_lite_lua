@@ -7,21 +7,25 @@ internal static class ObjectRegistry
 
     private static long _nextId;
 
-    internal static long Put(object value)
+    internal static void InitThread()
     {
         _objects ??= new Dictionary<long, object>();
+    }
+
+    internal static long Put(object value)
+    {
         var id = Interlocked.Increment(ref _nextId);
-        _objects.Add(id, value);
+        _objects.GetInRightThread().Add(id, value);
         return id;
     }
 
     internal static object? Get(long id)
     {
-        return _objects?.TryGetValue(id, out var value) == true ? value : null;
+        return _objects.GetInRightThread().TryGetValue(id, out var value) ? value : null;
     }
 
     internal static void Drop(long id)
     {
-        _objects?.Remove(id);
+        _objects.GetInRightThread().Remove(id);
     }
 }

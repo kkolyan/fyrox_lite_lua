@@ -14,7 +14,7 @@ internal partial struct NativeClassId : IEquatable<NativeClassId>
 
         internal static NativeClassId Resolve()
         {
-            _value ??= (_byType ?? throw new Exception("wrong thread"))[typeof(T)];
+            _value ??= _byType.GetInRightThread()[typeof(T)];
             return _value.Value;
         }
     }
@@ -22,24 +22,27 @@ internal partial struct NativeClassId : IEquatable<NativeClassId>
     [ThreadStatic] private static Dictionary<Type, NativeClassId>? _byType;
     [ThreadStatic] private static Dictionary<NativeClassId, Type>? _byId;
 
-    internal Type GetType()
+    internal Type GetCsClass()
     {
-        var byId = _byId ?? throw new Exception("wrong thread");
-        if (byId.TryGetValue(this, out var type))
+        if (_byId.GetInRightThread().TryGetValue(this, out var type))
         {
             return type;
         }
 
-        throw new Exception($"No types associated with {this}. associations: [{string.Join(", ", byId.Select(it => $"{it.Key}: {it.Value}"))}]");
+        throw new Exception($"No types associated with {this}. associations: [{string.Join(", ", _byId.GetInRightThread().Select(it => $"{it.Key}: {it.Value}"))}]");
+    }
+
+    internal static void InitThread()
+    {
+        _byType ??= new Dictionary<Type, NativeClassId>();
+        _byId ??= new Dictionary<NativeClassId, Type>();
     }
 
     internal static void Register(Type type, NativeClassId id)
     {
-        Console.WriteLine($"Associating {type.FullName} with {id}");
-        _byType ??= new Dictionary<Type, NativeClassId>();
-        _byId ??= new Dictionary<NativeClassId, Type>();
-        _byType[type] = id;
-        _byId[id] = type;
+        Console.WriteLine($"DEBUG C#: Associating {type.FullName} with {id}");
+        _byType.GetInRightThread()[type] = id;
+        _byId.GetInRightThread()[id] = type;
     }
 
     public bool Equals(NativeClassId other)

@@ -1,9 +1,21 @@
 
 namespace FyroxLite;
 
-internal partial struct NativeInstanceId(long handle)
+internal partial struct NativeInstanceId
 {
-    internal static NativeInstanceId FromFacade(object value) => new(ObjectRegistry.Put(value));
+    internal NativeInstanceId(long value)
+    {
+        this.value = value;
+    }
+
+    internal static NativeInstanceId FromFacade(object value)
+    {
+        if (value is long longValue)
+        {
+            throw new Exception("haha");
+        }
+        return new NativeInstanceId(ObjectRegistry.Put(value));
+    }
 
     internal static object? ToFacade(NativeInstanceId id) => ObjectRegistry.Get(id.value);
 

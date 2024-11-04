@@ -1,6 +1,4 @@
 
-using System.Text;
-
 namespace FyroxLite
 {
     internal static class FyroxImpls
@@ -107,9 +105,9 @@ namespace FyroxLite
         {
             try
             {
-                var instance = Activator.CreateInstance(thiz.GetType());
+                var instance = Activator.CreateInstance(thiz.GetCsClass());
                 PropertySetters.SetProperties(instance, NativePropertyValue_slice.ToFacade(state));
-                return NativeInstanceId_result.FromFacade(ObjectRegistry.Put(instance));
+                return NativeInstanceId_result.FromFacade(instance);
             }
             catch (Exception e)
             {
@@ -135,7 +133,7 @@ namespace FyroxLite
             {
                 GlobalScript script => script,
                 null => throw new Exception($"instance not found for id {instanceId.value}"),
-                _ => throw new Exception($"instance is not a NodeScript {instanceId.value}")
+                _ => throw new Exception($"instance is not a GlobalScript {instanceId.value}: {o.GetType()}")
             };
         }
 

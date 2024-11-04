@@ -12,6 +12,10 @@ public partial class FyroxExecutor
 
     public static void Run()
     {
+        ObjectRegistry.InitThread();
+        NativeClassId.InitThread();
+        PropertySetters.InitThread();
+        
         List<NativeScriptMetadata> scripts = new();
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {

@@ -143,20 +143,21 @@ impl Plugin for CPlugin {
                             .unwrap();
                     }
                     ScriptKind::Global => {
-                        let instance = (app.functions.create_script_instance)(class, Default::default())
+                        if let Some(instance) = (app.functions.create_script_instance)(class, Default::default())
                             .into_result_shallow()
-                            .unwrap();
-
-                        let mut plugin_scripts = self.scripts.borrow_mut();
-                        plugin_scripts.inner_mut().push(ExternalScriptProxy {
-                            name: name.to_string(),
-                            class,
-                            data: ScriptResidence::Unpacked(UnpackedObject {
-                                uuid: Default::default(),
+                            .handle_scripting_error() 
+                        {
+                            let mut plugin_scripts = self.scripts.borrow_mut();
+                            plugin_scripts.inner_mut().push(ExternalScriptProxy {
+                                name: name.to_string(),
                                 class,
-                                instance,
-                            }),
-                        });
+                                data: ScriptResidence::Unpacked(UnpackedObject {
+                                    uuid: Default::default(),
+                                    class,
+                                    instance,
+                                }),
+                            });   
+                        }
                     }
                 }
             }
@@ -170,7 +171,8 @@ impl Plugin for CPlugin {
             script.data.ensure_unpacked(&mut self.failed);
             invoke_callback(&mut context, |app| {
                 let scene_path = scene_path.map(|it| it.to_string()).into();
-                let result = (app.functions.on_game_init)(script.data.inner_unpacked().unwrap().instance, scene_path);
+                let id = script.data.inner_unpacked().unwrap().instance;
+                let result = (app.functions.on_game_init)(id, scene_path);
                 result.into_result().handle_scripting_error();
             });
         }

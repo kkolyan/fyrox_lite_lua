@@ -17,7 +17,7 @@ public class GuardChief : NodeScript
     [Transient]
     private bool FrameSkippedForBeacons;
 
-    public void OnUpdate(float dt)
+    protected override void OnUpdate(float dt)
     {
         if (!FrameSkippedForBeacons)
         {
