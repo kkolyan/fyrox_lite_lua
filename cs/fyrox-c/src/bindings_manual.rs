@@ -5,7 +5,7 @@ use std::{
 
 use fyrox::core::{algebra::iter, pool::Handle};
 use fyrox_lite::{lite_math::{PodQuaternion, PodVector3}, spi::UserScript, LiteDataType};
-use crate::bindings_lite_2::{u8_slice, NativeInstanceId_result, NativePropertyValue_slice, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeValue_slice, NativeVector2, NativeVector2I, NativeVector3};
+use crate::bindings_lite_2::{i32_result, u8_slice, NativeInstanceId_result, NativePropertyValue_slice, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeString_optional, NativeValue_slice, NativeVector2, NativeVector2I, NativeVector3};
 use crate::c_lang::CCompatibleLang;
 use crate::scripted_app::{ScriptedApp, APP};
 
@@ -95,7 +95,23 @@ pub enum NativeValueType {
 //     NativeHandle_option_result
 // );
 
-pub type NativeString = u8_slice;
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeString {
+    pub data: u8_slice
+}
+
+impl From<NativeString> for String {
+    fn from(value: NativeString) -> Self {
+        value.data.into()
+    }
+}
+
+impl From<String> for NativeString {
+    fn from(value: String) -> Self {
+        Self { data: value.into() }
+    }
+}
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -203,14 +219,14 @@ pub struct NativeScriptAppFunctions {
     pub create_script_instance: CreateScriptInstance,
 }
 
-pub type NodeOnUpdate = extern "C" fn(thiz: NativeInstanceId, dt: f32);
-pub type NodeOnInit = extern "C" fn(thiz: NativeInstanceId);
-pub type NodeOnDeinit = extern "C" fn(thiz: NativeInstanceId);
-pub type NodeOnStart = extern "C" fn(thiz: NativeInstanceId);
-pub type NodeOnMessage = extern "C" fn(thiz: NativeInstanceId, message: UserScriptMessage);
+pub type NodeOnUpdate = extern "C" fn(thiz: NativeInstanceId, dt: f32) -> i32_result;
+pub type NodeOnInit = extern "C" fn(thiz: NativeInstanceId) -> i32_result;
+pub type NodeOnDeinit = extern "C" fn(thiz: NativeInstanceId) -> i32_result;
+pub type NodeOnStart = extern "C" fn(thiz: NativeInstanceId) -> i32_result;
+pub type NodeOnMessage = extern "C" fn(thiz: NativeInstanceId, message: UserScriptMessage) -> i32_result;
 
-pub type GameOnInit = extern "C" fn(thiz: NativeInstanceId);
-pub type GameOnUpdate = extern "C" fn(thiz: NativeInstanceId);
+pub type GameOnInit = extern "C" fn(thiz: NativeInstanceId, initial_scene_override: NativeString_optional) -> i32_result;
+pub type GameOnUpdate = extern "C" fn(thiz: NativeInstanceId) -> i32_result;
 
 pub type CreateScriptInstance = extern "C" fn(thiz: NativeClassId, state: NativePropertyValue_slice) -> NativeInstanceId_result;
 

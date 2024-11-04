@@ -1,10 +1,10 @@
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace FyroxLite;
 
 internal partial struct NativeString
 {
-    private byte_slice data;
 
     internal NativeString(byte_slice data)
     {

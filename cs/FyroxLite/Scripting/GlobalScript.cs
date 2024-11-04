@@ -6,7 +6,7 @@ public abstract class GlobalScript
     {
     }
 
-    protected internal virtual void OnGlobalInit()
+    protected internal virtual void OnGlobalInit(string? initialSceneOverride)
     {
     }
 }

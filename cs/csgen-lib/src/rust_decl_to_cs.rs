@@ -1,9 +1,11 @@
 use std::collections::{HashMap, HashSet};
 use std::ops::Deref;
+use std::str::FromStr;
 use itertools::Itertools;
+use proc_macro2::TokenStream;
 use gen_common::templating::{render, render_string};
-use quote::ToTokens;
-use syn::{Attribute, Expr, File, FnArg, Item, ReturnType, Type};
+use quote::{quote, ToTokens};
+use syn::{parse2, Attribute, Expr, File, FnArg, Item, ReturnType, Type};
 use to_vec::ToVec;
 use gen_common::code_model::{HierarchicalCodeBase, Module};
 
@@ -147,7 +149,7 @@ fn convert_function(s: &mut String, item: &syn::ItemFn, custom_type_names: &Hash
         s,
         r#"
 
-                    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+                    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
                     internal static partial ${fn};
         "#,
         [("fn", &format!("{} {}({})", ret, name, &args.join(", ")))],
@@ -340,6 +342,14 @@ fn convert_union(s: &mut String, item: &syn::ItemUnion, custom_type_names: &Hash
 #[rustfmt::skip]
 fn type_rs2cs(ty: &Type, custom_type_names: &HashMap<String, CustomTypeProps> ) -> String {
     let s = ty.to_token_stream().to_string();
+    if let Some(s) = s.strip_suffix("_slice") {
+        let ty: Type = parse2(TokenStream::from_str(s).unwrap()).unwrap();
+        return format!("{}_slice", type_rs2cs(&ty, custom_type_names));
+    }
+    if let Some(s) = s.strip_suffix("_result") {
+        let ty: Type = parse2(TokenStream::from_str(s).unwrap()).unwrap();
+        return format!("{}_result", type_rs2cs(&ty, custom_type_names));
+    }
     if let Type::Tuple(ty) = ty {
         if ty.elems.is_empty() {
             return "void".to_owned();
@@ -349,7 +359,7 @@ fn type_rs2cs(ty: &Type, custom_type_names: &HashMap<String, CustomTypeProps> ) 
         if let Some(ident) = ty.path.get_ident() {
             let ident = ident.to_string();
             if ident == "bool" { return "bool".to_owned(); }
-            if ident == "u8" { return "ubyte".to_owned(); }
+            if ident == "u8" { return "byte".to_owned(); }
             if ident == "u16" { return "ushort".to_owned(); }
             if ident == "u32" { return "uint".to_owned(); }
             if ident == "u64" { return "ulong".to_owned(); }

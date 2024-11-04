@@ -3,7 +3,7 @@ use crate::bindings_lite_2::u8_slice;
 use crate::bindings_manual::{NativeString};
 
 impl From<u8_slice> for String {
-    fn from(value: NativeString) -> Self {
+    fn from(value: u8_slice) -> Self {
         let vec = Vec::from(value);
         String::from_utf8(vec).unwrap()
     }

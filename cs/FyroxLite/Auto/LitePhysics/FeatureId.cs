@@ -114,42 +114,46 @@ internal partial struct FeatureId_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial FeatureId_slice fyrox_lite_upload_fyrox_lite_lite_physics_LiteFeatureId_slice(FeatureId_slice managed);
 }
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct FeatureId_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private FeatureId value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal FeatureId_result_value value;
 
     internal static unsafe FeatureId ToFacade(in FeatureId_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static FeatureId_result FromFacade(in FeatureId self)
     {
         var __item = self;
         var __item_from_facade = __item;
-        return new FeatureId_result {ok = 1, value = __item_from_facade};
+        return new FeatureId_result {ok = 1, value = new FeatureId_result_value { ok = __item_from_facade } };
     }
 
     internal static FeatureId_result FromFacadeError(in string err)
     {
-        return new FeatureId_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new FeatureId_result {ok = 0, value = new FeatureId_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct FeatureId_result_value
+{
+    [FieldOffset(0)]
+    internal FeatureId ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }

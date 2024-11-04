@@ -15,22 +15,22 @@ using FyroxLite;
 internal partial class FyroxNativeGlobal {
     
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static partial void init_fyrox(NativeScriptedApp app);
 
-    internal delegate void NodeOnUpdate(NativeInstanceId thiz, float dt);
+    internal delegate int_result NodeOnUpdate(NativeInstanceId thiz, float dt);
 
-    internal delegate void NodeOnInit(NativeInstanceId thiz);
+    internal delegate int_result NodeOnInit(NativeInstanceId thiz);
 
-    internal delegate void NodeOnDeinit(NativeInstanceId thiz);
+    internal delegate int_result NodeOnDeinit(NativeInstanceId thiz);
 
-    internal delegate void NodeOnStart(NativeInstanceId thiz);
+    internal delegate int_result NodeOnStart(NativeInstanceId thiz);
 
-    internal delegate void NodeOnMessage(NativeInstanceId thiz, UserScriptMessage message);
+    internal delegate int_result NodeOnMessage(NativeInstanceId thiz, UserScriptMessage message);
 
-    internal delegate void GameOnInit(NativeInstanceId thiz);
+    internal delegate int_result GameOnInit(NativeInstanceId thiz, NativeString_optional initial_scene_override);
 
-    internal delegate void GameOnUpdate(NativeInstanceId thiz);
+    internal delegate int_result GameOnUpdate(NativeInstanceId thiz);
 
     internal delegate NativeInstanceId_result CreateScriptInstance(NativeClassId thiz, NativePropertyValue_slice state);
 }

@@ -24,14 +24,22 @@ internal partial struct NativeClassId : IEquatable<NativeClassId>
 
     internal Type GetType()
     {
-        return (_byId ?? throw new Exception("wrong thread"))[this];
+        var byId = _byId ?? throw new Exception("wrong thread");
+        if (byId.TryGetValue(this, out var type))
+        {
+            return type;
+        }
+
+        throw new Exception($"No types associated with {this}. associations: [{string.Join(", ", byId.Select(it => $"{it.Key}: {it.Value}"))}]");
     }
 
     internal static void Register(Type type, NativeClassId id)
     {
+        Console.WriteLine($"Associating {type.FullName} with {id}");
         _byType ??= new Dictionary<Type, NativeClassId>();
         _byId ??= new Dictionary<NativeClassId, Type>();
         _byType[type] = id;
+        _byId[id] = type;
     }
 
     public bool Equals(NativeClassId other)
@@ -47,5 +55,10 @@ internal partial struct NativeClassId : IEquatable<NativeClassId>
     public override int GetHashCode()
     {
         return value;
+    }
+
+    public override string ToString()
+    {
+        return $"{nameof(NativeClassId)}({value})";
     }
 }

@@ -11,9 +11,9 @@ public class Game : GlobalScript
     private int Wounds;
     private Text Hud;
 
-    protected override void OnGlobalInit()
+    protected override void OnGlobalInit(string? initialSceneOverride)
     {
-        Scene.LoadAsync("data/scene.rgs");
+        Scene.LoadAsync(initialSceneOverride ?? "data/scene.rgs");
 
         Hud = Text.New(new TextBuilder
         {

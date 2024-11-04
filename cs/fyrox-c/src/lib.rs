@@ -14,6 +14,7 @@ pub(crate) mod user_script_impl;
 pub(crate) mod buffer;
 mod string;
 pub(crate) mod executor_cs;
+mod errors;
 
 pub(crate) use arena::Arena;
 use crate::bindings_manual::UserScriptMessage;

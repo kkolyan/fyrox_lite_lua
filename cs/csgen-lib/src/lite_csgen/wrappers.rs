@@ -10,40 +10,44 @@ pub(crate) fn generate_result(s: &mut String, rust: &mut RustEmitter, wrapped_ty
 
     render(s, r#"
 
-            [StructLayout(LayoutKind.Explicit)]
+            [StructLayout(LayoutKind.Sequential)]
             internal struct ${blittable}_result
             {
-                [FieldOffset(0)]
-                private ${bool_type} ok;
-
-                [FieldOffset(sizeof(${bool_type}))]
-                private ${blittable} value;
-
-                [FieldOffset(sizeof(${bool_type}))]
-                private NativeString err;
+                internal ${bool_type} ok;
+                internal ${blittable}_result_value value;
 
                 internal static unsafe ${facade} ToFacade(in ${blittable}_result self)
                 {
                     if (self.ok != 0)
                     {
-                        var __item = self.value;
+                        var __item = self.value.ok;
                         var __item_to_facade = ${item_to_facade};
                         return __item_to_facade;
                     }
-                    throw new Exception(NativeString.ToFacade(self.err));
+                    throw new Exception(NativeString.ToFacade(self.value.err));
                 }
 
                 internal static ${blittable}_result FromFacade(in ${facade} self)
                 {
                     var __item = self;
                     var __item_from_facade = ${item_from_facade};
-                    return new ${blittable}_result {ok = 1, value = __item_from_facade};
+                    return new ${blittable}_result {ok = 1, value = new ${blittable}_result_value { ok = __item_from_facade } };
                 }
 
                 internal static ${blittable}_result FromFacadeError(in string err)
                 {
-                    return new ${blittable}_result {ok = 0, err = NativeString.FromFacade(err)};
+                    return new ${blittable}_result {ok = 0, value = new ${blittable}_result_value { err = NativeString.FromFacade(err) } };
                 }
+            }
+
+            [StructLayout(LayoutKind.Explicit)]
+            internal struct ${blittable}_result_value
+            {
+                [FieldOffset(0)]
+                internal ${blittable} ok;
+
+                [FieldOffset(0)]
+                internal NativeString err;
             }
     "#, [
         ("blittable", &marshalling.to_blittable()),
@@ -239,7 +243,7 @@ pub fn generate_slice(mut s: &mut String, rust: &mut RustEmitter, wrapped_type: 
                     }
                 }
 
-                [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+                [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
                 internal static unsafe partial ${blittable}_slice fyrox_lite_upload_${class_lite_escaped}_slice(${blittable}_slice managed);
             }
     "#, [

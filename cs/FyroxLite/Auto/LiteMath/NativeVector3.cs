@@ -102,42 +102,46 @@ internal partial struct NativeVector3_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial NativeVector3_slice fyrox_lite_upload_fyrox_lite_lite_math_PodVector3_slice(NativeVector3_slice managed);
 }
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct NativeVector3_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private NativeVector3 value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal NativeVector3_result_value value;
 
     internal static unsafe Vector3 ToFacade(in NativeVector3_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = NativeVector3.ToFacade(__item);
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static NativeVector3_result FromFacade(in Vector3 self)
     {
         var __item = self;
         var __item_from_facade = NativeVector3.FromFacade(__item);
-        return new NativeVector3_result {ok = 1, value = __item_from_facade};
+        return new NativeVector3_result {ok = 1, value = new NativeVector3_result_value { ok = __item_from_facade } };
     }
 
     internal static NativeVector3_result FromFacadeError(in string err)
     {
-        return new NativeVector3_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new NativeVector3_result {ok = 0, value = new NativeVector3_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct NativeVector3_result_value
+{
+    [FieldOffset(0)]
+    internal NativeVector3 ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }

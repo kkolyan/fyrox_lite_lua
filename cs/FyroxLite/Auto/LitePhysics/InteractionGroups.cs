@@ -114,42 +114,46 @@ internal partial struct InteractionGroups_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial InteractionGroups_slice fyrox_lite_upload_fyrox_lite_lite_physics_LiteInteractionGroups_slice(InteractionGroups_slice managed);
 }
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct InteractionGroups_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private InteractionGroups value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal InteractionGroups_result_value value;
 
     internal static unsafe InteractionGroups ToFacade(in InteractionGroups_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static InteractionGroups_result FromFacade(in InteractionGroups self)
     {
         var __item = self;
         var __item_from_facade = __item;
-        return new InteractionGroups_result {ok = 1, value = __item_from_facade};
+        return new InteractionGroups_result {ok = 1, value = new InteractionGroups_result_value { ok = __item_from_facade } };
     }
 
     internal static InteractionGroups_result FromFacadeError(in string err)
     {
-        return new InteractionGroups_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new InteractionGroups_result {ok = 0, value = new InteractionGroups_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct InteractionGroups_result_value
+{
+    [FieldOffset(0)]
+    internal InteractionGroups ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }

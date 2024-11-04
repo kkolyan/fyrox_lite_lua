@@ -37,13 +37,11 @@ impl ScriptedApp {
     pub fn from_native(app: NativeScriptedApp) -> Self {
         let scripts: Vec<_> = app.scripts.into();
         let scripts: HashMap<Uuid, CScriptMetadata> = scripts.into_iter()
-            .filter_map(|native_class| {
+            .map(|native_class| {
+                let uuid = Uuid::parse_str(String::from(native_class.uuid).as_str()).unwrap();
                 let script = extract_for_def(&native_class);
-                Some((
-                    match script.kind {
-                        ScriptKind::Node(uuid) => uuid,
-                        ScriptKind::Global => return None,
-                    },
+                (
+                    uuid,
                     CScriptMetadata {
                         id: native_class.id,
                         md: script,
@@ -53,7 +51,7 @@ impl ScriptedApp {
                         has_on_update: true,
                         has_on_message: true,
                     },
-                ))
+                )
             })
             .collect();
         let uuid_by_class = scripts.iter()

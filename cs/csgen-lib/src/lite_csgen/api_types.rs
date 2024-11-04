@@ -75,7 +75,7 @@ pub fn is_implemented_externally(class_name: &ClassName) -> bool {
 pub fn type_rs(ty: &DataType, ctx: &GenerationContext) -> RsType {
     match ty {
         DataType::UnresolvedClass(it) => panic!("Unresolved class: {}", it),
-        DataType::Unit => RsType::Basic(format!("())")),
+        DataType::Unit => RsType::Basic(format!("Unit")),
         DataType::Bool => RsType::Mapped { lite: "bool".to_string(), native: "NativeBool".to_string() },
         DataType::Byte => RsType::Basic(format!("u8")),
         DataType::I32 => RsType::Basic(format!("i32")),

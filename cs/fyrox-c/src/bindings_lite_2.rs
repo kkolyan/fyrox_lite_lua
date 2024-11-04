@@ -12,72 +12,17 @@ use fyrox_lite::externalizable::Externalizable;
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct NativeLog {
+pub struct NativePlugin {
     pub handle: NativeHandle,
 }
 
 #[no_mangle]
-pub extern "C" fn fyrox_lite_lite_log_LiteLog_info(msg: NativeString) -> () {
-    let msg = msg.into();
-    let ret = fyrox_lite::lite_log::LiteLog::info(msg);
+pub extern "C" fn fyrox_lite_lite_plugin_LitePlugin_get(
+    class_id: NativeClassId,
+) -> NativeInstanceId_result {
+    let class_id = class_id.into();
+    let ret = fyrox_lite::lite_plugin::LitePlugin::get::<crate::UserScriptImpl>(class_id, ());
     ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_log_LiteLog_warn(msg: NativeString) -> () {
-    let msg = msg.into();
-    let ret = fyrox_lite::lite_log::LiteLog::warn(msg);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_log_LiteLog_err(msg: NativeString) -> () {
-    let msg = msg.into();
-    let ret = fyrox_lite::lite_log::LiteLog::err(msg);
-    ret.into()
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeWindow {
-    pub handle: NativeHandle,
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_window_LiteWindow_set_cursor_grab(
-    mode: NativeCursorGrabMode,
-) -> () {
-    let mode = mode.into();
-    let ret = fyrox_lite::lite_window::LiteWindow::set_cursor_grab(mode);
-    ret.into()
-}
-
-#[repr(C)]
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum NativeCursorGrabMode {
-    None,
-    Confined,
-    Locked,
-}
-
-impl From<fyrox_lite::lite_window::LiteCursorGrabMode> for NativeCursorGrabMode {
-    fn from(value: fyrox_lite::lite_window::LiteCursorGrabMode) -> Self {
-        match value {
-            fyrox_lite::lite_window::LiteCursorGrabMode::None => NativeCursorGrabMode::None,
-            fyrox_lite::lite_window::LiteCursorGrabMode::Confined => NativeCursorGrabMode::Confined,
-            fyrox_lite::lite_window::LiteCursorGrabMode::Locked => NativeCursorGrabMode::Locked,
-        }
-    }
-}
-
-impl From<NativeCursorGrabMode> for fyrox_lite::lite_window::LiteCursorGrabMode {
-    fn from(value: NativeCursorGrabMode) -> Self {
-        match value {
-            NativeCursorGrabMode::None => fyrox_lite::lite_window::LiteCursorGrabMode::None,
-            NativeCursorGrabMode::Confined => fyrox_lite::lite_window::LiteCursorGrabMode::Confined,
-            NativeCursorGrabMode::Locked => fyrox_lite::lite_window::LiteCursorGrabMode::Locked,
-        }
-    }
 }
 
 #[repr(C)]
@@ -1225,6 +1170,19 @@ impl From<NativeGradientPoint_result>
 
 #[repr(C)]
 #[derive(Clone, Copy)]
+pub struct NativeScene {
+    pub handle: NativeHandle,
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_scene_LiteScene_load_async(scene_path: NativeString) -> () {
+    let scene_path = scene_path.into();
+    let ret = fyrox_lite::lite_scene::LiteScene::load_async(scene_path);
+    ret.into()
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
 pub struct NativeVector3 {
     pub x: f32,
     pub y: f32,
@@ -1933,6 +1891,113 @@ impl From<NativeQuaternion_result>
 {
     fn from(value: NativeQuaternion_result) -> Self {
         value.into_result()
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativeWindow {
+    pub handle: NativeHandle,
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_window_LiteWindow_set_cursor_grab(
+    mode: NativeCursorGrabMode,
+) -> () {
+    let mode = mode.into();
+    let ret = fyrox_lite::lite_window::LiteWindow::set_cursor_grab(mode);
+    ret.into()
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum NativeCursorGrabMode {
+    None,
+    Confined,
+    Locked,
+}
+
+impl From<fyrox_lite::lite_window::LiteCursorGrabMode> for NativeCursorGrabMode {
+    fn from(value: fyrox_lite::lite_window::LiteCursorGrabMode) -> Self {
+        match value {
+            fyrox_lite::lite_window::LiteCursorGrabMode::None => NativeCursorGrabMode::None,
+            fyrox_lite::lite_window::LiteCursorGrabMode::Confined => NativeCursorGrabMode::Confined,
+            fyrox_lite::lite_window::LiteCursorGrabMode::Locked => NativeCursorGrabMode::Locked,
+        }
+    }
+}
+
+impl From<NativeCursorGrabMode> for fyrox_lite::lite_window::LiteCursorGrabMode {
+    fn from(value: NativeCursorGrabMode) -> Self {
+        match value {
+            NativeCursorGrabMode::None => fyrox_lite::lite_window::LiteCursorGrabMode::None,
+            NativeCursorGrabMode::Confined => fyrox_lite::lite_window::LiteCursorGrabMode::Confined,
+            NativeCursorGrabMode::Locked => fyrox_lite::lite_window::LiteCursorGrabMode::Locked,
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativePrefab {
+    pub handle: NativeHandle,
+}
+
+impl From<fyrox_lite::lite_prefab::LitePrefab> for NativePrefab {
+    fn from(value: fyrox_lite::lite_prefab::LitePrefab) -> Self {
+        Self {
+            handle: NativeHandle::from_u128(value.to_external()),
+        }
+    }
+}
+
+impl From<NativePrefab> for fyrox_lite::lite_prefab::LitePrefab {
+    fn from(value: NativePrefab) -> Self {
+        Self::from_external(value.handle.as_u128())
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_prefab_LitePrefab_instantiate_at(
+    this: NativePrefab,
+    position: NativeVector3,
+    orientation: NativeQuaternion,
+) -> NativeNode {
+    let position = position.into();
+    let orientation = orientation.into();
+    let ret = fyrox_lite::lite_prefab::LitePrefab::from(this).instantiate_at(position, orientation);
+    ret.into()
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct NativePrefab_optional {
+    pub value: NativePrefab,
+    pub has_value: i32,
+}
+
+impl From<Option<fyrox_lite::lite_prefab::LitePrefab>> for NativePrefab_optional {
+    fn from(value: Option<fyrox_lite::lite_prefab::LitePrefab>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativePrefab_optional> for Option<fyrox_lite::lite_prefab::LitePrefab> {
+    fn from(value: NativePrefab_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
     }
 }
 
@@ -2811,30 +2876,241 @@ impl From<NativeRigidBody_optional> for Option<fyrox_lite::lite_physics::LiteRig
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct NativeScene {
+pub struct NativeNode {
     pub handle: NativeHandle,
 }
 
+impl From<fyrox_lite::lite_node::LiteNode> for NativeNode {
+    fn from(value: fyrox_lite::lite_node::LiteNode) -> Self {
+        Self {
+            handle: NativeHandle::from_u128(value.to_external()),
+        }
+    }
+}
+
+impl From<NativeNode> for fyrox_lite::lite_node::LiteNode {
+    fn from(value: NativeNode) -> Self {
+        Self::from_external(value.handle.as_u128())
+    }
+}
+
 #[no_mangle]
-pub extern "C" fn fyrox_lite_lite_scene_LiteScene_load_async(scene_path: NativeString) -> () {
-    let scene_path = scene_path.into();
-    let ret = fyrox_lite::lite_scene::LiteScene::load_async(scene_path);
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_as_rigid_body(
+    this: NativeNode,
+) -> NativeRigidBody_optional {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).as_rigid_body();
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_name(this: NativeNode) -> NativeString_result {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_name::<crate::UserScriptImpl>(());
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_alive(this: NativeNode) -> NativeBool {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_alive();
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_destroy(this: NativeNode) -> () {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).destroy();
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_global_position(
+    this: NativeNode,
+) -> NativeVector3 {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_global_position();
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_local_position(
+    this: NativeNode,
+) -> NativeVector3 {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_local_position();
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_local_rotation(
+    this: NativeNode,
+) -> NativeQuaternion {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_local_rotation();
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_send_hierarchical(
+    this: NativeNode,
+    routing: NativeRoutingStrategy,
+    payload: UserScriptMessage,
+) -> () {
+    let routing = routing.into();
+    let payload = payload.into();
+    let ret = fyrox_lite::lite_node::LiteNode::from(this)
+        .send_hierarchical::<crate::UserScriptImpl>(routing, payload);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_set_local_position(
+    this: NativeNode,
+    new_pos: NativeVector3,
+) -> () {
+    let new_pos = new_pos.into();
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).set_local_position(new_pos);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_set_local_rotation(
+    this: NativeNode,
+    value: NativeQuaternion,
+) -> () {
+    let value = value.into();
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).set_local_rotation(value);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_subscribe_to(this: NativeNode) -> () {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).subscribe_to::<crate::UserScriptImpl>(());
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_find_collider_in_children(
+    this: NativeNode,
+) -> NativeNode_optional {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).find_collider_in_children();
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_valid(this: NativeNode) -> NativeBool {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_valid();
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_parent(this: NativeNode) -> NativeNode {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_parent();
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_add_script(
+    this: NativeNode,
+    class_id: NativeClassId,
+) -> NativeInstanceId_result {
+    let class_id = class_id.into();
+    let ret = fyrox_lite::lite_node::LiteNode::from(this)
+        .add_script::<crate::UserScriptImpl>(class_id, ());
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_find_script(
+    this: NativeNode,
+    class_id: NativeClassId,
+) -> NativeInstanceId_optional_result {
+    let class_id = class_id.into();
+    let ret = fyrox_lite::lite_node::LiteNode::from(this)
+        .find_script::<crate::UserScriptImpl>(class_id, ());
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_global_rotation(
+    this: NativeNode,
+) -> NativeQuaternion {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_global_rotation();
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_tag_is(
+    this: NativeNode,
+    tag: NativeString,
+) -> NativeBool {
+    let tag = tag.into();
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).tag_is(tag);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_set_tag(this: NativeNode, tag: NativeString) -> () {
+    let tag = tag.into();
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).set_tag(tag);
+    ret.into()
+}
+
+#[no_mangle]
+pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_tag(this: NativeNode) -> NativeString {
+    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_tag();
     ret.into()
 }
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct NativePlugin {
-    pub handle: NativeHandle,
+pub struct NativeNode_optional {
+    pub value: NativeNode,
+    pub has_value: i32,
 }
 
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_plugin_LitePlugin_get(
-    class_id: NativeClassId,
-) -> NativeInstanceId_result {
-    let class_id = class_id.into();
-    let ret = fyrox_lite::lite_plugin::LitePlugin::get::<crate::UserScriptImpl>(class_id, ());
-    ret.into()
+impl From<Option<fyrox_lite::lite_node::LiteNode>> for NativeNode_optional {
+    fn from(value: Option<fyrox_lite::lite_node::LiteNode>) -> Self {
+        match value {
+            Some(it) => Self {
+                value: it.into(),
+                has_value: 1,
+            },
+            None => Self {
+                value: unsafe { std::mem::zeroed() },
+                has_value: 0,
+            },
+        }
+    }
+}
+
+impl From<NativeNode_optional> for Option<fyrox_lite::lite_node::LiteNode> {
+    fn from(value: NativeNode_optional) -> Self {
+        if value.has_value != 0 {
+            Some(value.value.into())
+        } else {
+            None
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum NativeRoutingStrategy {
+    Up,
+    Down,
+}
+
+impl From<fyrox_lite::lite_node::LiteRoutingStrategy> for NativeRoutingStrategy {
+    fn from(value: fyrox_lite::lite_node::LiteRoutingStrategy) -> Self {
+        match value {
+            fyrox_lite::lite_node::LiteRoutingStrategy::Up => NativeRoutingStrategy::Up,
+            fyrox_lite::lite_node::LiteRoutingStrategy::Down => NativeRoutingStrategy::Down,
+        }
+    }
+}
+
+impl From<NativeRoutingStrategy> for fyrox_lite::lite_node::LiteRoutingStrategy {
+    fn from(value: NativeRoutingStrategy) -> Self {
+        match value {
+            NativeRoutingStrategy::Up => fyrox_lite::lite_node::LiteRoutingStrategy::Up,
+            NativeRoutingStrategy::Down => fyrox_lite::lite_node::LiteRoutingStrategy::Down,
+        }
+    }
 }
 
 #[repr(C)]
@@ -3532,305 +3808,29 @@ impl From<NativeKeyCode> for fyrox_lite::lite_input::LiteKeyCode {
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct NativePrefab {
+pub struct NativeLog {
     pub handle: NativeHandle,
 }
 
-impl From<fyrox_lite::lite_prefab::LitePrefab> for NativePrefab {
-    fn from(value: fyrox_lite::lite_prefab::LitePrefab) -> Self {
-        Self {
-            handle: NativeHandle::from_u128(value.to_external()),
-        }
-    }
-}
-
-impl From<NativePrefab> for fyrox_lite::lite_prefab::LitePrefab {
-    fn from(value: NativePrefab) -> Self {
-        Self::from_external(value.handle.as_u128())
-    }
-}
-
 #[no_mangle]
-pub extern "C" fn fyrox_lite_lite_prefab_LitePrefab_instantiate_at(
-    this: NativePrefab,
-    position: NativeVector3,
-    orientation: NativeQuaternion,
-) -> NativeNode {
-    let position = position.into();
-    let orientation = orientation.into();
-    let ret = fyrox_lite::lite_prefab::LitePrefab::from(this).instantiate_at(position, orientation);
-    ret.into()
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativePrefab_optional {
-    pub value: NativePrefab,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_prefab::LitePrefab>> for NativePrefab_optional {
-    fn from(value: Option<fyrox_lite::lite_prefab::LitePrefab>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativePrefab_optional> for Option<fyrox_lite::lite_prefab::LitePrefab> {
-    fn from(value: NativePrefab_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeNode {
-    pub handle: NativeHandle,
-}
-
-impl From<fyrox_lite::lite_node::LiteNode> for NativeNode {
-    fn from(value: fyrox_lite::lite_node::LiteNode) -> Self {
-        Self {
-            handle: NativeHandle::from_u128(value.to_external()),
-        }
-    }
-}
-
-impl From<NativeNode> for fyrox_lite::lite_node::LiteNode {
-    fn from(value: NativeNode) -> Self {
-        Self::from_external(value.handle.as_u128())
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_as_rigid_body(
-    this: NativeNode,
-) -> NativeRigidBody_optional {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).as_rigid_body();
+pub extern "C" fn fyrox_lite_lite_log_LiteLog_info(msg: NativeString) -> () {
+    let msg = msg.into();
+    let ret = fyrox_lite::lite_log::LiteLog::info(msg);
     ret.into()
 }
 
 #[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_name(this: NativeNode) -> NativeString_result {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_name::<crate::UserScriptImpl>(());
+pub extern "C" fn fyrox_lite_lite_log_LiteLog_warn(msg: NativeString) -> () {
+    let msg = msg.into();
+    let ret = fyrox_lite::lite_log::LiteLog::warn(msg);
     ret.into()
 }
 
 #[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_alive(this: NativeNode) -> NativeBool {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_alive();
+pub extern "C" fn fyrox_lite_lite_log_LiteLog_err(msg: NativeString) -> () {
+    let msg = msg.into();
+    let ret = fyrox_lite::lite_log::LiteLog::err(msg);
     ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_destroy(this: NativeNode) -> () {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).destroy();
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_global_position(
-    this: NativeNode,
-) -> NativeVector3 {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_global_position();
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_local_position(
-    this: NativeNode,
-) -> NativeVector3 {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_local_position();
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_local_rotation(
-    this: NativeNode,
-) -> NativeQuaternion {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_local_rotation();
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_send_hierarchical(
-    this: NativeNode,
-    routing: NativeRoutingStrategy,
-    payload: UserScriptMessage,
-) -> () {
-    let routing = routing.into();
-    let payload = payload.into();
-    let ret = fyrox_lite::lite_node::LiteNode::from(this)
-        .send_hierarchical::<crate::UserScriptImpl>(routing, payload);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_set_local_position(
-    this: NativeNode,
-    new_pos: NativeVector3,
-) -> () {
-    let new_pos = new_pos.into();
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).set_local_position(new_pos);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_set_local_rotation(
-    this: NativeNode,
-    value: NativeQuaternion,
-) -> () {
-    let value = value.into();
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).set_local_rotation(value);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_subscribe_to(this: NativeNode) -> () {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).subscribe_to::<crate::UserScriptImpl>(());
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_find_collider_in_children(
-    this: NativeNode,
-) -> NativeNode_optional {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).find_collider_in_children();
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_valid(this: NativeNode) -> NativeBool {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_valid();
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_parent(this: NativeNode) -> NativeNode {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_parent();
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_add_script(
-    this: NativeNode,
-    class_id: NativeClassId,
-) -> NativeInstanceId_result {
-    let class_id = class_id.into();
-    let ret = fyrox_lite::lite_node::LiteNode::from(this)
-        .add_script::<crate::UserScriptImpl>(class_id, ());
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_find_script(
-    this: NativeNode,
-    class_id: NativeClassId,
-) -> NativeInstanceId_optional_result {
-    let class_id = class_id.into();
-    let ret = fyrox_lite::lite_node::LiteNode::from(this)
-        .find_script::<crate::UserScriptImpl>(class_id, ());
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_global_rotation(
-    this: NativeNode,
-) -> NativeQuaternion {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_global_rotation();
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_tag_is(
-    this: NativeNode,
-    tag: NativeString,
-) -> NativeBool {
-    let tag = tag.into();
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).tag_is(tag);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_set_tag(this: NativeNode, tag: NativeString) -> () {
-    let tag = tag.into();
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).set_tag(tag);
-    ret.into()
-}
-
-#[no_mangle]
-pub extern "C" fn fyrox_lite_lite_node_LiteNode_get_tag(this: NativeNode) -> NativeString {
-    let ret = fyrox_lite::lite_node::LiteNode::from(this).get_tag();
-    ret.into()
-}
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-pub struct NativeNode_optional {
-    pub value: NativeNode,
-    pub has_value: i32,
-}
-
-impl From<Option<fyrox_lite::lite_node::LiteNode>> for NativeNode_optional {
-    fn from(value: Option<fyrox_lite::lite_node::LiteNode>) -> Self {
-        match value {
-            Some(it) => Self {
-                value: it.into(),
-                has_value: 1,
-            },
-            None => Self {
-                value: unsafe { std::mem::zeroed() },
-                has_value: 0,
-            },
-        }
-    }
-}
-
-impl From<NativeNode_optional> for Option<fyrox_lite::lite_node::LiteNode> {
-    fn from(value: NativeNode_optional) -> Self {
-        if value.has_value != 0 {
-            Some(value.value.into())
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum NativeRoutingStrategy {
-    Up,
-    Down,
-}
-
-impl From<fyrox_lite::lite_node::LiteRoutingStrategy> for NativeRoutingStrategy {
-    fn from(value: fyrox_lite::lite_node::LiteRoutingStrategy) -> Self {
-        match value {
-            fyrox_lite::lite_node::LiteRoutingStrategy::Up => NativeRoutingStrategy::Up,
-            fyrox_lite::lite_node::LiteRoutingStrategy::Down => NativeRoutingStrategy::Down,
-        }
-    }
-}
-
-impl From<NativeRoutingStrategy> for fyrox_lite::lite_node::LiteRoutingStrategy {
-    fn from(value: NativeRoutingStrategy) -> Self {
-        match value {
-            NativeRoutingStrategy::Up => fyrox_lite::lite_node::LiteRoutingStrategy::Up,
-            NativeRoutingStrategy::Down => fyrox_lite::lite_node::LiteRoutingStrategy::Down,
-        }
-    }
 }
 
 #[repr(C)]
@@ -4134,7 +4134,7 @@ pub struct i32_result {
 #[derive(Clone, Copy)]
 pub union i32_result_value {
     ok: i32,
-    err: NativeString,
+    pub err: NativeString,
 }
 
 impl i32_result {

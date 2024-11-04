@@ -17,15 +17,19 @@ use fyrox::script::constructor::ScriptConstructor;
 use fyrox::script::PluginsRefMut;
 use fyrox::script::Script;
 use fyrox::walkdir::WalkDir;
-use fyrox_lite::script_metadata::ScriptDefinition;
+use fyrox_lite::script_metadata::{ScriptDefinition, ScriptKind};
 use fyrox_lite::script_object::ScriptObject;
 use fyrox_lite::script_object_residence::ScriptResidence;
 use fyrox_lite::wrapper_reflect;
 use std::cell::RefCell;
 use std::fmt::Debug;
+use std::slice::{from_raw_parts, from_raw_parts_mut};
 use std::sync::Arc;
 use fyrox_lite::lite_input::Input;
 use crate::arena::Arena;
+use crate::bindings_lite_2::{i32_result, i32_result_value};
+use crate::c_lang::UnpackedObject;
+use crate::errors::ResultTcrateLangSpecificErrorExt;
 
 #[derive(Visit, Reflect)]
 pub struct CPlugin {
@@ -105,33 +109,56 @@ impl Default for CPlugin {
 
 impl Plugin for CPlugin {
     fn register(&self, context: PluginRegistrationContext) {
+        println!("CPlugin::register");
         APP.with_borrow(|app| {
-            for (uuid, md) in app.as_ref().unwrap().scripts.iter() {
+            let app = app.as_ref().unwrap();
+            for md in app.scripts.values() {
+                println!("registering {}", md.md.class);
                 let def = Arc::new(ScriptDefinition {
                     metadata: md.md.clone(),
                     assembly_name: self.assembly_name(),
                 });
                 let name = def.metadata.class.clone();
                 let class = md.id;
-                context
-                    .serialization_context
-                    .script_constructors
-                    .add_custom(
-                        *uuid,
-                        ScriptConstructor {
-                            name: name.to_string(),
-                            source_path: "",
-                            assembly_name: self.assembly_name(),
-                            constructor: Box::new(move || {
-                                Script::new(ExternalScriptProxy {
+                match md.md.kind {
+                    ScriptKind::Node(uuid) => {
+                        context
+                            .serialization_context
+                            .script_constructors
+                            .add_custom(
+                                uuid,
+                                ScriptConstructor {
                                     name: name.to_string(),
-                                    class,
-                                    data: ScriptResidence::Packed(ScriptObject::new(&def)),
-                                })
+                                    source_path: "",
+                                    assembly_name: self.assembly_name(),
+                                    constructor: Box::new(move || {
+                                        Script::new(ExternalScriptProxy {
+                                            name: name.to_string(),
+                                            class,
+                                            data: ScriptResidence::Packed(ScriptObject::new(&def)),
+                                        })
+                                    }),
+                                },
+                            )
+                            .unwrap();
+                    }
+                    ScriptKind::Global => {
+                        let instance = (app.functions.create_script_instance)(class, Default::default())
+                            .into_result_shallow()
+                            .unwrap();
+
+                        let mut plugin_scripts = self.scripts.borrow_mut();
+                        plugin_scripts.inner_mut().push(ExternalScriptProxy {
+                            name: name.to_string(),
+                            class,
+                            data: ScriptResidence::Unpacked(UnpackedObject {
+                                uuid: Default::default(),
+                                class,
+                                instance,
                             }),
-                        },
-                    )
-                    .unwrap();
+                        });
+                    }
+                }
             }
         });
         for entry in WalkDir::new(&self.scripts_dir).into_iter().flatten() {}
@@ -142,7 +169,9 @@ impl Plugin for CPlugin {
         for script in self.scripts.borrow_mut().0.iter_mut() {
             script.data.ensure_unpacked(&mut self.failed);
             invoke_callback(&mut context, |app| {
-                (app.functions.on_game_init)(script.data.inner_unpacked().unwrap().instance);
+                let scene_path = scene_path.map(|it| it.to_string()).into();
+                let result = (app.functions.on_game_init)(script.data.inner_unpacked().unwrap().instance, scene_path);
+                result.into_result().handle_scripting_error();
             });
         }
     }
@@ -151,7 +180,7 @@ impl Plugin for CPlugin {
         for script in self.scripts.borrow_mut().0.iter_mut() {
             script.data.ensure_unpacked(&mut self.failed);
             invoke_callback(context, |app| {
-                (app.functions.on_game_update)(script.data.inner_unpacked().unwrap().instance);
+                (app.functions.on_game_update)(script.data.inner_unpacked().unwrap().instance).into_result().handle_scripting_error();
             });
         }
     }

@@ -6,7 +6,7 @@ namespace FyroxLite;
 
 public partial class FyroxExecutor
 {
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", EntryPoint = "fyrox_lite_executor_run",
+    [LibraryImport("libfyrox_c", EntryPoint = "fyrox_lite_executor_run",
         SetLastError = true)]
     private static partial void RunInternal();
 
@@ -15,6 +15,7 @@ public partial class FyroxExecutor
         List<NativeScriptMetadata> scripts = new();
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
+            Console.WriteLine($"scanning assembly {assembly}");
             foreach (var type in assembly.GetTypes())
             {
                 if (!type.IsClass || type.IsAbstract)
@@ -22,54 +23,28 @@ public partial class FyroxExecutor
                     continue;
                 }
 
+                if (type.IsAssignableTo(typeof(GlobalScript)))
+                {
+                    Console.WriteLine($"registering global script {type.FullName}");
+                    
+                    RegisterScript(type, scripts, Guid.NewGuid(), NativeScriptKind.Global);
+                }
+
                 if (type.IsAssignableTo(typeof(NodeScript)))
                 {
+                    Console.WriteLine($"registering node script {type.FullName}");
+                    
                     var uuidAttr = type.GetCustomAttribute<UuidAttribute>();
                     if (uuidAttr == null)
                     {
                         throw new Exception($"Invalid script {type}: [Uuid] attribute required for Node scripts");
                     }
 
-                    var properties = new List<NativeScriptProperty>();
-                    var propertySetters = new Dictionary<string, (NativeValueType, PropertySetters.SetPropertyDelegate)>();
-
-                    foreach (var field in type.GetFields(BindingFlags.Instance))
-                    {
-                        var (fieldType, fieldSetter) = ExtractFieldType(field.FieldType);
-                        properties.Add(new NativeScriptProperty
-                        {
-                            id = properties.Count,
-                            name = NativeString.FromFacade(field.Name),
-                            ty = fieldType,
-                            hide_in_inspector =
-                                NativeBool.FromFacade(field.GetCustomAttribute<HideInInspectorAttribute>() != null),
-                            transient = NativeBool.FromFacade(field.GetCustomAttribute<TransientAttribute>() != null),
-                        });
-                        propertySetters.Add(field.Name, (fieldType, (o, value) => fieldSetter(o, field, value)));
-                    }
-                    
-                    PropertySetters.Register(type, propertySetters);
-
-                    var metadata = new NativeScriptMetadata
-                    {
-                        id = new NativeClassId(scripts.Count + 1),
-                        uuid = NativeString.FromFacade(uuidAttr.Uuid.ToString()),
-                        kind = NativeScriptKind.Node,
-                        name = NativeString.FromFacade(type.Name),
-                        has_global_on_init = HasDeclaredMethod(type, nameof(GlobalScript.OnGlobalInit), []),
-                        has_global_on_update = HasDeclaredMethod(type, nameof(GlobalScript.OnGlobalUpdate), []),
-                        has_node_on_init = HasDeclaredMethod(type, nameof(NodeScript.OnInit), []),
-                        has_node_on_start = HasDeclaredMethod(type, nameof(NodeScript.OnStart), []),
-                        has_node_on_deinit = HasDeclaredMethod(type, nameof(NodeScript.OnDeinit), []),
-                        has_node_on_update = HasDeclaredMethod(type, nameof(NodeScript.OnUpdate), [typeof(float)]),
-                        has_node_on_message = HasDeclaredMethod(type, nameof(NodeScript.OnMessage), [typeof(object)]),
-                        properties = NativeScriptProperty_slice.FromFacade(properties),
-                    };
-                    NativeClassId.Register(type, metadata.id);
-                    scripts.Add(metadata);
+                    RegisterScript(type, scripts, uuidAttr.Uuid, NativeScriptKind.Node);
                 }
             }
         }
+        Console.WriteLine("initializing callbacks");
 
         FyroxNativeGlobal.init_fyrox(new NativeScriptedApp
         {
@@ -86,8 +61,50 @@ public partial class FyroxExecutor
                 create_script_instance = FyroxImpls.create_script_instance,
             },
         });
+        Console.WriteLine("running main loop");
 
         RunInternal();
+    }
+
+    private static void RegisterScript(Type type, List<NativeScriptMetadata> scripts, Guid uuid, NativeScriptKind kind)
+    {
+        var properties = new List<NativeScriptProperty>();
+        var propertySetters = new Dictionary<string, (NativeValueType, PropertySetters.SetPropertyDelegate)>();
+
+        foreach (var field in type.GetFields(BindingFlags.Instance))
+        {
+            var (fieldType, fieldSetter) = ExtractFieldType(field.FieldType);
+            properties.Add(new NativeScriptProperty
+            {
+                id = properties.Count,
+                name = NativeString.FromFacade(field.Name),
+                ty = fieldType,
+                hide_in_inspector =
+                    NativeBool.FromFacade(field.GetCustomAttribute<HideInInspectorAttribute>() != null),
+                transient = NativeBool.FromFacade(field.GetCustomAttribute<TransientAttribute>() != null),
+            });
+            propertySetters.Add(field.Name, (fieldType, (o, value) => fieldSetter(o, field, value)));
+        }
+                    
+        PropertySetters.Register(type, propertySetters);
+
+        var metadata = new NativeScriptMetadata
+        {
+            id = new NativeClassId(scripts.Count + 1),
+            uuid = NativeString.FromFacade(uuid.ToString()),
+            kind = kind,
+            name = NativeString.FromFacade(type.Name),
+            has_global_on_init = HasDeclaredMethod(type, nameof(GlobalScript.OnGlobalInit), []),
+            has_global_on_update = HasDeclaredMethod(type, nameof(GlobalScript.OnGlobalUpdate), []),
+            has_node_on_init = HasDeclaredMethod(type, nameof(NodeScript.OnInit), []),
+            has_node_on_start = HasDeclaredMethod(type, nameof(NodeScript.OnStart), []),
+            has_node_on_deinit = HasDeclaredMethod(type, nameof(NodeScript.OnDeinit), []),
+            has_node_on_update = HasDeclaredMethod(type, nameof(NodeScript.OnUpdate), [typeof(float)]),
+            has_node_on_message = HasDeclaredMethod(type, nameof(NodeScript.OnMessage), [typeof(object)]),
+            properties = NativeScriptProperty_slice.FromFacade(properties),
+        };
+        NativeClassId.Register(type, metadata.id);
+        scripts.Add(metadata);
     }
 
     private delegate void SetField(object o, FieldInfo field, NativeValue value);

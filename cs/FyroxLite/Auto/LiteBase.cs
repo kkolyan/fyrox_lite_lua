@@ -10,40 +10,44 @@ using System.Collections;
 namespace FyroxLite;
 
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct NativeBool_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private NativeBool value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal NativeBool_result_value value;
 
     internal static unsafe bool ToFacade(in NativeBool_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = NativeBool.ToFacade(__item);
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static NativeBool_result FromFacade(in bool self)
     {
         var __item = self;
         var __item_from_facade = NativeBool.FromFacade(__item);
-        return new NativeBool_result {ok = 1, value = __item_from_facade};
+        return new NativeBool_result {ok = 1, value = new NativeBool_result_value { ok = __item_from_facade } };
     }
 
     internal static NativeBool_result FromFacadeError(in string err)
     {
-        return new NativeBool_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new NativeBool_result {ok = 0, value = new NativeBool_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct NativeBool_result_value
+{
+    [FieldOffset(0)]
+    internal NativeBool ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -130,44 +134,48 @@ internal partial struct NativeBool_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial NativeBool_slice fyrox_lite_upload_bool_slice(NativeBool_slice managed);
 }
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct byte_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private byte value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal byte_result_value value;
 
     internal static unsafe byte ToFacade(in byte_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static byte_result FromFacade(in byte self)
     {
         var __item = self;
         var __item_from_facade = __item;
-        return new byte_result {ok = 1, value = __item_from_facade};
+        return new byte_result {ok = 1, value = new byte_result_value { ok = __item_from_facade } };
     }
 
     internal static byte_result FromFacadeError(in string err)
     {
-        return new byte_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new byte_result {ok = 0, value = new byte_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct byte_result_value
+{
+    [FieldOffset(0)]
+    internal byte ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -254,44 +262,48 @@ internal partial struct byte_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial byte_slice fyrox_lite_upload_u8_slice(byte_slice managed);
 }
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct int_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private int value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal int_result_value value;
 
     internal static unsafe int ToFacade(in int_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static int_result FromFacade(in int self)
     {
         var __item = self;
         var __item_from_facade = __item;
-        return new int_result {ok = 1, value = __item_from_facade};
+        return new int_result {ok = 1, value = new int_result_value { ok = __item_from_facade } };
     }
 
     internal static int_result FromFacadeError(in string err)
     {
-        return new int_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new int_result {ok = 0, value = new int_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct int_result_value
+{
+    [FieldOffset(0)]
+    internal int ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -378,44 +390,48 @@ internal partial struct int_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial int_slice fyrox_lite_upload_i32_slice(int_slice managed);
 }
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct long_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private long value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal long_result_value value;
 
     internal static unsafe long ToFacade(in long_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static long_result FromFacade(in long self)
     {
         var __item = self;
         var __item_from_facade = __item;
-        return new long_result {ok = 1, value = __item_from_facade};
+        return new long_result {ok = 1, value = new long_result_value { ok = __item_from_facade } };
     }
 
     internal static long_result FromFacadeError(in string err)
     {
-        return new long_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new long_result {ok = 0, value = new long_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct long_result_value
+{
+    [FieldOffset(0)]
+    internal long ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -502,44 +518,48 @@ internal partial struct long_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial long_slice fyrox_lite_upload_i64_slice(long_slice managed);
 }
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct float_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private float value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal float_result_value value;
 
     internal static unsafe float ToFacade(in float_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static float_result FromFacade(in float self)
     {
         var __item = self;
         var __item_from_facade = __item;
-        return new float_result {ok = 1, value = __item_from_facade};
+        return new float_result {ok = 1, value = new float_result_value { ok = __item_from_facade } };
     }
 
     internal static float_result FromFacadeError(in string err)
     {
-        return new float_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new float_result {ok = 0, value = new float_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct float_result_value
+{
+    [FieldOffset(0)]
+    internal float ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -626,44 +646,48 @@ internal partial struct float_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial float_slice fyrox_lite_upload_f32_slice(float_slice managed);
 }
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct double_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private double value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal double_result_value value;
 
     internal static unsafe double ToFacade(in double_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = __item;
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static double_result FromFacade(in double self)
     {
         var __item = self;
         var __item_from_facade = __item;
-        return new double_result {ok = 1, value = __item_from_facade};
+        return new double_result {ok = 1, value = new double_result_value { ok = __item_from_facade } };
     }
 
     internal static double_result FromFacadeError(in string err)
     {
-        return new double_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new double_result {ok = 0, value = new double_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct double_result_value
+{
+    [FieldOffset(0)]
+    internal double ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -750,44 +774,48 @@ internal partial struct double_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial double_slice fyrox_lite_upload_f64_slice(double_slice managed);
 }
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct NativeString_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal NativeString_result_value value;
 
     internal static unsafe string ToFacade(in NativeString_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = NativeString.ToFacade(__item);
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static NativeString_result FromFacade(in string self)
     {
         var __item = self;
         var __item_from_facade = NativeString.FromFacade(__item);
-        return new NativeString_result {ok = 1, value = __item_from_facade};
+        return new NativeString_result {ok = 1, value = new NativeString_result_value { ok = __item_from_facade } };
     }
 
     internal static NativeString_result FromFacadeError(in string err)
     {
-        return new NativeString_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new NativeString_result {ok = 0, value = new NativeString_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct NativeString_result_value
+{
+    [FieldOffset(0)]
+    internal NativeString ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -874,44 +902,48 @@ internal partial struct NativeString_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial NativeString_slice fyrox_lite_upload_String_slice(NativeString_slice managed);
 }
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct NativeInstanceId_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private NativeInstanceId value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal NativeInstanceId_result_value value;
 
     internal static unsafe object ToFacade(in NativeInstanceId_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = NativeInstanceId.ToFacade(__item);
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static NativeInstanceId_result FromFacade(in object self)
     {
         var __item = self;
         var __item_from_facade = NativeInstanceId.FromFacade(__item);
-        return new NativeInstanceId_result {ok = 1, value = __item_from_facade};
+        return new NativeInstanceId_result {ok = 1, value = new NativeInstanceId_result_value { ok = __item_from_facade } };
     }
 
     internal static NativeInstanceId_result FromFacadeError(in string err)
     {
-        return new NativeInstanceId_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new NativeInstanceId_result {ok = 0, value = new NativeInstanceId_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct NativeInstanceId_result_value
+{
+    [FieldOffset(0)]
+    internal NativeInstanceId ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -998,7 +1030,7 @@ internal partial struct NativeInstanceId_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial NativeInstanceId_slice fyrox_lite_upload_crate_UserScriptImpl_slice(NativeInstanceId_slice managed);
 }
 
@@ -1055,7 +1087,7 @@ internal partial struct NativeScriptMetadata_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial NativeScriptMetadata_slice fyrox_lite_upload_NativeScriptMetadata_slice(NativeScriptMetadata_slice managed);
 }
 
@@ -1112,7 +1144,7 @@ internal partial struct NativeScriptProperty_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial NativeScriptProperty_slice fyrox_lite_upload_NativeScriptProperty_slice(NativeScriptProperty_slice managed);
 }
 
@@ -1169,7 +1201,7 @@ internal partial struct NativeValue_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial NativeValue_slice fyrox_lite_upload_NativeValue_slice(NativeValue_slice managed);
 }
 
@@ -1226,42 +1258,46 @@ internal partial struct NativePropertyValue_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial NativePropertyValue_slice fyrox_lite_upload_NativePropertyValue_slice(NativePropertyValue_slice managed);
 }
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct NativeInstanceId_optional_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private NativeInstanceId_optional value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal NativeInstanceId_optional_result_value value;
 
     internal static unsafe object? ToFacade(in NativeInstanceId_optional_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = NativeInstanceId_optional.ToFacade(__item);
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static NativeInstanceId_optional_result FromFacade(in object? self)
     {
         var __item = self;
         var __item_from_facade = NativeInstanceId_optional.FromFacade(__item);
-        return new NativeInstanceId_optional_result {ok = 1, value = __item_from_facade};
+        return new NativeInstanceId_optional_result {ok = 1, value = new NativeInstanceId_optional_result_value { ok = __item_from_facade } };
     }
 
     internal static NativeInstanceId_optional_result FromFacadeError(in string err)
     {
-        return new NativeInstanceId_optional_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new NativeInstanceId_optional_result {ok = 0, value = new NativeInstanceId_optional_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct NativeInstanceId_optional_result_value
+{
+    [FieldOffset(0)]
+    internal NativeInstanceId_optional ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }

@@ -103,42 +103,46 @@ internal partial struct NativeQuaternion_slice
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial NativeQuaternion_slice fyrox_lite_upload_fyrox_lite_lite_math_PodQuaternion_slice(NativeQuaternion_slice managed);
 }
 
-[StructLayout(LayoutKind.Explicit)]
+[StructLayout(LayoutKind.Sequential)]
 internal struct NativeQuaternion_result
 {
-    [FieldOffset(0)]
-    private int ok;
-
-    [FieldOffset(sizeof(int))]
-    private NativeQuaternion value;
-
-    [FieldOffset(sizeof(int))]
-    private NativeString err;
+    internal int ok;
+    internal NativeQuaternion_result_value value;
 
     internal static unsafe Quaternion ToFacade(in NativeQuaternion_result self)
     {
         if (self.ok != 0)
         {
-            var __item = self.value;
+            var __item = self.value.ok;
             var __item_to_facade = NativeQuaternion.ToFacade(__item);
             return __item_to_facade;
         }
-        throw new Exception(NativeString.ToFacade(self.err));
+        throw new Exception(NativeString.ToFacade(self.value.err));
     }
 
     internal static NativeQuaternion_result FromFacade(in Quaternion self)
     {
         var __item = self;
         var __item_from_facade = NativeQuaternion.FromFacade(__item);
-        return new NativeQuaternion_result {ok = 1, value = __item_from_facade};
+        return new NativeQuaternion_result {ok = 1, value = new NativeQuaternion_result_value { ok = __item_from_facade } };
     }
 
     internal static NativeQuaternion_result FromFacadeError(in string err)
     {
-        return new NativeQuaternion_result {ok = 0, err = NativeString.FromFacade(err)};
+        return new NativeQuaternion_result {ok = 0, value = new NativeQuaternion_result_value { err = NativeString.FromFacade(err) } };
     }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct NativeQuaternion_result_value
+{
+    [FieldOffset(0)]
+    internal NativeQuaternion ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }

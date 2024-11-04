@@ -22,6 +22,6 @@ public static partial class Plugin
         }
     }
 
-    [LibraryImport("../../../../../target/debug/libfyrox_c.dylib", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial NativeInstanceId_result fyrox_lite_lite_plugin_LitePlugin_get(NativeClassId class_id);
 }
