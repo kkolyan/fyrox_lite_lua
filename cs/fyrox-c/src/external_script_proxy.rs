@@ -27,21 +27,20 @@ pub struct ExternalScriptProxy {
 
 impl ScriptTrait for ExternalScriptProxy {
     fn on_init(&mut self, ctx: &mut ScriptContext) {
-        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
+        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed, ctx.handle);
         invoke_callback(ctx, |app| {
             (app.functions.on_init)(self.data.inner_unpacked().unwrap().instance).into_result().handle_scripting_error();
         });
     }
 
     fn on_start(&mut self, ctx: &mut ScriptContext) {
-        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
+        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed, ctx.handle);
         invoke_callback(ctx, |app| {
             (app.functions.on_start)(self.data.inner_unpacked().unwrap().instance).into_result().handle_scripting_error();
         });
     }
 
     fn on_deinit(&mut self, ctx: &mut fyrox::script::ScriptDeinitContext) {
-        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
         invoke_callback(ctx, |app| {
             (app.functions.on_deinit)(self.data.inner_unpacked().unwrap().instance).into_result().handle_scripting_error();
         });
@@ -51,7 +50,7 @@ impl ScriptTrait for ExternalScriptProxy {
     }
 
     fn on_update(&mut self, ctx: &mut ScriptContext) {
-        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
+        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed, ctx.handle);
         let dt = ctx.dt;
         invoke_callback(ctx, |app| {
             (app.functions.on_update)(self.data.inner_unpacked().unwrap().instance, dt).into_result().handle_scripting_error();
@@ -66,7 +65,7 @@ impl ScriptTrait for ExternalScriptProxy {
         let Some(message) = message.downcast_ref::<crate::UserScriptMessageImpl>() else {
             return;
         };
-        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed);
+        self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed, ctx.handle);
         invoke_callback(ctx, |app| {
             (app.functions.on_message)(self.data.inner_unpacked().unwrap().instance, *message).into_result().handle_scripting_error();
         });

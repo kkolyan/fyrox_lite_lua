@@ -33,8 +33,8 @@ public partial struct TextBuilder
 [StructLayout(LayoutKind.Sequential)]
 internal struct TextBuilder_optional
 {
-    private TextBuilder value;
-    private int has_value;
+    internal TextBuilder value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TextBuilder? ToFacade(in TextBuilder_optional value)

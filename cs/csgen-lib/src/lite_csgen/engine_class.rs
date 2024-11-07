@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet};
+use std::ops::Deref;
 use convert_case::{Case, Casing};
 use to_vec::ToVec;
 use gen_common::code_model::{ModContent, Module};
@@ -192,6 +193,8 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
 
     if !static_class {
         wrappers::generate_optional(&mut s, rust, &DataType::Object(class.class_name.clone()), ctx);
+        wrappers::generate_result(&mut s, rust, &DataType::Object(class.class_name.clone()), ctx);
+        wrappers::generate_result(&mut s, rust, &DataType::Option(Box::new(DataType::Object(class.class_name.clone()))), ctx);
     }
 
     Module::code(&class.class_name, s)
@@ -206,16 +209,26 @@ struct Setter {
     instance: bool,
     prop_name: String,
     prop_type: DataType,
+    has_result: bool,
 }
 
 fn as_setter(method: &Method) -> Option<Setter> {
-    if method.signature.return_ty.is_none() && method.signature.params.iter().filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub)).count() == 1 && method.method_name.starts_with("set_") {
+    let (no_return, has_result) = match &method.signature.return_ty {
+        None => (true, false),
+        Some(it) => match it {
+            DataType::Unit => (true, false),
+            DataType::Result { ok } => (matches!(ok.deref(), DataType::Unit), true),
+            _ => (false, true),
+        }
+    };
+    if no_return && method.signature.params.iter().filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub)).count() == 1 && method.method_name.starts_with("set_") {
         let prop_name = method.method_name.strip_prefix("set_").unwrap().to_string();
         let prop_type = method.signature.params.first().as_ref().unwrap().ty.clone();
         return Some(Setter {
             instance: method.instance,
             prop_name,
             prop_type,
+            has_result,
         });
     }
     None
@@ -274,7 +287,7 @@ fn generate_property(s: &mut String, class: &EngineClass, getter: Option<Getter>
             ("this", &if instance { "this" } else { "" }),
         ]);
     }
-    if let Some(Setter { .. }) = setter.as_ref() {
+    if let Some(Setter { has_result, .. }) = setter.as_ref() {
         let conversion = if let CsType::Mapped { blittable, .. } = api_types::type_cs(prop_type) {
             render_string(r#"var _value = ${blittable}.FromFacade(value)"#, [("blittable", &blittable)])
         } else {
@@ -285,16 +298,27 @@ fn generate_property(s: &mut String, class: &EngineClass, getter: Option<Getter>
                     {
                         unsafe {
                             ${conversion};
-                            ${rust_path_escaped}_set_${name}(${this}${deref}_value);
-                        }
-                    }
+                            ${ret_var}${rust_path_escaped}_set_${name}(${this}${deref}_value);
         "#, [
             ("name", &prop_name),
             ("deref", &if ctx.is_struct(&prop_type) { "&" } else { "" }),
             ("rust_path_escaped", &class.rust_struct_path.to_string().replace("::", "_")),
             ("this", &if instance { "this, " } else { "" }),
             ("conversion", &conversion),
+            ("ret_var", &if *has_result {"var __ret = "} else {""}),
         ]);
+
+        if *has_result {
+
+            render(s, r#"
+                            void_result.ToFacade(__ret);
+            "#, []);
+        }
+
+        render(s, r#"
+                        }
+                    }
+            "#, []);
     }
 
     render(s, r#"
@@ -340,6 +364,7 @@ fn generate_method(
 
     if let Some(return_ty) = &method.signature.return_ty {
         let return_ty = api_types::type_cs(return_ty);
+        let rendered_return_ty = if has_class_name_arg { return_ty.to_facade_generic() } else { return_ty.to_facade() };
         render(s, r#"
 
                 public ${static}${return_ty} ${name}${generics}(${input_params})${generic_where}
@@ -347,13 +372,14 @@ fn generate_method(
                     unsafe {
                         ${converted_params}
                         var __ret = ${rust_path_escaped}_${rust_name}(${this}${output_params});
-                        return ${ret_expr}${generic_cast};
+                        ${return}${ret_expr}${generic_cast};
                     }
                 }
             "#, [
             ("static", &if !method.instance { "static " } else { "" }),
-            ("return_ty", &if has_class_name_arg { return_ty.to_facade_generic() } else { return_ty.to_facade() }),
+            ("return_ty", &rendered_return_ty),
             ("ret_expr", &if return_ty.is_mapped() { format!("{}.ToFacade(__ret)", return_ty.to_blittable()) } else { "__ret".to_string() }),
+            ("return", &if rendered_return_ty == "void" {""} else {"return "}),
             ("generic_cast", &if has_class_name_arg { " as T" } else { "" }),
             ("generic_where", &if has_class_name_arg { " where T : class" } else { "" }),
             ("name", &method.method_name.to_case(Case::Pascal)),

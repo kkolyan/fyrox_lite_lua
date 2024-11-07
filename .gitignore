@@ -10,3 +10,4 @@
 /cs/examples/*/bin
 /cs/examples/*/obj
 *.sln.DotSettings.user
+settings.ron

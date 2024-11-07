@@ -48,8 +48,8 @@ public partial struct RayCastOptions
 [StructLayout(LayoutKind.Sequential)]
 internal struct RayCastOptions_optional
 {
-    private RayCastOptions value;
-    private int has_value;
+    internal RayCastOptions value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static RayCastOptions? ToFacade(in RayCastOptions_optional value)

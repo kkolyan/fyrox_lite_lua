@@ -4,59 +4,59 @@ namespace FyroxLite
     internal static class FyroxImpls
     {
 
-        internal static int_result on_init(NativeInstanceId thiz)
+        internal static void_result on_init(NativeInstanceId thiz)
         {
             try
             {
                 GetNodeScript(thiz).OnInit();
-                return int_result.FromFacade(0);
+                return void_result.FromFacade();
             }
             catch (Exception e)
             {
-                return int_result.FromFacadeError(e.ToString());
+                return void_result.FromFacadeError(e.ToString());
             }
         }
 
-        internal static int_result on_start(NativeInstanceId thiz)
+        internal static void_result on_start(NativeInstanceId thiz)
         {
             try
             {
                 GetNodeScript(thiz).OnStart();
-                return int_result.FromFacade(0);
+                return void_result.FromFacade();
             }
             catch (Exception e)
             {
-                return int_result.FromFacadeError(e.ToString());
+                return void_result.FromFacadeError(e.ToString());
             }
         }
 
-        internal static int_result on_deinit(NativeInstanceId thiz)
+        internal static void_result on_deinit(NativeInstanceId thiz)
         {
             try
             {
                 GetNodeScript(thiz).OnDeinit();
-                return int_result.FromFacade(0);
+                return void_result.FromFacade();
             }
             catch (Exception e)
             {
-                return int_result.FromFacadeError(e.ToString());
+                return void_result.FromFacadeError(e.ToString());
             }
         }
 
-        internal static int_result on_update(NativeInstanceId thiz, float dt)
+        internal static void_result on_update(NativeInstanceId thiz, float dt)
         {
             try
             {
                 GetNodeScript(thiz).OnUpdate(dt);
-                return int_result.FromFacade(0);
+                return void_result.FromFacade();
             }
             catch (Exception e)
             {
-                return int_result.FromFacadeError(e.ToString());
+                return void_result.FromFacadeError(e.ToString());
             }
         }
 
-        internal static int_result on_message(NativeInstanceId thiz, UserScriptMessage message)
+        internal static void_result on_message(NativeInstanceId thiz, UserScriptMessage message)
         {
             try
             {
@@ -67,45 +67,50 @@ namespace FyroxLite
                 }
 
                 GetNodeScript(thiz).OnMessage(thiz);
-                return int_result.FromFacade(0);
+                return void_result.FromFacade();
             }
             catch (Exception e)
             {
-                return int_result.FromFacadeError(e.ToString());
+                return void_result.FromFacadeError(e.ToString());
             }
         }
 
-        internal static int_result on_game_init(NativeInstanceId thiz, NativeString_optional initial_scene_override)
+        internal static void_result on_game_init(NativeInstanceId thiz, NativeString_optional initial_scene_override)
         {
             try
             {
                 GetGlobalScript(thiz).OnGlobalInit(NativeString_optional.ToFacade(initial_scene_override));
-                return int_result.FromFacade(0);
+                return void_result.FromFacade();
             }
             catch (Exception e)
             {
-                return int_result.FromFacadeError(e.ToString());
+                return void_result.FromFacadeError(e.ToString());
             }
         }
 
-        internal static int_result on_game_update(NativeInstanceId thiz)
+        internal static void_result on_game_update(NativeInstanceId thiz)
         {
             try
             {
                 GetGlobalScript(thiz).OnGlobalUpdate();
-                return int_result.FromFacade(0);
+                return void_result.FromFacade();
             }
             catch (Exception e)
             {
-                return int_result.FromFacadeError(e.ToString());
+                return void_result.FromFacadeError(e.ToString());
             }
         }
 
-        internal static NativeInstanceId_result create_script_instance(NativeClassId thiz, NativePropertyValue_slice state)
+        internal static NativeInstanceId_result create_script_instance(NativeClassId thiz, NativePropertyValue_slice state, NativeHandle_optional node)
         {
             try
             {
                 var instance = Activator.CreateInstance(thiz.GetCsClass());
+                if (instance is NodeScript ns)
+                {
+                    var handle = NativeHandle_optional.ToFacade(node) ?? throw new Exception("node handle required for Node scripts, but not supplied");
+                    ns._node = new Node(handle);
+                }
                 PropertySetters.SetProperties(instance, NativePropertyValue_slice.ToFacade(state));
                 return NativeInstanceId_result.FromFacade(instance);
             }

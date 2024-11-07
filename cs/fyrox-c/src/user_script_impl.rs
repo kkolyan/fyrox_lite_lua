@@ -1,4 +1,6 @@
+use fyrox::core::pool::Handle;
 use fyrox::core::Uuid;
+use fyrox::scene::node::Node;
 use fyrox::script::PluginsRefMut;
 use fyrox_lite::{spi::UserScript, LiteDataType};
 use fyrox_lite::script_context::with_script_context;
@@ -27,12 +29,13 @@ impl UserScript for UnpackedObject {
     type UserScriptGenericStub = ();
 
     fn extract_from(
+        node: Handle<Node>,
         proxy: &mut Self::ProxyScript,
         class_name: &Self::ClassId,
         plugin: &mut Self::Plugin,
     ) -> Option<Self> {
         if &proxy.class == class_name {
-            proxy.data.ensure_unpacked(&mut plugin.failed);
+            proxy.data.ensure_unpacked(&mut plugin.failed, node);
             let script_data = &mut proxy.data.inner_unpacked();
             return Some(*script_data.expect("expected to be unpacked here"));
         }
@@ -49,12 +52,12 @@ impl UserScript for UnpackedObject {
         })
     }
 
-    fn new_instance(class: &Self::ClassId) -> Result<Self, Self::LangSpecificError> {
+    fn new_instance(node: Handle<Node>, class: &Self::ClassId) -> Result<Self, Self::LangSpecificError> {
         APP.with_borrow(|it| {
             let app = it.as_ref().unwrap();
             let uuid = app.uuid_by_class.get(class).unwrap();
             let md = app.scripts.get(uuid).unwrap();
-            let instance_id = (app.functions.create_script_instance)(md.id, Default::default()).into_result_shallow()?;
+            let instance_id = (app.functions.create_script_instance)(md.id, Default::default(), Some(node.into()).into()).into_result_shallow()?;
             Ok(UnpackedObject {
                 uuid: *uuid,
                 class: md.id,

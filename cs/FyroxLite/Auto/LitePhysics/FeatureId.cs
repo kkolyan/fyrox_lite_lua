@@ -33,8 +33,8 @@ public partial struct FeatureId
 [StructLayout(LayoutKind.Sequential)]
 internal struct FeatureId_optional
 {
-    private FeatureId value;
-    private int has_value;
+    internal FeatureId value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static FeatureId? ToFacade(in FeatureId_optional value)

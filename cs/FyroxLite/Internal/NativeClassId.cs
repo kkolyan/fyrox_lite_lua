@@ -40,7 +40,6 @@ internal partial struct NativeClassId : IEquatable<NativeClassId>
 
     internal static void Register(Type type, NativeClassId id)
     {
-        Console.WriteLine($"DEBUG C#: Associating {type.FullName} with {id}");
         _byType.GetInRightThread()[type] = id;
         _byId.GetInRightThread()[id] = type;
     }

@@ -13,11 +13,13 @@ use fyrox::{
     scene::node::Node,
 };
 use fyrox::core::algebra::Vector2;
+use crate::lite_node::LiteNode;
 use super::script_metadata::{ScriptDefinition, ScriptFieldValueType};
 
 /// Useful for persisting script data, but for some languages could be used as a runtime type
 #[derive(Clone)]
 pub struct ScriptObject<T: Lang> {
+    pub node: Handle<Node>,
     pub def: Arc<ScriptDefinition>,
     pub values: Vec<ScriptFieldValue<T>>,
 }
@@ -25,7 +27,7 @@ pub struct ScriptObject<T: Lang> {
 pub trait Lang: Debug + Clone + 'static {
     type String<'a>;
     type RuntimePin: Clone + Debug + Visit + Default;
-    type UnpackedScriptObject: Visit;
+    type UnpackedScriptObject: Visit + Debug;
 
     fn drop_runtime_pin(runtime_pin: &mut Self::RuntimePin);
     fn clone_runtime_pin(runtime_pin: &Self::RuntimePin) -> Self::RuntimePin;
@@ -82,6 +84,7 @@ impl<T: Lang> Drop for ScriptObject<T> {
 impl<T: Lang> ScriptObject<T> {
     pub fn new(def: &Arc<ScriptDefinition>) -> Self {
         ScriptObject {
+            node: Default::default(),
             def: def.clone(),
             values: def
                 .metadata

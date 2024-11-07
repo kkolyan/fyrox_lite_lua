@@ -69,6 +69,7 @@ pub fn extract_for_def(md: &NativeScriptMetadata) -> ScriptMetadata {
     let properties: Vec<_> = md.properties.into();
     let class: String = md.name.into();
     let uuid: String = md.uuid.into();
+    println!("Register class. name: {}, id: {}, uuid: {}", class, md.id.value, uuid);
     let fields = properties
         .into_iter()
         .map(|property| {

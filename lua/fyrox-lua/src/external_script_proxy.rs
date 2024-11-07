@@ -13,6 +13,7 @@ use mlua::Value;
 use send_wrapper::SendWrapper;
 use std::any::Any;
 use std::fmt::Debug;
+use fyrox_lite::lite_node::LiteNode;
 
 #[derive(Debug, Clone, ComponentProvider)]
 pub struct ExternalScriptProxy {
@@ -22,7 +23,7 @@ pub struct ExternalScriptProxy {
 
 impl ScriptTrait for ExternalScriptProxy {
     fn on_init(&mut self, ctx: &mut ScriptContext) {
-        self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed);
+        self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed, ctx.handle);
         invoke_callback(
             &mut self.data,
             ctx,
@@ -32,7 +33,7 @@ impl ScriptTrait for ExternalScriptProxy {
     }
 
     fn on_start(&mut self, ctx: &mut ScriptContext) {
-        self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed);
+        self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed, ctx.handle);
         invoke_callback(
             &mut self.data,
             ctx,
@@ -42,7 +43,6 @@ impl ScriptTrait for ExternalScriptProxy {
     }
 
     fn on_deinit(&mut self, ctx: &mut fyrox::script::ScriptDeinitContext) {
-        self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed);
         invoke_callback(
             &mut self.data,
             ctx,
@@ -52,7 +52,7 @@ impl ScriptTrait for ExternalScriptProxy {
     }
 
     fn on_update(&mut self, ctx: &mut ScriptContext) {
-        self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed);
+        self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed, ctx.handle);
         let dt = ctx.dt;
         invoke_callback(
             &mut self.data,
@@ -68,7 +68,7 @@ impl ScriptTrait for ExternalScriptProxy {
         ctx: &mut fyrox::script::ScriptMessageContext,
     ) {
         if let Some(lua_message) = message.downcast_ref::<Traitor<SendWrapper<Value>>>() {
-            self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed);
+            self.data.ensure_unpacked(&mut ctx.plugins.lua_mut().failed, ctx.handle);
             invoke_callback(
                 &mut self.data,
                 ctx,

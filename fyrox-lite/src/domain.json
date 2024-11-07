@@ -23,10 +23,19 @@
                     "Object": "Quaternion"
                   },
                   "variadic": false
+                },
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub",
+                  "variadic": false
                 }
               ],
               "return_ty": {
-                "Object": "Node"
+                "Result": {
+                  "ok": {
+                    "Object": "Node"
+                  }
+                }
               }
             }
           }
@@ -1436,9 +1445,20 @@
             "instance": true,
             "method_name": "as_rigid_body",
             "signature": {
+              "params": [
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub",
+                  "variadic": false
+                }
+              ],
               "return_ty": {
-                "Option": {
-                  "Object": "RigidBody"
+                "Result": {
+                  "ok": {
+                    "Option": {
+                      "Object": "RigidBody"
+                    }
+                  }
                 }
               }
             }
@@ -1531,8 +1551,18 @@
                     "Object": "Vector3"
                   },
                   "variadic": false
+                },
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub",
+                  "variadic": false
                 }
-              ]
+              ],
+              "return_ty": {
+                "Result": {
+                  "ok": "Unit"
+                }
+              }
             }
           },
           {
@@ -1546,8 +1576,18 @@
                     "Object": "Quaternion"
                   },
                   "variadic": false
+                },
+                {
+                  "name": "_stub",
+                  "ty": "UserScriptGenericStub",
+                  "variadic": false
                 }
-              ]
+              ],
+              "return_ty": {
+                "Result": {
+                  "ok": "Unit"
+                }
+              }
             }
           },
           {

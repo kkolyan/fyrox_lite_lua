@@ -48,8 +48,8 @@ public partial struct Intersection
 [StructLayout(LayoutKind.Sequential)]
 internal struct Intersection_optional
 {
-    private Intersection value;
-    private int has_value;
+    internal Intersection value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Intersection? ToFacade(in Intersection_optional value)

@@ -3,13 +3,13 @@ using FyroxLite;
 [Uuid("c5671d19-9f1a-4286-8486-add4ebaadaec")]
 public class Player: NodeScript
 {
-    private float Sensitivity;
-    private Node Camera;
-    private float Power;
-    private Prefab Bullet;
-    private float InitialBulletVelocity;
-    private float ShootingRange;
-    private float ReloadDelaySec;
+    private float sensitivity;
+    private Node camera;
+    private float power;
+    private Prefab bullet;
+    private float initial_bullet_velocity;
+    private float shooting_range;
+    private float reload_delay_sec;
     
     [HideInInspector]
     [Transient]
@@ -31,31 +31,31 @@ public class Player: NodeScript
 
     public void Turn(float x)
     {
-        Quaternion rotDelta = Quaternion.FromEuler(Vector3.Up * Sensitivity * x);
+        Quaternion rotDelta = Quaternion.FromEuler(Vector3.Up * sensitivity * x);
         Node.LocalRotation *= rotDelta;
     }
 
     public void Aim(float y)
     {
-        AimY += y * Sensitivity;
+        AimY += y * sensitivity;
         AimY = Math.Max(-MathF.PI / 2.0f, Math.Min(AimY, MathF.PI / 2.0f));
 
-        Camera.LocalRotation = Quaternion.FromEuler(Vector3.Right * AimY);
+        camera.LocalRotation = Quaternion.FromEuler(Vector3.Right * AimY);
     }
 
     public void Fire()
     {
-        Vector3 cameraPos = Camera.GlobalPosition;
-        Quaternion bulletOrientation = Camera.GlobalRotation;
+        Vector3 cameraPos = camera.GlobalPosition;
+        Quaternion bulletOrientation = camera.GlobalRotation;
 
         global::Bullet.Spawn(new Bullet.BulletSeed
         {
-            Prefab = Bullet,
+            Prefab = bullet,
             Origin = cameraPos,
             Direction = bulletOrientation * Vector3.Forward,
-            InitialVelocity = InitialBulletVelocity,
+            InitialVelocity = initial_bullet_velocity,
             AuthorCollider = Collider,
-            Range = ShootingRange,
+            Range = shooting_range,
             Fraction = FractionPlayer,
         });
     }
@@ -89,14 +89,14 @@ public class Player: NodeScript
         if (!Published)
         {
             Published = true;
-            Plugin.Get<Game>().Player = Node;
+            Plugin.Get<Game>().player = Node;
         }
 
         if (Input.IsMouseButton(Input.MouseLeft))
         {
             if (ReloadSec <= 0.0f)
             {
-                ReloadSec = ReloadDelaySec;
+                ReloadSec = reload_delay_sec;
                 Fire();
             }
         }
@@ -130,7 +130,7 @@ public class Player: NodeScript
 
         var selfRotation = Node.LocalRotation;
         Vector3 moveDirection = selfRotation * moveDelta;
-        Vector3 force = moveDirection * Power;
+        Vector3 force = moveDirection * power;
         Node.AsRigidBody().Value.ApplyForce(force);
     }
 }

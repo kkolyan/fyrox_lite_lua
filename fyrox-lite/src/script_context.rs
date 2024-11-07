@@ -12,7 +12,7 @@ use fyrox::{
     },
 };
 
-type StaticSc = UnifiedContext<'static, 'static, 'static>;
+pub type StaticSc = UnifiedContext<'static, 'static, 'static>;
 
 thread_local! {
     static SCRIPT_CONTEXT: RefCell<Option<&'static mut StaticSc>> = RefCell::new(None);

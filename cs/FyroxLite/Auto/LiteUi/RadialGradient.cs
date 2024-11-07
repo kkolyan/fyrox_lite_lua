@@ -33,8 +33,8 @@ public partial struct RadialGradient
 [StructLayout(LayoutKind.Sequential)]
 internal struct RadialGradient_optional
 {
-    private RadialGradient value;
-    private int has_value;
+    internal RadialGradient value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static RadialGradient? ToFacade(in RadialGradient_optional value)

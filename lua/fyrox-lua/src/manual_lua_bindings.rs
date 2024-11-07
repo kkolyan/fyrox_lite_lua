@@ -34,8 +34,8 @@ impl UserData for ScriptClass {
 
 impl UserData for Traitor<ScriptObject> {
     fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
-        fields.add_field_method_get("node", |_lua, _this| {
-            with_script_context(|ctx| Ok(ctx.handle.map(|it| Traitor::new(LiteNode::new(it)))))
+        fields.add_field_method_get("node", |_lua, this| {
+            Ok(Traitor::new(LiteNode::new(this.node)))
         });
     }
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
@@ -239,14 +239,11 @@ impl UserData for Traitor<ScriptObject> {
                             ScriptFieldValue::Prefab(it) => {
                                 *it = match value {
                                     Value::Nil => Default::default(),
-                                    _ => Some(
-                                        extract_userdata_value::<LitePrefab>(
-                                            value,
-                                            &class,
-                                            &field_name,
-                                        )?
-                                        .inner(),
-                                    ),
+                                    _ => extract_userdata_value::<LitePrefab>(
+                                        value,
+                                        &class,
+                                        &field_name,
+                                    )?.inner(),
                                 }
                             }
                             ScriptFieldValue::Vector3(it) => {

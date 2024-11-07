@@ -5,12 +5,12 @@ using FyroxLite;
 [Uuid("12371d19-9f1a-4286-8486-add4ebaadaec")]
 public class Bullet : NodeScript
 {
-    private Vector3 Velocity;
-    private float RemainingSeconds;
-    private Node AuthorCollider;
-    private int Fraction;
+    private Vector3 velocity;
+    private float remaining_sec;
+    private Node author_collider;
+    private float fraction;
 
-    public class BulletSeed
+    public struct BulletSeed
     {
         public Prefab Prefab;
         public Vector3 Origin;
@@ -26,28 +26,28 @@ public class Bullet : NodeScript
         Quaternion orientation = Basis.LookingAt(seed.Direction, Vector3.Up).GetRotationQuaternion();
         Node bullet = seed.Prefab.InstantiateAt(seed.Origin, orientation);
         Bullet script = bullet.FindScript<Bullet>();
-        script.Velocity = seed.Direction.Normalized() * seed.InitialVelocity;
-        script.RemainingSeconds = seed.Range / seed.InitialVelocity;
-        script.AuthorCollider = seed.AuthorCollider;
-        script.Fraction = seed.Fraction;
+        script.velocity = seed.Direction.Normalized() * seed.InitialVelocity;
+        script.remaining_sec = seed.Range / seed.InitialVelocity;
+        script.author_collider = seed.AuthorCollider;
+        script.fraction = seed.Fraction;
     }
 
     protected override void OnUpdate(float deltaTime)
     {
-        RemainingSeconds -= deltaTime;
-        if (RemainingSeconds <= 0.0f)
+        remaining_sec -= deltaTime;
+        if (remaining_sec <= 0.0f)
         {
             Node.Destroy();
             return;
         }
 
-        Vector3 newPos = Node.LocalPosition + Velocity * deltaTime;
+        Vector3 newPos = Node.LocalPosition + velocity * deltaTime;
 
         RayCastOptions opts = new RayCastOptions
         {
             RayOrigin = Node.LocalPosition,
-            RayDirection = Velocity.Normalized(),
-            MaxLen = Velocity.Length() * deltaTime,
+            RayDirection = velocity.Normalized(),
+            MaxLen = velocity.Length() * deltaTime,
             SortResults = true
         };
 
@@ -55,9 +55,9 @@ public class Bullet : NodeScript
 
         foreach (var hit in results)
         {
-            if (hit.Collider != AuthorCollider)
+            if (hit.Collider != author_collider)
             {
-                hit.Collider.SendHierarchical(RoutingStrategy.Up, new BulletHitMessage { Fraction = Fraction });
+                hit.Collider.SendHierarchical(RoutingStrategy.Up, new BulletHitMessage { Fraction = (int)fraction });
                 Node.Destroy();
                 return;
             }

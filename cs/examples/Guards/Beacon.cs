@@ -7,7 +7,7 @@ public class Beacon : NodeScript
     {
         Vector3 pos = Node.GlobalPosition;
 
-        Plugin.Get<Game>().Beacons.Add(pos);
+        Plugin.Get<Game>().beacons.Add(pos);
 
         Console.WriteLine($"Beacon registered: {Node}");
 

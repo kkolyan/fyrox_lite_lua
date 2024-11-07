@@ -21,8 +21,8 @@ internal partial struct NativeVector3
 [StructLayout(LayoutKind.Sequential)]
 internal struct NativeVector3_optional
 {
-    private NativeVector3 value;
-    private int has_value;
+    internal NativeVector3 value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector3? ToFacade(in NativeVector3_optional value)

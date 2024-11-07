@@ -119,8 +119,8 @@ pub(crate) fn generate_optional(s: &mut String, rust: &mut RustEmitter, wrapped_
             [StructLayout(LayoutKind.Sequential)]
             internal struct ${blittable}_optional
             {
-                private ${blittable} value;
-                private int has_value;
+                internal ${blittable} value;
+                internal int has_value;
 
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 public static ${facade}? ToFacade(in ${blittable}_optional value)

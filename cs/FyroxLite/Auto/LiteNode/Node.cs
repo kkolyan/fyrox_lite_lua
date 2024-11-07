@@ -24,7 +24,7 @@ public partial struct Node : IEquatable<Node>
         unsafe {
             
             var __ret = fyrox_lite_lite_node_LiteNode_as_rigid_body(this);
-            return RigidBody_optional.ToFacade(__ret);
+            return RigidBody_optional_result.ToFacade(__ret);
         }
     }
     public string Name
@@ -78,7 +78,8 @@ public partial struct Node : IEquatable<Node>
         {
             unsafe {
                 var _value = NativeVector3.FromFacade(value);
-                fyrox_lite_lite_node_LiteNode_set_local_position(this, &_value);
+                var __ret = fyrox_lite_lite_node_LiteNode_set_local_position(this, &_value);
+                void_result.ToFacade(__ret);
             }
         }
     }
@@ -95,7 +96,8 @@ public partial struct Node : IEquatable<Node>
         {
             unsafe {
                 var _value = NativeQuaternion.FromFacade(value);
-                fyrox_lite_lite_node_LiteNode_set_local_rotation(this, &_value);
+                var __ret = fyrox_lite_lite_node_LiteNode_set_local_rotation(this, &_value);
+                void_result.ToFacade(__ret);
             }
         }
     }
@@ -201,7 +203,7 @@ public partial struct Node : IEquatable<Node>
     }
 
     [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial RigidBody_optional fyrox_lite_lite_node_LiteNode_as_rigid_body(Node self);
+    private static unsafe partial RigidBody_optional_result fyrox_lite_lite_node_LiteNode_as_rigid_body(Node self);
 
     [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial NativeString_result fyrox_lite_lite_node_LiteNode_get_name(Node self);
@@ -225,10 +227,10 @@ public partial struct Node : IEquatable<Node>
     private static unsafe partial void fyrox_lite_lite_node_LiteNode_send_hierarchical(Node self, RoutingStrategy routing, UserScriptMessage payload);
 
     [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_node_LiteNode_set_local_position(Node self, NativeVector3* new_pos);
+    private static unsafe partial void_result fyrox_lite_lite_node_LiteNode_set_local_position(Node self, NativeVector3* new_pos);
 
     [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial void fyrox_lite_lite_node_LiteNode_set_local_rotation(Node self, NativeQuaternion* value);
+    private static unsafe partial void_result fyrox_lite_lite_node_LiteNode_set_local_rotation(Node self, NativeQuaternion* value);
 
     [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial void fyrox_lite_lite_node_LiteNode_subscribe_to(Node self);
@@ -289,8 +291,8 @@ public partial struct Node : IEquatable<Node>
 [StructLayout(LayoutKind.Sequential)]
 internal struct Node_optional
 {
-    private Node value;
-    private int has_value;
+    internal Node value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Node? ToFacade(in Node_optional value)
@@ -315,4 +317,84 @@ internal struct Node_optional
         var __item_from_facade = __item;
         return new Node_optional { value = __item_from_facade, has_value = 1 };
     }
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct Node_result
+{
+    internal int ok;
+    internal Node_result_value value;
+
+    internal static unsafe Node ToFacade(in Node_result self)
+    {
+        if (self.ok != 0)
+        {
+            var __item = self.value.ok;
+            var __item_to_facade = __item;
+            return __item_to_facade;
+        }
+        throw new Exception(NativeString.ToFacade(self.value.err));
+    }
+
+    internal static Node_result FromFacade(in Node self)
+    {
+        var __item = self;
+        var __item_from_facade = __item;
+        return new Node_result {ok = 1, value = new Node_result_value { ok = __item_from_facade } };
+    }
+
+    internal static Node_result FromFacadeError(in string err)
+    {
+        return new Node_result {ok = 0, value = new Node_result_value { err = NativeString.FromFacade(err) } };
+    }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct Node_result_value
+{
+    [FieldOffset(0)]
+    internal Node ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct Node_optional_result
+{
+    internal int ok;
+    internal Node_optional_result_value value;
+
+    internal static unsafe Node? ToFacade(in Node_optional_result self)
+    {
+        if (self.ok != 0)
+        {
+            var __item = self.value.ok;
+            var __item_to_facade = Node_optional.ToFacade(__item);
+            return __item_to_facade;
+        }
+        throw new Exception(NativeString.ToFacade(self.value.err));
+    }
+
+    internal static Node_optional_result FromFacade(in Node? self)
+    {
+        var __item = self;
+        var __item_from_facade = Node_optional.FromFacade(__item);
+        return new Node_optional_result {ok = 1, value = new Node_optional_result_value { ok = __item_from_facade } };
+    }
+
+    internal static Node_optional_result FromFacadeError(in string err)
+    {
+        return new Node_optional_result {ok = 0, value = new Node_optional_result_value { err = NativeString.FromFacade(err) } };
+    }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct Node_optional_result_value
+{
+    [FieldOffset(0)]
+    internal Node_optional ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }

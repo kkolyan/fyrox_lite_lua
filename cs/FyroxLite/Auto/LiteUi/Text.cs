@@ -73,8 +73,8 @@ public partial struct Text : IEquatable<Text>
 [StructLayout(LayoutKind.Sequential)]
 internal struct Text_optional
 {
-    private Text value;
-    private int has_value;
+    internal Text value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Text? ToFacade(in Text_optional value)
@@ -99,4 +99,84 @@ internal struct Text_optional
         var __item_from_facade = __item;
         return new Text_optional { value = __item_from_facade, has_value = 1 };
     }
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct Text_result
+{
+    internal int ok;
+    internal Text_result_value value;
+
+    internal static unsafe Text ToFacade(in Text_result self)
+    {
+        if (self.ok != 0)
+        {
+            var __item = self.value.ok;
+            var __item_to_facade = __item;
+            return __item_to_facade;
+        }
+        throw new Exception(NativeString.ToFacade(self.value.err));
+    }
+
+    internal static Text_result FromFacade(in Text self)
+    {
+        var __item = self;
+        var __item_from_facade = __item;
+        return new Text_result {ok = 1, value = new Text_result_value { ok = __item_from_facade } };
+    }
+
+    internal static Text_result FromFacadeError(in string err)
+    {
+        return new Text_result {ok = 0, value = new Text_result_value { err = NativeString.FromFacade(err) } };
+    }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct Text_result_value
+{
+    [FieldOffset(0)]
+    internal Text ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct Text_optional_result
+{
+    internal int ok;
+    internal Text_optional_result_value value;
+
+    internal static unsafe Text? ToFacade(in Text_optional_result self)
+    {
+        if (self.ok != 0)
+        {
+            var __item = self.value.ok;
+            var __item_to_facade = Text_optional.ToFacade(__item);
+            return __item_to_facade;
+        }
+        throw new Exception(NativeString.ToFacade(self.value.err));
+    }
+
+    internal static Text_optional_result FromFacade(in Text? self)
+    {
+        var __item = self;
+        var __item_from_facade = Text_optional.FromFacade(__item);
+        return new Text_optional_result {ok = 1, value = new Text_optional_result_value { ok = __item_from_facade } };
+    }
+
+    internal static Text_optional_result FromFacadeError(in string err)
+    {
+        return new Text_optional_result {ok = 0, value = new Text_optional_result_value { err = NativeString.FromFacade(err) } };
+    }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct Text_optional_result_value
+{
+    [FieldOffset(0)]
+    internal Text_optional ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }

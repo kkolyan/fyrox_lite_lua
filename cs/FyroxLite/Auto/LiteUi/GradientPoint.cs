@@ -33,8 +33,8 @@ public partial struct GradientPoint
 [StructLayout(LayoutKind.Sequential)]
 internal struct GradientPoint_optional
 {
-    private GradientPoint value;
-    private int has_value;
+    internal GradientPoint value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static GradientPoint? ToFacade(in GradientPoint_optional value)

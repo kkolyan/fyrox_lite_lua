@@ -33,8 +33,8 @@ public partial struct InteractionGroups
 [StructLayout(LayoutKind.Sequential)]
 internal struct InteractionGroups_optional
 {
-    private InteractionGroups value;
-    private int has_value;
+    internal InteractionGroups value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static InteractionGroups? ToFacade(in InteractionGroups_optional value)

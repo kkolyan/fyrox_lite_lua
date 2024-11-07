@@ -4,7 +4,10 @@ namespace FyroxLite;
 
 public abstract class NodeScript
 {
-    public ref Node Node => throw new Exception();
+    [HideInInspector]
+    [Transient]
+    internal Node _node;
+    public ref Node Node => ref _node;
 
     protected internal virtual void OnInit()
     {

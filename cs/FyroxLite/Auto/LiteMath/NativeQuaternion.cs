@@ -22,8 +22,8 @@ internal partial struct NativeQuaternion
 [StructLayout(LayoutKind.Sequential)]
 internal struct NativeQuaternion_optional
 {
-    private NativeQuaternion value;
-    private int has_value;
+    internal NativeQuaternion value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Quaternion? ToFacade(in NativeQuaternion_optional value)

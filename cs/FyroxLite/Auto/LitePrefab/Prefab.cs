@@ -25,12 +25,12 @@ public partial struct Prefab : IEquatable<Prefab>
             var _position = NativeVector3.FromFacade(position);
             var _orientation = NativeQuaternion.FromFacade(orientation);
             var __ret = fyrox_lite_lite_prefab_LitePrefab_instantiate_at(this, &_position, &_orientation);
-            return __ret;
+            return Node_result.ToFacade(__ret);
         }
     }
 
     [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial Node fyrox_lite_lite_prefab_LitePrefab_instantiate_at(Prefab self, NativeVector3* position, NativeQuaternion* orientation);
+    private static unsafe partial Node_result fyrox_lite_lite_prefab_LitePrefab_instantiate_at(Prefab self, NativeVector3* position, NativeQuaternion* orientation);
 
     public bool Equals(Prefab other)
     {
@@ -61,8 +61,8 @@ public partial struct Prefab : IEquatable<Prefab>
 [StructLayout(LayoutKind.Sequential)]
 internal struct Prefab_optional
 {
-    private Prefab value;
-    private int has_value;
+    internal Prefab value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Prefab? ToFacade(in Prefab_optional value)
@@ -87,4 +87,84 @@ internal struct Prefab_optional
         var __item_from_facade = __item;
         return new Prefab_optional { value = __item_from_facade, has_value = 1 };
     }
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct Prefab_result
+{
+    internal int ok;
+    internal Prefab_result_value value;
+
+    internal static unsafe Prefab ToFacade(in Prefab_result self)
+    {
+        if (self.ok != 0)
+        {
+            var __item = self.value.ok;
+            var __item_to_facade = __item;
+            return __item_to_facade;
+        }
+        throw new Exception(NativeString.ToFacade(self.value.err));
+    }
+
+    internal static Prefab_result FromFacade(in Prefab self)
+    {
+        var __item = self;
+        var __item_from_facade = __item;
+        return new Prefab_result {ok = 1, value = new Prefab_result_value { ok = __item_from_facade } };
+    }
+
+    internal static Prefab_result FromFacadeError(in string err)
+    {
+        return new Prefab_result {ok = 0, value = new Prefab_result_value { err = NativeString.FromFacade(err) } };
+    }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct Prefab_result_value
+{
+    [FieldOffset(0)]
+    internal Prefab ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct Prefab_optional_result
+{
+    internal int ok;
+    internal Prefab_optional_result_value value;
+
+    internal static unsafe Prefab? ToFacade(in Prefab_optional_result self)
+    {
+        if (self.ok != 0)
+        {
+            var __item = self.value.ok;
+            var __item_to_facade = Prefab_optional.ToFacade(__item);
+            return __item_to_facade;
+        }
+        throw new Exception(NativeString.ToFacade(self.value.err));
+    }
+
+    internal static Prefab_optional_result FromFacade(in Prefab? self)
+    {
+        var __item = self;
+        var __item_from_facade = Prefab_optional.FromFacade(__item);
+        return new Prefab_optional_result {ok = 1, value = new Prefab_optional_result_value { ok = __item_from_facade } };
+    }
+
+    internal static Prefab_optional_result FromFacadeError(in string err)
+    {
+        return new Prefab_optional_result {ok = 0, value = new Prefab_optional_result_value { err = NativeString.FromFacade(err) } };
+    }
+}
+
+[StructLayout(LayoutKind.Explicit)]
+internal struct Prefab_optional_result_value
+{
+    [FieldOffset(0)]
+    internal Prefab_optional ok;
+
+    [FieldOffset(0)]
+    internal NativeString err;
 }

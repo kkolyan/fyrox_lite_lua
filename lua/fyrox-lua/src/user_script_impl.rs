@@ -9,6 +9,8 @@ use crate::{
 use fyrox_lite::{script_context::with_script_context, spi::UserScript, LiteDataType};
 use mlua::{UserDataRef, Value};
 use send_wrapper::SendWrapper;
+use fyrox::core::pool::Handle;
+use fyrox::scene::node::Node;
 use fyrox_lite::spi::ClassId;
 
 impl<'a> UserScript for TypedUserData<'a, Traitor<ScriptObject>> {
@@ -25,12 +27,13 @@ impl<'a> UserScript for TypedUserData<'a, Traitor<ScriptObject>> {
     type UserScriptGenericStub = ();
 
     fn extract_from(
+        node: Handle<Node>,
         proxy: &mut Self::ProxyScript,
         class: &Self::ClassId,
         plugin: &mut Self::Plugin,
     ) -> Option<Self> {
         if &proxy.name == class {
-            proxy.data.ensure_unpacked(&mut plugin.failed);
+            proxy.data.ensure_unpacked(&mut plugin.failed, node);
             let script_data = &mut proxy.data.inner_unpacked();
             return Some(TypedUserData::clone(
                 &script_data.expect("expected to be unpacked here").0,
@@ -72,7 +75,7 @@ impl<'a> UserScript for TypedUserData<'a, Traitor<ScriptObject>> {
         mlua::Error::runtime(msg)
     }
 
-    fn new_instance(class_id: &Self::ClassId) -> Result<Self, Self::LangSpecificError> {
+    fn new_instance(node: Handle<Node>, class_id: &Self::ClassId) -> Result<Self, Self::LangSpecificError> {
         let class = lua_vm()
             .globals()
             .get::<_, Option<UserDataRef<ScriptClass>>>(class_id.clone())?;
@@ -82,7 +85,9 @@ impl<'a> UserScript for TypedUserData<'a, Traitor<ScriptObject>> {
         let Some(def) = &class.def else {
             return Err(lua_error!("invalid class: {}", class_id.lookup_class_name()));
         };
-        let obj = lua_vm().create_userdata(Traitor::new(ScriptObject::new(def)))?;
+        let mut script_object = ScriptObject::new(def);
+        script_object.node = node;
+        let obj = lua_vm().create_userdata(Traitor::new(script_object))?;
         Ok(TypedUserData::<Traitor<ScriptObject>>::new(obj))
     }
 }

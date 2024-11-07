@@ -1,5 +1,6 @@
 use std::fmt::Debug;
-
+use fyrox::core::pool::Handle;
+use fyrox::scene::node::Node;
 use fyrox::script::{ScriptMessagePayload, ScriptTrait};
 
 pub trait ClassId: LiteDataType + Clone {
@@ -17,6 +18,7 @@ pub trait UserScript: Sized + LiteDataType {
     type UserScriptGenericStub: LiteDataType + Copy;
 
     fn extract_from(
+        node: Handle<Node>,
         proxy: &mut Self::ProxyScript,
         class_id: &Self::ClassId,
         ctx: &mut Self::Plugin,
@@ -24,7 +26,7 @@ pub trait UserScript: Sized + LiteDataType {
 
     fn into_proxy_script(self, class_id: &Self::ClassId) -> Result<Self::ProxyScript, Self::LangSpecificError>;
 
-    fn new_instance(class_id: &Self::ClassId) -> Result<Self, Self::LangSpecificError>;
+    fn new_instance(node: Handle<Node>, class_id: &Self::ClassId) -> Result<Self, Self::LangSpecificError>;
 
     fn find_plugin_script(class_name: &Self::ClassId) -> Result<Self, Self::LangSpecificError>;
 

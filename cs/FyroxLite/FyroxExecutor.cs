@@ -9,8 +9,12 @@ public partial class FyroxExecutor
     [LibraryImport("libfyrox_c", EntryPoint = "fyrox_lite_executor_run",
         SetLastError = true)]
     private static partial void RunInternal();
+    
+    [LibraryImport("libfyrox_c", EntryPoint = "fyrox_lite_editor_run",
+        SetLastError = true)]
+    private static partial void RunEditorInternal();
 
-    public static void Run()
+    public static void Run(bool editor = false)
     {
         ObjectRegistry.InitThread();
         NativeClassId.InitThread();
@@ -67,7 +71,14 @@ public partial class FyroxExecutor
         });
         Console.WriteLine("running main loop");
 
-        RunInternal();
+        if (editor)
+        {
+            RunEditorInternal();
+        }
+        else
+        {
+            RunInternal();
+        }
     }
 
     private static void RegisterScript(Type type, List<NativeScriptMetadata> scripts, Guid uuid, NativeScriptKind kind)
@@ -75,17 +86,24 @@ public partial class FyroxExecutor
         var properties = new List<NativeScriptProperty>();
         var propertySetters = new Dictionary<string, (NativeValueType, PropertySetters.SetPropertyDelegate)>();
 
-        foreach (var field in type.GetFields(BindingFlags.Instance))
+        var fieldInfos = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+        foreach (var field in fieldInfos)
         {
-            var (fieldType, fieldSetter) = ExtractFieldType(field.FieldType);
+            var hideInInspector = kind == NativeScriptKind.Global || field.GetCustomAttribute<HideInInspectorAttribute>() != null;
+            var transient = field.GetCustomAttribute<TransientAttribute>() != null;
+//            Console.WriteLine($"registering property {field.Name}. transient: {transient}, hidden: {hideInInspector}");
+            if (hideInInspector && transient)
+            {
+                continue;
+            }
+            var (fieldType, fieldSetter) = ExtractFieldType(field);
             properties.Add(new NativeScriptProperty
             {
                 id = properties.Count,
                 name = NativeString.FromFacade(field.Name),
                 ty = fieldType,
-                hide_in_inspector =
-                    NativeBool.FromFacade(field.GetCustomAttribute<HideInInspectorAttribute>() != null),
-                transient = NativeBool.FromFacade(field.GetCustomAttribute<TransientAttribute>() != null),
+                hide_in_inspector = NativeBool.FromFacade(hideInInspector),
+                transient = NativeBool.FromFacade(transient),
             });
             propertySetters.Add(field.Name, (fieldType, (o, value) => fieldSetter(o, field, value)));
         }
@@ -113,11 +131,14 @@ public partial class FyroxExecutor
 
     private delegate void SetField(object o, FieldInfo field, NativeValue value);
 
-    private static (NativeValueType, SetField) ExtractFieldType(Type type)
+    private static (NativeValueType, SetField) ExtractFieldType(FieldInfo field)
     {
         // @formatter:off
         
         // value types
+        
+        var ownerType = field.DeclaringType;
+        var type = field.FieldType;
         
         if (type == typeof(bool)) return (NativeValueType.@bool, (o, field, value) => field.SetValue(o, NativeBool.ToFacade(value.@bool)));
         if (type == typeof(float)) return (NativeValueType.f32, (o, field, value) => field.SetValue(o, value.f32));
@@ -128,13 +149,14 @@ public partial class FyroxExecutor
         if (type == typeof(string)) return (NativeValueType.String, (o, field, value) => field.SetValue(o, NativeString.ToFacade(value.String)));
         if (type == typeof(Vector3)) return (NativeValueType.Vector3, (o, field, value) => field.SetValue(o, NativeVector3.ToFacade(value.Vector3)));
         if (type == typeof(Quaternion)) return (NativeValueType.Quaternion, (o, field, value) => field.SetValue(o, NativeQuaternion.ToFacade(value.Quaternion)));
+        if (type == typeof(Prefab)) return (NativeValueType.Prefab, (o, field, value) => field.SetValue(o, new Prefab(value.Handle)));
         
         // node-backed types, prefabs
-        var fromHandle = type.GetConstructor([typeof(NativeHandle)]);
+        var fromHandle = type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,[typeof(NativeHandle)]);
         if (fromHandle != null) {
             return (NativeValueType.Handle, (o, field, value) => field.SetValue(o, fromHandle.Invoke([value.Handle])));}
 
-        throw new Exception($"ERROR [FyroxLite] Unsupported field type: {type}");
+        throw new Exception($"Field `{ownerType.FullName}::{field.Name}` ({type}) has unsupported field type. Mark it with [Transient] and [HideInInspector] if you still want to use it without persistence and inspecting support.");
         // @formatter:on
     }
 

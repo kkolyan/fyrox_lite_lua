@@ -38,8 +38,8 @@ public partial struct LinearGradient
 [StructLayout(LayoutKind.Sequential)]
 internal struct LinearGradient_optional
 {
-    private LinearGradient value;
-    private int has_value;
+    internal LinearGradient value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static LinearGradient? ToFacade(in LinearGradient_optional value)

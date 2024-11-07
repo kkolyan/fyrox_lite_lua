@@ -2,10 +2,11 @@ use std::{
     ffi::{c_char, CString},
     fmt::Display,
 };
-
+use std::fmt::{Debug, Formatter};
 use fyrox::core::{algebra::iter, pool::Handle};
 use fyrox_lite::{lite_math::{PodQuaternion, PodVector3}, spi::UserScript, LiteDataType};
-use crate::bindings_lite_2::{i32_result, u8_slice, NativeInstanceId_result, NativePropertyValue_slice, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeString_optional, NativeValue_slice, NativeVector2, NativeVector2I, NativeVector3};
+use fyrox_lite::spi::ClassId;
+use crate::bindings_lite_2::{f64_result, f64_result_value, i32_result, u8_slice, NativeHandle_optional, NativeInstanceId_result, NativePrefab, NativePropertyValue_slice, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeString_optional, NativeValue_slice, NativeVector2, NativeVector2I, NativeVector3};
 use crate::c_lang::CCompatibleLang;
 use crate::scripted_app::{ScriptedApp, APP};
 
@@ -23,9 +24,15 @@ pub struct NativeInstanceId {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Hash, PartialEq, Eq)]
 pub struct NativeClassId {
     pub value: i32,
+}
+
+impl Debug for NativeClassId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}({})", self.lookup_class_name(), self.value)
+    }
 }
 
 #[repr(C)]
@@ -101,6 +108,13 @@ pub struct NativeString {
     pub data: u8_slice
 }
 
+impl Debug for NativeString {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let s: String = self.data.into();
+        write!(f, "{:?}", s)
+    }
+}
+
 impl From<NativeString> for String {
     fn from(value: NativeString) -> Self {
         value.data.into()
@@ -123,7 +137,6 @@ pub union NativeValue {
     pub i32: i32,
     pub i64: i64,
     pub String: NativeString,
-    /// Node and their derivatives. also, Resource passed as the handles in the specially allocated pool of Resource. because Fyrox Resource is not portable itself.
     pub Handle: NativeHandle,
     pub Vector3: NativeVector3,
     pub Vector2: NativeVector2,
@@ -137,6 +150,12 @@ pub struct NativePropertyValue {
     pub name: NativeString,
     pub ty: NativeValueType,
     pub value: NativeValue,
+}
+
+impl Debug for NativePropertyValue {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{{ {:?}: {:?} }}", self.name, self.ty)
+    }
 }
 
 pub trait NativeType: Sized {
@@ -219,16 +238,16 @@ pub struct NativeScriptAppFunctions {
     pub create_script_instance: CreateScriptInstance,
 }
 
-pub type NodeOnUpdate = extern "C" fn(thiz: NativeInstanceId, dt: f32) -> i32_result;
-pub type NodeOnInit = extern "C" fn(thiz: NativeInstanceId) -> i32_result;
-pub type NodeOnDeinit = extern "C" fn(thiz: NativeInstanceId) -> i32_result;
-pub type NodeOnStart = extern "C" fn(thiz: NativeInstanceId) -> i32_result;
-pub type NodeOnMessage = extern "C" fn(thiz: NativeInstanceId, message: UserScriptMessage) -> i32_result;
+pub type NodeOnUpdate = extern "C" fn(thiz: NativeInstanceId, dt: f32) -> Unit_result;
+pub type NodeOnInit = extern "C" fn(thiz: NativeInstanceId) -> Unit_result;
+pub type NodeOnDeinit = extern "C" fn(thiz: NativeInstanceId) -> Unit_result;
+pub type NodeOnStart = extern "C" fn(thiz: NativeInstanceId) -> Unit_result;
+pub type NodeOnMessage = extern "C" fn(thiz: NativeInstanceId, message: UserScriptMessage) -> Unit_result;
 
-pub type GameOnInit = extern "C" fn(thiz: NativeInstanceId, initial_scene_override: NativeString_optional) -> i32_result;
-pub type GameOnUpdate = extern "C" fn(thiz: NativeInstanceId) -> i32_result;
+pub type GameOnInit = extern "C" fn(thiz: NativeInstanceId, initial_scene_override: NativeString_optional) -> Unit_result;
+pub type GameOnUpdate = extern "C" fn(thiz: NativeInstanceId) -> Unit_result;
 
-pub type CreateScriptInstance = extern "C" fn(thiz: NativeClassId, state: NativePropertyValue_slice) -> NativeInstanceId_result;
+pub type CreateScriptInstance = extern "C" fn(thiz: NativeClassId, state: NativePropertyValue_slice, node: NativeHandle_optional) -> NativeInstanceId_result;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -253,5 +272,43 @@ impl From<bool> for NativeBool {
 impl From<NativeBool> for bool {
     fn from(value: NativeBool) -> Self {
         value.value != 0
+    }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct Unit_result {
+    pub ok: i32,
+    pub err: NativeString,
+}
+
+impl Unit_result {
+    pub fn into_result(self) -> Result<(), crate::LangSpecificError> {
+        if self.ok != 0 {
+            Ok(())
+        } else {
+            Err(self.err.into())
+        }
+    }
+}
+
+impl From<Result<(), crate::LangSpecificError>> for Unit_result {
+    fn from(value: Result<(), crate::LangSpecificError>) -> Self {
+        match value {
+            Ok(_) => Self {
+                ok: 1,
+                err: unsafe { std::mem::zeroed() },
+            },
+            Err(err) => Self {
+                ok: 0,
+                err: err.into(),
+            },
+        }
+    }
+}
+
+impl From<Unit_result> for Result<(), crate::LangSpecificError> {
+    fn from(value: Unit_result) -> Self {
+        value.into_result()
     }
 }

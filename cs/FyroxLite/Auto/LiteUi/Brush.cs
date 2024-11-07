@@ -38,8 +38,8 @@ public partial struct Brush
 [StructLayout(LayoutKind.Sequential)]
 internal struct Brush_optional
 {
-    private Brush value;
-    private int has_value;
+    internal Brush value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Brush? ToFacade(in Brush_optional value)

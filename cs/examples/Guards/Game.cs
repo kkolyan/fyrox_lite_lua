@@ -5,17 +5,18 @@ using FyroxLite;
 
 public class Game : GlobalScript
 {
-    public Node Player;
-    public List<Vector3> Beacons;
-    private int Frags;
-    private int Wounds;
-    private Text Hud;
+    public Node player;
+    [Transient]
+    public List<Vector3> beacons;
+    private int frags;
+    private int wounds;
+    private Text hud;
 
     protected override void OnGlobalInit(string? initialSceneOverride)
     {
         Scene.LoadAsync(initialSceneOverride ?? "data/scene.rgs");
 
-        Hud = Text.New(new TextBuilder
+        hud = Text.New(new TextBuilder
         {
             FontSize = 40,
             Foreground = new Brush
@@ -24,21 +25,21 @@ public class Game : GlobalScript
             }
         });
 
-        Beacons = new List<Vector3>();
+        beacons = new List<Vector3>();
     }
 
     protected override void OnGlobalUpdate()
     {
-        Hud.TextAsync = $"Wounds: {Wounds}\nKilled Guards: {Frags}";
+        hud.TextAsync = $"Wounds: {wounds}\nKilled Guards: {frags}";
     }
 
     public void IncFrags()
     {
-        Frags += 1;
+        frags += 1;
     }
 
     public void IncWounds()
     {
-        Wounds += 1;
+        wounds += 1;
     }
 }

@@ -109,11 +109,9 @@ impl Default for CPlugin {
 
 impl Plugin for CPlugin {
     fn register(&self, context: PluginRegistrationContext) {
-        println!("CPlugin::register");
         APP.with_borrow(|app| {
             let app = app.as_ref().unwrap();
             for md in app.scripts.values() {
-                println!("registering {}", md.md.class);
                 let def = Arc::new(ScriptDefinition {
                     metadata: md.md.clone(),
                     assembly_name: self.assembly_name(),
@@ -143,9 +141,9 @@ impl Plugin for CPlugin {
                             .unwrap();
                     }
                     ScriptKind::Global => {
-                        if let Some(instance) = (app.functions.create_script_instance)(class, Default::default())
+                        if let Some(instance) = (app.functions.create_script_instance)(class, Default::default(), None.into())
                             .into_result_shallow()
-                            .handle_scripting_error() 
+                            .handle_scripting_error()
                         {
                             let mut plugin_scripts = self.scripts.borrow_mut();
                             plugin_scripts.inner_mut().push(ExternalScriptProxy {
@@ -156,7 +154,7 @@ impl Plugin for CPlugin {
                                     class,
                                     instance,
                                 }),
-                            });   
+                            });
                         }
                     }
                 }
@@ -168,7 +166,7 @@ impl Plugin for CPlugin {
     fn init(&mut self, scene_path: Option<&str>, mut context: PluginContext) {
         Input::init_thread_local_state();
         for script in self.scripts.borrow_mut().0.iter_mut() {
-            script.data.ensure_unpacked(&mut self.failed);
+            script.data.ensure_unpacked(&mut self.failed, Default::default());
             invoke_callback(&mut context, |app| {
                 let scene_path = scene_path.map(|it| it.to_string()).into();
                 let id = script.data.inner_unpacked().unwrap().instance;
@@ -180,7 +178,7 @@ impl Plugin for CPlugin {
 
     fn update(&mut self, context: &mut PluginContext) {
         for script in self.scripts.borrow_mut().0.iter_mut() {
-            script.data.ensure_unpacked(&mut self.failed);
+            script.data.ensure_unpacked(&mut self.failed, Default::default());
             invoke_callback(context, |app| {
                 (app.functions.on_game_update)(script.data.inner_unpacked().unwrap().instance).into_result().handle_scripting_error();
             });

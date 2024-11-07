@@ -69,6 +69,7 @@ fn generate_base(rust: &mut RustEmitter, ctx: &GenerationContext) -> Module {
     wrappers::generate_slice(&mut s, rust, &DataType::Object(ClassName("NativeScriptMetadata".to_string())), ctx);
     wrappers::generate_slice(&mut s, rust, &DataType::Object(ClassName("NativeScriptProperty".to_string())), ctx);
     wrappers::generate_slice(&mut s, rust, &DataType::Object(ClassName("NativeValue".to_string())), ctx);
+    wrappers::generate_optional(&mut s, rust, &DataType::Object(ClassName("NativeHandle".to_string())), ctx);
     wrappers::generate_slice(&mut s, rust, &DataType::Object(ClassName("NativePropertyValue".to_string())), ctx);
     wrappers::generate_result(&mut s, rust, &DataType::Option(Box::new(DataType::UserScript)), ctx);
     Module::code("LiteBase", s)

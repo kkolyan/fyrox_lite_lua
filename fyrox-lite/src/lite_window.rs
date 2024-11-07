@@ -22,7 +22,7 @@ impl LiteWindow {
                     LiteCursorGrabMode::Locked => CursorGrabMode::Locked,
                 });
             if let Err(err) = result {
-                Log::err(format!("set_cursor_grab failed: {}", err));
+                Log::warn(format!("set_cursor_grab failed: {}", err));
             }
         });
     }

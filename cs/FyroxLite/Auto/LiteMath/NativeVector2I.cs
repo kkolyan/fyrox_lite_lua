@@ -20,8 +20,8 @@ internal partial struct NativeVector2I
 [StructLayout(LayoutKind.Sequential)]
 internal struct NativeVector2I_optional
 {
-    private NativeVector2I value;
-    private int has_value;
+    internal NativeVector2I value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2I? ToFacade(in NativeVector2I_optional value)

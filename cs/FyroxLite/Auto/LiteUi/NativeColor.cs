@@ -22,8 +22,8 @@ internal partial struct NativeColor
 [StructLayout(LayoutKind.Sequential)]
 internal struct NativeColor_optional
 {
-    private NativeColor value;
-    private int has_value;
+    internal NativeColor value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Color? ToFacade(in NativeColor_optional value)

@@ -15,6 +15,7 @@ use lite_macro::lite_api;
 
 use crate::{lite_physics::LiteRigidBody, script_context::with_script_context};
 use fyrox::graph::BaseSceneGraph;
+use crate::script_context::StaticSc;
 
 #[derive(Clone, Copy, Eq, PartialEq, Default)]
 pub struct LiteNode {
@@ -35,19 +36,52 @@ impl LiteNode {
     pub fn inner(&self) -> Handle<Node> {
         self.handle
     }
+
+    fn with_node_mut<T: UserScript, R>(
+        &self,
+        f: impl FnOnce(&mut Node) -> Result<R, T::LangSpecificError>,
+    ) -> Result<R, T::LangSpecificError> {
+        with_script_context(|ctx| {
+            let Some(scene) = &mut ctx.scene else {
+                return Err(T::create_error("scene unavailable"));
+            };
+            if self.handle.is_none() {
+                return Err(T::create_error("this node is null reference"));
+            }
+            let Some(node) = scene.graph.try_get_mut(self.handle) else {
+                return Err(T::create_error(format!("attempt to access detached node {}", self.handle).as_str()));
+            };
+            f(node)
+        })
+    }
+
+}
+
+macro_rules! extract_node {
+    ($ctx:expr,$self:expr) => {
+        {
+            let Some(scene) = &mut $ctx.scene else {
+                return Err(T::create_error("scene unavailable"));
+            };
+            let Some(node) = scene.graph.try_get($self.handle) else {
+                return Err(T::create_error(format!("attempt to access detached node {}", $self.handle).as_str()));
+            };
+            node
+        }
+    };
 }
 
 #[lite_api(class=Node, eq)]
 impl LiteNode {
-    pub fn as_rigid_body(&mut self) -> Option<LiteRigidBody> {
-        with_script_context(|ctx| {
-            if ctx.scene.as_ref().expect("scene unavailable").graph[self.handle].is_rigid_body() {
+    pub fn as_rigid_body<T: UserScript>(&mut self, _stub: T::UserScriptGenericStub) -> Result<Option<LiteRigidBody>, T::LangSpecificError> {
+        self.with_node_mut::<T, _>(|node| {
+            Ok(if node.is_rigid_body() {
                 Some(LiteRigidBody {
                     handle: self.handle,
                 })
             } else {
                 None
-            }
+            })
         })
     }
 
@@ -132,20 +166,22 @@ impl LiteNode {
         });
     }
 
-    pub fn set_local_position(&self, new_pos: PodVector3) {
-        with_script_context(|ctx| {
-            ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
+    pub fn set_local_position<T: UserScript>(&self, new_pos: PodVector3, _stub: T::UserScriptGenericStub) -> Result<(), T::LangSpecificError> {
+        self.with_node_mut::<T, _>(move |node| {
+            node
                 .local_transform_mut()
                 .set_position(new_pos.into());
-        });
+            Ok(())
+        })
     }
 
-    pub fn set_local_rotation(&self, value: PodQuaternion) {
-        with_script_context(|ctx| {
-            ctx.scene.as_mut().expect("scene unavailable").graph[self.handle]
+    pub fn set_local_rotation<T: UserScript>(&self, value: PodQuaternion, _stub: T::UserScriptGenericStub) -> Result<(), T::LangSpecificError> {
+        self.with_node_mut::<T, _>(|node| {
+            node
                 .local_transform_mut()
                 .set_rotation(value.into());
-        });
+            Ok(())
+        })
     }
 
     pub fn subscribe_to<T: UserScript>(&self, _stub: T::UserScriptGenericStub) {
@@ -183,9 +219,9 @@ impl LiteNode {
         if self.find_script::<T>(class_id.clone(), _stub)?.is_some() {
             return Err(T::create_error(format!("node {:?} already contains script of class {}", self, class_id.lookup_class_name()).as_str()))
         }
-        let script = T::new_instance(&class_id)?;
+        let script = T::new_instance(self.handle, &class_id)?;
         let proxy = T::into_proxy_script(script, &class_id)?;
-        
+
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
             node.add_script(proxy);
@@ -195,14 +231,20 @@ impl LiteNode {
     }
 
     pub fn find_script<T: UserScript>(&self, class_id: T::ClassId, _stub: T::UserScriptGenericStub) -> Result<Option<T>, T::LangSpecificError> {
+        println!("DEBUG: find script of type {:?}", class_id);
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
+            println!("number of scripts: {}", node.scripts().count());
+            for x in node.scripts() {
+                println!("script {}", x.type_name());
+            }
             for script in node.try_get_scripts_mut::<T::ProxyScript>() {
+                println!("DEBUG: check script {:?}", script);
                 let Some(plugin) = &mut ctx.plugins else {
                     return Err(T::create_error("plugins access not allowed from Plugin scripts"));
                 };
                 let plugin = plugin.of_type_mut::<T::Plugin>().expect("WTF: Lua plugin unavailable");
-                if let Some(r) = T::extract_from(script, &class_id, plugin) {
+                if let Some(r) = T::extract_from(self.handle, script, &class_id, plugin) {
                     return Ok(Some(r));
                 }
             }

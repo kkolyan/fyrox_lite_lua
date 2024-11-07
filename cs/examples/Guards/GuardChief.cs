@@ -6,38 +6,38 @@ using FyroxLite;
 [Uuid("c69ae5fa-de26-4ee5-b70c-113df285f6e2")]
 public class GuardChief : NodeScript
 {
-    private Prefab GuardPrefab;
-    private int InitialCount;
+    private Prefab gaurd_prefab;
+    private float initial_count;
     
     [HideInInspector]
     [Transient]
-    private bool Initialized;
+    private bool initialized;
     
     [HideInInspector]
     [Transient]
-    private bool FrameSkippedForBeacons;
+    private bool frame_skipped_for_beacons;
 
     protected override void OnUpdate(float dt)
     {
-        if (!FrameSkippedForBeacons)
+        if (!frame_skipped_for_beacons)
         {
-            FrameSkippedForBeacons = true;
+            frame_skipped_for_beacons = true;
             return;
         }
 
-        if (!Initialized)
+        if (!initialized)
         {
-            Initialized = true;
-            for (int i = 1; i <= InitialCount; i++)
+            initialized = true;
+            for (int i = 1; i <= initial_count; i++)
             {
-                List<Vector3> beacons = Plugin.Get<Game>().Beacons;
+                List<Vector3> beacons = Plugin.Get<Game>().beacons;
                 if (beacons.Count > 0)
                 {
                     Vector3 position = beacons[new Random().Next(beacons.Count)];
                     var angle = (float)(new Random().NextDouble() * 2 * Math.PI);
                     Quaternion orientation = Quaternion.FromEuler(Vector3.Up * angle);
 
-                    Node guard = GuardPrefab.InstantiateAt(position, orientation);
+                    Node guard = gaurd_prefab.InstantiateAt(position, orientation);
                     guard.FindScript<Guard>().Init(i);
 
                     Log.Info($"Guard spawned at {position}");

@@ -8,7 +8,9 @@ use fyrox::core::Uuid;
 use std::fmt::Debug;
 use std::fmt::Formatter;
 use std::ops::DerefMut;
-
+use fyrox::core::pool::Handle;
+use fyrox::scene::node::Node;
+use crate::lite_node::LiteNode;
 use crate::script_metadata::ScriptKind;
 use crate::script_object::Lang;
 use crate::script_object::ScriptFieldValue;
@@ -38,7 +40,7 @@ impl<T: Lang> ScriptResidence<T> {
         }
     }
 
-    pub fn ensure_unpacked(self: &mut ScriptResidence<T>, failed: &mut bool) {
+    pub fn ensure_unpacked(self: &mut ScriptResidence<T>, failed: &mut bool, node: Handle<Node>) {
         if *failed {
             // don't spam logs, though, plugin is completely broken at this point
             return;
@@ -47,6 +49,7 @@ impl<T: Lang> ScriptResidence<T> {
             // script was just loaded from the scene file or safe game. unpack it!
             let data = match self {
                 ScriptResidence::Packed(it) => {
+                    it.node = node;
                     let so = T::unpack_script(it);
                     match so {
                         Ok(it) => it,
@@ -96,7 +99,10 @@ pub fn uuid_of_script<T: Lang>(script: &ScriptObject<T>) -> Uuid {
 
 impl<T: Lang> Debug for ScriptResidence<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        self.with_script_object(|it| it.fmt(f))
+        match self {
+            ScriptResidence::Packed(it) => it.fmt(f),
+            ScriptResidence::Unpacked(it) => write!(f, "Packed( {:?} )", it),
+        }
     }
 }
 
@@ -137,7 +143,22 @@ impl<T: Lang> Visit for ScriptResidence<T> {
 
 impl<T: Lang> Visit for ScriptObject<T> {
     fn visit(&mut self, name: &str, visitor: &mut Visitor) -> VisitResult {
+        let reading = visitor.is_reading();
+
         let mut guard = visitor.enter_region(name)?;
+
+        macro_rules! visit_as_f64 {
+            ($var:expr, $field_name:expr, $guard:expr, $ty:ty) => {
+                {
+                    let mut s = *$var as f64;
+                    let result = s.visit($field_name, &mut $guard);
+                    if reading {
+                       *$var = s as $ty;
+                    }
+                    result
+                }
+            };
+        }
 
         let it = self;
         let def = it.def.clone();
@@ -154,11 +175,11 @@ impl<T: Lang> Visit for ScriptObject<T> {
                 ScriptFieldValue::Quaternion(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::RuntimePin(it) => it.visit(field_name, &mut guard),
                 ScriptFieldValue::bool(it) => it.visit(field_name, &mut guard),
-                ScriptFieldValue::f32(it) => it.visit(field_name, &mut guard),
-                ScriptFieldValue::f64(it) => it.visit(field_name, &mut guard),
-                ScriptFieldValue::i16(it) => it.visit(field_name, &mut guard),
-                ScriptFieldValue::i32(it) => it.visit(field_name, &mut guard),
-                ScriptFieldValue::i64(it) => it.visit(field_name, &mut guard),
+                ScriptFieldValue::f32(it) => visit_as_f64!(it, field_name, guard, f32),
+                ScriptFieldValue::f64(it) => visit_as_f64!(it, field_name, guard, f64),
+                ScriptFieldValue::i16(it) => visit_as_f64!(it, field_name, guard, i16),
+                ScriptFieldValue::i32(it) => visit_as_f64!(it, field_name, guard, i32),
+                ScriptFieldValue::i64(it) => visit_as_f64!(it, field_name, guard, i64),
             };
             if let Err(err) = &result {
                 Log::warn(format!("skipping deserialization of field `{}::{}` ({:?}) due to error: {}", it.def.metadata.class, field_name, it.values[i], err).as_str());

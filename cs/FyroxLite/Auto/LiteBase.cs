@@ -53,8 +53,8 @@ internal struct NativeBool_result_value
 [StructLayout(LayoutKind.Sequential)]
 internal struct NativeBool_optional
 {
-    private NativeBool value;
-    private int has_value;
+    internal NativeBool value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool? ToFacade(in NativeBool_optional value)
@@ -181,8 +181,8 @@ internal struct byte_result_value
 [StructLayout(LayoutKind.Sequential)]
 internal struct byte_optional
 {
-    private byte value;
-    private int has_value;
+    internal byte value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static byte? ToFacade(in byte_optional value)
@@ -309,8 +309,8 @@ internal struct int_result_value
 [StructLayout(LayoutKind.Sequential)]
 internal struct int_optional
 {
-    private int value;
-    private int has_value;
+    internal int value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int? ToFacade(in int_optional value)
@@ -437,8 +437,8 @@ internal struct long_result_value
 [StructLayout(LayoutKind.Sequential)]
 internal struct long_optional
 {
-    private long value;
-    private int has_value;
+    internal long value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static long? ToFacade(in long_optional value)
@@ -565,8 +565,8 @@ internal struct float_result_value
 [StructLayout(LayoutKind.Sequential)]
 internal struct float_optional
 {
-    private float value;
-    private int has_value;
+    internal float value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float? ToFacade(in float_optional value)
@@ -693,8 +693,8 @@ internal struct double_result_value
 [StructLayout(LayoutKind.Sequential)]
 internal struct double_optional
 {
-    private double value;
-    private int has_value;
+    internal double value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double? ToFacade(in double_optional value)
@@ -821,8 +821,8 @@ internal struct NativeString_result_value
 [StructLayout(LayoutKind.Sequential)]
 internal struct NativeString_optional
 {
-    private NativeString value;
-    private int has_value;
+    internal NativeString value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string? ToFacade(in NativeString_optional value)
@@ -949,8 +949,8 @@ internal struct NativeInstanceId_result_value
 [StructLayout(LayoutKind.Sequential)]
 internal struct NativeInstanceId_optional
 {
-    private NativeInstanceId value;
-    private int has_value;
+    internal NativeInstanceId value;
+    internal int has_value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static object? ToFacade(in NativeInstanceId_optional value)
@@ -1203,6 +1203,37 @@ internal partial struct NativeValue_slice
 
     [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     internal static unsafe partial NativeValue_slice fyrox_lite_upload_NativeValue_slice(NativeValue_slice managed);
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct NativeHandle_optional
+{
+    internal NativeHandle value;
+    internal int has_value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static NativeHandle? ToFacade(in NativeHandle_optional value)
+    {
+        if (value.has_value != 0)
+        {
+            var __item = value.value;
+            var __item_to_facade = __item;
+            return __item_to_facade;
+        }
+        return null;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static NativeHandle_optional FromFacade(in NativeHandle? value)
+    {
+        if (value == null)
+        {
+            return new NativeHandle_optional { value = default, has_value = 0 };
+        }
+        var __item = value.Value;
+        var __item_from_facade = __item;
+        return new NativeHandle_optional { value = __item_from_facade, has_value = 1 };
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]

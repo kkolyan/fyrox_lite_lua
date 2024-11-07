@@ -1175,6 +1175,7 @@ dependencies = [
  "extend",
  "fyrox",
  "fyrox-lite",
+ "fyroxed_base",
  "send_wrapper",
  "to_vec",
 ]

@@ -358,6 +358,7 @@ fn type_rs2cs(ty: &Type, custom_type_names: &HashMap<String, CustomTypeProps> ) 
     if let Type::Path(ty) = ty {
         if let Some(ident) = ty.path.get_ident() {
             let ident = ident.to_string();
+            if ident == "Unit" { return "void".to_owned(); }
             if ident == "bool" { return "bool".to_owned(); }
             if ident == "u8" { return "byte".to_owned(); }
             if ident == "u16" { return "ushort".to_owned(); }
