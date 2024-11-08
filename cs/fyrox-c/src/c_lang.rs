@@ -41,7 +41,6 @@ impl Lang for CCompatibleLang {
     }
 
     fn unpack_script(script: &ScriptObject<Self>) -> Result<Self::UnpackedScriptObject, String> {
-        println!("DEBUG: unpack {:?} {:?}", script.def.metadata.class, script);
         let uuid = uuid_of_script(script);
         APP.with_borrow(|app| {
             let app = app.as_ref().unwrap();
@@ -53,7 +52,6 @@ impl Lang for CCompatibleLang {
                 let name = prop.name.clone().into();
 
                 let value = convert_value(name, value, prop.ty);
-                println!("DEBUG {} {:?}", script.def.metadata.class, value);
                 state.push(value);
             }
             let instance = (app.functions.create_script_instance)(metadata.id, state.into(), Some(script.node.into()).into()).into_result_shallow()?;

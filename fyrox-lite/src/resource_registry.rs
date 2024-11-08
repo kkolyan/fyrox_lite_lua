@@ -25,7 +25,6 @@ struct ResourceRegistry {
 }
 
 pub(crate) fn retrieve_externalized(handle: u128) -> UntypedResource {
-    println!("DEBUG: retrieve_externalized {}", handle);
     RESOURCES.with_borrow(|it| {
         let handle = Handle::decode_from_u128(handle);
         it.as_ref()
@@ -47,8 +46,6 @@ pub(crate) fn externalize_resource(resource: UntypedResource) -> u128 {
         let handle = existing_handle
             .copied()
             .unwrap_or_else(|| registry.resources.spawn(resource.clone()));
-        let id = handle.encode_to_u128();
-        println!("DEBUG: externalize_resource {:?} with id {}", resource, id);
-        id
+        handle.encode_to_u128()
     })
 }

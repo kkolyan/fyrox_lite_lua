@@ -21,4 +21,9 @@ internal partial struct NativeQuaternion
     {
         return new NativeQuaternion(self.X, self.Y, self.Z, self.W);
     }
+
+    public override string ToString()
+    {
+        return $"{nameof(NativeQuaternion)}( {_i}, {_j}, {_k}, {_w} )";
+    }
 }

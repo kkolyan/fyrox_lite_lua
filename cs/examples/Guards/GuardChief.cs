@@ -37,7 +37,8 @@ public class GuardChief : NodeScript
                     var angle = (float)(new Random().NextDouble() * 2 * Math.PI);
                     Quaternion orientation = Quaternion.FromEuler(Vector3.Up * angle);
 
-                    Node guard = gaurd_prefab.InstantiateAt(position, orientation);
+                    var quaternion = Quaternion.Identity;
+                    Node guard = gaurd_prefab.InstantiateAt(position, quaternion);
                     guard.FindScript<Guard>().Init(i);
 
                     Log.Info($"Guard spawned at {position}");

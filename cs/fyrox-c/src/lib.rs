@@ -17,6 +17,7 @@ pub(crate) mod executor_cs;
 mod errors;
 
 mod editor_cs;
+mod utils;
 
 pub(crate) use arena::Arena;
 use crate::bindings_manual::UserScriptMessage;

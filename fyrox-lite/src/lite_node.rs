@@ -231,15 +231,11 @@ impl LiteNode {
     }
 
     pub fn find_script<T: UserScript>(&self, class_id: T::ClassId, _stub: T::UserScriptGenericStub) -> Result<Option<T>, T::LangSpecificError> {
-        println!("DEBUG: find script of type {:?}", class_id);
         with_script_context(|ctx| {
             let node = &mut ctx.scene.as_mut().expect("scene unavailable").graph[self.handle];
-            println!("number of scripts: {}", node.scripts().count());
             for x in node.scripts() {
-                println!("script {}", x.type_name());
             }
             for script in node.try_get_scripts_mut::<T::ProxyScript>() {
-                println!("DEBUG: check script {:?}", script);
                 let Some(plugin) = &mut ctx.plugins else {
                     return Err(T::create_error("plugins access not allowed from Plugin scripts"));
                 };

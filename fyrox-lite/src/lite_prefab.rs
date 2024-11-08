@@ -54,8 +54,6 @@ impl LitePrefab {
                 .with_rotation(orientation.into())
                 .with_position(position.into())
                 .finish();
-            let node = &mut ctx.scene.as_mut().unwrap().graph[handle];
-            println!("loaded: ({:?}) [{}]", node, node.scripts().map(|it| it.type_name().to_string()).collect::<Vec<_>>().join(", "));
             Ok(LiteNode::new(
                 handle,
             ))

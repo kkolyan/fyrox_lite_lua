@@ -457,12 +457,23 @@ fn generate_rust_entry_point(rust: &mut RustEmitter, class: &EngineClass, method
             output_params += "(),";
             continue;
         }
-        render(&mut conversions, r#"
+        if ctx.is_struct(&param.ty) {
+            render(&mut conversions, r#"
+                let ${name} = unsafe { *${name} }.into();
+            "#, [("name", &param.name)]);
+        } else {
+            render(&mut conversions, r#"
                 let ${name} = ${name}.into();
-        "#, [("name", &param.name)]);
+            "#, [("name", &param.name)]);
+        }
         output_params += param.name.as_str();
         output_params += ",";
-        input_params += format!("{}: {},", param.name, api_types::type_rs(&param.ty, ctx).to_native()).as_str();
+        input_params += format!(
+            "{}: {}{},",
+            param.name,
+            if ctx.is_struct(&param.ty) {"*mut "} else {""},
+            api_types::type_rs(&param.ty, ctx).to_native()
+        ).as_str();
     }
 
     let mut rs = String::new();
