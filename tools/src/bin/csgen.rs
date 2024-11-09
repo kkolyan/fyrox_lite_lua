@@ -12,7 +12,7 @@ fn main() {
     let (facade_cs, facade_rs) = csgen_lib::lite_csgen::generate_cs_facade(&domain);
     let (mut internal_cs, internal_rs) = csgen_lib::lite_csgen::generate_base();
 
-    internal_cs.mods.push(Module::children("Internal", manuals.mods));
+    internal_cs.mods.extend(manuals.mods);
     
     csgen_lib::lite_csgen::write_cs::write_cs("cs/FyroxLite/FyroxLiteInternal/Auto", internal_cs);
     csgen_lib::lite_csgen::write_cs::write_cs("cs/FyroxLite/FyroxLite/Auto", facade_cs);
