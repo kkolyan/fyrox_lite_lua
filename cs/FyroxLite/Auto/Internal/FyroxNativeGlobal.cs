@@ -33,4 +33,8 @@ internal partial class FyroxNativeGlobal {
     internal delegate void_result GameOnUpdate(NativeInstanceId thiz);
 
     internal delegate NativeInstanceId_result CreateScriptInstance(NativeClassId thiz, NativePropertyValue_slice state, NativeHandle_optional node);
+
+    internal delegate void DisposeMessage(UserScriptMessage message);
+
+    internal delegate void DisposeScript(NativeInstanceId script);
 }

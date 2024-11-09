@@ -120,6 +120,16 @@ namespace FyroxLite
             }
         }
 
+        internal static void dispose_message(UserScriptMessage message)
+        {
+            ObjectRegistry.Drop(message.id);
+        }
+
+        internal static void dispose_script(NativeInstanceId script)
+        {
+            ObjectRegistry.Drop(script.value);
+        }
+
         private static NodeScript GetNodeScript(NativeInstanceId instanceId)
         {
             var o = ObjectRegistry.Get(instanceId.value);
@@ -140,12 +150,6 @@ namespace FyroxLite
                 null => throw new Exception($"instance not found for id {instanceId.value}"),
                 _ => throw new Exception($"instance is not a GlobalScript {instanceId.value}: {o.GetType()}")
             };
-        }
-
-        private static void HandleException(Exception ex)
-        {
-            throw ex;
-            // Console.WriteLine($"ERROR (FyroxLite): {ex}");
         }
     }
 }

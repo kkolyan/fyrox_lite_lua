@@ -1,5 +1,5 @@
 use std::{cell::RefCell, collections::HashMap, ffi::CString};
-
+use std::sync::Arc;
 use fyrox::{
     core::{
         pool::{Handle, Pool},
@@ -17,6 +17,7 @@ use crate::{bindings_manual::{
 use crate::bindings_lite_2::{NativePrefab, NativeQuaternion, NativeVector2, NativeVector2I, NativeVector3};
 use crate::bindings_manual::{NativeClassId, NativeInstanceId, NativePropertyValue, NativeString, NativeValueType};
 use crate::errors::print_backtrace_and_exit;
+use crate::tracked::{AutoDisposableScriptInstance};
 
 #[derive(Debug, Clone)]
 pub struct CCompatibleLang;
@@ -58,7 +59,7 @@ impl Lang for CCompatibleLang {
             Ok(UnpackedObject {
                 uuid,
                 class: metadata.id,
-                instance,
+                instance: AutoDisposableScriptInstance::new(instance),
             })
         })
     }
@@ -197,16 +198,17 @@ impl Visit for NativeRuntimePin {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct UnpackedObject {
     pub uuid: Uuid,
     pub class: NativeClassId,
-    pub instance: NativeInstanceId,
+    pub instance: AutoDisposableScriptInstance,
 }
+
 
 impl From<UnpackedObject> for NativeInstanceId {
     fn from(value: UnpackedObject) -> Self {
-        value.instance
+        value.instance.inner()
     }
 }
 

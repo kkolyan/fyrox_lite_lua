@@ -67,6 +67,8 @@ public partial class FyroxExecutor
                 on_game_init = FyroxImpls.on_game_init,
                 on_game_update = FyroxImpls.on_game_update,
                 create_script_instance = FyroxImpls.create_script_instance,
+                dispose_message = FyroxImpls.dispose_message,
+                dispose_script = FyroxImpls.dispose_script,
             },
         });
         Console.WriteLine("running main loop");

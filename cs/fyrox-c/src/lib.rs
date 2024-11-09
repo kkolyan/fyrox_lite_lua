@@ -18,6 +18,7 @@ mod errors;
 
 mod editor_cs;
 mod utils;
+mod tracked;
 
 pub(crate) use arena::Arena;
 use crate::bindings_manual::UserScriptMessage;

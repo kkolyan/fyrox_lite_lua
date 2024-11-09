@@ -60,4 +60,16 @@ internal unsafe partial struct NativeScriptAppFunctions {
         get => Marshal.GetDelegateForFunctionPointer<FyroxNativeGlobal.CreateScriptInstance>(_create_script_instance);
         set => _create_script_instance = Marshal.GetFunctionPointerForDelegate(value);
     }
+    private IntPtr _dispose_message;
+    internal FyroxNativeGlobal.DisposeMessage dispose_message
+    {
+        get => Marshal.GetDelegateForFunctionPointer<FyroxNativeGlobal.DisposeMessage>(_dispose_message);
+        set => _dispose_message = Marshal.GetFunctionPointerForDelegate(value);
+    }
+    private IntPtr _dispose_script;
+    internal FyroxNativeGlobal.DisposeScript dispose_script
+    {
+        get => Marshal.GetDelegateForFunctionPointer<FyroxNativeGlobal.DisposeScript>(_dispose_script);
+        set => _dispose_script = Marshal.GetFunctionPointerForDelegate(value);
+    }
 }

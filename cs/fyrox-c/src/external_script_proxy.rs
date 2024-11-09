@@ -15,6 +15,7 @@ use crate::bindings_manual::NativeClassId;
 use crate::c_lang::CCompatibleLang;
 use crate::errors::ResultTcrateLangSpecificErrorExt;
 use crate::fyrox_c_plugin::CPlugin;
+use crate::tracked::AutoDisposableUserMessage;
 use crate::scripted_app::ScriptedApp;
 use crate::scripted_app::APP;
 
@@ -29,20 +30,20 @@ impl ScriptTrait for ExternalScriptProxy {
     fn on_init(&mut self, ctx: &mut ScriptContext) {
         self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed, ctx.handle);
         invoke_callback(ctx, |app| {
-            (app.functions.on_init)(self.data.inner_unpacked().unwrap().instance).into_result().handle_scripting_error();
+            (app.functions.on_init)(self.data.inner_unpacked().unwrap().instance.inner()).into_result().handle_scripting_error();
         });
     }
 
     fn on_start(&mut self, ctx: &mut ScriptContext) {
         self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed, ctx.handle);
         invoke_callback(ctx, |app| {
-            (app.functions.on_start)(self.data.inner_unpacked().unwrap().instance).into_result().handle_scripting_error();
+            (app.functions.on_start)(self.data.inner_unpacked().unwrap().instance.inner()).into_result().handle_scripting_error();
         });
     }
 
     fn on_deinit(&mut self, ctx: &mut fyrox::script::ScriptDeinitContext) {
         invoke_callback(ctx, |app| {
-            (app.functions.on_deinit)(self.data.inner_unpacked().unwrap().instance).into_result().handle_scripting_error();
+            (app.functions.on_deinit)(self.data.inner_unpacked().unwrap().instance.inner()).into_result().handle_scripting_error();
         });
     }
 
@@ -53,7 +54,7 @@ impl ScriptTrait for ExternalScriptProxy {
         self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed, ctx.handle);
         let dt = ctx.dt;
         invoke_callback(ctx, |app| {
-            (app.functions.on_update)(self.data.inner_unpacked().unwrap().instance, dt).into_result().handle_scripting_error();
+            (app.functions.on_update)(self.data.inner_unpacked().unwrap().instance.inner(), dt).into_result().handle_scripting_error();
         });
     }
 
@@ -62,12 +63,12 @@ impl ScriptTrait for ExternalScriptProxy {
         message: &mut dyn fyrox::script::ScriptMessagePayload,
         ctx: &mut fyrox::script::ScriptMessageContext,
     ) {
-        let Some(message) = message.downcast_ref::<crate::UserScriptMessageImpl>() else {
+        let Some(message) = message.downcast_ref::<AutoDisposableUserMessage>() else {
             return;
         };
         self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed, ctx.handle);
         invoke_callback(ctx, |app| {
-            (app.functions.on_message)(self.data.inner_unpacked().unwrap().instance, *message).into_result().handle_scripting_error();
+            (app.functions.on_message)(self.data.inner_unpacked().unwrap().instance.inner(), message.inner()).into_result().handle_scripting_error();
         });
     }
 }

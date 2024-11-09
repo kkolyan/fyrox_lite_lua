@@ -98,7 +98,10 @@ pub fn type_rs(ty: &DataType, ctx: &GenerationContext) -> RsType {
             lite: "crate::UserScriptImpl".to_string(),
             native: "NativeInstanceId".to_string(),
         },
-        DataType::UserScriptMessage => RsType::Basic("UserScriptMessage".to_string()),
+        DataType::UserScriptMessage => RsType::Mapped {
+            lite: "AutoDisposableMessage".to_string(),
+            native: "UserScriptMessage".to_string(),
+        },
         DataType::UserScriptGenericStub => panic!("WTF, UserScriptGenericStub should be filtered out"),
         DataType::Object(it) => {
             let class = ctx.domain.get_class(it);

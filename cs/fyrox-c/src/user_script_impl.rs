@@ -9,7 +9,8 @@ use fyrox_lite::spi::ClassId;
 use crate::{bindings_manual::{NativeHandle, NativeInstanceId}, external_script_proxy::ExternalScriptProxy, fyrox_c_plugin::CPlugin};
 use crate::bindings_lite_2::NativePropertyValue_slice;
 use crate::bindings_manual::NativeClassId;
-use crate::c_lang::UnpackedObject;
+use crate::c_lang::{UnpackedObject};
+use crate::tracked::{AutoDisposableUserMessage, AutoDisposableScriptInstance};
 use crate::scripted_app::APP;
 
 
@@ -24,7 +25,7 @@ impl UserScript for UnpackedObject {
 
     type LangSpecificError = crate::LangSpecificError;
 
-    type UserScriptMessage = crate::UserScriptMessage;
+    type UserScriptMessage = AutoDisposableUserMessage;
 
     type UserScriptGenericStub = ();
 
@@ -37,7 +38,7 @@ impl UserScript for UnpackedObject {
         if &proxy.class == class_name {
             proxy.data.ensure_unpacked(&mut plugin.failed, node);
             let script_data = &mut proxy.data.inner_unpacked();
-            return Some(*script_data.expect("expected to be unpacked here"));
+            return Some(script_data.expect("expected to be unpacked here").clone());
         }
         None
     }
@@ -61,7 +62,7 @@ impl UserScript for UnpackedObject {
             Ok(UnpackedObject {
                 uuid: *uuid,
                 class: md.id,
-                instance: instance_id,
+                instance: AutoDisposableScriptInstance::new(instance_id),
             })
         })
     }
@@ -74,7 +75,7 @@ impl UserScript for UnpackedObject {
                     let scripts = it.get::<CPlugin>().scripts.borrow();
                     let script = scripts.inner().iter().find(|it| &it.class == class);
                     if let Some(script) = script {
-                        Ok(*script.data.inner_unpacked().unwrap())
+                        Ok(script.data.inner_unpacked().unwrap().clone())
                     } else {
                         Err(format!("script not found: '{}'", class.lookup_class_name()))
                     }

@@ -28,8 +28,9 @@ use std::sync::Arc;
 use fyrox_lite::lite_input::Input;
 use crate::arena::Arena;
 use crate::bindings_lite_2::{i32_result, i32_result_value};
-use crate::c_lang::UnpackedObject;
+use crate::c_lang::{ UnpackedObject};
 use crate::errors::ResultTcrateLangSpecificErrorExt;
+use crate::tracked::{AutoDisposableScriptInstance};
 
 #[derive(Visit, Reflect)]
 pub struct CPlugin {
@@ -152,7 +153,7 @@ impl Plugin for CPlugin {
                                 data: ScriptResidence::Unpacked(UnpackedObject {
                                     uuid: Default::default(),
                                     class,
-                                    instance,
+                                    instance: AutoDisposableScriptInstance::new(instance),
                                 }),
                             });
                         }
@@ -169,7 +170,7 @@ impl Plugin for CPlugin {
             script.data.ensure_unpacked(&mut self.failed, Default::default());
             invoke_callback(&mut context, |app| {
                 let scene_path = scene_path.map(|it| it.to_string()).into();
-                let id = script.data.inner_unpacked().unwrap().instance;
+                let id = script.data.inner_unpacked().unwrap().instance.inner();
                 let result = (app.functions.on_game_init)(id, scene_path);
                 result.into_result().handle_scripting_error();
             });
@@ -180,7 +181,7 @@ impl Plugin for CPlugin {
         for script in self.scripts.borrow_mut().0.iter_mut() {
             script.data.ensure_unpacked(&mut self.failed, Default::default());
             invoke_callback(context, |app| {
-                (app.functions.on_game_update)(script.data.inner_unpacked().unwrap().instance).into_result().handle_scripting_error();
+                (app.functions.on_game_update)(script.data.inner_unpacked().unwrap().instance.inner()).into_result().handle_scripting_error();
             });
         }
     }

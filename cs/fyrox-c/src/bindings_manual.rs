@@ -235,7 +235,10 @@ pub struct NativeScriptAppFunctions {
 
     pub on_game_init: GameOnInit,
     pub on_game_update: GameOnUpdate,
+
     pub create_script_instance: CreateScriptInstance,
+    pub dispose_message: DisposeMessage,
+    pub dispose_script: DisposeScript,
 }
 
 pub type NodeOnUpdate = extern "C" fn(thiz: NativeInstanceId, dt: f32) -> Unit_result;
@@ -248,14 +251,14 @@ pub type GameOnInit = extern "C" fn(thiz: NativeInstanceId, initial_scene_overri
 pub type GameOnUpdate = extern "C" fn(thiz: NativeInstanceId) -> Unit_result;
 
 pub type CreateScriptInstance = extern "C" fn(thiz: NativeClassId, state: NativePropertyValue_slice, node: NativeHandle_optional) -> NativeInstanceId_result;
+pub type DisposeMessage = extern "C" fn(message: UserScriptMessage);
+pub type DisposeScript = extern "C" fn(script: NativeInstanceId);
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct UserScriptMessage {
     pub id: i64,
 }
-
-impl LiteDataType for UserScriptMessage {}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
