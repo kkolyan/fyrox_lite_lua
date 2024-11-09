@@ -29,6 +29,11 @@ public class Game : GlobalScript
 
     protected override void OnGlobalUpdate()
     {
+        if (Input.IsKeyDown(KeyCode.Escape))
+        {
+            Console.WriteLine("User requested exit");
+            Environment.Exit(0);
+        }
         hud.TextAsync = $"Wounds: {wounds}\nKilled Guards: {frags}";
     }
 
