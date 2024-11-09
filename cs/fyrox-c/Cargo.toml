@@ -7,10 +7,4 @@ edition = "2021"
 crate-type = ["dylib"]
 
 [dependencies]
-fyroxed_base = { workspace = true }
-fyrox = { workspace = true }
-fyrox-lite = { workspace = true }
-extend = { workspace = true }
-to_vec = { workspace = true }
-convert_case = { workspace = true }
-send_wrapper = { workspace = true }
+fyrox-c-lib = { workspace = true }

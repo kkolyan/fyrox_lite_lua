@@ -1171,6 +1171,13 @@ dependencies = [
 name = "fyrox-c"
 version = "0.1.0"
 dependencies = [
+ "fyrox-c-lib",
+]
+
+[[package]]
+name = "fyrox-c-lib"
+version = "0.1.0"
+dependencies = [
  "convert_case",
  "extend",
  "fyrox",

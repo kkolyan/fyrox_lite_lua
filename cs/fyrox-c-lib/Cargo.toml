@@ -1,0 +1,13 @@
+[package]
+name = "fyrox-c-lib"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fyroxed_base = { workspace = true }
+fyrox = { workspace = true }
+fyrox-lite = { workspace = true }
+extend = { workspace = true }
+to_vec = { workspace = true }
+convert_case = { workspace = true }
+send_wrapper = { workspace = true }

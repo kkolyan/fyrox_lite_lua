@@ -16,6 +16,7 @@ members = [
 	"cs/fyrox-c",
 	"cs/csgen-lib",
 	"gen-common",
+	"cs/fyrox-c-lib",
 ]
 resolver = "2"
 exclude = ["mlua"]
@@ -24,6 +25,7 @@ exclude = ["mlua"]
 luagen-lib = { path = "lua/luagen-lib" }
 fyrox-lua = { path = "lua/fyrox-lua"}
 fyrox-c = { path = "cs/fyrox-c"}
+fyrox-c-lib = { path = "cs/fyrox-c-lib"}
 csgen-lib = { path = "cs/csgen-lib" }
 fyrox-lite = {path = "fyrox-lite"}
 fyrox-lite-math = {path = "fyrox-lite-math"}
