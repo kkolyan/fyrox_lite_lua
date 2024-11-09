@@ -79,7 +79,7 @@ function Player:on_update(dt)
         Plugin:get("Game").player = self.node;
     end
 
-    if Input:is_mouse_button(Input.MouseLeft) then
+    if Input:is_mouse_button_pressed(Input.MouseLeft) then
         if self.reload_sec <= 0.0 then
             self.reload_sec = self.reload_delay_sec;
             self:fire();
@@ -88,16 +88,16 @@ function Player:on_update(dt)
 
     local move_delta = Vector3.ZERO;
 
-    if Input:is_key(KeyCode.W) then
+    if Input:is_key_pressed(KeyCode.W) then
         move_delta.z = move_delta.z + 1.0
     end
-    if Input:is_key(KeyCode.S) then
+    if Input:is_key_pressed(KeyCode.S) then
         move_delta.z = move_delta.z - 1.0
     end
-    if Input:is_key(KeyCode.A) then
+    if Input:is_key_pressed(KeyCode.A) then
         move_delta.x = move_delta.x + 1.0
     end
-    if Input:is_key(KeyCode.D) then
+    if Input:is_key_pressed(KeyCode.D) then
         move_delta.x = move_delta.x - 1.0
     end
 

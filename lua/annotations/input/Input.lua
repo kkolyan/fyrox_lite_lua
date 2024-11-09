@@ -31,7 +31,7 @@ function Input:is_mouse_button_up(button) end
 
 ---@param button number
 ---@return boolean
-function Input:is_mouse_button(button) end
+function Input:is_mouse_button_pressed(button) end
 
 ---@param key KeyCode
 ---@return boolean
@@ -43,5 +43,5 @@ function Input:is_key_up(key) end
 
 ---@param key KeyCode
 ---@return boolean
-function Input:is_key(key) end
+function Input:is_key_pressed(key) end
 

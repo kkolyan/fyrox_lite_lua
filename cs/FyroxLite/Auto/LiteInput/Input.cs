@@ -36,11 +36,11 @@ public static partial class Input
         }
     }
 
-    public static bool IsMouseButton(int button)
+    public static bool IsMouseButtonPressed(int button)
     {
         unsafe {
             var _button = button;
-            var __ret = fyrox_lite_lite_input_Input_is_mouse_button(_button);
+            var __ret = fyrox_lite_lite_input_Input_is_mouse_button_pressed(_button);
             return NativeBool.ToFacade(__ret);
         }
     }
@@ -63,11 +63,11 @@ public static partial class Input
         }
     }
 
-    public static bool IsKey(KeyCode key)
+    public static bool IsKeyPressed(KeyCode key)
     {
         unsafe {
             var _key = key;
-            var __ret = fyrox_lite_lite_input_Input_is_key(_key);
+            var __ret = fyrox_lite_lite_input_Input_is_key_pressed(_key);
             return NativeBool.ToFacade(__ret);
         }
     }
@@ -99,7 +99,7 @@ public static partial class Input
     private static unsafe partial NativeBool fyrox_lite_lite_input_Input_is_mouse_button_up(int button);
 
     [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial NativeBool fyrox_lite_lite_input_Input_is_mouse_button(int button);
+    private static unsafe partial NativeBool fyrox_lite_lite_input_Input_is_mouse_button_pressed(int button);
 
     [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial NativeBool fyrox_lite_lite_input_Input_is_key_down(KeyCode key);
@@ -108,7 +108,7 @@ public static partial class Input
     private static unsafe partial NativeBool fyrox_lite_lite_input_Input_is_key_up(KeyCode key);
 
     [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
-    private static unsafe partial NativeBool fyrox_lite_lite_input_Input_is_key(KeyCode key);
+    private static unsafe partial NativeBool fyrox_lite_lite_input_Input_is_key_pressed(KeyCode key);
 
     [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
     private static unsafe partial NativeVector2 fyrox_lite_lite_input_Input_get_mouse_move();

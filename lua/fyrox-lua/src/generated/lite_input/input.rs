@@ -44,9 +44,9 @@ impl FyroxUserData for fyrox_lite::lite_input::Input {
             let ret = ret;
             Ok(ret)
         });
-        methods.add_method_mut("is_mouse_button", |lua, this, (button): (i32)| {
+        methods.add_method_mut("is_mouse_button_pressed", |lua, this, (button): (i32)| {
             let button = button;
-            let ret = fyrox_lite::lite_input::Input::is_mouse_button(button);
+            let ret = fyrox_lite::lite_input::Input::is_mouse_button_pressed(button);
             let ret = ret;
             Ok(ret)
         });
@@ -69,10 +69,10 @@ impl FyroxUserData for fyrox_lite::lite_input::Input {
             },
         );
         methods.add_method_mut(
-            "is_key",
+            "is_key_pressed",
             |lua, this, (key): (TypedUserData<Traitor<fyrox_lite::lite_input::LiteKeyCode>>)| {
                 let key = key.borrow()?.inner().clone().into();
-                let ret = fyrox_lite::lite_input::Input::is_key(key);
+                let ret = fyrox_lite::lite_input::Input::is_key_pressed(key);
                 let ret = ret;
                 Ok(ret)
             },

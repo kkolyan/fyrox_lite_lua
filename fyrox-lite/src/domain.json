@@ -420,7 +420,7 @@
           },
           {
             "instance": false,
-            "method_name": "is_mouse_button",
+            "method_name": "is_mouse_button_pressed",
             "signature": {
               "params": [
                 {
@@ -466,7 +466,7 @@
           },
           {
             "instance": false,
-            "method_name": "is_key",
+            "method_name": "is_key_pressed",
             "signature": {
               "params": [
                 {

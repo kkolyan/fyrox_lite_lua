@@ -42,7 +42,7 @@ impl Input {
     pub fn is_mouse_button_up(button: i32) -> bool {
         with_input(&mut |input| input.mouse_button_up.contains(&button))
     }
-    pub fn is_mouse_button(button: i32) -> bool {
+    pub fn is_mouse_button_pressed(button: i32) -> bool {
         with_input(&mut |input| input.mouse_button.contains(&button))
     }
 
@@ -52,7 +52,7 @@ impl Input {
     pub fn is_key_up(key: LiteKeyCode) -> bool {
         with_input(&mut |input| input.keys_up.contains(&key))
     }
-    pub fn is_key(key: LiteKeyCode) -> bool {
+    pub fn is_key_pressed(key: LiteKeyCode) -> bool {
         with_input(&mut |input| input.keys.contains(&key))
     }
 

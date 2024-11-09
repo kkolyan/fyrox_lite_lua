@@ -5,11 +5,9 @@ public class Beacon : NodeScript
 {
     protected override void OnUpdate(float dt)
     {
-        Vector3 pos = Node.GlobalPosition;
+        Plugin.Get<Game>().beacons.Add(Node.GlobalPosition);
 
-        Plugin.Get<Game>().beacons.Add(pos);
-
-        Console.WriteLine($"Beacon registered: {Node}");
+        Log.Info($"Beacon registered: {Node}");
 
         Node.Destroy();
     }

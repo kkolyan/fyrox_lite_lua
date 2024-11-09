@@ -6,8 +6,7 @@ using FyroxLite;
 public class Game : GlobalScript
 {
     public Node player;
-    [Transient]
-    public List<Vector3> beacons;
+    [Transient] public List<Vector3> beacons;
     private int frags;
     private int wounds;
     private Text hud;

@@ -5,35 +5,20 @@ using FyroxLite;
 [Uuid("9f8183d3-2a4a-4951-a6e6-5fbc9c479e2e")]
 public class Guard : NodeScript
 {
-    [HideInInspector]
-    [Transient]
-    private float reloading_sec;
-    
     private float reload_delay_sec;
     private float gun_height;
     private float switch_waypoint_timeout_sec;
-    
-    [HideInInspector]
-    [Transient]
-    private float waypoint_sec;
-    
-    [HideInInspector]
-    [Transient]
-    private Vector3? current_waypoint;
-    
-    [HideInInspector]
-    [Transient]
-    private Node collider;
-    
     private Prefab bullet_prefab;
     private float initial_bullet_velocity;
     private float attack_range;
     private float beacon_reached_distance;
     private float move_power;
-    
-    [HideInInspector]
-    [Transient]
-    private int id;
+ 
+    [HideInInspector] [Transient] private float reloading_sec;   
+    [HideInInspector] [Transient] private float waypoint_sec;
+    [HideInInspector] [Transient] private Vector3? current_waypoint;
+    [HideInInspector] [Transient] private Node collider;
+    [HideInInspector] [Transient] private int id;
 
     private const int FRACTION_GUARDS = 1;
 
@@ -42,18 +27,18 @@ public class Guard : NodeScript
         this.id = id;
     }
 
-    public bool TryAttackPlayer()
+    private bool TryAttackPlayer()
     {
-        Vector3 playerPos = Plugin.Get<Game>().player.GlobalPosition;
-        Vector3 selfPos = Node.GlobalPosition;
-        Vector3 sightVector = playerPos - selfPos;
+        var playerPos = Plugin.Get<Game>().player.GlobalPosition;
+        var selfPos = Node.GlobalPosition;
+        var sightVector = playerPos - selfPos;
 
         if (CanSeePlayer(playerPos, sightVector))
         {
             Bullet.Spawn(new Bullet.BulletSeed
             {
                 Prefab = bullet_prefab,
-                Origin = selfPos + new Vector3(0.0f, gun_height, 0.0f),
+                Origin = selfPos + Vector3.Up * gun_height,
                 Direction = sightVector,
                 InitialVelocity = initial_bullet_velocity,
                 AuthorCollider = collider,
@@ -67,20 +52,18 @@ public class Guard : NodeScript
         return false;
     }
 
-    public bool CanSeePlayer(Vector3 playerPos, Vector3 sightVector)
+    private bool CanSeePlayer(Vector3 playerPos, Vector3 sightVector)
     {
-        RayCastOptions opts = new RayCastOptions
+        var results = Physics.CastRay(new RayCastOptions
         {
             RayOrigin = playerPos,
             RayDirection = sightVector.Normalized(),
             MaxLen = sightVector.Length(),
             SortResults = true
-        };
-
-        List<Intersection> results = Physics.CastRay(opts);
+        });
         foreach (var hit in results)
         {
-            Node node = hit.Collider;
+            var node = hit.Collider;
             if (node != collider)
             {
                 while (node.Alive)
@@ -100,7 +83,7 @@ public class Guard : NodeScript
         return false;
     }
 
-    public void MoveToWaypoint(float dt)
+    private void MoveToWaypoint(float dt)
     {
         waypoint_sec += dt;
         if (waypoint_sec > switch_waypoint_timeout_sec)
@@ -115,16 +98,14 @@ public class Guard : NodeScript
             current_waypoint = beacons[new Random().Next(beacons.Count)];
         }
 
-        Vector3 pos = Node.LocalPosition;
-        Vector3 vectorToBeacon = current_waypoint.Value - pos;
+        var vectorToBeacon = current_waypoint.Value - Node.LocalPosition;
         if (vectorToBeacon.Length() < beacon_reached_distance)
         {
             current_waypoint = null;
         }
         else
         {
-            Vector3 force = vectorToBeacon.Normalized() * move_power;
-            Node.AsRigidBody().Value.ApplyForce(force);
+            Node.AsRigidBody().Value.ApplyForce(vectorToBeacon.Normalized() * move_power);
         }
     }
 

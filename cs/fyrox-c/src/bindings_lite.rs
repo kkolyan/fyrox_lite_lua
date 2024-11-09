@@ -427,7 +427,7 @@ pub extern "C" fn fyrox_lite_Input_is_mouse_button_up(button: i32) -> bool {
 }
 pub extern "C" fn fyrox_lite_Input_is_mouse_button(button: i32) -> bool {
     let mut button = button;
-    let __result = fyrox_lite::lite_input::Input::is_mouse_button(button);
+    let __result = fyrox_lite::lite_input::Input::is_mouse_button_pressed(button);
     let __result = __result;
     __result
 }
@@ -445,7 +445,7 @@ pub extern "C" fn fyrox_lite_Input_is_key_up(key: NativeKeyCode) -> bool {
 }
 pub extern "C" fn fyrox_lite_Input_is_key(key: NativeKeyCode) -> bool {
     let mut key = key.into();
-    let __result = fyrox_lite::lite_input::Input::is_key(key);
+    let __result = fyrox_lite::lite_input::Input::is_key_pressed(key);
     let __result = __result;
     __result
 }

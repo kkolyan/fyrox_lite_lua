@@ -1,7 +1,7 @@
 using FyroxLite;
 
 [Uuid("c5671d19-9f1a-4286-8486-add4ebaadaec")]
-public class Player: NodeScript
+public class Player : NodeScript
 {
     private float sensitivity;
     private Node camera;
@@ -10,55 +10,16 @@ public class Player: NodeScript
     private float initial_bullet_velocity;
     private float shooting_range;
     private float reload_delay_sec;
-    
-    [HideInInspector]
-    [Transient]
-    private float ReloadSec;
-    
-    [HideInInspector]
-    [Transient]
-    private bool Published;
-    
-    [HideInInspector]
-    [Transient]
-    private Node Collider;
-    
-    [HideInInspector]
-    [Transient]
-    private float AimY;
 
-    public const int FractionPlayer = 0;
+    [HideInInspector] [Transient] private float ReloadSec;
 
-    public void Turn(float x)
-    {
-        Quaternion rotDelta = Quaternion.FromEuler(Vector3.Up * sensitivity * x);
-        Node.LocalRotation *= rotDelta;
-    }
+    [HideInInspector] [Transient] private bool Published;
 
-    public void Aim(float y)
-    {
-        AimY += y * sensitivity;
-        AimY = Math.Max(-MathF.PI / 2.0f, Math.Min(AimY, MathF.PI / 2.0f));
+    [HideInInspector] [Transient] private Node Collider;
 
-        camera.LocalRotation = Quaternion.FromEuler(Vector3.Left * AimY);
-    }
+    [HideInInspector] [Transient] private float AimY;
 
-    public void Fire()
-    {
-        Vector3 cameraPos = camera.GlobalPosition;
-        Quaternion bulletOrientation = camera.GlobalRotation;
-
-        Bullet.Spawn(new Bullet.BulletSeed
-        {
-            Prefab = bullet,
-            Origin = cameraPos,
-            Direction = bulletOrientation * Vector3.Forward,
-            InitialVelocity = initial_bullet_velocity,
-            AuthorCollider = Collider,
-            Range = shooting_range,
-            Fraction = FractionPlayer,
-        });
-    }
+    private const int FractionPlayer = 0;
 
     protected override void OnInit()
     {
@@ -86,13 +47,14 @@ public class Player: NodeScript
         {
             ReloadSec -= dt;
         }
+
         if (!Published)
         {
             Published = true;
             Plugin.Get<Game>().player = Node;
         }
 
-        if (Input.IsMouseButton(Input.MouseLeft))
+        if (Input.IsMouseButtonPressed(Input.MouseLeft))
         {
             if (ReloadSec <= 0.0f)
             {
@@ -101,21 +63,24 @@ public class Player: NodeScript
             }
         }
 
-        Vector3 moveDelta = Vector3.Zero;
+        var moveDelta = Vector3.Zero;
 
-        if (Input.IsKey(KeyCode.W))
+        if (Input.IsKeyPressed(KeyCode.W))
         {
             moveDelta.Z += 1.0f;
         }
-        if (Input.IsKey(KeyCode.S))
+
+        if (Input.IsKeyPressed(KeyCode.S))
         {
             moveDelta.Z -= 1.0f;
         }
-        if (Input.IsKey(KeyCode.A))
+
+        if (Input.IsKeyPressed(KeyCode.A))
         {
             moveDelta.X += 1.0f;
         }
-        if (Input.IsKey(KeyCode.D))
+
+        if (Input.IsKeyPressed(KeyCode.D))
         {
             moveDelta.X -= 1.0f;
         }
@@ -123,14 +88,38 @@ public class Player: NodeScript
         Turn(-Input.MouseMove.X);
         Aim(Input.MouseMove.Y);
 
-        if (moveDelta.Length() > 0.001f)
+        if (moveDelta.Length() > Mathf.Epsilon)
         {
             moveDelta = moveDelta.Normalized();
         }
 
-        var selfRotation = Node.LocalRotation;
-        Vector3 moveDirection = selfRotation * moveDelta;
-        Vector3 force = moveDirection * power;
-        Node.AsRigidBody().Value.ApplyForce(force);
+        Node.AsRigidBody().Value.ApplyForce(Node.LocalRotation * moveDelta * power);
+    }
+
+    private void Turn(float x)
+    {
+        Node.LocalRotation *= new Quaternion(Vector3.Up, sensitivity * x);
+    }
+
+    private void Aim(float y)
+    {
+        AimY += y * sensitivity;
+        AimY = Mathf.Clamp(AimY, -MathF.PI / 2.0f, MathF.PI / 2.0f);
+
+        camera.LocalRotation = new Quaternion(Vector3.Left, AimY);
+    }
+
+    private void Fire()
+    {
+        Bullet.Spawn(new Bullet.BulletSeed
+        {
+            Prefab = bullet,
+            Origin = camera.GlobalPosition,
+            Direction = camera.GlobalRotation * Vector3.Forward,
+            InitialVelocity = initial_bullet_velocity,
+            AuthorCollider = Collider,
+            Range = shooting_range,
+            Fraction = FractionPlayer,
+        });
     }
 }
