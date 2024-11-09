@@ -35,5 +35,9 @@ pub fn register_classes(lua: &mlua::Lua) {
 
     fyrox_lite_math::lite_math::LiteVector3::register_class(lua);
 
+    fyrox_lite_math::lite_math::LiteVector2::register_class(lua);
+
+    fyrox_lite_math::lite_math::LiteVector2I::register_class(lua);
+
     fyrox_lite_color::lite_color::Color::register_class(lua);
 }

@@ -66,7 +66,7 @@ namespace FyroxLite
                     throw new Exception($"message not found for id {message.id}");
                 }
 
-                GetNodeScript(thiz).OnMessage(thiz);
+                GetNodeScript(thiz).OnMessage(m);
                 return void_result.FromFacade();
             }
             catch (Exception e)

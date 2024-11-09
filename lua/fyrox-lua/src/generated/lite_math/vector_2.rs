@@ -16,39 +16,93 @@ use fyrox_lite_math::*;
 use mlua;
 
 use crate::{
-    lua_error,
     script_object::ScriptObject,
     typed_userdata::TypedUserData,
     user_data_plus::{FyroxUserData, Traitor, UserDataClass},
 };
-impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_math::PodVector2> {
-    fn into_lua(self, lua: &'lua mlua::Lua) -> mlua::Result<mlua::Value<'lua>> {
-        Ok(mlua::Value::Table({
-            let t = lua.create_table()?;
-            t.set("x", {
-                let x = self.x.clone();
-                x
-            })?;
-            t.set("y", {
-                let y = self.y.clone();
-                y
-            })?;
-            t
-        }))
+
+impl FyroxUserData for fyrox_lite_math::lite_math::LiteVector2 {
+    const CLASS_NAME: &'static str = "Vector2";
+
+    fn add_instance_methods<'lua, M: mlua::UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
+        methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
+            Ok(format!("{:?}", this.inner()))
+        });
+        methods.add_method_mut("mul", |lua, this, (o): (f32)| {
+            let o = o;
+            let ret = this.mul(o);
+            let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector2::from(ret));
+            Ok(ret)
+        });
+        methods.add_method_mut(
+            "add",
+            |lua, this, (o): (TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector2>>)| {
+                let o = o.borrow()?.inner().clone().into();
+                let ret = this.add(o);
+                let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector2::from(ret));
+                Ok(ret)
+            },
+        );
+        methods.add_method_mut("normalize", |lua, this, (): ()| {
+            let ret = this.normalize();
+            let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector2::from(ret));
+            Ok(ret)
+        });
+        methods.add_method_mut(
+            "sub",
+            |lua, this, (o): (TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector2>>)| {
+                let o = o.borrow()?.inner().clone().into();
+                let ret = this.sub(o);
+                let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector2::from(ret));
+                Ok(ret)
+            },
+        );
+        methods.add_method_mut("magnitude", |lua, this, (): ()| {
+            let ret = this.magnitude();
+            let ret = ret;
+            Ok(ret)
+        });
+        methods.add_method_mut("normalize_inplace", |lua, this, (): ()| {
+            let ret = this.normalize_inplace();
+            let ret = ret;
+            Ok(ret)
+        });
     }
-}
-impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_math::PodVector2> {
-    fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> mlua::Result<Self> {
-        let mlua::Value::Table(value) = value else {
-            return Err(lua_error!(
-                "cannot extract Vector2 from {:?}. expected table.",
-                value
-            ));
-        };
-        let x = value.get::<_, f32>("x")?;
-        let x = x;
-        let y = value.get::<_, f32>("y")?;
-        let y = y;
-        Ok(Traitor::new(fyrox_lite::lite_math::PodVector2 { x, y }))
+    fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
+        methods: &mut M,
+    ) {
+        methods.add_method_mut("new", |lua, this, (x, y): (f32, f32)| {
+            let x = x;
+            let y = y;
+            let ret = fyrox_lite_math::lite_math::LiteVector2::new(x, y);
+            let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector2::from(ret));
+            Ok(ret)
+        });
+    }
+    fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+        fields.add_field_method_get("x", |lua, this| {
+            let value = this.get_x();
+            Ok(value)
+        });
+        fields.add_field_method_get("y", |lua, this| {
+            let value = this.get_y();
+            Ok(value)
+        });
+        fields.add_field_method_set("x", |lua, this, value: f32| {
+            this.set_x(value);
+            Ok(())
+        });
+        fields.add_field_method_set("y", |lua, this, value: f32| {
+            this.set_y(value);
+            Ok(())
+        });
+    }
+    fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
+        fields.add_field_method_get("ZERO", |lua, this| {
+            let value = fyrox_lite_math::lite_math::LiteVector2::get_ZERO();
+            Ok(Traitor::new(fyrox_lite_math::lite_math::LiteVector2::from(
+                value,
+            )))
+        });
     }
 }

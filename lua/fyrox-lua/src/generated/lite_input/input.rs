@@ -102,11 +102,15 @@ impl FyroxUserData for fyrox_lite::lite_input::Input {
         });
         fields.add_field_method_get("mouse_move", |lua, this| {
             let value = fyrox_lite::lite_input::Input::get_mouse_move();
-            Ok(Traitor::new(fyrox_lite::lite_math::PodVector2::from(value)))
+            Ok(Traitor::new(fyrox_lite_math::lite_math::LiteVector2::from(
+                value,
+            )))
         });
         fields.add_field_method_get("mouse_scroll", |lua, this| {
             let value = fyrox_lite::lite_input::Input::get_mouse_scroll();
-            Ok(Traitor::new(fyrox_lite::lite_math::PodVector2::from(value)))
+            Ok(Traitor::new(fyrox_lite_math::lite_math::LiteVector2::from(
+                value,
+            )))
         });
     }
 }

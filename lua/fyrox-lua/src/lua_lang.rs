@@ -1,3 +1,4 @@
+use std::fmt::{Debug, Formatter};
 use std::ops::DerefMut;
 
 use fyrox::core::{visitor::Visit, Uuid};
@@ -77,6 +78,12 @@ impl Lang for LuaLang {
 pub struct UnpackedScriptObjectVisit(
     pub SendWrapper<TypedUserData<'static, Traitor<ScriptObject>>>,
 );
+
+impl Debug for UnpackedScriptObjectVisit {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
 
 impl Visit for UnpackedScriptObjectVisit {
     fn visit(

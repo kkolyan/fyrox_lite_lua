@@ -32,12 +32,12 @@ impl FyroxUserData for fyrox_lite::lite_plugin::LitePlugin {
     fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
         methods: &mut M,
     ) {
-        methods.add_method_mut("get", |lua, this, (class): (mlua::String)| {
-            let class = class.to_str()?.to_string();
+        methods.add_method_mut("get", |lua, this, (class_id): (mlua::String)| {
+            let class_id = class_id.to_str()?.to_string();
             let _stub = Default::default();
             let ret = fyrox_lite::lite_plugin::LitePlugin::get::<
                 TypedUserData<Traitor<ScriptObject>>,
-            >(class, _stub);
+            >(class_id, _stub);
             let ret = match ret {
                 Ok(ret) => ret,
                 Err(err) => return Err(err),

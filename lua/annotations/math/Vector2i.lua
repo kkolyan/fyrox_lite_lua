@@ -5,11 +5,32 @@
 ---@diagnostic disable: missing-return, lowercase-global, missing-fields
 
 -----------------------------------------------------------
------- fyrox_lite::lite_math::PodVector2i
+------ fyrox_lite_math::lite_math::LiteVector2I
 -----------------------------------------------------------
 
----@class Vector2i
+---@class Vector2I_static
+---@field ZERO Vector2I
+Vector2I = {}
+
+---@class Vector2I
 ---@field x number
 ---@field y number
-Vector2i_instance = {}
+Vector2I_instance = {}
+
+---@param x number
+---@param y number
+---@return Vector2I
+function Vector2I:new(x, y) end
+
+---@param o number
+---@return Vector2I
+function Vector2I_instance:mul(o) end
+
+---@param o Vector2I
+---@return Vector2I
+function Vector2I_instance:add(o) end
+
+---@param o Vector2I
+---@return Vector2I
+function Vector2I_instance:sub(o) end
 

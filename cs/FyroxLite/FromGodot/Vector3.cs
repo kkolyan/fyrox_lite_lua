@@ -758,10 +758,10 @@ namespace FyroxLite
 
         private static readonly Vector3 _up = new Vector3(0, 1, 0);
         private static readonly Vector3 _down = new Vector3(0, -1, 0);
-        private static readonly Vector3 _right = new Vector3(1, 0, 0);
-        private static readonly Vector3 _left = new Vector3(-1, 0, 0);
-        private static readonly Vector3 _forward = new Vector3(0, 0, -1);
-        private static readonly Vector3 _back = new Vector3(0, 0, 1);
+        private static readonly Vector3 _right = new Vector3(-1, 0, 0);
+        private static readonly Vector3 _left = new Vector3(1, 0, 0);
+        private static readonly Vector3 _forward = new Vector3(0, 0, 1);
+        private static readonly Vector3 _back = new Vector3(0, 0, -1);
 
         private static readonly Vector3 _modelLeft = new Vector3(1, 0, 0);
         private static readonly Vector3 _modelRight = new Vector3(-1, 0, 0);

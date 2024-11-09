@@ -294,6 +294,287 @@
           }
         ]
       }
+    },
+    {
+      "Engine": {
+        "class_name": "Vector2",
+        "rust_struct_path": "fyrox_lite_math::lite_math::LiteVector2",
+        "methods": [
+          {
+            "instance": true,
+            "method_name": "get_x",
+            "signature": {
+              "return_ty": "F32"
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "get_y",
+            "signature": {
+              "return_ty": "F32"
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "set_x",
+            "signature": {
+              "params": [
+                {
+                  "name": "value",
+                  "ty": "F32",
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "set_y",
+            "signature": {
+              "params": [
+                {
+                  "name": "value",
+                  "ty": "F32",
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "get_ZERO",
+            "signature": {
+              "return_ty": {
+                "Object": "Vector2"
+              }
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "new",
+            "signature": {
+              "params": [
+                {
+                  "name": "x",
+                  "ty": "F32",
+                  "variadic": false
+                },
+                {
+                  "name": "y",
+                  "ty": "F32",
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Object": "Vector2"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "mul",
+            "signature": {
+              "params": [
+                {
+                  "name": "o",
+                  "ty": "F32",
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Object": "Vector2"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "add",
+            "signature": {
+              "params": [
+                {
+                  "name": "o",
+                  "ty": {
+                    "Object": "Vector2"
+                  },
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Object": "Vector2"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "normalize",
+            "signature": {
+              "return_ty": {
+                "Object": "Vector2"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "sub",
+            "signature": {
+              "params": [
+                {
+                  "name": "o",
+                  "ty": {
+                    "Object": "Vector2"
+                  },
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Object": "Vector2"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "magnitude",
+            "signature": {
+              "return_ty": "F32"
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "normalize_inplace",
+            "signature": {}
+          }
+        ]
+      }
+    },
+    {
+      "Engine": {
+        "class_name": "Vector2I",
+        "rust_struct_path": "fyrox_lite_math::lite_math::LiteVector2I",
+        "methods": [
+          {
+            "instance": true,
+            "method_name": "get_x",
+            "signature": {
+              "return_ty": "I32"
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "get_y",
+            "signature": {
+              "return_ty": "I32"
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "set_x",
+            "signature": {
+              "params": [
+                {
+                  "name": "value",
+                  "ty": "I32",
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "set_y",
+            "signature": {
+              "params": [
+                {
+                  "name": "value",
+                  "ty": "I32",
+                  "variadic": false
+                }
+              ]
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "get_ZERO",
+            "signature": {
+              "return_ty": {
+                "Object": "Vector2I"
+              }
+            }
+          },
+          {
+            "instance": false,
+            "method_name": "new",
+            "signature": {
+              "params": [
+                {
+                  "name": "x",
+                  "ty": "I32",
+                  "variadic": false
+                },
+                {
+                  "name": "y",
+                  "ty": "I32",
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Object": "Vector2I"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "mul",
+            "signature": {
+              "params": [
+                {
+                  "name": "o",
+                  "ty": "I32",
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Object": "Vector2I"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "add",
+            "signature": {
+              "params": [
+                {
+                  "name": "o",
+                  "ty": {
+                    "Object": "Vector2I"
+                  },
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Object": "Vector2I"
+              }
+            }
+          },
+          {
+            "instance": true,
+            "method_name": "sub",
+            "signature": {
+              "params": [
+                {
+                  "name": "o",
+                  "ty": {
+                    "Object": "Vector2I"
+                  },
+                  "variadic": false
+                }
+              ],
+              "return_ty": {
+                "Object": "Vector2I"
+              }
+            }
+          }
+        ]
+      }
     }
   ]
 }

@@ -27,11 +27,11 @@ impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_ui::LinearGradient> 
             let t = lua.create_table()?;
             t.set("from", {
                 let from = self.from.clone();
-                Traitor::new(fyrox_lite::lite_math::PodVector2::from(from))
+                Traitor::new(fyrox_lite_math::lite_math::LiteVector2::from(from))
             })?;
             t.set("to", {
                 let to = self.to.clone();
-                Traitor::new(fyrox_lite::lite_math::PodVector2::from(to))
+                Traitor::new(fyrox_lite_math::lite_math::LiteVector2::from(to))
             })?;
             t.set("stops", {
                 let stops = self.stops.clone();
@@ -55,10 +55,12 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_ui::LinearGradient> 
                 value
             ));
         };
-        let from = value.get::<_, Traitor<fyrox_lite::lite_math::PodVector2>>("from")?;
-        let from = from.inner().clone().into();
-        let to = value.get::<_, Traitor<fyrox_lite::lite_math::PodVector2>>("to")?;
-        let to = to.inner().clone().into();
+        let from = value
+            .get::<_, TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector2>>>("from")?;
+        let from = from.borrow()?.inner().clone().into();
+        let to = value
+            .get::<_, TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector2>>>("to")?;
+        let to = to.borrow()?.inner().clone().into();
         let stops = value.get::<_, Vec<Traitor<fyrox_lite::lite_ui::GradientPoint>>>("stops")?;
         let stops = stops
             .into_iter()

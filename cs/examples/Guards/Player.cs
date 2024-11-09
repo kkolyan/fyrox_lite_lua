@@ -27,7 +27,7 @@ public class Player: NodeScript
     [Transient]
     private float AimY;
 
-    private const int FractionPlayer = 0;
+    public const int FractionPlayer = 0;
 
     public void Turn(float x)
     {
@@ -40,7 +40,7 @@ public class Player: NodeScript
         AimY += y * sensitivity;
         AimY = Math.Max(-MathF.PI / 2.0f, Math.Min(AimY, MathF.PI / 2.0f));
 
-        camera.LocalRotation = Quaternion.FromEuler(Vector3.Right * AimY);
+        camera.LocalRotation = Quaternion.FromEuler(Vector3.Left * AimY);
     }
 
     public void Fire()
@@ -48,7 +48,7 @@ public class Player: NodeScript
         Vector3 cameraPos = camera.GlobalPosition;
         Quaternion bulletOrientation = camera.GlobalRotation;
 
-        global::Bullet.Spawn(new Bullet.BulletSeed
+        Bullet.Spawn(new Bullet.BulletSeed
         {
             Prefab = bullet,
             Origin = cameraPos,

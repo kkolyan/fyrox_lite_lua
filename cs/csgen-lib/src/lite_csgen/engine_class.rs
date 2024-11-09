@@ -1,34 +1,24 @@
 use std::collections::{HashMap, HashSet};
-use std::ops::Deref;
 use convert_case::{Case, Casing};
 use to_vec::ToVec;
-use gen_common::code_model::{ModContent, Module};
+use gen_common::code_model::{Module};
 use gen_common::context::GenerationContext;
+use gen_common::properties::{Getter, Setter};
 use gen_common::templating::{render, render_string};
-use lite_model::{Class, ClassName, ConstantValue, DataType, EngineClass, Literal, Method, StructClass};
+use lite_model::{Class, ConstantValue, DataType, EngineClass, Literal, Method, StructClass};
 use crate::lite_csgen::{api_types, wrappers};
 use crate::lite_csgen::api_types::CsType;
 use crate::lite_csgen::gen_rs::RustEmitter;
-
-fn contains_type(ty: &DataType, class_name: &ClassName) -> bool {
-    match ty {
-        DataType::Vec(it) => contains_type(it, class_name),
-        DataType::Object(it) => *it == *class_name,
-        DataType::Option(it) => contains_type(it, class_name),
-        DataType::Result { ok, .. } => contains_type(ok, class_name),
-        _ => false,
-    }
-}
 
 pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, rust: &mut RustEmitter) -> Module {
     let static_class = !class.methods.iter().any(|it| it.instance) && !ctx.domain.classes.iter().any(|it| {
         match it {
             Class::Engine(it) => {
                 let methods_can_create = it.methods.iter().any(|it| match &it.signature.return_ty {
-                    Some(it) => contains_type(it, &class.class_name),
+                    Some(it) => it.contains_type(&class.class_name),
                     _ => false
                 });
-                let constants_has = it.constants.iter().any(|it| contains_type(&it.ty, &class.class_name));
+                let constants_has = it.constants.iter().any(|it| it.ty.contains_type(&class.class_name));
                 methods_can_create || constants_has
             },
             _ => false,
@@ -105,13 +95,13 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
     let mut props: HashMap<String, (Option<Getter>, Option<Setter>)> = HashMap::new();
 
     for method in class.methods.iter() {
-        if let Some(getter) = as_getter(method) {
+        if let Some(getter) = Getter::try_from(method) {
             let key = getter.prop_name.to_string();
             props.entry(key)
                 .or_default()
                 .0 = Some(getter);
         }
-        if let Some(setter) = as_setter(method) {
+        if let Some(setter) = Setter::try_from(method) {
             let key = setter.prop_name.to_string();
             props.entry(key)
                 .or_default()
@@ -120,12 +110,12 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
     }
 
     for method in class.methods.iter() {
-        if let Some(getter) = as_getter(method) {
+        if let Some(getter) = Getter::try_from(method) {
             let Some((getter, setter)) = props.remove(&getter.prop_name) else { continue };
             generate_property(&mut s, class, getter, setter, ctx);
             continue;
         }
-        if let Some(setter) = as_setter(method) {
+        if let Some(setter) = Setter::try_from(method) {
             let Some((getter, setter)) = props.remove(&setter.prop_name) else { continue };
             generate_property(&mut s, class, getter, setter, ctx);
             continue;
@@ -198,52 +188,6 @@ pub(crate) fn generate_bindings(class: &EngineClass, ctx: &GenerationContext, ru
     }
 
     Module::code(&class.class_name, s)
-}
-
-struct Getter {
-    instance: bool,
-    prop_name: String,
-    prop_type: DataType,
-}
-struct Setter {
-    instance: bool,
-    prop_name: String,
-    prop_type: DataType,
-    has_result: bool,
-}
-
-fn as_setter(method: &Method) -> Option<Setter> {
-    let (no_return, has_result) = match &method.signature.return_ty {
-        None => (true, false),
-        Some(it) => match it {
-            DataType::Unit => (true, false),
-            DataType::Result { ok } => (matches!(ok.deref(), DataType::Unit), true),
-            _ => (false, true),
-        }
-    };
-    if no_return && method.signature.params.iter().filter(|it| !matches!(&it.ty, DataType::UserScriptGenericStub)).count() == 1 && method.method_name.starts_with("set_") {
-        let prop_name = method.method_name.strip_prefix("set_").unwrap().to_string();
-        let prop_type = method.signature.params.first().as_ref().unwrap().ty.clone();
-        return Some(Setter {
-            instance: method.instance,
-            prop_name,
-            prop_type,
-            has_result,
-        });
-    }
-    None
-}
-fn as_getter(method: &Method) -> Option<Getter> {
-    if method.signature.return_ty.is_some() && !method.signature.params.iter().any(|it| !matches!(&it.ty, DataType::UserScriptGenericStub)) && method.method_name.starts_with("get_") {
-        let prop_name = method.method_name.strip_prefix("get_").unwrap().to_string();
-        let prop_type = method.signature.return_ty.as_ref().unwrap().clone();
-        return Some(Getter {
-            instance: method.instance,
-            prop_name,
-            prop_type,
-        });
-    }
-    None
 }
 
 fn generate_property(s: &mut String, class: &EngineClass, getter: Option<Getter>, setter: Option<Setter>, ctx: &GenerationContext) {

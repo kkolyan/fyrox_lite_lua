@@ -34,20 +34,26 @@ function Node_instance:destroy() end
 ---@param payload any
 function Node_instance:send_hierarchical(routing, payload) end
 
+---@param new_pos Vector3
+function Node_instance:set_local_position(new_pos) end
+
+---@param value Quaternion
+function Node_instance:set_local_rotation(value) end
+
 function Node_instance:subscribe_to() end
 
 ---@return Node?
 function Node_instance:find_collider_in_children() end
 
 ---@generic T
----@param class `T`
+---@param class_id `T`
 ---@return T
-function Node_instance:add_script(class) end
+function Node_instance:add_script(class_id) end
 
 ---@generic T
----@param class `T`
+---@param class_id `T`
 ---@return T?
-function Node_instance:find_script(class) end
+function Node_instance:find_script(class_id) end
 
 ---@param tag string
 ---@return boolean

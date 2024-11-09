@@ -102,3 +102,16 @@ impl Method {
             })
     }
 }
+
+impl DataType {
+    
+    pub fn contains_type(&self, class_name: &ClassName) -> bool {
+        match self {
+            DataType::Vec(it) => it.contains_type(class_name),
+            DataType::Object(it) => *it == *class_name,
+            DataType::Option(it) => it.contains_type(class_name),
+            DataType::Result { ok, .. } => ok.contains_type(class_name),
+            _ => false,
+        }
+    }
+}

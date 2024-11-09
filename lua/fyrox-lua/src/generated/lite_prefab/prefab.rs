@@ -38,8 +38,16 @@ impl FyroxUserData for fyrox_lite::lite_prefab::LitePrefab {
             )| {
                 let position = position.borrow()?.inner().clone().into();
                 let orientation = orientation.borrow()?.inner().clone().into();
-                let ret = this.instantiate_at(position, orientation);
-                let ret = Traitor::new(fyrox_lite::lite_node::LiteNode::from(ret));
+                let _stub = Default::default();
+                let ret = this.instantiate_at::<TypedUserData<Traitor<ScriptObject>>>(
+                    position,
+                    orientation,
+                    _stub,
+                );
+                let ret = match ret {
+                    Ok(ret) => Traitor::new(fyrox_lite::lite_node::LiteNode::from(ret)),
+                    Err(err) => return Err(err),
+                };
                 Ok(ret)
             },
         );

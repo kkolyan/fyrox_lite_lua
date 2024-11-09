@@ -16,39 +16,78 @@ use fyrox_lite_math::*;
 use mlua;
 
 use crate::{
-    lua_error,
     script_object::ScriptObject,
     typed_userdata::TypedUserData,
     user_data_plus::{FyroxUserData, Traitor, UserDataClass},
 };
-impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_math::PodVector2I> {
-    fn into_lua(self, lua: &'lua mlua::Lua) -> mlua::Result<mlua::Value<'lua>> {
-        Ok(mlua::Value::Table({
-            let t = lua.create_table()?;
-            t.set("x", {
-                let x = self.x.clone();
-                x
-            })?;
-            t.set("y", {
-                let y = self.y.clone();
-                y
-            })?;
-            t
-        }))
+
+impl FyroxUserData for fyrox_lite_math::lite_math::LiteVector2I {
+    const CLASS_NAME: &'static str = "Vector2I";
+
+    fn add_instance_methods<'lua, M: mlua::UserDataMethods<'lua, Traitor<Self>>>(methods: &mut M) {
+        methods.add_meta_method(mlua::MetaMethod::ToString.name(), |lua, this, args: ()| {
+            Ok(format!("{:?}", this.inner()))
+        });
+        methods.add_method_mut("mul", |lua, this, (o): (i32)| {
+            let o = o;
+            let ret = this.mul(o);
+            let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector2I::from(ret));
+            Ok(ret)
+        });
+        methods.add_method_mut(
+            "add",
+            |lua, this, (o): (TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector2I>>)| {
+                let o = o.borrow()?.inner().clone().into();
+                let ret = this.add(o);
+                let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector2I::from(ret));
+                Ok(ret)
+            },
+        );
+        methods.add_method_mut(
+            "sub",
+            |lua, this, (o): (TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector2I>>)| {
+                let o = o.borrow()?.inner().clone().into();
+                let ret = this.sub(o);
+                let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector2I::from(ret));
+                Ok(ret)
+            },
+        );
     }
-}
-impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_math::PodVector2I> {
-    fn from_lua(value: mlua::Value<'lua>, lua: &'lua mlua::Lua) -> mlua::Result<Self> {
-        let mlua::Value::Table(value) = value else {
-            return Err(lua_error!(
-                "cannot extract Vector2i from {:?}. expected table.",
-                value
-            ));
-        };
-        let x = value.get::<_, i64>("x")?;
-        let x = x;
-        let y = value.get::<_, i64>("y")?;
-        let y = y;
-        Ok(Traitor::new(fyrox_lite::lite_math::PodVector2I { x, y }))
+    fn add_class_methods<'lua, M: mlua::UserDataMethods<'lua, UserDataClass<Self>>>(
+        methods: &mut M,
+    ) {
+        methods.add_method_mut("new", |lua, this, (x, y): (i32, i32)| {
+            let x = x;
+            let y = y;
+            let ret = fyrox_lite_math::lite_math::LiteVector2I::new(x, y);
+            let ret = Traitor::new(fyrox_lite_math::lite_math::LiteVector2I::from(ret));
+            Ok(ret)
+        });
+    }
+    fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+        fields.add_field_method_get("x", |lua, this| {
+            let value = this.get_x();
+            Ok(value)
+        });
+        fields.add_field_method_get("y", |lua, this| {
+            let value = this.get_y();
+            Ok(value)
+        });
+        fields.add_field_method_set("x", |lua, this, value: i32| {
+            this.set_x(value);
+            Ok(())
+        });
+        fields.add_field_method_set("y", |lua, this, value: i32| {
+            this.set_y(value);
+            Ok(())
+        });
+    }
+    fn add_class_fields<'lua, F: mlua::UserDataFields<'lua, UserDataClass<Self>>>(fields: &mut F) {
+        fields.add_field_method_get("ZERO", |lua, this| {
+            let value = fyrox_lite_math::lite_math::LiteVector2I::get_ZERO();
+            Ok(Traitor::new(
+                fyrox_lite_math::lite_math::LiteVector2I::from(value),
+            ))
+        });
     }
 }

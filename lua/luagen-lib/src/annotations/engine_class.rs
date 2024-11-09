@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use lite_model::{DataType, EngineClass, Method};
 use to_vec::ToVec;
-
+use gen_common::methods::analyze_method_result;
 use crate::{
     annotations::type_to_lua::type_rust_to_lua,
     bindings::generate_methods::{is_getter, is_setter},
@@ -102,8 +102,10 @@ pub fn methods(s: &mut String, class: &EngineClass, instance: bool) {
             );
         }
 
-        if let Some(return_ty) = &method.signature.return_ty {
-            writelnu!(s, "---@return {}", type_rust_to_lua(return_ty),);
+        let method_result = analyze_method_result(method);
+
+        if !matches!(method_result.success_type, DataType::Unit) {
+            writelnu!(s, "---@return {}", type_rust_to_lua(&method_result.success_type),);
         }
 
         writelnu!(

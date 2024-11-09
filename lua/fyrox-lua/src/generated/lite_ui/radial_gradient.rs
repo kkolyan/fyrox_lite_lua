@@ -27,7 +27,7 @@ impl<'lua> mlua::IntoLua<'lua> for Traitor<fyrox_lite::lite_ui::RadialGradient> 
             let t = lua.create_table()?;
             t.set("center", {
                 let center = self.center.clone();
-                Traitor::new(fyrox_lite::lite_math::PodVector2::from(center))
+                Traitor::new(fyrox_lite_math::lite_math::LiteVector2::from(center))
             })?;
             t.set("stops", {
                 let stops = self.stops.clone();
@@ -51,8 +51,9 @@ impl<'lua> mlua::FromLua<'lua> for Traitor<fyrox_lite::lite_ui::RadialGradient> 
                 value
             ));
         };
-        let center = value.get::<_, Traitor<fyrox_lite::lite_math::PodVector2>>("center")?;
-        let center = center.inner().clone().into();
+        let center = value
+            .get::<_, TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector2>>>("center")?;
+        let center = center.borrow()?.inner().clone().into();
         let stops = value.get::<_, Vec<Traitor<fyrox_lite::lite_ui::GradientPoint>>>("stops")?;
         let stops = stops
             .into_iter()

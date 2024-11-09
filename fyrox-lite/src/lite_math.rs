@@ -53,6 +53,21 @@ impl From<PodVector2> for Vector2<f32> {
     }
 }
 
+impl From<Vector2<i32>> for PodVector2I {
+    fn from(v: Vector2<i32>) -> Self {
+        Self {
+            x: v.x,
+            y: v.y,
+        }
+    }
+}
+
+impl From<PodVector2I> for Vector2<i32> {
+    fn from(v: PodVector2I) -> Self {
+        Self::new(v.x, v.y)
+    }
+}
+
 #[lite_api(class=Quaternion)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PodQuaternion {

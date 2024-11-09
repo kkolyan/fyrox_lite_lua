@@ -151,7 +151,7 @@ public class Guard : NodeScript
         }
     }
 
-    public void OnMessage(object message)
+    protected override void OnMessage(object message)
     {
         if (message is BulletHitMessage hit && hit.Fraction != FRACTION_GUARDS)
         {

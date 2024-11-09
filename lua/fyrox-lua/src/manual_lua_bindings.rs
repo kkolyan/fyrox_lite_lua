@@ -1,11 +1,10 @@
 use fyrox::core::{log::Log, Uuid};
 use fyrox_lite::{lite_node::LiteNode, lite_prefab::LitePrefab, lite_ui::LiteUiNode, script_context::with_script_context};
-use fyrox_lite_math::lite_math::{LiteQuaternion, LiteVector3};
+use fyrox_lite_math::lite_math::{LiteQuaternion, LiteVector2, LiteVector2I, LiteVector3};
 use mlua::{MetaMethod, String as LuaString, Table, UserData, UserDataRef, Value};
 
 use crate::{debug::VerboseLuaValue, lua_error, lua_utils::{OptionX, ValueX}, script_class::ScriptClass, script_object::{ScriptFieldValue, ScriptObject}, user_data_plus::{FyroxUserData, Traitor}};
-
-
+use crate::lua_lang::LuaLang;
 
 impl UserData for ScriptClass {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
@@ -82,6 +81,12 @@ impl UserData for Traitor<ScriptObject> {
                                 }
                                 ScriptFieldValue::Vector3(it) => Value::UserData(
                                     lua.create_userdata(Traitor::new(LiteVector3::from(*it)))?,
+                                ),
+                                ScriptFieldValue::Vector2(it) => Value::UserData(
+                                    lua.create_userdata(Traitor::new(LiteVector2::from(*it)))?,
+                                ),
+                                ScriptFieldValue::Vector2I(it) => Value::UserData(
+                                    lua.create_userdata(Traitor::new(LiteVector2I::from(*it)))?,
                                 ),
                                 ScriptFieldValue::Quaternion(it) => Value::UserData(
                                     lua.create_userdata(Traitor::new(LiteQuaternion::from(*it)))?,
@@ -248,6 +253,22 @@ impl UserData for Traitor<ScriptObject> {
                             }
                             ScriptFieldValue::Vector3(it) => {
                                 *it = extract_userdata_value::<LiteVector3>(
+                                    value,
+                                    &class,
+                                    &field_name,
+                                )?
+                                .into()
+                            }
+                            ScriptFieldValue::Vector2(it) => {
+                                *it = extract_userdata_value::<LiteVector2>(
+                                    value,
+                                    &class,
+                                    &field_name,
+                                )?
+                                .into()
+                            }
+                            ScriptFieldValue::Vector2I(it) => {
+                                *it = extract_userdata_value::<LiteVector2I>(
                                     value,
                                     &class,
                                     &field_name,
