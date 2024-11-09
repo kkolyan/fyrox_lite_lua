@@ -7,7 +7,10 @@ use gen_common::{
     context::GenerationContext,
     templating::render,
 };
+use gen_common::properties::{Getter, Setter};
 use super::expressions::{mlua_to_rust_expr, rust_expr_to_mlua, type_to_mlua};
+
+pub const USER_SCRIPT_IMPL: &str = "TypedUserData<Traitor<ScriptObject>>";
 
 pub fn generate_methods(
     s: &mut String,
@@ -29,8 +32,8 @@ pub fn generate_methods(
             .to_vec();
 
         let generics = match method.is_generic() {
-            true => "::<TypedUserData<Traitor<ScriptObject>>>",
-            false => "",
+            true => format!("::<{}>", USER_SCRIPT_IMPL),
+            false => "".to_owned(),
         };
 
         let input_names = params.iter()
@@ -113,11 +116,11 @@ pub fn generate_methods(
 }
 
 pub(crate) fn is_setter(method: &Method) -> bool {
-    method.method_name.starts_with("set_") && method.signature.params.len() == 1
+    Setter::try_from(method).is_some()
 }
 
 pub(crate) fn is_getter(method: &Method) -> bool {
-    method.method_name.starts_with("get_") && method.signature.params.is_empty() && method.signature.return_ty.is_some()
+    Getter::try_from(method).is_some()
 }
 
 pub(crate) fn is_regular(method: &Method) -> bool {

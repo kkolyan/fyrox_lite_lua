@@ -55,15 +55,6 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
             };
             Ok(ret)
         });
-        methods.add_method_mut("get_name", |lua, this, (): ()| {
-            let _stub = Default::default();
-            let ret = this.get_name::<TypedUserData<Traitor<ScriptObject>>>(_stub);
-            let ret = match ret {
-                Ok(ret) => ret,
-                Err(err) => return Err(err),
-            };
-            Ok(ret)
-        });
         methods.add_method_mut("destroy", |lua, this, (): ()| {
             let ret = this.destroy();
             let ret = ret;
@@ -87,26 +78,6 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
                 Ok(ret)
             },
         );
-        methods.add_method_mut(
-                    "set_local_position",
-                    |lua, this, (new_pos): (TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector3>>)| {
-                    let new_pos = new_pos.borrow()?.inner().clone().into();
-                    let _stub = Default::default();
-                        let ret = this.set_local_position::<TypedUserData<Traitor<ScriptObject>>>(new_pos, _stub);
-                        let ret = match ret { Ok(ret) => ret, Err(err) => return Err(err) };
-                        Ok(ret)
-                    },
-                );
-        methods.add_method_mut(
-                    "set_local_rotation",
-                    |lua, this, (value): (TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteQuaternion>>)| {
-                    let value = value.borrow()?.inner().clone().into();
-                    let _stub = Default::default();
-                        let ret = this.set_local_rotation::<TypedUserData<Traitor<ScriptObject>>>(value, _stub);
-                        let ret = match ret { Ok(ret) => ret, Err(err) => return Err(err) };
-                        Ok(ret)
-                    },
-                );
         methods.add_method_mut("subscribe_to", |lua, this, (): ()| {
             let _stub = Default::default();
             let ret = this.subscribe_to::<TypedUserData<Traitor<ScriptObject>>>(_stub);
@@ -160,6 +131,13 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
     ) {
     }
     fn add_instance_fields<'lua, F: mlua::UserDataFields<'lua, Traitor<Self>>>(fields: &mut F) {
+        fields.add_field_method_get("name", |lua, this| {
+            let value = this.get_name::<TypedUserData<Traitor<ScriptObject>>>(());
+            Ok(match value {
+                Ok(value) => value,
+                Err(err) => return Err(err),
+            })
+        });
         fields.add_field_method_get("alive", |lua, this| {
             let value = this.get_alive();
             Ok(value)
@@ -200,6 +178,20 @@ impl FyroxUserData for fyrox_lite::lite_node::LiteNode {
             let value = this.get_tag();
             Ok(value)
         });
+        fields.add_field_method_set(
+            "local_position",
+            |lua, this, value: TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteVector3>>| {
+                this.set_local_position::<TypedUserData<Traitor<ScriptObject>>>(
+                    value.borrow()?.inner().clone().into(),
+                    (),
+                );
+                Ok(())
+            },
+        );
+        fields.add_field_method_set("local_rotation", |lua, this, value: TypedUserData<Traitor<fyrox_lite_math::lite_math::LiteQuaternion>>| {
+                    this.set_local_rotation::<TypedUserData<Traitor<ScriptObject>>>(value.borrow()?.inner().clone().into(), ());
+                    Ok(())
+                });
         fields.add_field_method_set("tag", |lua, this, value: mlua::String| {
             this.set_tag(value.to_str()?.to_string());
             Ok(())
