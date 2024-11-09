@@ -57,7 +57,10 @@ public class Bullet : NodeScript
         {
             if (hit.Collider != author_collider)
             {
-                hit.Collider.SendHierarchical(RoutingStrategy.Up, new BulletHitMessage { Fraction = (int)fraction });
+                // scene from the Lua version of game is used, and Lua stores any number as f32
+                var fraction = (int)this.fraction;
+                
+                hit.Collider.SendHierarchical(RoutingStrategy.Up, new BulletHitMessage { Fraction = fraction });
                 Node.Destroy();
                 return;
             }
