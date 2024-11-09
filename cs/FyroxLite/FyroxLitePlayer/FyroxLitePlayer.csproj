@@ -11,7 +11,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\FyroxLiteInternal\FyroxLiteInternal.csproj" />
-      <ProjectReference Include="..\Player\FyroxLite.csproj" />
+      <ProjectReference Include="..\FyroxLite\FyroxLite.csproj" />
     </ItemGroup>
 
 </Project>

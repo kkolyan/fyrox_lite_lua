@@ -1,19 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <InvariantGlobalization>true</InvariantGlobalization>
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Auto\Internal\" />
-      <Folder Include="Internal\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\FyroxLiteInternal\FyroxLiteInternal.csproj" />
+      <ProjectReference Include="..\FyroxLite\FyroxLite.csproj" />
     </ItemGroup>
 
 </Project>

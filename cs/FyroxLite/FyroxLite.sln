@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FyroxLite", "Player\FyroxLite.csproj", "{440868BA-6472-49A7-B877-710267FA51FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FyroxLite", "FyroxLite\FyroxLite.csproj", "{440868BA-6472-49A7-B877-710267FA51FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FyroxLiteEditor", "Editor\FyroxLiteEditor.csproj", "{4D986C52-C802-4528-AB64-425F1C5E2358}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FyroxLiteEditor", "FyroxLiteEditor\FyroxLiteEditor.csproj", "{4D986C52-C802-4528-AB64-425F1C5E2358}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FyroxLitePlayer", "FyroxLitePlayer\FyroxLitePlayer.csproj", "{553DC782-B340-48D5-8FC7-896FE93A9B4D}"
 EndProject
