@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-cargo run --bin csgen
+RUST_BACKTRACE=1 cargo run --bin csgen

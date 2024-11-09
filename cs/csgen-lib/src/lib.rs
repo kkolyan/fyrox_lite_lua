@@ -13,7 +13,7 @@ pub mod lite_cgen;
 pub mod lite_csgen;
 
 pub fn generate_manual_bindings_cs() -> HierarchicalCodeBase {
-    let s = fs::read_to_string("cs/fyrox-c/src/bindings_manual.rs").unwrap();
+    let s = fs::read_to_string("cs/fyrox-c-lib/src/bindings_manual.rs").unwrap();
     let file = parse2::<File>(TokenStream::from_str(&s).unwrap()).unwrap();
 
     rust_decl_to_cs::rust_decl_to_c(&file, &HashSet::new())

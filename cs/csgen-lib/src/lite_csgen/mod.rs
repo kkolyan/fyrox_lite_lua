@@ -10,7 +10,7 @@ pub mod enum_class;
 pub mod api_types;
 pub mod write_cs;
 pub mod wrappers;
-mod gen_rs;
+pub mod gen_rs;
 
 pub fn generate_cs_facade(domain: &Domain) -> (HierarchicalCodeBase, RustEmitter) {
     let ctx = GenerationContext {
@@ -45,11 +45,19 @@ pub fn generate_cs_facade(domain: &Domain) -> (HierarchicalCodeBase, RustEmitter
             content: ModContent::Children(mods),
         });
     }
-    bindings.mods.push(generate_base(&mut rust, &ctx));
     (bindings, rust)
 }
 
-fn generate_base(rust: &mut RustEmitter, ctx: &GenerationContext) -> Module {
+pub fn generate_base() -> (HierarchicalCodeBase, RustEmitter) {
+    let ctx = GenerationContext {
+        internal_to_external: Default::default(),
+        domain: &Default::default(),
+    };
+    let ctx = &ctx;
+
+    let mut rust_owned = RustEmitter::default();
+    let rust = &mut rust_owned;
+    
     let mut s = String::new();
     let basic_types = [
         DataType::Bool,
@@ -72,5 +80,5 @@ fn generate_base(rust: &mut RustEmitter, ctx: &GenerationContext) -> Module {
     wrappers::generate_optional(&mut s, rust, &DataType::Object(ClassName("NativeHandle".to_string())), ctx);
     wrappers::generate_slice(&mut s, rust, &DataType::Object(ClassName("NativePropertyValue".to_string())), ctx);
     wrappers::generate_result(&mut s, rust, &DataType::Option(Box::new(DataType::UserScript)), ctx);
-    Module::code("LiteBase", s)
+    (HierarchicalCodeBase {mods: vec![Module::code("LiteBase", s)]}, rust_owned)
 }

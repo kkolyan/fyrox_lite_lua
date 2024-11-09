@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="Auto\Internal\" />
+      <Folder Include="Internal\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FyroxLiteInternal\FyroxLiteInternal.csproj" />
+    </ItemGroup>
+
+</Project>

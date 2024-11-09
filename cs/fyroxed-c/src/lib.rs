@@ -1,3 +1,2 @@
 pub use fyrox_c_lib::*;
-
-pub mod executor_cs;
+pub mod editor_cs;

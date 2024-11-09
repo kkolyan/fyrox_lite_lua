@@ -1,5 +1,5 @@
 [package]
-name = "fyrox-c"
+name = "fyroxed-c"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,5 +7,6 @@ edition = "2021"
 crate-type = ["dylib"]
 
 [dependencies]
+fyroxed_base = { workspace = true }
 fyrox = { workspace = true }
 fyrox-c-lib = { workspace = true }

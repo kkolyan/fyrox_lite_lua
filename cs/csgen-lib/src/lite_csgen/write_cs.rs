@@ -3,8 +3,7 @@ use convert_case::{Case, Casing};
 use to_vec::ToVec;
 use gen_common::code_model::{HierarchicalCodeBase, ModContent, Module};
 
-pub fn write_cs(code: HierarchicalCodeBase) {
-    let dir = "cs/FyroxLite/Auto";
+pub fn write_cs(dir: &str, code: HierarchicalCodeBase) {
     fs::create_dir_all(dir).unwrap();
     fs::remove_dir_all(dir).unwrap();
 

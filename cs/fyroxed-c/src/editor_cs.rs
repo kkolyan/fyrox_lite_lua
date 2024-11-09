@@ -9,7 +9,7 @@ use crate::fyrox_c_plugin::CPlugin;
 
 #[no_mangle]
 pub extern "C" fn fyrox_lite_editor_run() {
-    Log::set_verbosity(MessageKind::Warning);
+    Log::set_verbosity(MessageKind::Information);
     let event_loop = EventLoop::new().unwrap();
     let mut editor = Editor::new(Some(StartupData {
         working_directory: Default::default(),

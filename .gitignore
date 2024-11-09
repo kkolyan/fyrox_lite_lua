@@ -7,6 +7,8 @@
 /lua/examples/guards/fyrox-lite.lua
 /cs/*/bin
 /cs/*/obj
+/cs/FyroxLite/*/bin
+/cs/FyroxLite/*/obj
 /cs/examples/*/bin
 /cs/examples/*/obj
 *.sln.DotSettings.user

@@ -1171,6 +1171,7 @@ dependencies = [
 name = "fyrox-c"
 version = "0.1.0"
 dependencies = [
+ "fyrox",
  "fyrox-c-lib",
 ]
 
@@ -1182,7 +1183,6 @@ dependencies = [
  "extend",
  "fyrox",
  "fyrox-lite",
- "fyroxed_base",
  "send_wrapper",
  "to_vec",
 ]
@@ -1422,6 +1422,15 @@ dependencies = [
  "strum",
  "strum_macros",
  "sysinfo",
+]
+
+[[package]]
+name = "fyroxed-c"
+version = "0.1.0"
+dependencies = [
+ "fyrox",
+ "fyrox-c-lib",
+ "fyroxed_base",
 ]
 
 [[package]]
