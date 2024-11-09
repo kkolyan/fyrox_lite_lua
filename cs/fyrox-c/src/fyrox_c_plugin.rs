@@ -30,7 +30,7 @@ use crate::arena::Arena;
 use crate::bindings_lite_2::{i32_result, i32_result_value};
 use crate::c_lang::{ UnpackedObject};
 use crate::errors::ResultTcrateLangSpecificErrorExt;
-use crate::tracked::{AutoDisposableScriptInstance};
+use crate::auto_dispose::{AutoDispose};
 
 #[derive(Visit, Reflect)]
 pub struct CPlugin {
@@ -153,7 +153,7 @@ impl Plugin for CPlugin {
                                 data: ScriptResidence::Unpacked(UnpackedObject {
                                     uuid: Default::default(),
                                     class,
-                                    instance: AutoDisposableScriptInstance::new(instance),
+                                    instance: AutoDispose::new(instance),
                                 }),
                             });
                         }

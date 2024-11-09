@@ -18,7 +18,7 @@ mod errors;
 
 mod editor_cs;
 mod utils;
-mod tracked;
+mod auto_dispose;
 
 pub(crate) use arena::Arena;
 use crate::bindings_manual::UserScriptMessage;

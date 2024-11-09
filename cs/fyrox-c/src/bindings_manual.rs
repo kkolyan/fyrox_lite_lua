@@ -3,12 +3,11 @@ use std::{
     fmt::Display,
 };
 use std::fmt::{Debug, Formatter};
-use fyrox::core::{algebra::iter, pool::Handle};
-use fyrox_lite::{lite_math::{PodQuaternion, PodVector3}, spi::UserScript, LiteDataType};
+use fyrox_lite::{spi::UserScript};
 use fyrox_lite::spi::ClassId;
 use crate::bindings_lite_2::{f64_result, f64_result_value, i32_result, u8_slice, NativeHandle_optional, NativeInstanceId_result, NativePrefab, NativePropertyValue_slice, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeString_optional, NativeValue_slice, NativeVector2, NativeVector2I, NativeVector3};
-use crate::c_lang::CCompatibleLang;
 use crate::scripted_app::{ScriptedApp, APP};
+use crate::auto_dispose::DisposableHandle;
 
 #[no_mangle]
 ///@owner_class FyroxCApi
@@ -239,6 +238,18 @@ pub struct NativeScriptAppFunctions {
     pub create_script_instance: CreateScriptInstance,
     pub dispose_message: DisposeMessage,
     pub dispose_script: DisposeScript,
+}
+
+impl DisposableHandle for NativeInstanceId {
+    fn dispose_handle(&self, f: &NativeScriptAppFunctions) {
+        (f.dispose_script)(*self);
+    }
+}
+
+impl DisposableHandle for UserScriptMessage {
+    fn dispose_handle(&self, f: &NativeScriptAppFunctions) {
+        (f.dispose_message)(*self);
+    }
 }
 
 pub type NodeOnUpdate = extern "C" fn(thiz: NativeInstanceId, dt: f32) -> Unit_result;

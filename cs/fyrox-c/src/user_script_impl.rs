@@ -8,9 +8,9 @@ use fyrox_lite::script_object_residence::ScriptResidence;
 use fyrox_lite::spi::ClassId;
 use crate::{bindings_manual::{NativeHandle, NativeInstanceId}, external_script_proxy::ExternalScriptProxy, fyrox_c_plugin::CPlugin};
 use crate::bindings_lite_2::NativePropertyValue_slice;
-use crate::bindings_manual::NativeClassId;
+use crate::bindings_manual::{NativeClassId, UserScriptMessage};
 use crate::c_lang::{UnpackedObject};
-use crate::tracked::{AutoDisposableUserMessage, AutoDisposableScriptInstance};
+use crate::auto_dispose::{AutoDispose};
 use crate::scripted_app::APP;
 
 
@@ -25,7 +25,7 @@ impl UserScript for UnpackedObject {
 
     type LangSpecificError = crate::LangSpecificError;
 
-    type UserScriptMessage = AutoDisposableUserMessage;
+    type UserScriptMessage = AutoDispose<UserScriptMessage>;
 
     type UserScriptGenericStub = ();
 
@@ -62,7 +62,7 @@ impl UserScript for UnpackedObject {
             Ok(UnpackedObject {
                 uuid: *uuid,
                 class: md.id,
-                instance: AutoDisposableScriptInstance::new(instance_id),
+                instance: AutoDispose::new(instance_id),
             })
         })
     }

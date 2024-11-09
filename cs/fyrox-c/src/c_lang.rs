@@ -17,7 +17,7 @@ use crate::{bindings_manual::{
 use crate::bindings_lite_2::{NativePrefab, NativeQuaternion, NativeVector2, NativeVector2I, NativeVector3};
 use crate::bindings_manual::{NativeClassId, NativeInstanceId, NativePropertyValue, NativeString, NativeValueType};
 use crate::errors::print_backtrace_and_exit;
-use crate::tracked::{AutoDisposableScriptInstance};
+use crate::auto_dispose::AutoDispose;
 
 #[derive(Debug, Clone)]
 pub struct CCompatibleLang;
@@ -59,7 +59,7 @@ impl Lang for CCompatibleLang {
             Ok(UnpackedObject {
                 uuid,
                 class: metadata.id,
-                instance: AutoDisposableScriptInstance::new(instance),
+                instance: AutoDispose::new(instance),
             })
         })
     }
@@ -202,7 +202,7 @@ impl Visit for NativeRuntimePin {
 pub struct UnpackedObject {
     pub uuid: Uuid,
     pub class: NativeClassId,
-    pub instance: AutoDisposableScriptInstance,
+    pub instance: AutoDispose<NativeInstanceId>,
 }
 
 

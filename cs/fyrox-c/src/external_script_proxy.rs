@@ -11,11 +11,11 @@ use fyrox_lite::script_context::UnsafeAsUnifiedContext;
 use fyrox_lite::script_object_residence::ScriptResidence;
 use std::any::Any;
 use std::fmt::Debug;
-use crate::bindings_manual::NativeClassId;
+use crate::bindings_manual::{NativeClassId, UserScriptMessage};
 use crate::c_lang::CCompatibleLang;
 use crate::errors::ResultTcrateLangSpecificErrorExt;
 use crate::fyrox_c_plugin::CPlugin;
-use crate::tracked::AutoDisposableUserMessage;
+use crate::auto_dispose::AutoDispose;
 use crate::scripted_app::ScriptedApp;
 use crate::scripted_app::APP;
 
@@ -63,7 +63,7 @@ impl ScriptTrait for ExternalScriptProxy {
         message: &mut dyn fyrox::script::ScriptMessagePayload,
         ctx: &mut fyrox::script::ScriptMessageContext,
     ) {
-        let Some(message) = message.downcast_ref::<AutoDisposableUserMessage>() else {
+        let Some(message) = message.downcast_ref::<AutoDispose<UserScriptMessage>>() else {
             return;
         };
         self.data.ensure_unpacked(&mut ctx.plugins.get_mut::<CPlugin>().failed, ctx.handle);
