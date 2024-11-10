@@ -1,5 +1,5 @@
 use crate::arena::Arena;
-use crate::bindings_lite_2::u8_slice;
+use crate::internal_auto::u8_slice;
 use crate::bindings_manual::{NativeString};
 
 impl From<u8_slice> for String {

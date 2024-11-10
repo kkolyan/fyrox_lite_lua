@@ -11,6 +11,6 @@ namespace FyroxLite;
 
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct NativeBool {
+internal unsafe partial struct NativeBool {
     internal int value;
 }

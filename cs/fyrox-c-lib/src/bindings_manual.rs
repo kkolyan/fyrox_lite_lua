@@ -5,7 +5,7 @@ use std::{
 use std::fmt::{Debug, Formatter};
 use fyrox_lite::{spi::UserScript};
 use fyrox_lite::spi::ClassId;
-use crate::bindings_lite_2::{f64_result, f64_result_value, i32_result, u8_slice, NativeHandle_optional, NativeInstanceId_result, NativePrefab, NativePropertyValue_slice, NativeQuaternion, NativeScriptMetadata_slice, NativeScriptProperty_slice, NativeString_optional, NativeValue_slice, NativeVector2, NativeVector2I, NativeVector3};
+use crate::*;
 use crate::scripted_app::{ScriptedApp, APP};
 use crate::auto_dispose::DisposableHandle;
 

@@ -9,12 +9,12 @@ fn main() {
     println!("parsing domain");
     let domain = tools::get_fyrox_lite_domain();
 
-    let (facade_cs, facade_rs) = csgen_lib::lite_csgen::generate_cs_facade(&domain);
+    let (mut facade_cs, facade_rs) = csgen_lib::lite_csgen::generate_cs_facade(&domain);
     let (mut internal_cs, internal_rs) = csgen_lib::lite_csgen::generate_base();
 
-    internal_cs.mods.extend(manuals.mods);
-    
-    csgen_lib::lite_csgen::write_cs::write_cs("cs/FyroxLite/FyroxLiteInternal/Auto", internal_cs);
+    facade_cs.mods.extend(internal_cs.mods);
+    facade_cs.mods.extend(manuals.mods);
+
     csgen_lib::lite_csgen::write_cs::write_cs("cs/FyroxLite/FyroxLite/Auto", facade_cs);
     write_rs_to_file("cs/fyrox-c-lib/src/bindings_lite_2.rs", facade_rs);
     write_rs_to_file("cs/fyrox-c-lib/src/internal_auto.rs", internal_rs);
@@ -32,7 +32,7 @@ fn write_rs_to_file(path: &str, rust: RustEmitter) {
             #![allow(clippy::unused_unit)]
             #![allow(clippy::let_unit_value)]
             #![allow(unused)]
-            use crate::bindings_manual::*;
+            use crate::*;
             use fyrox_lite::externalizable::Externalizable;
             {}
     ", rust.code);

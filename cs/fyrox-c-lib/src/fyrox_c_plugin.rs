@@ -27,7 +27,7 @@ use std::slice::{from_raw_parts, from_raw_parts_mut};
 use std::sync::Arc;
 use fyrox_lite::lite_input::Input;
 use crate::arena::Arena;
-use crate::bindings_lite_2::{i32_result, i32_result_value};
+use crate::internal_auto::{i32_result, i32_result_value};
 use crate::c_lang::{ UnpackedObject};
 use crate::errors::ResultTcrateLangSpecificErrorExt;
 use crate::auto_dispose::{AutoDispose};

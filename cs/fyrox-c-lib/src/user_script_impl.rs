@@ -7,7 +7,6 @@ use fyrox_lite::script_context::with_script_context;
 use fyrox_lite::script_object_residence::ScriptResidence;
 use fyrox_lite::spi::ClassId;
 use crate::{bindings_manual::{NativeHandle, NativeInstanceId}, external_script_proxy::ExternalScriptProxy, fyrox_c_plugin::CPlugin};
-use crate::bindings_lite_2::NativePropertyValue_slice;
 use crate::bindings_manual::{NativeClassId, UserScriptMessage};
 use crate::c_lang::{UnpackedObject};
 use crate::auto_dispose::{AutoDispose};
