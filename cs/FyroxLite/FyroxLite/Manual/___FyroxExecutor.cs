@@ -1,10 +1,9 @@
-using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace FyroxLite;
+namespace FyroxLite.___Internal;
 
-public partial class FyroxExecutor
+public unsafe partial class ___FyroxExecutor
 {
     [LibraryImport("libfyrox_c", EntryPoint = "fyrox_lite_executor_run",
         SetLastError = true)]
@@ -14,14 +13,14 @@ public partial class FyroxExecutor
         SetLastError = true)]
     private static partial void RunEditorInternal();
 
-    public static void Run(bool editor = false)
+    public static void __Run(IEnumerable<Assembly> scriptAssemblies, bool editor = false)
     {
         ObjectRegistry.InitThread();
         NativeClassId.InitThread();
         PropertySetters.InitThread();
         
         List<NativeScriptMetadata> scripts = new();
-        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        foreach (var assembly in scriptAssemblies)
         {
             Console.WriteLine($"scanning assembly {assembly}");
             foreach (var type in assembly.GetTypes())

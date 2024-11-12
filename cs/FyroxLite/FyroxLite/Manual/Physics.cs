@@ -21,5 +21,15 @@ public static partial class Physics
     //public const int ONLY_KINEMATIC = LitePhysics :: EXCLUDE_DYNAMIC | LitePhysics :: EXCLUDE_FIXED;
     //public const int ONLY_FIXED = LitePhysics :: EXCLUDE_DYNAMIC | LitePhysics :: EXCLUDE_KINEMATIC;
 
-    public static partial List<Intersection> CastRay(RayCastOptions opts);
+    public static partial List<Intersection> CastRay(RayCastOptions opts)
+    {
+        unsafe {
+            var _opts = opts;
+            var __ret = fyrox_lite_lite_physics_LitePhysics_cast_ray(&_opts);
+            return Intersection_slice.ToFacade(__ret);
+        }
+    }
+
+    [LibraryImport("libfyrox_c", StringMarshalling = StringMarshalling.Utf8, SetLastError = true)]
+    private static unsafe partial Intersection_slice fyrox_lite_lite_physics_LitePhysics_cast_ray(RayCastOptions* opts);
 }

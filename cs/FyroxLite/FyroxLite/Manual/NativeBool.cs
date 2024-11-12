@@ -1,6 +1,6 @@
 namespace FyroxLite;
 
-public partial struct NativeBool
+internal partial struct NativeBool
 {
     internal NativeBool(int value)
     {

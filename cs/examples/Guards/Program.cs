@@ -1,3 +1,0 @@
-﻿using FyroxLite;
-
-FyroxExecutor.Run();

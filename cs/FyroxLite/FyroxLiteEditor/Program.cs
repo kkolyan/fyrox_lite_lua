@@ -1,3 +1,4 @@
-﻿using FyroxLite;
+﻿using FyroxLite.___Internal;
 
-FyroxExecutor.Run(true);
+Console.WriteLine("FyroxLite Editor");
+// FyroxExecutor.Run(true);
